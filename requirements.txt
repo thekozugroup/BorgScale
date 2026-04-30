@@ -21,6 +21,7 @@ python-multipart==0.0.26
 pyyaml==6.0.3
 redis==7.4.0
 requests==2.33.1
+respx>=0.21
 ruff==0.14.0
 sqlalchemy==2.0.49
 structlog==25.5.0
