@@ -101,8 +101,6 @@ docker/frontend-build-output/
 
 # Claude Code
 .claude/worktrees/
-.superpowers/
-docs/superpowers/
 
 # Temporary files
 *.tmp
