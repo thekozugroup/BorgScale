@@ -1,0 +1,13 @@
+# gitleaks configuration for BorgScale
+# Suppress false positives from test fixtures and example files.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Test fixtures, example configs, and backup sample data"
+paths = [
+    '''tests/unit/''',
+    '''env\.example''',
+    '''backups/''',
+]
