@@ -19,7 +19,7 @@ else
 fi
 
 echo "==> 2/4 outbound-URL allowlist scan"
-ALLOW='github\.com|ghcr\.io|127\.0\.0\.1|localhost|tailscale\.com|docker\.io|pypi\.org|npmjs\.org|npm\.pkg\.github\.com|lucide\.dev|ui\.shadcn\.com|gnu\.org|borgbackup\.readthedocs\.io|impeccable\.style|w3\.org|anthropic\.com'
+ALLOW='github\.com|ghcr\.io|127\.0\.0\.1|localhost|tailscale\.com|docker\.io|pypi\.org|npmjs\.org|npm\.pkg\.github\.com|lucide\.dev|ui\.shadcn\.com|gnu\.org|borgbackup\.readthedocs\.io|impeccable\.style|w3\.org|anthropic\.com|opencollective\.com|paulmillr\.com|paypal\.me|polar\.sh|dotenvx\.com|fontsource\.org|radix-ui\.com|vaul\.emilkowal\.ski|cmdk\.dev'
 
 if [ -n "$STAGED" ]; then
   # Developer pre-push: scan staged diff
@@ -58,8 +58,16 @@ else
   echo "frontend lockfile missing; skipping npm audit"
 fi
 
+echo "==> 5/5 impeccable design audit"
+if [ -d frontend/src ] && [ -f frontend/node_modules/.bin/impeccable ]; then
+  ( cd frontend && npx impeccable detect src/ --severity error ) \
+    || { echo "  impeccable: error-severity violations present" >&2; exit 1; }
+else
+  echo "  impeccable not installed yet (Phase 3 wave 6); skipping"
+fi
+
 if [ "${BORGSCALE_DOCKER_SMOKE:-0}" = "1" ]; then
-  echo "==> 5/5 docker --network none smoke"
+  echo "==> 6/6 docker --network none smoke"
   docker build -t borgscale:smoke .
   CID=$(docker run -d --rm --network none borgscale:smoke)
   trap 'docker stop "$CID" >/dev/null 2>&1 || true' EXIT
