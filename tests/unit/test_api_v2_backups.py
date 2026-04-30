@@ -47,21 +47,6 @@ def _create_v2_repo(
 
 @pytest.mark.unit
 class TestV2BackupRoutes:
-    def test_backup_run_is_feature_gated_by_plan(
-        self, test_client: TestClient, admin_headers
-    ):
-        response = test_client.post(
-            "/api/v2/backup/run",
-            json={"repository_id": 1},
-            headers=admin_headers,
-        )
-
-        assert response.status_code == 403
-        assert (
-            response.json()["detail"]["key"]
-            == "backend.errors.plan.featureNotAvailable"
-        )
-
     def test_backup_run_success(self, test_client: TestClient, admin_headers, test_db):
         _enable_borg_v2(test_db)
         repo = _create_v2_repo(

@@ -46,10 +46,10 @@ class User(Base):
     totp_enabled = Column(Boolean, default=False, nullable=False)
     totp_enabled_at = Column(DateTime, nullable=True)
     totp_recovery_codes_hashes = Column(Text, nullable=True)
-    analytics_enabled = Column(Boolean, default=True)  # User's analytics preference
+    analytics_enabled = Column(Boolean, default=False)  # BorgScale: analytics removed
     analytics_consent_given = Column(
         Boolean, default=False
-    )  # Whether user has responded to consent banner
+    )  # BorgScale: analytics removed
     last_login = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=utc_now)
     updated_at = Column(DateTime, default=utc_now, onupdate=utc_now)

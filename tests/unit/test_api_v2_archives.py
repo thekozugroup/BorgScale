@@ -55,20 +55,6 @@ def _create_v2_repo(
 
 @pytest.mark.unit
 class TestV2ArchiveRoutes:
-    def test_archive_routes_are_feature_gated_by_plan(
-        self, test_client: TestClient, admin_headers
-    ):
-        response = test_client.get(
-            "/api/v2/archives/list?repository=1",
-            headers=admin_headers,
-        )
-
-        assert response.status_code == 403
-        assert (
-            response.json()["detail"]["key"]
-            == "backend.errors.plan.featureNotAvailable"
-        )
-
     def test_list_archives_by_repository_id(
         self, test_client: TestClient, admin_headers, test_db
     ):

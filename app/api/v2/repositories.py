@@ -17,7 +17,6 @@ import structlog
 from app.database.database import get_db
 from app.database.models import User, Repository, SystemSettings
 from app.core.security import get_current_user
-from app.core.features import require_feature
 from app.core.borg2 import borg2, BORG2_ENCRYPTION_MODES
 from app.core.borg_errors import is_lock_error
 from app.services.repository_command_lock import run_serialized_repository_command
@@ -26,7 +25,7 @@ from app.utils.fs import calculate_path_size_bytes
 from app.utils.borg_env import repository_borg_env
 
 logger = structlog.get_logger()
-router = APIRouter(tags=["Repositories v2"], dependencies=[require_feature("borg_v2")])
+router = APIRouter(tags=["Repositories v2"])
 
 
 # ── Pydantic schemas ───────────────────────────────────────────────────────────

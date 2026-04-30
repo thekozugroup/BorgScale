@@ -249,36 +249,31 @@ class TestSettingsUserContracts:
         assert profile["deployment_type"] == "enterprise"
         assert profile["enterprise_name"] == "Acme Inc"
 
-    def test_get_preferences_returns_user_analytics_flags(
+    def test_get_preferences_returns_analytics_always_false(
         self, test_client: TestClient, admin_headers, admin_user
     ):
-        admin_user.analytics_enabled = False
-        admin_user.analytics_consent_given = True
-
+        """BorgScale removes analytics: flags always read as False regardless of stored value."""
         response = test_client.get("/api/settings/preferences", headers=admin_headers)
 
         assert response.status_code == 200
-        assert response.json() == {
-            "success": True,
-            "preferences": {
-                "analytics_enabled": False,
-                "analytics_consent_given": True,
-            },
-        }
+        prefs = response.json()["preferences"]
+        assert prefs["analytics_enabled"] is False
+        assert prefs["analytics_consent_given"] is False
 
-    def test_update_preferences_persists_analytics_flags(
+    def test_update_preferences_analytics_always_false(
         self, test_client: TestClient, admin_headers, admin_user, test_db
     ):
+        """PUT with analytics_enabled=True must not persist True: stub always returns False."""
         response = test_client.put(
             "/api/settings/preferences",
-            json={"analytics_enabled": False, "analytics_consent_given": True},
+            json={"analytics_enabled": True, "analytics_consent_given": True},
             headers=admin_headers,
         )
 
         assert response.status_code == 200
         test_db.refresh(admin_user)
         assert admin_user.analytics_enabled is False
-        assert admin_user.analytics_consent_given is True
+        assert admin_user.analytics_consent_given is False
         assert (
             response.json()["message"] == "backend.success.settings.preferencesUpdated"
         )

@@ -17,11 +17,12 @@ class Plan(str, Enum):
 _RANK = {Plan.COMMUNITY: 0, Plan.PRO: 1, Plan.ENTERPRISE: 2}
 
 # Single source of truth: feature name → minimum plan required
+# BorgScale runs unrestricted: all features available on community plan.
 FEATURES: dict[str, Plan] = {
-    "borg_v2": Plan.PRO,
-    "multi_user": Plan.COMMUNITY,  # up to 5 users
-    "extra_users": Plan.PRO,  # >5 users (up to 10 on Pro)
-    "rbac": Plan.ENTERPRISE,  # role-based access control
+    "borg_v2": Plan.COMMUNITY,
+    "multi_user": Plan.COMMUNITY,
+    "extra_users": Plan.COMMUNITY,
+    "rbac": Plan.ENTERPRISE,  # intentionally kept to preserve test coverage of gate logic
 }
 
 # User limits per plan (None = unlimited)
