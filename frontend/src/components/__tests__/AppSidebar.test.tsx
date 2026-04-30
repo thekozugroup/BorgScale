@@ -5,13 +5,11 @@ import AppSidebar from '../AppSidebar'
 const {
   mockApiGet,
   mockGetSystemSettings,
-  mockSetAppVersion,
   mockTabEnablement,
   mockGetTabDisabledReason,
 } = vi.hoisted(() => ({
   mockApiGet: vi.fn().mockResolvedValue({ data: {} }),
   mockGetSystemSettings: vi.fn().mockResolvedValue({ data: { settings: {} } }),
-  mockSetAppVersion: vi.fn(),
   mockTabEnablement: {
     dashboard: true,
     connections: true,
@@ -28,10 +26,6 @@ vi.mock('../../services/api', () => ({
   settingsAPI: {
     getSystemSettings: mockGetSystemSettings,
   },
-}))
-
-vi.mock('../../utils/analytics', () => ({
-  setAppVersion: mockSetAppVersion,
 }))
 
 vi.mock('../SidebarVersionInfo', () => ({
@@ -117,12 +111,11 @@ describe('AppSidebar', () => {
     )
   })
 
-  it('fetches system info and forwards the app version to analytics', async () => {
+  it('fetches system info on mount', async () => {
     renderWithProviders(<AppSidebar mobileOpen={false} onClose={vi.fn()} />)
 
     await waitFor(() => {
       expect(mockApiGet).toHaveBeenCalledWith('/system/info')
-      expect(mockSetAppVersion).toHaveBeenCalledWith('1.78.0')
     })
   })
 

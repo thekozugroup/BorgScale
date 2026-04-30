@@ -5,15 +5,11 @@ import Layout from '../Layout'
 const {
   logoutMock,
   refreshUserMock,
-  hasConsentBeenGivenMock,
-  loadUserPreferenceMock,
   announcementSurfaceMock,
   useAuthMock,
 } = vi.hoisted(() => ({
   logoutMock: vi.fn(),
   refreshUserMock: vi.fn(),
-  hasConsentBeenGivenMock: vi.fn(),
-  loadUserPreferenceMock: vi.fn(),
   announcementSurfaceMock: vi.fn(),
   useAuthMock: vi.fn(),
 }))
@@ -28,16 +24,6 @@ vi.mock('../../hooks/useAuthorization', () => ({
       role === 'admin' && permission === 'settings.users.manage',
   }),
 }))
-
-vi.mock('../../utils/analytics', async () => {
-  const actual =
-    await vi.importActual<typeof import('../../utils/analytics')>('../../utils/analytics')
-  return {
-    ...actual,
-    hasConsentBeenGiven: () => hasConsentBeenGivenMock(),
-    loadUserPreference: () => loadUserPreferenceMock(),
-  }
-})
 
 vi.mock('../../hooks/useAnnouncementSurface', () => ({
   useAnnouncementSurface: () => announcementSurfaceMock(),
@@ -99,8 +85,6 @@ describe('Layout', () => {
     vi.clearAllMocks()
     localStorage.clear()
     sessionStorage.clear()
-    loadUserPreferenceMock.mockResolvedValue(undefined)
-    hasConsentBeenGivenMock.mockReturnValue(true)
     announcementSurfaceMock.mockReturnValue({
       announcement: null,
       acknowledgeAnnouncement: vi.fn(),
@@ -134,7 +118,6 @@ describe('Layout', () => {
   })
 
   it('shows the passkey prompt before analytics even when password setup is still pending', async () => {
-    hasConsentBeenGivenMock.mockReturnValue(false)
     sessionStorage.setItem('recent_password_login', '1')
     useAuthMock.mockReturnValue({
       user: {
