@@ -519,7 +519,7 @@ Phase 1 (~50 files):
 - `frontend/src/types/planContent.ts` (delete — type definitions for the deleted plan-content service)
 - every `frontend/src/**/__tests__/*.tsx` test file referencing the deleted components (delete or amend)
 - new: `tests/test_no_phone_home.py`
-- new: `scripts/security-scan.sh` (Wave 0)
+- modified: `scripts/security-scan.sh` (Wave 0 — adds gitleaks + URL-allowlist checks)
 
 Phase 2 (~50 files; mostly text):
 
@@ -527,7 +527,7 @@ Phase 2 (~50 files; mostly text):
   `borg-ui-logo.png`, `logo.png`, `frontend/public/*.png`
 - `package.json` (top + frontend), `pyproject.toml`, Dockerfile
 - `README.md`, `CHANGELOG.md`, `docs/**/*.md`
-- `frontend/src/i18n/locales/*.json`
+- `frontend/src/locales/*.json`
 - `index.html`, `manifest.json`, `apple-touch-icon`
 
 Phase 3 (~120 files):
