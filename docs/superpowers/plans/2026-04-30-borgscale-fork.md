@@ -1050,7 +1050,7 @@ Files:
   `frontend/public/favicon-32x32.png`,
   `frontend/public/apple-touch-icon.png`,
   `frontend/public/logo.png`
-- Rename `borg-ui-logo.png` → `borgscale-logo.png`
+- Rename `borgscale-logo.png` → `borgscale-logo.png`
 
 - [ ] **Step 1: Write `scripts/generate-logos.mjs`**
 
@@ -1094,24 +1094,24 @@ cd frontend && npm install --save-dev sharp && cd ..
 node scripts/generate-logos.mjs
 ```
 
-- [ ] **Step 3: Remove the old `borg-ui-logo.png`**
+- [ ] **Step 3: Remove the old `borgscale-logo.png`**
 
 ```bash
-git rm -f borg-ui-logo.png 2>/dev/null || true
+git rm -f borgscale-logo.png 2>/dev/null || true
 ```
 
 - [ ] **Step 4: Update references**
 
 ```bash
-grep -rln 'borg-ui-logo' . --exclude-dir=node_modules --exclude-dir=.git \
-  | xargs -r sed -i 's/borg-ui-logo/borgscale-logo/g'
+grep -rln 'borgscale-logo' . --exclude-dir=node_modules --exclude-dir=.git \
+  | xargs -r sed -i 's/borgscale-logo/borgscale-logo/g'
 ```
 
 - [ ] **Step 5: Commit**
 
 ```bash
 git add -A
-git commit -m "feat(brand): regenerate logos from lucide:boxes; rename borg-ui-logo"
+git commit -m "feat(brand): regenerate logos from lucide:boxes; rename borgscale-logo"
 ```
 
 ### Bucket B — String + metadata sweep

@@ -212,7 +212,7 @@ Components:
    `#fff` on `#000` (white-on-black variant), and exports PNGs at
    the same pixel sizes the upstream assets used. Files refreshed:
    `LogoWithBackground.png`, `LogoWithName.png`, `LogoWithNameWhite.png`,
-   `borg-ui-logo.png` (renamed to `borgscale-logo.png` — old name
+   `borgscale-logo.png` (renamed to `borgscale-logo.png` — old name
    removed), `logo.png`, `frontend/public/favicon-{16x16,32x32}.png`,
    `frontend/public/logo.png`, `frontend/public/apple-touch-icon.png`,
    any references to those filenames. Until Phase 3 swaps the layout,
@@ -547,7 +547,7 @@ Phase 1 (~50 files):
 Phase 2 (~50 files; mostly text):
 
 - `LogoWithBackground.png`, `LogoWithName.png`, `LogoWithNameWhite.png`,
-  `borg-ui-logo.png`, `logo.png`, `frontend/public/*.png`
+  `borgscale-logo.png`, `logo.png`, `frontend/public/*.png`
 - `package.json` (top + frontend), `pyproject.toml`, Dockerfile
 - `README.md`, `CHANGELOG.md`, `docs/**/*.md`
 - `frontend/src/locales/*.json`
