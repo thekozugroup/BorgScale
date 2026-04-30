@@ -1,11 +1,4 @@
 import { useCallback } from 'react'
-import {
-  trackEvent,
-  trackPageView,
-  EventCategory,
-  EventAction,
-  anonymizeEntityName,
-} from '../utils/analytics'
 import { formatBytes, parseBytes } from '../utils/dateUtils'
 
 type AnalyticsEntity =
@@ -17,12 +10,53 @@ type AnalyticsEntity =
       size_bytes?: number | null
     }
 
+export const EventCategory = {
+  REPOSITORY: 'Repository',
+  BACKUP: 'Backup',
+  ARCHIVE: 'Archive',
+  MOUNT: 'Mount',
+  MAINTENANCE: 'Maintenance',
+  SSH: 'SSH Connection',
+  SCRIPT: 'Script',
+  NOTIFICATION: 'Notification',
+  SYSTEM: 'System',
+  PACKAGE: 'Package',
+  SETTINGS: 'Settings',
+  AUTH: 'Authentication',
+  NAVIGATION: 'Navigation',
+  PLAN: 'Plan',
+  ANNOUNCEMENT: 'Announcement',
+} as const
+
+export const EventAction = {
+  CREATE: 'Create',
+  EDIT: 'Edit',
+  DELETE: 'Delete',
+  VIEW: 'View',
+  START: 'Start',
+  STOP: 'Stop',
+  COMPLETE: 'Complete',
+  FAIL: 'Fail',
+  MOUNT: 'Mount',
+  UNMOUNT: 'Unmount',
+  DOWNLOAD: 'Download',
+  UPLOAD: 'Upload',
+  TEST: 'Test',
+  LOGIN: 'Login',
+  LOGOUT: 'Logout',
+  SEARCH: 'Search',
+  FILTER: 'Filter',
+  EXPORT: 'Export',
+  CANCEL: 'Cancel',
+} as const
+
+/** All analytics functions are no-ops — tracking was removed in Wave 2b. */
+const anonymizeEntityName = (name: string): string => name
+
 /**
  * Custom hook for analytics event tracking.
  * Provides easy-to-use tracking functions for components.
- *
- * Entity names (repos, connections, etc.) are automatically hashed for privacy.
- * Example: "my-backup-repo" → "a3f2b1c8"
+ * All tracking is a no-op; the hook shape is preserved for call-site stability.
  */
 export const useAnalytics = () => {
   const resolveEntityName = useCallback((entity?: AnalyticsEntity) => {
@@ -60,148 +94,88 @@ export const useAnalytics = () => {
     [resolveEntityName, resolveEntitySize]
   )
 
-  // Track page view with current location
-  const trackPage = useCallback((customTitle?: string) => {
-    trackPageView(customTitle || `${window.location.pathname}${window.location.search}`)
-  }, [])
+  // Track page view — no-op
+  const trackPage = useCallback((_customTitle?: string) => {}, [])
 
-  // Generic event tracking
+  // Generic event tracking — no-op
   const track = useCallback(
     (
-      category: string,
-      action: string,
-      nameOrData?: string | Record<string, unknown>,
-      value?: number
-    ) => {
-      trackEvent(category, action, nameOrData, value)
-    },
+      _category: string,
+      _action: string,
+      _nameOrData?: string | Record<string, unknown>,
+      _value?: number
+    ) => {},
     []
   )
 
-  // Repository-specific tracking with anonymous entity hash
+  // Repository-specific tracking — no-op
   const trackRepository = useCallback(
-    (action: string, entity?: AnalyticsEntity, extra?: Record<string, unknown>) => {
-      trackEvent(EventCategory.REPOSITORY, action, buildEntityData(entity, extra))
-    },
-    [buildEntityData]
+    (_action: string, _entity?: AnalyticsEntity, _extra?: Record<string, unknown>) => {},
+    []
   )
 
-  // Backup tracking - descriptor for type (e.g., 'logs'), entityName for repo
+  // Backup tracking — no-op
   const trackBackup = useCallback(
     (
-      action: string,
-      descriptor?: string,
-      entity?: AnalyticsEntity,
-      extra?: Record<string, unknown>
-    ) => {
-      trackEvent(
-        EventCategory.BACKUP,
-        action,
-        buildEntityData(entity, {
-          ...(descriptor ? { descriptor } : {}),
-          ...(extra || {}),
-        })
-      )
-    },
-    [buildEntityData]
+      _action: string,
+      _descriptor?: string,
+      _entity?: AnalyticsEntity,
+      _extra?: Record<string, unknown>
+    ) => {},
+    []
   )
 
-  // Archive tracking with anonymous entity hash
+  // Archive tracking — no-op
   const trackArchive = useCallback(
-    (action: string, entity?: AnalyticsEntity, extra?: Record<string, unknown>) => {
-      trackEvent(EventCategory.ARCHIVE, action, buildEntityData(entity, extra))
-    },
-    [buildEntityData]
+    (_action: string, _entity?: AnalyticsEntity, _extra?: Record<string, unknown>) => {},
+    []
   )
 
-  // Mount tracking with anonymous entity hash
-  const trackMount = useCallback(
-    (action: string, entity?: AnalyticsEntity) => {
-      trackEvent(EventCategory.MOUNT, action, buildEntityData(entity))
-    },
-    [buildEntityData]
-  )
+  // Mount tracking — no-op
+  const trackMount = useCallback((_action: string, _entity?: AnalyticsEntity) => {}, [])
 
-  // Maintenance tracking - operationType required, entityName for repo hash
+  // Maintenance tracking — no-op
   const trackMaintenance = useCallback(
     (
-      action: string,
-      operationType: string,
-      entity?: AnalyticsEntity,
-      extra?: Record<string, unknown>
-    ) => {
-      trackEvent(
-        EventCategory.MAINTENANCE,
-        action,
-        buildEntityData(entity, { operation_type: operationType, ...(extra || {}) })
-      )
-    },
-    [buildEntityData]
+      _action: string,
+      _operationType: string,
+      _entity?: AnalyticsEntity,
+      _extra?: Record<string, unknown>
+    ) => {},
+    []
   )
 
   const trackSSH = useCallback(
-    (action: string, entityNameOrData?: string | Record<string, unknown>) => {
-      if (typeof entityNameOrData === 'string') {
-        trackEvent(EventCategory.SSH, action, { name: anonymizeEntityName(entityNameOrData) })
-        return
-      }
-
-      trackEvent(EventCategory.SSH, action, entityNameOrData)
-    },
+    (_action: string, _entityNameOrData?: string | Record<string, unknown>) => {},
     []
   )
 
   const trackSettings = useCallback(
-    (action: string, settingNameOrData?: string | Record<string, unknown>) => {
-      trackEvent(EventCategory.SETTINGS, action, settingNameOrData)
-    },
+    (_action: string, _settingNameOrData?: string | Record<string, unknown>) => {},
     []
   )
 
   const trackScripts = useCallback(
-    (action: string, scriptName?: string, data?: Record<string, unknown>) => {
-      trackEvent(EventCategory.SCRIPT, action, {
-        ...(data || {}),
-        ...(scriptName ? { name: anonymizeEntityName(scriptName) } : {}),
-      })
-    },
+    (_action: string, _scriptName?: string, _data?: Record<string, unknown>) => {},
     []
   )
 
-  const trackNotifications = useCallback((action: string, data?: Record<string, unknown>) => {
-    trackEvent(EventCategory.NOTIFICATION, action, data)
-  }, [])
+  const trackNotifications = useCallback((_action: string, _data?: Record<string, unknown>) => {}, [])
 
-  const trackSystem = useCallback((action: string, data?: Record<string, unknown>) => {
-    trackEvent(EventCategory.SYSTEM, action, data)
-  }, [])
+  const trackSystem = useCallback((_action: string, _data?: Record<string, unknown>) => {}, [])
 
   const trackPackage = useCallback(
-    (action: string, packageName?: string, data?: Record<string, unknown>) => {
-      trackEvent(EventCategory.PACKAGE, action, {
-        ...(data || {}),
-        ...(packageName ? { name: packageName } : {}),
-      })
-    },
+    (_action: string, _packageName?: string, _data?: Record<string, unknown>) => {},
     []
   )
 
-  const trackNavigation = useCallback((action: string, data?: Record<string, unknown>) => {
-    trackEvent(EventCategory.NAVIGATION, action, data)
-  }, [])
+  const trackNavigation = useCallback((_action: string, _data?: Record<string, unknown>) => {}, [])
 
-  const trackPlan = useCallback((action: string, data?: Record<string, unknown>) => {
-    trackEvent(EventCategory.PLAN, action, data)
-  }, [])
+  const trackPlan = useCallback((_action: string, _data?: Record<string, unknown>) => {}, [])
 
-  const trackAnnouncement = useCallback((action: string, data?: Record<string, unknown>) => {
-    trackEvent(EventCategory.ANNOUNCEMENT, action, data)
-  }, [])
+  const trackAnnouncement = useCallback((_action: string, _data?: Record<string, unknown>) => {}, [])
 
-  // Auth tracking
-  const trackAuth = useCallback((action: string, data?: Record<string, unknown>) => {
-    trackEvent(EventCategory.AUTH, action, data)
-  }, [])
+  const trackAuth = useCallback((_action: string, _data?: Record<string, unknown>) => {}, [])
 
   return {
     trackPage,

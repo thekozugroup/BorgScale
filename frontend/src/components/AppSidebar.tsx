@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useTabEnablement } from '../context/AppContext'
-import { setAppVersion } from '../utils/analytics'
 import { BASE_PATH } from '@/utils/basePath'
 import { useQuery } from '@tanstack/react-query'
 import { Box, Drawer, Toolbar, List, Typography, Divider } from '@mui/material'
@@ -287,9 +286,6 @@ export default function AppSidebar({ mobileOpen, onClose }: AppSidebarProps) {
       try {
         const response = await api.get('/system/info')
         setSystemInfo(response.data)
-        if (response.data.app_version) {
-          setAppVersion(response.data.app_version)
-        }
       } catch (error) {
         console.error('Failed to fetch system info:', error)
       }

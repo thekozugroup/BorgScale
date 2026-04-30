@@ -1,122 +1,70 @@
 import { renderHook } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
-const trackEventMock = vi.fn()
-const trackPageViewMock = vi.fn()
-const anonymizeEntityNameMock = vi.fn((name: string) => `hash:${name}`)
-
-vi.mock('../utils/analytics', () => ({
-  trackEvent: trackEventMock,
-  trackPageView: trackPageViewMock,
-  anonymizeEntityName: anonymizeEntityNameMock,
-  EventCategory: {
-    REPOSITORY: 'Repository',
-    BACKUP: 'Backup',
-    ARCHIVE: 'Archive',
-    MOUNT: 'Mount',
-    MAINTENANCE: 'Maintenance',
-    SSH: 'SSH Connection',
-    SCRIPT: 'Script',
-    NOTIFICATION: 'Notification',
-    SYSTEM: 'System',
-    PACKAGE: 'Package',
-    SETTINGS: 'Settings',
-    AUTH: 'Authentication',
-    NAVIGATION: 'Navigation',
-    PLAN: 'Plan',
-    ANNOUNCEMENT: 'Announcement',
-  },
-  EventAction: {
-    VIEW: 'View',
-    START: 'Start',
-    EDIT: 'Edit',
-  },
-}))
+import { beforeEach, describe, expect, it } from 'vitest'
 
 describe('useAnalytics', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     window.history.pushState({}, '', '/settings?tab=appearance')
   })
 
-  it('tracks the current page by default', async () => {
+  it('returns all expected tracking functions', async () => {
     const { useAnalytics } = await import('./useAnalytics')
     const { result } = renderHook(() => useAnalytics())
 
-    result.current.trackPage()
-
-    expect(trackPageViewMock).toHaveBeenCalledWith('/settings?tab=appearance')
+    expect(typeof result.current.trackPage).toBe('function')
+    expect(typeof result.current.track).toBe('function')
+    expect(typeof result.current.trackRepository).toBe('function')
+    expect(typeof result.current.trackBackup).toBe('function')
+    expect(typeof result.current.trackArchive).toBe('function')
+    expect(typeof result.current.trackMount).toBe('function')
+    expect(typeof result.current.trackMaintenance).toBe('function')
+    expect(typeof result.current.trackSSH).toBe('function')
+    expect(typeof result.current.trackSettings).toBe('function')
+    expect(typeof result.current.trackScripts).toBe('function')
+    expect(typeof result.current.trackNotifications).toBe('function')
+    expect(typeof result.current.trackSystem).toBe('function')
+    expect(typeof result.current.trackPackage).toBe('function')
+    expect(typeof result.current.trackNavigation).toBe('function')
+    expect(typeof result.current.trackPlan).toBe('function')
+    expect(typeof result.current.trackAnnouncement).toBe('function')
+    expect(typeof result.current.trackAuth).toBe('function')
   })
 
-  it('tracks repository events with anonymized names and normalized sizes', async () => {
+  it('tracking functions are no-ops that return undefined', async () => {
     const { useAnalytics } = await import('./useAnalytics')
     const { result } = renderHook(() => useAnalytics())
 
-    result.current.trackRepository('View', {
+    expect(result.current.trackPage()).toBeUndefined()
+    expect(result.current.track('Category', 'Action')).toBeUndefined()
+    expect(result.current.trackRepository('View')).toBeUndefined()
+    expect(result.current.trackBackup('Start')).toBeUndefined()
+    expect(result.current.trackSSH('Edit', 'ssh-prod')).toBeUndefined()
+    expect(result.current.trackSettings('Edit', { section: 'appearance' })).toBeUndefined()
+    expect(result.current.trackAnnouncement('Acknowledge', { id: 'a1' })).toBeUndefined()
+  })
+
+  it('exposes EventCategory and EventAction consts', async () => {
+    const { useAnalytics } = await import('./useAnalytics')
+    const { result } = renderHook(() => useAnalytics())
+
+    expect(result.current.EventCategory.REPOSITORY).toBe('Repository')
+    expect(result.current.EventCategory.BACKUP).toBe('Backup')
+    expect(result.current.EventAction.VIEW).toBe('View')
+    expect(result.current.EventAction.START).toBe('Start')
+  })
+
+  it('buildEntityData normalizes entity size and name', async () => {
+    const { useAnalytics } = await import('./useAnalytics')
+    const { result } = renderHook(() => useAnalytics())
+
+    const data = result.current.buildEntityData({
       name: 'prod-repo',
       total_size: '1.5 GB',
     })
 
-    expect(anonymizeEntityNameMock).toHaveBeenCalledWith('prod-repo')
-    expect(trackEventMock).toHaveBeenCalledWith('Repository', 'View', {
-      name: 'hash:prod-repo',
+    expect(data).toMatchObject({
+      name: 'prod-repo',
       size_bytes: 1610612736,
       size_human: '1.50 GB',
-    })
-  })
-
-  it('tracks backup events with descriptors and SSH/settings wrappers', async () => {
-    const { useAnalytics } = await import('./useAnalytics')
-    const { result } = renderHook(() => useAnalytics())
-
-    result.current.trackBackup('Start', 'logs', { repository: 'nightly-repo' })
-    result.current.trackSSH('Edit', 'ssh-prod')
-    result.current.trackSettings('Edit', { section: 'appearance', theme: 'dark' })
-
-    expect(trackEventMock).toHaveBeenNthCalledWith(1, 'Backup', 'Start', {
-      descriptor: 'logs',
-      name: 'hash:nightly-repo',
-    })
-    expect(trackEventMock).toHaveBeenNthCalledWith(2, 'SSH Connection', 'Edit', {
-      name: 'hash:ssh-prod',
-    })
-    expect(trackEventMock).toHaveBeenNthCalledWith(3, 'Settings', 'Edit', {
-      section: 'appearance',
-      theme: 'dark',
-    })
-  })
-
-  it('tracks script and maintenance events with merged payloads', async () => {
-    const { useAnalytics } = await import('./useAnalytics')
-    const { result } = renderHook(() => useAnalytics())
-
-    result.current.trackScripts('Start', 'health-check', { source: 'toolbar' })
-    result.current.trackMaintenance('Start', 'prune', { name: 'repo-a', size_bytes: 2048 })
-
-    expect(trackEventMock).toHaveBeenNthCalledWith(1, 'Script', 'Start', {
-      source: 'toolbar',
-      name: 'hash:health-check',
-    })
-    expect(trackEventMock).toHaveBeenNthCalledWith(2, 'Maintenance', 'Start', {
-      operation_type: 'prune',
-      name: 'hash:repo-a',
-      size_bytes: 2048,
-      size_human: '2.00 KB',
-    })
-  })
-
-  it('tracks announcement events through the dedicated wrapper', async () => {
-    const { useAnalytics } = await import('./useAnalytics')
-    const { result } = renderHook(() => useAnalytics())
-
-    result.current.trackAnnouncement('Acknowledge', {
-      announcement_id: 'update-1',
-      announcement_type: 'update_available',
-    })
-
-    expect(trackEventMock).toHaveBeenCalledWith('Announcement', 'Acknowledge', {
-      announcement_id: 'update-1',
-      announcement_type: 'update_available',
     })
   })
 })
