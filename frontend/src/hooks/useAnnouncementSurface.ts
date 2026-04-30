@@ -7,7 +7,6 @@ import type { Announcement } from '../types/announcements'
 import {
   DEFAULT_ANNOUNCEMENTS_MANIFEST,
   fetchAnnouncementsManifest,
-  getAnnouncementsUrl,
 } from '../services/announcements'
 import {
   acknowledgeAnnouncement,
@@ -29,12 +28,11 @@ export function useAnnouncementSurface(): UseAnnouncementSurfaceResult {
   const { i18n } = useTranslation()
   const { trackAnnouncement, EventAction } = useAnalytics()
   const { data: systemInfo } = useSystemInfo()
-  const announcementsUrl = getAnnouncementsUrl()
   const lastTrackedAnnouncementIdRef = useRef<string | null>(null)
 
   const { data: manifest } = useQuery({
-    queryKey: ['announcements-manifest', announcementsUrl],
-    queryFn: () => fetchAnnouncementsManifest(announcementsUrl),
+    queryKey: ['announcements-manifest'],
+    queryFn: () => fetchAnnouncementsManifest(),
     initialData: DEFAULT_ANNOUNCEMENTS_MANIFEST,
     initialDataUpdatedAt: 0,
     staleTime: 60 * 60 * 1000,
