@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 import structlog
-from typing import Optional
+from typing import Any, Optional
 
 from app.core.borg import BorgInterface
 from app.core.borg2 import borg2
@@ -13,12 +13,9 @@ from app.core.security import get_current_admin_user
 from app.config import get_runtime_app_version
 from app.database.database import get_db
 from app.services.licensing_service import (
-    activate_paid_license,
-    deactivate_paid_license,
     get_entitlement_summary,
     get_feature_access,
     import_offline_entitlement,
-    refresh_entitlement,
 )
 
 logger = structlog.get_logger()
@@ -26,10 +23,6 @@ router = APIRouter(tags=["system"])
 
 # Initialize Borg interface
 borg = BorgInterface()
-
-
-class LicenseActivationRequest(BaseModel):
-    license_key: str = Field(min_length=1)
 
 
 class OfflineEntitlementImportRequest(BaseModel):
@@ -114,46 +107,16 @@ async def get_system_info(db: Session = Depends(get_db)):
         }
 
 
-@router.post("/licensing/refresh")
-async def refresh_system_entitlement(
-    db: Session = Depends(get_db),
-    _: object = Depends(get_current_admin_user),
-):
-    try:
-        result = await refresh_entitlement(db, app_version=get_runtime_app_version())
-        return result
-    except Exception as e:
-        logger.warning("Failed to refresh entitlement", error=str(e))
-        raise _licensing_http_error("entitlement_refresh_failed", str(e))
-
-
-@router.post("/licensing/activate")
-async def activate_system_license(
-    request: LicenseActivationRequest,
-    db: Session = Depends(get_db),
-    _: object = Depends(get_current_admin_user),
-):
-    try:
-        return await activate_paid_license(
-            db,
-            license_key=request.license_key,
-            app_version=get_runtime_app_version(),
-        )
-    except Exception as e:
-        logger.warning("Failed to activate paid license", error=str(e))
-        raise _licensing_http_error("license_activation_failed", str(e))
-
-
-@router.post("/licensing/deactivate")
-async def deactivate_system_license(
-    db: Session = Depends(get_db),
-    _: object = Depends(get_current_admin_user),
-):
-    try:
-        return await deactivate_paid_license(db)
-    except Exception as e:
-        logger.warning("Failed to deactivate paid license", error=str(e))
-        raise _licensing_http_error("license_deactivation_failed", str(e))
+@router.get("/licensing/status")
+async def licensing_status() -> dict[str, Any]:
+    """BorgScale runs unrestricted. Endpoint kept for client back-compat."""
+    return {
+        "tier": "full",
+        "entitlement_id": "open-source",
+        "expires_at": None,
+        "status": "active",
+        "features": ["all"],
+    }
 
 
 @router.post("/licensing/import")
