@@ -88,7 +88,7 @@ describe('AppSidebar', () => {
   it('renders a link to the dashboard', async () => {
     renderWithProviders(<AppSidebar mobileOpen={false} onClose={vi.fn()} />)
     await waitFor(() =>
-      expect(screen.getAllByRole('link', { name: /borg ui/i })[0]).toHaveAttribute(
+      expect(screen.getAllByRole('link', { name: /borgscale/i })[0]).toHaveAttribute(
         'href',
         '/dashboard'
       )
