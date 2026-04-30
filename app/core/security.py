@@ -189,7 +189,7 @@ async def get_current_user_proxy(request: Request, db: Session) -> User:
     Get the current authenticated user from reverse proxy headers.
     Used when DISABLE_AUTHENTICATION is enabled.
 
-    Security: Ensure Borg UI is only accessible through your reverse proxy
+    Security: Ensure BorgScale is only accessible through your reverse proxy
     by binding to localhost (127.0.0.1) or using firewall rules.
     """
 

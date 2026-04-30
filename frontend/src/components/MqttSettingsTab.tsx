@@ -33,7 +33,7 @@ const MqttSettingsTab: React.FC = () => {
   const [mqttBrokerPort, setMqttBrokerPort] = useState(1883)
   const [mqttUsername, setMqttUsername] = useState('')
   const [mqttPassword, setMqttPassword] = useState('')
-  const [mqttClientId, setMqttClientId] = useState('borg-ui')
+  const [mqttClientId, setMqttClientId] = useState('borgscale')
   const [mqttQos, setMqttQos] = useState(1)
   const [mqttRetain, setMqttRetain] = useState(false)
   const [mqttTlsEnabled, setMqttTlsEnabled] = useState(false)
@@ -62,7 +62,7 @@ const MqttSettingsTab: React.FC = () => {
       setMqttBrokerUrl(systemSettings.mqtt_broker_url || '')
       setMqttBrokerPort(systemSettings.mqtt_broker_port || 1883)
       setMqttUsername(systemSettings.mqtt_username || '')
-      setMqttClientId(systemSettings.mqtt_client_id || 'borg-ui')
+      setMqttClientId(systemSettings.mqtt_client_id || 'borgscale')
       setMqttQos(systemSettings.mqtt_qos || 1)
       setMqttRetain(systemSettings.mqtt_retain || false)
       setMqttTlsEnabled(systemSettings.mqtt_tls_enabled || false)
@@ -82,7 +82,7 @@ const MqttSettingsTab: React.FC = () => {
         mqttBrokerUrl !== (systemSettings.mqtt_broker_url || '') ||
         mqttBrokerPort !== (systemSettings.mqtt_broker_port || 1883) ||
         mqttUsername !== (systemSettings.mqtt_username || '') ||
-        mqttClientId !== (systemSettings.mqtt_client_id || 'borg-ui') ||
+        mqttClientId !== (systemSettings.mqtt_client_id || 'borgscale') ||
         mqttQos !== (systemSettings.mqtt_qos || 1) ||
         mqttRetain !== (systemSettings.mqtt_retain || false) ||
         mqttTlsEnabled !== (systemSettings.mqtt_tls_enabled || false) ||

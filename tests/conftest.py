@@ -1,5 +1,5 @@
 """
-Pytest configuration and fixtures for Borg UI tests
+Pytest configuration and fixtures for BorgScale tests
 
 This is the main conftest.py that configures pytest and imports
 fixtures from the fixtures/ directory.
@@ -114,7 +114,7 @@ def pytest_configure(config):
         "markers", "requires_borg: Tests that require borg binary to be installed"
     )
     config.addinivalue_line(
-        "markers", "requires_ui: Tests that require Borg UI to be running"
+        "markers", "requires_ui: Tests that require BorgScale to be running"
     )
 
 
@@ -127,7 +127,7 @@ def test_base_url():
 @pytest.fixture(scope="session")
 def test_directory():
     """Get the test directory path"""
-    return os.environ.get("TEST_DIRECTORY", "/tmp/borg-ui-tests")
+    return os.environ.get("TEST_DIRECTORY", "/tmp/borgscale-tests")
 
 
 @pytest.fixture(scope="session")

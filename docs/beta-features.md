@@ -55,7 +55,7 @@ Beta features allow gradual rollout of new functionality while maintaining stabi
 
 3. **Configure Home Assistant:**
    - Ensure Home Assistant is running and can reach your MQTT broker
-   - Home Assistant will automatically discover Borg UI sensors
+   - Home Assistant will automatically discover BorgScale sensors
    - Sensors will appear in **Settings** > **Devices & Services** > **MQTT**
    - Add the discovered devices to your dashboard
 
@@ -65,19 +65,19 @@ Beta features allow gradual rollout of new functionality while maintaining stabi
 
 **MQTT Topics:**
 
-All MQTT messages are published under the fixed base topic `borg-ui`:
+All MQTT messages are published under the fixed base topic `borgscale`:
 
-- `borg-ui/status` - Server connection status (online/offline)
-- `borg-ui/backup/status` - Current backup status
-- `borg-ui/backup/progress` - Backup progress and ETA
-- `borg-ui/backup/last` - Last backup information
-- `borg-ui/backup/success` - Success/failure state
-- `borg-ui/repositories/{id}/status` - Repository health status
-- `borg-ui/repositories/{id}/size` - Repository size metrics
-- `borg-ui/repositories/{id}/archives` - Archive count
-- `borg-ui/repositories/{id}/last_backup` - Last backup timestamp
-- `borg-ui/repositories/{id}/backup/status` - Backup status
-- `borg-ui/repositories/{id}/backup/progress` - Backup progress
+- `borgscale/status` - Server connection status (online/offline)
+- `borgscale/backup/status` - Current backup status
+- `borgscale/backup/progress` - Backup progress and ETA
+- `borgscale/backup/last` - Last backup information
+- `borgscale/backup/success` - Success/failure state
+- `borgscale/repositories/{id}/status` - Repository health status
+- `borgscale/repositories/{id}/size` - Repository size metrics
+- `borgscale/repositories/{id}/archives` - Archive count
+- `borgscale/repositories/{id}/last_backup` - Last backup timestamp
+- `borgscale/repositories/{id}/backup/status` - Backup status
+- `borgscale/repositories/{id}/backup/progress` - Backup progress
 
 **TLS Configuration:**
 
@@ -95,7 +95,7 @@ For secure MQTT connections (recommended for production):
 - **Connection Failed**: Verify broker URL and port are correct
 - **Authentication Failed**: Check username and password
 - **TLS Errors**: Verify certificate paths and permissions
-- **No Data**: Verify MQTT is enabled in Borg UI and broker is reachable
+- **No Data**: Verify MQTT is enabled in BorgScale and broker is reachable
 
 **Security Considerations:**
 
@@ -135,7 +135,7 @@ A redesigned step-based repository wizard with improved UX, validation, and mobi
 To help test beta features:
 
 1. Enable the feature via Settings UI
-2. Report issues at https://github.com/karanhudia/borg-ui/issues
+2. Report issues at https://github.com/karanhudia/borgscale/issues
 3. Test thoroughly before using in production
 4. You can switch back to stable anytime via Settings
 

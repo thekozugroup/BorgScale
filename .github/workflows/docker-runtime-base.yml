@@ -28,7 +28,7 @@ concurrency:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/borg-ui-runtime-base
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/borgscale-runtime-base
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
@@ -68,7 +68,7 @@ jobs:
           file: ./Dockerfile.runtime-base
           platforms: linux/amd64
           load: true
-          tags: borg-ui-runtime-base:smoke-test
+          tags: borgscale-runtime-base:smoke-test
           cache-from: type=gha,scope=runtime-base
           build-args: |
             BORG1_VERSION=${{ steps.versions.outputs.borg1 }}
@@ -76,9 +76,9 @@ jobs:
 
       - name: Smoke test runtime base
         run: |
-          docker run --rm borg-ui-runtime-base:smoke-test borg --version
-          docker run --rm borg-ui-runtime-base:smoke-test borg2 --version
-          docker run --rm borg-ui-runtime-base:smoke-test python3 -c "import pyfuse3; print('pyfuse3 ok')"
+          docker run --rm borgscale-runtime-base:smoke-test borg --version
+          docker run --rm borgscale-runtime-base:smoke-test borg2 --version
+          docker run --rm borgscale-runtime-base:smoke-test python3 -c "import pyfuse3; print('pyfuse3 ok')"
 
   build-and-push:
     runs-on: ubuntu-latest

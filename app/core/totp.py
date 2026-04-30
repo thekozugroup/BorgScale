@@ -52,7 +52,7 @@ def verify_totp_code(
     return False
 
 
-def build_totp_uri(secret: str, username: str, issuer: str = "Borg UI") -> str:
+def build_totp_uri(secret: str, username: str, issuer: str = "BorgScale") -> str:
     label = quote(f"{issuer}:{username}")
     issuer_q = quote(issuer)
     return (

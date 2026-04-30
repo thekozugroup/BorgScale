@@ -1,5 +1,5 @@
 """
-Prometheus metrics endpoint for borg-ui
+Prometheus metrics endpoint for borgscale
 
 Exports metrics in Prometheus text format for monitoring and alerting.
 Accessible at /metrics when enabled in system settings. Token authentication is optional.
@@ -117,7 +117,7 @@ async def get_metrics(
     lines = []
 
     # Header
-    lines.append("# Prometheus metrics for borg-ui")
+    lines.append("# Prometheus metrics for borgscale")
     lines.append(f"# Generated at {datetime.now(timezone.utc).isoformat()}")
     lines.append("")
 

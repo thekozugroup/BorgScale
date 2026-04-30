@@ -1,6 +1,6 @@
 import { createTheme } from '@mui/material/styles'
 
-// Create a custom theme for Borg UI
+// Create a custom theme for BorgScale
 export const theme = createTheme({
   palette: {
     mode: 'light',

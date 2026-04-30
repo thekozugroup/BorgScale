@@ -1,5 +1,5 @@
 """
-Test fixtures for Borg UI
+Test fixtures for BorgScale
 
 This package contains reusable pytest fixtures organized by category:
 - database.py: Database session and model fixtures

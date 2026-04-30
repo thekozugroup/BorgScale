@@ -2,7 +2,7 @@
 
 ## Project overview
 
-BorgScale is the AGPL-3.0 fork of `karanhudia/borg-ui` maintained by
+BorgScale is the AGPL-3.0 fork of `karanhudia/borgscale` maintained by
 The Kozu Group. The fork preserves the upstream's open-source
 baseline while removing the closed-ecosystem activation and
 analytics scaffolding announced for the post-relicense direction.

@@ -1,7 +1,7 @@
 services:
   prometheus:
     image: prom/prometheus:latest
-    container_name: borg-ui-prometheus
+    container_name: borgscale-prometheus
     restart: unless-stopped
     command:
       - --config.file=/etc/prometheus/prometheus.yml
@@ -19,7 +19,7 @@ services:
 
   grafana:
     image: grafana/grafana:latest
-    container_name: borg-ui-grafana
+    container_name: borgscale-grafana
     restart: unless-stopped
     environment:
       - GF_SECURITY_ADMIN_USER=admin

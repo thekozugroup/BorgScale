@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Borg UI Archive Contents Testing
+BorgScale Archive Contents Testing
 
 This script tests the archive browsing functionality by:
 1. Creating test repositories with borg command line
-2. Querying the Borg UI API to browse archive contents
+2. Querying the BorgScale API to browse archive contents
 3. Comparing UI results with actual borg list output
 4. Identifying discrepancies and bugs
 
@@ -69,7 +69,7 @@ class ArchiveContentsTester:
         print(f"{color}{message}{Colors.END}")
 
     def authenticate(self) -> bool:
-        """Authenticate with Borg UI"""
+        """Authenticate with BorgScale"""
         try:
             login_data = {"username": "admin", "password": "admin123"}
             response = self.session.post(
@@ -79,7 +79,7 @@ class ArchiveContentsTester:
             if response.status_code == 200:
                 data = response.json()
                 self.auth_token = data.get("access_token")
-                self.log("✅ Authenticated with Borg UI", "SUCCESS")
+                self.log("✅ Authenticated with BorgScale", "SUCCESS")
                 return True
             else:
                 self.log(f"❌ Authentication failed: {response.status_code}", "ERROR")
@@ -203,7 +203,7 @@ class ArchiveContentsTester:
         self, repo_id: int, archive_name: str, path: str = ""
     ) -> Set[str]:
         """
-        Get archive contents from Borg UI API
+        Get archive contents from BorgScale API
         Returns set of immediate children at the given path
         """
         try:
@@ -230,7 +230,7 @@ class ArchiveContentsTester:
             return set()
 
     def add_repository_to_ui(self, name: str, path: str, passphrase: str = None) -> int:
-        """Add a repository to Borg UI, returns repository ID"""
+        """Add a repository to BorgScale, returns repository ID"""
         try:
             headers = {
                 "X-Borg-Authorization": f"Bearer {self.auth_token}",
@@ -285,7 +285,7 @@ class ArchiveContentsTester:
                         "WARNING",
                     )
                     self.log(
-                        f"   2. Fix permissions: sudo chown -R $(id -u):$(id -g) /tmp/borg-ui-tests",
+                        f"   2. Fix permissions: sudo chown -R $(id -u):$(id -g) /tmp/borgscale-tests",
                         "WARNING",
                     )
                     self.log(
@@ -392,7 +392,7 @@ class ArchiveContentsTester:
     def run_tests(self):
         """Run all tests"""
         self.log(f"\n{'=' * 70}", "INFO")
-        self.log("🧪 Borg UI Archive Contents Test Suite", "INFO")
+        self.log("🧪 BorgScale Archive Contents Test Suite", "INFO")
         self.log(f"{'=' * 70}\n", "INFO")
 
         # Check if test environment exists
@@ -494,17 +494,17 @@ class ArchiveContentsTester:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Test Borg UI archive contents")
+    parser = argparse.ArgumentParser(description="Test BorgScale archive contents")
     parser.add_argument(
         "test_dir",
         nargs="?",
-        default="/tmp/borg-ui-tests",
-        help="Test directory (default: /tmp/borg-ui-tests)",
+        default="/tmp/borgscale-tests",
+        help="Test directory (default: /tmp/borgscale-tests)",
     )
     parser.add_argument(
         "--url",
         default="http://localhost:8081",
-        help="Borg UI URL (default: http://localhost:8081)",
+        help="BorgScale URL (default: http://localhost:8081)",
     )
 
     args = parser.parse_args()

@@ -79,7 +79,7 @@ const ExportImportTab: React.FC = () => {
       const contentDisposition = response.headers['content-disposition'] || ''
 
       // Extract filename from Content-Disposition header
-      let filename = 'borg-ui-export.yaml'
+      let filename = 'borgscale-export.yaml'
       const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)
       if (filenameMatch && filenameMatch[1]) {
         filename = filenameMatch[1].replace(/['"]/g, '')

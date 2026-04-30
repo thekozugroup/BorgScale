@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=docker.io/ainullcode/borg-ui-runtime-base:runtime-borg1-1.4.4-borg2-2.0.0b21-r1
+ARG BASE_IMAGE=docker.io/ainullcode/borgscale-runtime-base:runtime-borg1-1.4.4-borg2-2.0.0b21-r1
 
 # Build stage for backend
 FROM python:3.10-slim AS backend-builder
@@ -50,7 +50,7 @@ ENV DATABASE_URL=sqlite:////data/borg.db
 ENV BORG_BACKUP_PATH=/backups
 ENV ENABLE_CRON_BACKUPS=false
 ENV PORT=8081
-ENV ACTIVATION_SERVICE_URL=https://license.borgui.com
+ENV ACTIVATION_SERVICE_URL=https://github.com/thekozugroup/BorgScale
 ENV ENABLE_STARTUP_LICENSE_SYNC=true
 
 EXPOSE 8081
@@ -65,15 +65,15 @@ ARG APP_VERSION=dev
 ENV APP_VERSION=${APP_VERSION}
 
 # Docker image metadata
-LABEL org.opencontainers.image.title="Borg Web UI"
-LABEL org.opencontainers.image.description="A lightweight web interface for Borg backup management"
+LABEL org.opencontainers.image.title="BorgScale"
+LABEL org.opencontainers.image.source="https://github.com/thekozugroup/BorgScale"
+LABEL org.opencontainers.image.licenses="AGPL-3.0"
+LABEL org.opencontainers.image.description="Self-hosted UI for Borg Backup (BorgScale fork of borg-ui)"
 LABEL org.opencontainers.image.version="${APP_VERSION}"
-LABEL org.opencontainers.image.vendor="Borg Web UI"
-LABEL org.opencontainers.image.url="https://github.com/karanhudia/borg-ui"
-LABEL org.opencontainers.image.documentation="https://github.com/karanhudia/borg-ui/blob/main/README.md"
-LABEL org.opencontainers.image.source="https://github.com/karanhudia/borg-ui"
-LABEL org.opencontainers.image.licenses="MIT"
-LABEL com.borg-ui.icon.color="#00dd00"
+LABEL org.opencontainers.image.vendor="BorgScale"
+LABEL org.opencontainers.image.url="https://github.com/thekozugroup/BorgScale"
+LABEL org.opencontainers.image.documentation="https://github.com/thekozugroup/BorgScale/blob/main/README.md"
+LABEL com.borgscale.icon.color="#00dd00"
 
 WORKDIR /app
 
@@ -112,7 +112,7 @@ ENV DATABASE_URL=sqlite:////data/borg.db
 ENV BORG_BACKUP_PATH=/backups
 ENV ENABLE_CRON_BACKUPS=false
 ENV PORT=8081
-ENV ACTIVATION_SERVICE_URL=https://license.borgui.com
+ENV ACTIVATION_SERVICE_URL=https://github.com/thekozugroup/BorgScale
 ENV ENABLE_STARTUP_LICENSE_SYNC=true
 
 # Expose port

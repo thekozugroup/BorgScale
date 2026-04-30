@@ -43,7 +43,7 @@ volumes:
   - /var/run/docker.sock:/var/run/docker.sock:rw
 ```
 
-### 2. Restart Borg UI
+### 2. Restart BorgScale
 
 ```bash
 docker-compose down
@@ -52,7 +52,7 @@ docker-compose up -d
 
 ### 3. Configure Pre/Post Backup Scripts
 
-In the Borg UI:
+In the BorgScale:
 1. Go to **Repositories**
 2. Edit your repository
 3. Scroll to **Advanced Settings**
@@ -60,7 +60,7 @@ In the Borg UI:
 
 ## Environment Variables
 
-Borg UI passes useful context to your pre/post backup scripts via environment variables. These allow your scripts to react to backup status and access repository information.
+BorgScale passes useful context to your pre/post backup scripts via environment variables. These allow your scripts to react to backup status and access repository information.
 
 ### Available Variables
 
@@ -161,7 +161,7 @@ fi
 
 5. **Use Docker contexts**: Consider using Docker contexts to limit scope
 
-6. **Network isolation**: Keep Borg UI on an isolated network if possible
+6. **Network isolation**: Keep BorgScale on an isolated network if possible
 
 ### Alternatives Without Docker Socket:
 
@@ -375,7 +375,7 @@ volumes:
   - /var/run/docker.sock:/var/run/docker.sock:rw
 ```
 
-**Solution 2:** Restart Borg UI container:
+**Solution 2:** Restart BorgScale container:
 ```bash
 docker-compose restart
 ```
@@ -509,7 +509,7 @@ docker ps --filter "label=backup.stop=true" --format "{{.Names}}" | \
 ### 7. Consider Downtime Windows
 
 Schedule backups during low-usage periods to minimize impact:
-- Use cron schedules in Borg UI (e.g., 2 AM daily)
+- Use cron schedules in BorgScale (e.g., 2 AM daily)
 - Stop containers only for critical backups
 - Use database dump tools for hot backups
 
@@ -600,7 +600,7 @@ echo "[$(date)] Post-backup hook completed"
 ## Related Documentation
 
 - [Pre/Post Backup Scripts](./backup-hooks.md) - General hook documentation
-- [Installation Guide](../docs/installation.md) - Setting up Borg UI
+- [Installation Guide](../docs/installation.md) - Setting up BorgScale
 - [Repository Configuration](./repositories.md) - Configuring repositories
 
 ## Support
@@ -609,7 +609,7 @@ If you encounter issues with Docker hooks:
 1. Check the backup job logs in the UI
 2. Test your scripts manually in the container
 3. Review the [troubleshooting section](#troubleshooting)
-4. Open an issue on [GitHub](https://github.com/karanhudia/borg-ui/issues) with:
+4. Open an issue on [GitHub](https://github.com/karanhudia/borgscale/issues) with:
    - Your docker-compose.yml (sanitized)
    - Your pre/post backup scripts
    - Relevant log output

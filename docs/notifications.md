@@ -13,7 +13,7 @@ Get real-time alerts for backup failures, restore completions, and scheduled job
 
 ## Supported Services
 
-Borg Web UI uses [Apprise](https://github.com/caronc/apprise) for notifications, which supports:
+BorgScale uses [Apprise](https://github.com/caronc/apprise) for notifications, which supports:
 
 - **Email** (Gmail, Outlook, Yahoo, custom SMTP)
 - **Messaging** (Slack, Discord, Telegram, Microsoft Teams, Matrix)
@@ -279,8 +279,8 @@ Always test your notification configuration before relying on it:
 
 **Test message format:**
 ```
-Title: 🔔 Borg UI Test Notification
-Body: This is a test notification from Borg Web UI.
+Title: 🔔 BorgScale Test Notification
+Body: This is a test notification from BorgScale.
       If you received this, your notification service is configured correctly!
 ```
 
@@ -618,7 +618,7 @@ backup_data = extract_json_from_markdown(webhook_payload)
 
 1. Go to [webhook.site](https://webhook.site)
 2. Copy your unique URL (e.g., `https://webhook.site/abc-123`)
-3. In Borg UI → Settings → Notifications → Add Service:
+3. In BorgScale → Settings → Notifications → Add Service:
    ```
    Name: JSON Test
    URL: jsons://webhook.site/abc-123
@@ -698,7 +698,7 @@ daily_backups.append({
 
 7. **Secure Service URLs** - Notification URLs contain credentials. Keep them secure.
 
-8. **Test After Updates** - Re-test notifications after updating Borg Web UI
+8. **Test After Updates** - Re-test notifications after updating BorgScale
 
 ---
 
@@ -739,5 +739,5 @@ Currently, notifications are global for all repositories. To achieve per-reposit
 
 - **Full Apprise Documentation**: [Apprise Wiki](https://github.com/caronc/apprise/wiki)
 - **Service-Specific Guides**: [Apprise Notifications](https://github.com/caronc/apprise/wiki#notification-services)
-- **GitHub Issues**: [Report problems](https://github.com/karanhudia/borg-ui/issues)
-- **GitHub Discussions**: [Ask questions](https://github.com/karanhudia/borg-ui/discussions)
+- **GitHub Issues**: [Report problems](https://github.com/karanhudia/borgscale/issues)
+- **GitHub Discussions**: [Ask questions](https://github.com/karanhudia/borgscale/discussions)

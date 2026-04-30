@@ -1,9 +1,9 @@
 apiVersion: 1
 
 providers:
-  - name: borg-ui
+  - name: borgscale
     orgId: 1
-    folder: Borg UI
+    folder: BorgScale
     type: file
     disableDeletion: false
     editable: true

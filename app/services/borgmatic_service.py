@@ -2,8 +2,8 @@
 Service for exporting and importing borgmatic configurations.
 
 This service handles:
-1. Exporting Borg UI configurations to borgmatic YAML format
-2. Importing borgmatic YAML configs into Borg UI
+1. Exporting BorgScale configurations to borgmatic YAML format
+2. Importing borgmatic YAML configs into BorgScale
 3. Round-trip import/export for multi-server deployments
 """
 
@@ -16,7 +16,7 @@ from app.database.models import Repository, ScheduledJob, ScheduledJobRepository
 
 
 class BorgmaticExportService:
-    """Handles exporting Borg UI configurations to borgmatic format."""
+    """Handles exporting BorgScale configurations to borgmatic format."""
 
     def __init__(self, db: Session):
         self.db = db
@@ -82,7 +82,7 @@ class BorgmaticExportService:
         if repository.post_backup_script:
             config["after_backup"] = [repository.post_backup_script]
 
-        # Borg UI metadata fields (ignored by standard borgmatic — forward compatible)
+        # BorgScale metadata fields (ignored by standard borgmatic — forward compatible)
         # borg_ui_name: preserves the custom display name for round-trip imports
         config["borg_ui_name"] = repository.name
         # borg_ui_type: preserves observability-only mode (omit for 'full' which is the default)
@@ -192,7 +192,7 @@ class BorgmaticExportService:
         if repository.passphrase:
             storage["encryption_passphrase"] = repository.passphrase
 
-        # Note: SSH keys in Borg UI are stored encrypted in DB, not as files
+        # Note: SSH keys in BorgScale are stored encrypted in DB, not as files
         # Users need to configure SSH authentication separately (ssh-agent, ssh config, etc.)
 
         return storage
@@ -381,7 +381,7 @@ class BorgmaticExportService:
 
 
 class BorgmaticImportService:
-    """Handles importing borgmatic configurations into Borg UI."""
+    """Handles importing borgmatic configurations into BorgScale."""
 
     def __init__(self, db: Session):
         self.db = db
@@ -411,7 +411,7 @@ class BorgmaticImportService:
         except yaml.YAMLError as e:
             return {"success": False, "error": f"Invalid YAML: {str(e)}"}
 
-        # Check if this is a Borg UI export (old format with borg_ui_export wrapper)
+        # Check if this is a BorgScale export (old format with borg_ui_export wrapper)
         is_old_borg_ui_export = "borg_ui_export" in data and "configurations" in data
 
         if is_old_borg_ui_export:
@@ -422,7 +422,7 @@ class BorgmaticImportService:
     def _import_borg_ui_export(
         self, data: Dict[str, Any], merge_strategy: str, dry_run: bool
     ) -> Dict[str, Any]:
-        """Import Borg UI export format (round-trip)."""
+        """Import BorgScale export format (round-trip)."""
         summary = {
             "success": True,
             "repositories_created": 0,
@@ -496,7 +496,7 @@ class BorgmaticImportService:
         if not repo_paths:
             return {"success": False, "error": "No repositories found in configuration"}
 
-        # Borg UI metadata fields — only meaningful for single-repo YAMLs
+        # BorgScale metadata fields — only meaningful for single-repo YAMLs
         # (ambiguous when multiple repositories share one config file)
         borg_ui_name = data.get("borg_ui_name") if len(repo_paths) == 1 else None
         borg_ui_type = data.get("borg_ui_type") if len(repo_paths) == 1 else None
@@ -737,7 +737,7 @@ class BorgmaticImportService:
             if ssh_info and ssh_info.get("remote_path"):
                 repository.remote_path = ssh_info["remote_path"]
             result["warnings"].append(
-                f"SSH repository '{repo_name}' imported but SSH connection must be configured manually in Borg UI. "
+                f"SSH repository '{repo_name}' imported but SSH connection must be configured manually in BorgScale. "
                 f"Original connection: {ssh_info.get('username', 'user')}@{ssh_info.get('host', 'host')}:{ssh_info.get('port', 22)}"
             )
 

@@ -54,7 +54,7 @@ class ArchiveBrowsingTester:
         print(f"{color}{message}{Colors.END}")
 
     def authenticate(self) -> bool:
-        """Authenticate with Borg UI"""
+        """Authenticate with BorgScale"""
         try:
             response = self.session.post(
                 f"{self.base_url}/api/auth/login",
@@ -136,7 +136,7 @@ class ArchiveBrowsingTester:
         self, repo_id: int, archive_name: str, path: str = ""
     ) -> Set[str]:
         """
-        Get directories from Borg UI API at a specific path
+        Get directories from BorgScale API at a specific path
         Returns set of directory names
         """
         try:
@@ -347,7 +347,7 @@ class ArchiveBrowsingTester:
             self.log("✓ Cleaned up test environment", "SUCCESS")
 
     def add_repository_to_ui(self, repo_path: str) -> int:
-        """Add repository to Borg UI and return repo ID"""
+        """Add repository to BorgScale and return repo ID"""
         try:
             headers = {
                 "X-Borg-Authorization": f"Bearer {self.auth_token}",
@@ -511,7 +511,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Test archive directory browsing")
-    parser.add_argument("--url", default="http://localhost:8082", help="Borg UI URL")
+    parser.add_argument("--url", default="http://localhost:8082", help="BorgScale URL")
     parser.add_argument("--repo-path", help="Path to test repository")
     args = parser.parse_args()
 

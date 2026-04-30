@@ -7,7 +7,7 @@ description: "Best practices and security recommendations"
 
 # Security Guide
 
-Best practices for securing your Borg Web UI installation.
+Best practices for securing your BorgScale installation.
 
 ---
 
@@ -30,7 +30,7 @@ Best practices for securing your Borg Web UI installation.
 
 ### Built-in Authentication (Default)
 
-By default, Borg Web UI uses its own JWT-based authentication system.
+By default, BorgScale uses its own JWT-based authentication system.
 
 #### Change Default Password
 
@@ -62,7 +62,7 @@ Use passwords with:
 
 #### Two-Factor Authentication (TOTP)
 
-Borg UI supports built-in TOTP for local password-based accounts.
+BorgScale supports built-in TOTP for local password-based accounts.
 
 **What it does:**
 - Adds a second factor after username/password login
@@ -78,13 +78,13 @@ Borg UI supports built-in TOTP for local password-based accounts.
 6. Enter the current 6-digit authenticator code to finish setup
 
 **Notes:**
-- TOTP is only available for Borg UI's built-in local accounts
+- TOTP is only available for BorgScale's built-in local accounts
 - Proxy-auth / external SSO deployments should enforce MFA in the identity provider instead
 - Recovery codes are shown during setup, so they must be stored before closing the dialog
 
 #### Passkeys
 
-Borg UI also supports WebAuthn passkeys for local accounts.
+BorgScale also supports WebAuthn passkeys for local accounts.
 
 **What it does:**
 - Lets users sign in with device-bound passkeys instead of typing a password
@@ -94,7 +94,7 @@ Borg UI also supports WebAuthn passkeys for local accounts.
 **Notes:**
 - Passkeys require the Python `webauthn` dependency to be installed
 - Passkey enrollment currently requires confirming the current account password first
-- Reverse-proxy / external SSO deployments should usually keep passkeys in the identity provider instead of inside Borg UI
+- Reverse-proxy / external SSO deployments should usually keep passkeys in the identity provider instead of inside BorgScale
 
 #### Emergency Password Reset (CLI)
 
@@ -106,13 +106,13 @@ Use this procedure when a user (including the admin) is locked out of the web UI
 **Docker (primary method):**
 
 ```bash
-docker exec -it borg-ui python -m app.scripts.reset_password <username> <new_password>
+docker exec -it borgscale python -m app.scripts.reset_password <username> <new_password>
 ```
 
 Concrete example:
 
 ```bash
-docker exec -it borg-ui python -m app.scripts.reset_password admin newpassword123
+docker exec -it borgscale python -m app.scripts.reset_password admin newpassword123
 ```
 
 **Non-Docker / custom database path:**
@@ -132,7 +132,7 @@ BORG_DB_PATH=/custom/path/borg.db python -m app.scripts.reset_password admin new
 {: .new }
 > **New Feature**: Proxy-based authentication for OIDC/SSO integration
 
-Borg Web UI supports **proxy-based authentication** to integrate with external authentication providers like:
+BorgScale supports **proxy-based authentication** to integrate with external authentication providers like:
 - **Authentik**
 - **Authelia**
 - **Keycloak**
@@ -144,17 +144,17 @@ Borg Web UI supports **proxy-based authentication** to integrate with external a
 
 #### How It Works
 
-When enabled, Borg Web UI:
+When enabled, BorgScale:
 1. **Disables the login screen** - No password prompts
 2. **Trusts the reverse proxy** - Reads username from HTTP headers
 3. **Auto-creates users** - Creates accounts on first access
-4. **Optionally maps authorization from trusted headers** - Can assign Borg UI roles from proxy-provided claims
-5. **Maintains authorization** - Still respects Borg UI's built-in permission model
+4. **Optionally maps authorization from trusted headers** - Can assign BorgScale roles from proxy-provided claims
+5. **Maintains authorization** - Still respects BorgScale's built-in permission model
 6. **Fails closed without a trusted header** - Requests are rejected instead of falling back to a local default user
 
 **Security Model:**
 - ✅ Authentication: Handled by your proxy/OIDC provider
-- ✅ Authorization: Managed by Borg Web UI (admin vs. regular user)
+- ✅ Authorization: Managed by BorgScale (admin vs. regular user)
 - ✅ Session management: JWT tokens still used for API calls
 
 #### Configuration
@@ -165,7 +165,7 @@ When enabled, Borg Web UI:
 environment:
   - DISABLE_AUTHENTICATION=true  # Disable built-in login screen
   - PROXY_AUTH_HEADER=X-Forwarded-User  # Default header name
-  - PROXY_AUTH_ROLE_HEADER=X-Borg-Role  # Optional trusted Borg UI global role header
+  - PROXY_AUTH_ROLE_HEADER=X-Borg-Role  # Optional trusted BorgScale global role header
   - PROXY_AUTH_ALL_REPOSITORIES_ROLE_HEADER=X-Borg-All-Repositories-Role  # Optional trusted default repository role header
   - PROXY_AUTH_EMAIL_HEADER=X-Borg-Email  # Optional trusted email header
   - PROXY_AUTH_FULL_NAME_HEADER=X-Borg-Full-Name  # Optional trusted display-name header
@@ -181,21 +181,21 @@ The proxy must set the `X-Forwarded-User` header (or your custom header) with th
 - `Remote-User`
 - `X-authentik-username` (Authentik)
 
-If you set a custom `PROXY_AUTH_HEADER`, Borg UI trusts only that configured header for identity.
+If you set a custom `PROXY_AUTH_HEADER`, BorgScale trusts only that configured header for identity.
 
 **Optional authorization headers (only when explicitly configured):**
-- `PROXY_AUTH_ROLE_HEADER` supports Borg UI global roles: `viewer`, `operator`, `admin`
-- `PROXY_AUTH_ALL_REPOSITORIES_ROLE_HEADER` supports Borg UI default repository roles: `viewer`, `operator`
+- `PROXY_AUTH_ROLE_HEADER` supports BorgScale global roles: `viewer`, `operator`, `admin`
+- `PROXY_AUTH_ALL_REPOSITORIES_ROLE_HEADER` supports BorgScale default repository roles: `viewer`, `operator`
 - `PROXY_AUTH_EMAIL_HEADER` can update the user's email address
 - `PROXY_AUTH_FULL_NAME_HEADER` can update the user's display name
-- Invalid values are ignored and Borg UI falls back to its normal defaults
+- Invalid values are ignored and BorgScale falls back to its normal defaults
 
 #### Security Requirements
 
 ⚠️ **CRITICAL: This feature requires proper security configuration**
 
 **You MUST:**
-1. **Bind Borg UI to localhost only:**
+1. **Bind BorgScale to localhost only:**
    ```yaml
    ports:
      - "127.0.0.1:8081:8081"  # Only accessible via localhost
@@ -208,20 +208,20 @@ If you set a custom `PROXY_AUTH_HEADER`, Borg UI trusts only that configured hea
    sudo ufw allow from 127.0.0.1 to any port 8081
    ```
 
-3. **Ensure ONLY your reverse proxy can reach Borg UI**
+3. **Ensure ONLY your reverse proxy can reach BorgScale**
    - Never expose the container port to the internet
-   - Use Docker networks to isolate Borg UI from direct access
+   - Use Docker networks to isolate BorgScale from direct access
 
 **Why this matters:**
-- If Borg UI is directly accessible, anyone can set the `X-Forwarded-User` header and impersonate any user
+- If BorgScale is directly accessible, anyone can set the `X-Forwarded-User` header and impersonate any user
 - The proxy MUST strip/override user-supplied headers before forwarding
 - The same rule applies to any trusted role-mapping headers
 
 #### Optional Role Mapping
 
-If your reverse proxy or identity provider can emit trusted claims as headers, Borg UI can map them into its built-in authorization model.
+If your reverse proxy or identity provider can emit trusted claims as headers, BorgScale can map them into its built-in authorization model.
 
-**Supported Borg UI global roles:**
+**Supported BorgScale global roles:**
 - `viewer`
 - `operator`
 - `admin`
@@ -263,8 +263,8 @@ proxy_set_header X-borg-full-name $upstream_http_x_borg_full_name;
 **docker-compose.yml:**
 ```yaml
 services:
-  borg-ui:
-    image: ainullcode/borg-ui:latest
+  borgscale:
+    image: ainullcode/borgscale:latest
     environment:
       - DISABLE_AUTHENTICATION=true
       - PROXY_AUTH_HEADER=X-authentik-username
@@ -285,14 +285,14 @@ services:
       - external
     labels:
       - "authentik.enabled=true"
-      - "authentik.upstream=http://borg-ui:8081"
+      - "authentik.upstream=http://borgscale:8081"
 ```
 
 **Authentik Application Setup:**
 1. Create new application in Authentik
 2. Select **Proxy Provider**
 3. Set External URL: `https://backups.example.com`
-4. Set Internal URL: `http://borg-ui:8081`
+4. Set Internal URL: `http://borgscale:8081`
 5. Enable **Forward auth (single application)**
 6. Set authorization flow and user/group bindings
 
@@ -321,7 +321,7 @@ server {
     include /path/to/authelia-authrequest.conf;
 
     location / {
-        # Forward authenticated username to Borg UI
+        # Forward authenticated username to BorgScale
         proxy_set_header X-Remote-User $remote_user;
         proxy_set_header X-Forwarded-User $remote_user;
 
@@ -341,7 +341,7 @@ server {
 - Session duration: 24 hours
 - Add policies for users/groups
 
-**2. Configure Borg UI:**
+**2. Configure BorgScale:**
 ```yaml
 environment:
   - DISABLE_AUTHENTICATION=true
@@ -443,7 +443,7 @@ curl http://localhost:8081/api/auth/me
 
 **Problem: Login screen still appears**
 - Verify `DISABLE_AUTHENTICATION=true` is set
-- Check environment variables: `docker exec borg-ui env | grep DISABLE`
+- Check environment variables: `docker exec borgscale env | grep DISABLE`
 - Restart container after changing environment
 
 **Problem: "Could not validate credentials" errors**
@@ -453,7 +453,7 @@ curl http://localhost:8081/api/auth/me
 
 **Problem: Wrong user is logged in**
 - Proxy may not be stripping user-supplied headers
-- Verify Borg UI is only accessible via proxy (not directly)
+- Verify BorgScale is only accessible via proxy (not directly)
 - Check firewall rules and port bindings
 
 **Problem: Users can't access after proxy auth is enabled**
@@ -464,7 +464,7 @@ curl http://localhost:8081/api/auth/me
 #### Security Checklist for Proxy Auth
 
 - [ ] `DISABLE_AUTHENTICATION=true` is set
-- [ ] Borg UI bound to localhost only (`127.0.0.1:8081`)
+- [ ] BorgScale bound to localhost only (`127.0.0.1:8081`)
 - [ ] Firewall blocks external access to port 8081
 - [ ] Reverse proxy is configured to authenticate users
 - [ ] Reverse proxy strips user-supplied authentication headers
@@ -480,7 +480,7 @@ curl http://localhost:8081/api/auth/me
 
 ### Use HTTPS in Production
 
-**Never expose Borg Web UI directly to the internet without HTTPS.**
+**Never expose BorgScale directly to the internet without HTTPS.**
 
 #### Option 1: Nginx Reverse Proxy
 
@@ -511,14 +511,14 @@ server {
 
 ```yaml
 services:
-  borg-ui:
-    image: ainullcode/borg-ui:latest
+  borgscale:
+    image: ainullcode/borgscale:latest
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.borg-ui.rule=Host(`backups.example.com`)"
-      - "traefik.http.routers.borg-ui.entrypoints=websecure"
-      - "traefik.http.routers.borg-ui.tls.certresolver=letsencrypt"
-      - "traefik.http.services.borg-ui.loadbalancer.server.port=8081"
+      - "traefik.http.routers.borgscale.rule=Host(`backups.example.com`)"
+      - "traefik.http.routers.borgscale.entrypoints=websecure"
+      - "traefik.http.routers.borgscale.tls.certresolver=letsencrypt"
+      - "traefik.http.services.borgscale.loadbalancer.server.port=8081"
 ```
 
 #### Option 3: Caddy (Automatic HTTPS)
@@ -812,7 +812,7 @@ Use [notifications](notifications.md) to get alerts for:
 
 ```bash
 # Check for updates
-docker pull ainullcode/borg-ui:latest
+docker pull ainullcode/borgscale:latest
 
 # Update
 docker compose pull
@@ -822,7 +822,7 @@ docker compose up -d
 ### Subscribe to Security Announcements
 
 - Watch GitHub repository for security releases
-- Check [GitHub Security Advisories](https://github.com/karanhudia/borg-ui/security/advisories)
+- Check [GitHub Security Advisories](https://github.com/karanhudia/borgscale/security/advisories)
 - Review release notes for security fixes
 
 ---
@@ -859,7 +859,7 @@ Regularly test restoring from backups:
 ### If Credentials Are Compromised
 
 1. **Change passwords immediately**
-   - Admin password in Borg Web UI
+   - Admin password in BorgScale
    - Repository passphrases
    - Remote server passwords
 

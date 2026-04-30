@@ -24,7 +24,7 @@ class TestScriptExecutor:
         """
         script = """#!/bin/bash
 # Bash array syntax - NOT supported in POSIX sh
-EXCLUDED_STACKS=("borg-ui" "traefik" "postgres")
+EXCLUDED_STACKS=("borgscale" "traefik" "postgres")
 
 # Iterate over array
 for stack in "${EXCLUDED_STACKS[@]}"; do
@@ -41,7 +41,7 @@ echo "Array length: ${#EXCLUDED_STACKS[@]}"
         # Should succeed with bash
         assert result["success"] is True
         assert result["exit_code"] == 0
-        assert "Excluded: borg-ui" in result["stdout"]
+        assert "Excluded: borgscale" in result["stdout"]
         assert "Excluded: traefik" in result["stdout"]
         assert "Excluded: postgres" in result["stdout"]
         assert "Array length: 3" in result["stdout"]
@@ -262,7 +262,7 @@ echo "Done"
 set -e
 
 # Define stacks to exclude from backup
-EXCLUDED_STACKS=("borg-ui" "traefik" "monitoring")
+EXCLUDED_STACKS=("borgscale" "traefik" "monitoring")
 
 # Simulate checking running containers
 echo "Checking Docker containers..."
@@ -294,7 +294,7 @@ exit 0
         # Should succeed with bash
         assert result["success"] is True
         assert result["exit_code"] == 0
-        assert "Skipping stack: borg-ui" in result["stdout"]
+        assert "Skipping stack: borgscale" in result["stdout"]
         assert "Skipping stack: traefik" in result["stdout"]
         assert "Skipping stack: monitoring" in result["stdout"]
         assert "Found 3 containers to backup" in result["stdout"]

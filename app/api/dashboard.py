@@ -89,7 +89,7 @@ class ScheduleResponse(BaseModel):
 
 
 def build_full_repository_health(repo: Repository, now: datetime) -> Dict[str, Any]:
-    """Build health signals for repositories managed directly by Borg UI."""
+    """Build health signals for repositories managed directly by BorgScale."""
     health_status = "healthy"
     health_color = "success"
     warnings = []

@@ -7,7 +7,7 @@ description: "How to create and manage backups"
 
 # Usage Guide: Creating Backups
 
-This guide shows you how to create backups using Borg Web UI. There are two main methods:
+This guide shows you how to create backups using BorgScale. There are two main methods:
 
 1. **Local Backups** - Backup to storage attached to your Docker host (USB drives, NAS mounts, etc.)
 2. **SSH/Remote Backups** - Backup to remote servers via SSH
@@ -81,9 +81,9 @@ Stores backup data on a remote server accessible via SSH.
 
 Before creating backups, ensure:
 
-1. **Borg Web UI is running**: `http://localhost:8081`
+1. **BorgScale is running**: `http://localhost:8081`
 2. **You're logged in** (default: `admin` / `admin123`)
-3. **Container has proper permissions**: Set `PUID`/`PGID` if needed (see [Troubleshooting > Permission Issues](https://github.com/karanhudia/borg-ui#permission-issues))
+3. **Container has proper permissions**: Set `PUID`/`PGID` if needed (see [Troubleshooting > Permission Issues](https://github.com/karanhudia/borgscale#permission-issues))
 
 ---
 
@@ -108,7 +108,7 @@ environment:
   - LOCAL_MOUNT_POINTS=/photos,/nas,/external
 ```
 
-Inside borg-ui, `/photos` is your photos drive, `/nas` is your NAS, `/external` is your external drive. `LOCAL_MOUNT_POINTS` tells borg-ui about all of them so the file browser picks them up.
+Inside borgscale, `/photos` is your photos drive, `/nas` is your NAS, `/external` is your external drive. `LOCAL_MOUNT_POINTS` tells borgscale about all of them so the file browser picks them up.
 
 Use these container paths when creating repositories or selecting source paths in the UI.
 
@@ -139,11 +139,11 @@ sudo chown -R $(id -u):$(id -g) /mnt/usb-drive
 ls -la /mnt/usb-drive
 ```
 
-**Tip:** Ensure `PUID`/`PGID` in docker-compose matches your user ID. See [Troubleshooting > Permission Issues](https://github.com/karanhudia/borg-ui#permission-issues).
+**Tip:** Ensure `PUID`/`PGID` in docker-compose matches your user ID. See [Troubleshooting > Permission Issues](https://github.com/karanhudia/borgscale#permission-issues).
 
 ---
 
-### Step 2: Create a Repository in Borg Web UI
+### Step 2: Create a Repository in BorgScale
 
 A **repository** is where Borg stores your encrypted backup data.
 
@@ -304,7 +304,7 @@ SSH keys authenticate your connection to the remote server without passwords.
    |-------|---------|-------------|
    | **Key Name** | `backup-server-key` | Friendly identifier |
    | **Key Type** | `ed25519` | Recommended (secure & fast) |
-   | **Comment** | `borg-ui@myhost` | Optional label |
+   | **Comment** | `borgscale@myhost` | Optional label |
 
 3. **Download Private Key** (Optional)
    - Click **"Download Private Key"** to save a backup
@@ -351,7 +351,7 @@ mkdir -p ~/.ssh
 chmod 700 ~/.ssh
 
 # Add public key (paste the key you copied from UI)
-echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... borg-ui@myhost" >> ~/.ssh/authorized_keys
+echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... borgscale@myhost" >> ~/.ssh/authorized_keys
 
 # Set correct permissions
 chmod 600 ~/.ssh/authorized_keys
@@ -411,7 +411,7 @@ exit
 
 ---
 
-### Step 5: Create SSH Repository in Borg Web UI
+### Step 5: Create SSH Repository in BorgScale
 
 Now create a repository that uses SSH to store data remotely.
 
@@ -811,10 +811,10 @@ Restart container: `docker compose down && docker compose up -d`
 
 ## Next Steps
 
-- **[Scheduling Guide](https://github.com/karanhudia/borg-ui#scheduling)** - Automate your backups
-- **[Archives Browser](https://github.com/karanhudia/borg-ui#archive-browser)** - Browse and restore files
+- **[Scheduling Guide](https://github.com/karanhudia/borgscale#scheduling)** - Automate your backups
+- **[Archives Browser](https://github.com/karanhudia/borgscale#archive-browser)** - Browse and restore files
 - **[API Documentation](http://localhost:8081/api/docs)** - Integrate with other tools
-- **[Troubleshooting Guide](https://github.com/karanhudia/borg-ui#troubleshooting)** - Common issues
+- **[Troubleshooting Guide](https://github.com/karanhudia/borgscale#troubleshooting)** - Common issues
 
 ---
 
@@ -840,6 +840,6 @@ Restart container: `docker compose down && docker compose up -d`
 ---
 
 **Need Help?**
-- 📖 [Full Documentation](https://docs.borgui.com)
-- 🐛 [Report Issues](https://github.com/karanhudia/borg-ui/issues)
-- 💬 [GitHub Discussions](https://github.com/karanhudia/borg-ui/discussions)
+- 📖 [Full Documentation](https://github.com/thekozugroup/BorgScale
+- 🐛 [Report Issues](https://github.com/karanhudia/borgscale/issues)
+- 💬 [GitHub Discussions](https://github.com/karanhudia/borgscale/discussions)

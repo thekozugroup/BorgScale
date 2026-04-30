@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     """Application settings"""
 
     # Application settings
-    app_name: str = "Borg Web UI"
+    app_name: str = "BorgScale"
     app_version: str = "2.0.0"
     debug: bool = False
     environment: str = "production"  # Default to production for safety
@@ -168,7 +168,7 @@ else:
 settings.ssh_keys_dir = f"{settings.data_dir}/ssh_keys"
 
 # 3. Log file - always derived from data_dir
-settings.log_file = f"{settings.data_dir}/logs/borg-ui.log"
+settings.log_file = f"{settings.data_dir}/logs/borgscale.log"
 
 # 4. SECRET_KEY - auto-generate on first run if not provided
 secret_key_file = Path(settings.data_dir) / ".secret_key"

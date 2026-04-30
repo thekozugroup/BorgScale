@@ -15,7 +15,7 @@ def inspect_proxy_auth_config() -> dict[str, Any]:
         warnings.append(
             {
                 "code": "broad_bind",
-                "message": "Borg UI is bound broadly while proxy authentication is enabled. Ensure only your authenticated reverse proxy can reach it.",
+                "message": "BorgScale is bound broadly while proxy authentication is enabled. Ensure only your authenticated reverse proxy can reach it.",
             }
         )
 

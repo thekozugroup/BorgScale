@@ -44,7 +44,7 @@ from app.core.security import create_first_user
 # Load environment variables
 load_dotenv()
 
-# Base path for sub-directory reverse proxy deployment (e.g., /borg-ui)
+# Base path for sub-directory reverse proxy deployment (e.g., /borgscale)
 _base_path_raw = os.getenv("BASE_PATH", "").strip().rstrip("/")
 BASE_PATH = "" if _base_path_raw in ("", "/") else _base_path_raw
 
@@ -112,7 +112,7 @@ def _log_insecure_no_auth_warning() -> None:
     logger.warning(
         "Insecure no-auth mode enabled",
         code="insecure_no_auth_enabled",
-        message="ALLOW_INSECURE_NO_AUTH is enabled. Borg UI will allow unauthenticated access and impersonate a local user. Use only for local development or explicitly trusted environments.",
+        message="ALLOW_INSECURE_NO_AUTH is enabled. BorgScale will allow unauthenticated access and impersonate a local user. Use only for local development or explicitly trusted environments.",
     )
 
     if settings.disable_authentication:
@@ -158,7 +158,7 @@ Base.metadata.create_all(bind=engine)
 
 # Create FastAPI app
 app = FastAPI(
-    title="Borg Web UI",
+    title="BorgScale",
     description="A lightweight web interface for Borg backup management",
     version="2.0.0",
     docs_url="/api/docs",
@@ -221,7 +221,7 @@ app.include_router(v2_router, prefix="/api/v2")  # Borg 2 versioned API
 @app.on_event("startup")
 async def startup_event():
     """Initialize application on startup"""
-    logger.info("Starting Borg Web UI")
+    logger.info("Starting BorgScale")
     _log_insecure_no_auth_warning()
     _log_proxy_auth_security_warnings()
     from app.database.database import SessionLocal
@@ -380,13 +380,13 @@ async def startup_event():
     app.state.background_tasks.append(task4)
     logger.info("MQTT sync scheduler started")
 
-    logger.info("Borg Web UI started successfully")
+    logger.info("BorgScale started successfully")
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """Cleanup on application shutdown"""
-    logger.info("Shutting down Borg Web UI")
+    logger.info("Shutting down BorgScale")
 
     # Cancel background tasks
     tasks = getattr(app.state, "background_tasks", [])
@@ -418,7 +418,7 @@ async def root():
     if _cached_index_html is not None:
         return HTMLResponse(content=_cached_index_html)
     return HTMLResponse(
-        content="<h1>Borg Web UI</h1><p>Frontend not built yet. Please run the build process.</p>"
+        content="<h1>BorgScale</h1><p>Frontend not built yet. Please run the build process.</p>"
     )
 
 
@@ -444,7 +444,7 @@ async def catch_all(full_path: str):
     if _cached_index_html is not None:
         return HTMLResponse(content=_cached_index_html)
     return HTMLResponse(
-        content="<h1>Borg Web UI</h1><p>Frontend not built yet. Please run the build process.</p>"
+        content="<h1>BorgScale</h1><p>Frontend not built yet. Please run the build process.</p>"
     )
 
 
@@ -458,7 +458,7 @@ async def health_check():
 async def api_info():
     """API information endpoint"""
     return {
-        "name": "Borg Web UI API",
+        "name": "BorgScale API",
         "version": get_runtime_app_version(),
         "docs": "/api/docs",
         "status": "running",

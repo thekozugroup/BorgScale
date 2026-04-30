@@ -1,4 +1,4 @@
-# Borg Web UI - Docker Compose Configuration
+# BorgScale - Docker Compose Configuration
 #
 # Zero-configuration setup with smart defaults:
 # - SECRET_KEY: Auto-generated and persisted to /data/.secret_key
@@ -80,9 +80,9 @@ services:
       # - INITIAL_ADMIN_PASSWORD=your-secure-password
       # - SECRET_KEY=your-custom-secret-key
 
-      # Sub-path for reverse proxy deployment (e.g., /borg-ui)
+      # Sub-path for reverse proxy deployment (e.g., /borgscale)
       # Leave empty or unset for root deployment. See docs/reverse-proxy.md for NGINX config.
-      # - BASE_PATH=/borg-ui
+      # - BASE_PATH=/borgscale
 
       # Borg operation timeouts in seconds (uncomment to customize for large repos)
       # Increase these for very large repositories with long cache build times
@@ -104,7 +104,7 @@ services:
       # Redis cache settings (for 600x faster archive browsing)
       # ⚙️ Configure via Settings → Cache tab in UI (recommended)
       # Environment variables below set initial defaults only
-      # See: https://karanhudia.github.io/borg-ui/cache
+      # See: https://karanhudia.github.io/borgscale/cache
 
       # Local Redis connection (uses redis service below)
       - REDIS_HOST=redis
@@ -122,7 +122,7 @@ services:
       # - DISABLE_AUTHENTICATION=true
 
       # Licensing / activation
-      - ACTIVATION_SERVICE_URL=${ACTIVATION_SERVICE_URL:-https://license.borgui.com}
+      - ACTIVATION_SERVICE_URL=${ACTIVATION_SERVICE_URL:-https://github.com/thekozugroup/BorgScale
       - ACTIVATION_TIMEOUT_SECONDS=${ACTIVATION_TIMEOUT_SECONDS:-10}
       - ENABLE_STARTUP_LICENSE_SYNC=${ENABLE_STARTUP_LICENSE_SYNC:-true}
     healthcheck:

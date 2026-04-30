@@ -6,17 +6,17 @@
       "id": "update-2.0.3-available",
       "type": "update_available",
       "priority": 80,
-      "title": "Borg UI 2.0.3 is available",
+      "title": "BorgScale 2.0.3 is available",
       "title_localized": {
-        "es": "Borg UI 2.0.3 ya esta disponible",
-        "de": "Borg UI 2.0.3 ist verfugbar",
-        "it": "Borg UI 2.0.3 e disponibile"
+        "es": "BorgScale 2.0.3 ya esta disponible",
+        "de": "BorgScale 2.0.3 ist verfugbar",
+        "it": "BorgScale 2.0.3 e disponibile"
       },
-      "message": "Update to Borg UI 2.0.3 for a major security and UX refresh with passkeys, built-in TOTP, a new first-login onboarding flow, improved archive browsing, secured metrics configuration, and better Borg 2 and remote SSH reliability.",
+      "message": "Update to BorgScale 2.0.3 for a major security and UX refresh with passkeys, built-in TOTP, a new first-login onboarding flow, improved archive browsing, secured metrics configuration, and better Borg 2 and remote SSH reliability.",
       "message_localized": {
-        "es": "Actualiza a Borg UI 2.0.3 para obtener una gran mejora de seguridad y experiencia de uso con passkeys, TOTP integrado, un nuevo flujo de onboarding en el primer acceso, mejor navegacion de archivos, configuracion segura de metricas y mejor fiabilidad con Borg 2 y SSH remoto.",
-        "de": "Aktualisieren Sie auf Borg UI 2.0.3 fur ein grosses Sicherheits- und UX-Update mit Passkeys, integriertem TOTP, einem neuen Onboarding beim ersten Login, verbessertem Archive-Browsing, gesicherter Metrik-Konfiguration sowie besserer Zuverlassigkeit fur Borg 2 und Remote-SSH.",
-        "it": "Aggiorna a Borg UI 2.0.3 per un importante aggiornamento di sicurezza e UX con passkey, TOTP integrato, un nuovo onboarding al primo accesso, navigazione degli archivi migliorata, configurazione sicura delle metriche e migliore affidabilita per Borg 2 e SSH remoto."
+        "es": "Actualiza a BorgScale 2.0.3 para obtener una gran mejora de seguridad y experiencia de uso con passkeys, TOTP integrado, un nuevo flujo de onboarding en el primer acceso, mejor navegacion de archivos, configuracion segura de metricas y mejor fiabilidad con Borg 2 y SSH remoto.",
+        "de": "Aktualisieren Sie auf BorgScale 2.0.3 fur ein grosses Sicherheits- und UX-Update mit Passkeys, integriertem TOTP, einem neuen Onboarding beim ersten Login, verbessertem Archive-Browsing, gesicherter Metrik-Konfiguration sowie besserer Zuverlassigkeit fur Borg 2 und Remote-SSH.",
+        "it": "Aggiorna a BorgScale 2.0.3 per un importante aggiornamento di sicurezza e UX con passkey, TOTP integrato, un nuovo onboarding al primo accesso, navigazione degli archivi migliorata, configurazione sicura delle metriche e migliore affidabilita per Borg 2 e SSH remoto."
       },
       "highlights": [
         "Passkeys and built-in TOTP for local accounts",
@@ -58,7 +58,7 @@
         "de": "Upgrade-Details",
         "it": "Dettagli dell'aggiornamento"
       },
-      "cta_url": "https://github.com/karanhudia/borg-ui/releases",
+      "cta_url": "https://github.com/karanhudia/borgscale/releases",
       "dismissible": true,
       "snooze_days": 7,
       "starts_at": "2026-04-14T00:00:00Z",
@@ -77,11 +77,11 @@
         "de": "Neu in Version 2.0.3",
         "it": "Novita della versione 2.0.3"
       },
-      "message": "Borg UI 2.0.3 delivers a major security and UX refresh with passkeys, built-in TOTP, a new first-login onboarding flow, refreshed account and archive experiences, secured metrics configuration, and stronger Borg 2 and remote SSH reliability.",
+      "message": "BorgScale 2.0.3 delivers a major security and UX refresh with passkeys, built-in TOTP, a new first-login onboarding flow, refreshed account and archive experiences, secured metrics configuration, and stronger Borg 2 and remote SSH reliability.",
       "message_localized": {
-        "es": "Borg UI 2.0.3 ofrece una gran mejora de seguridad y experiencia de uso con passkeys, TOTP integrado, un nuevo flujo de onboarding en el primer acceso, experiencias renovadas en cuentas y archivos, configuracion segura de metricas y mayor fiabilidad con Borg 2 y SSH remoto.",
-        "de": "Borg UI 2.0.3 bringt ein grosses Sicherheits- und UX-Update mit Passkeys, integriertem TOTP, einem neuen Onboarding beim ersten Login, erneuerten Konto- und Archiv-Oberflachen, gesicherter Metrik-Konfiguration sowie besserer Zuverlassigkeit fur Borg 2 und Remote-SSH.",
-        "it": "Borg UI 2.0.3 offre un importante aggiornamento di sicurezza e UX con passkey, TOTP integrato, un nuovo onboarding al primo accesso, esperienze rinnovate per account e archivi, configurazione sicura delle metriche e maggiore affidabilita per Borg 2 e SSH remoto."
+        "es": "BorgScale 2.0.3 ofrece una gran mejora de seguridad y experiencia de uso con passkeys, TOTP integrado, un nuevo flujo de onboarding en el primer acceso, experiencias renovadas en cuentas y archivos, configuracion segura de metricas y mayor fiabilidad con Borg 2 y SSH remoto.",
+        "de": "BorgScale 2.0.3 bringt ein grosses Sicherheits- und UX-Update mit Passkeys, integriertem TOTP, einem neuen Onboarding beim ersten Login, erneuerten Konto- und Archiv-Oberflachen, gesicherter Metrik-Konfiguration sowie besserer Zuverlassigkeit fur Borg 2 und Remote-SSH.",
+        "it": "BorgScale 2.0.3 offre un importante aggiornamento di sicurezza e UX con passkey, TOTP integrato, un nuovo onboarding al primo accesso, esperienze rinnovate per account e archivi, configurazione sicura delle metriche e maggiore affidabilita per Borg 2 e SSH remoto."
       },
       "highlights": [
         "Passkeys and built-in TOTP for local account security",
@@ -127,7 +127,7 @@
         "de": "Release Notes ansehen",
         "it": "Vedi note di rilascio"
       },
-      "cta_url": "https://github.com/karanhudia/borg-ui/releases",
+      "cta_url": "https://github.com/karanhudia/borgscale/releases",
       "dismissible": true,
       "snooze_days": 7,
       "starts_at": "2026-04-14T00:00:00Z",
@@ -146,11 +146,11 @@
         "de": "Neu in Version 2.0.0",
         "it": "Novita della versione 2.0.0"
       },
-      "message": "Borg UI 2.0 is here with Borg 2 beta support, a fully responsive UI, RBAC, a fresh new look across the app, localisation across English, German, Spanish, and Italian, and a more reliable foundation backed by 64% combined test coverage.",
+      "message": "BorgScale 2.0 is here with Borg 2 beta support, a fully responsive UI, RBAC, a fresh new look across the app, localisation across English, German, Spanish, and Italian, and a more reliable foundation backed by 64% combined test coverage.",
       "message_localized": {
-        "es": "Borg UI 2.0 ya esta aqui con soporte beta para Borg 2, una interfaz totalmente adaptable, RBAC, una apariencia renovada en toda la app, localizacion en ingles, aleman, espanol e italiano, y una base mas fiable respaldada por un 64 % de cobertura de pruebas combinada.",
-        "de": "Borg UI 2.0 ist da mit Borg-2-Beta-Unterstutzung, einer voll responsiven Oberflache, RBAC, einem frischen neuen Look in der gesamten App, Lokalisierung auf Englisch, Deutsch, Spanisch und Italienisch sowie einer zuverlassigeren Grundlage mit 64 % kombinierter Testabdeckung.",
-        "it": "Borg UI 2.0 e arrivato con supporto beta per Borg 2, un'interfaccia completamente reattiva, RBAC, un look rinnovato in tutta l'app, localizzazione in inglese, tedesco, spagnolo e italiano, e una base piu affidabile supportata dal 64% di copertura test combinata."
+        "es": "BorgScale 2.0 ya esta aqui con soporte beta para Borg 2, una interfaz totalmente adaptable, RBAC, una apariencia renovada en toda la app, localizacion en ingles, aleman, espanol e italiano, y una base mas fiable respaldada por un 64 % de cobertura de pruebas combinada.",
+        "de": "BorgScale 2.0 ist da mit Borg-2-Beta-Unterstutzung, einer voll responsiven Oberflache, RBAC, einem frischen neuen Look in der gesamten App, Lokalisierung auf Englisch, Deutsch, Spanisch und Italienisch sowie einer zuverlassigeren Grundlage mit 64 % kombinierter Testabdeckung.",
+        "it": "BorgScale 2.0 e arrivato con supporto beta per Borg 2, un'interfaccia completamente reattiva, RBAC, un look rinnovato in tutta l'app, localizzazione in inglese, tedesco, spagnolo e italiano, e una base piu affidabile supportata dal 64% di copertura test combinata."
       },
       "highlights": [
         "Borg 2 beta support across core repository flows",
@@ -200,7 +200,7 @@
         "de": "Release Notes ansehen",
         "it": "Vedi note di rilascio"
       },
-      "cta_url": "https://github.com/karanhudia/borg-ui/releases/tag/v2.0.0",
+      "cta_url": "https://github.com/karanhudia/borgscale/releases/tag/v2.0.0",
       "dismissible": true,
       "snooze_days": 7,
       "starts_at": "2026-04-11T00:00:00Z",

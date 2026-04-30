@@ -31,7 +31,7 @@ describe('MqttSettingsTab', () => {
       mqtt_broker_url: '',
       mqtt_broker_port: 1883,
       mqtt_username: '',
-      mqtt_client_id: 'borg-ui',
+      mqtt_client_id: 'borgscale',
       mqtt_qos: 1,
       mqtt_tls_enabled: false,
       mqtt_tls_ca_cert: '',

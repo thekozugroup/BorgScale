@@ -45,11 +45,11 @@
         "de": "Bis zu 5 Benutzer",
         "it": "Fino a 5 utenti"
       },
-      "description": "Invite up to 5 user accounts to manage your Borg UI instance.",
+      "description": "Invite up to 5 user accounts to manage your BorgScale instance.",
       "description_localized": {
-        "es": "Invita hasta 5 cuentas de usuario para gestionar tu instancia de Borg UI.",
+        "es": "Invita hasta 5 cuentas de usuario para gestionar tu instancia de BorgScale.",
         "de": "Laden Sie bis zu 5 Benutzerkonten zur Verwaltung Ihrer Borg-UI-Instanz ein.",
-        "it": "Invita fino a 5 account utente per gestire la tua istanza Borg UI."
+        "it": "Invita fino a 5 account utente per gestire la tua istanza BorgScale."
       },
       "availability": "included"
     },
@@ -215,11 +215,11 @@
         "de": "Bereitstellung auf 3 Servern",
         "it": "Distribuzione su 3 server"
       },
-      "description": "Use the same license key on up to 3 Borg UI servers.",
+      "description": "Use the same license key on up to 3 BorgScale servers.",
       "description_localized": {
-        "es": "Usa la misma clave de licencia en hasta 3 servidores de Borg UI.",
+        "es": "Usa la misma clave de licencia en hasta 3 servidores de BorgScale.",
         "de": "Verwenden Sie denselben Lizenzschlüssel auf bis zu 3 Borg-UI-Servern.",
-        "it": "Usa la stessa chiave di licenza su fino a 3 server Borg UI."
+        "it": "Usa la stessa chiave di licenza su fino a 3 server BorgScale."
       },
       "availability": "included"
     },
@@ -385,11 +385,11 @@
         "de": "Bereitstellung auf bis zu 15 Servern",
         "it": "Distribuzione su fino a 15 server"
       },
-      "description": "Use the same Enterprise license key on up to 15 Borg UI servers.",
+      "description": "Use the same Enterprise license key on up to 15 BorgScale servers.",
       "description_localized": {
-        "es": "Usa la misma clave de licencia Enterprise en hasta 15 servidores de Borg UI.",
+        "es": "Usa la misma clave de licencia Enterprise en hasta 15 servidores de BorgScale.",
         "de": "Verwenden Sie denselben Enterprise-Lizenzschlüssel auf bis zu 15 Borg-UI-Servern.",
-        "it": "Usa la stessa chiave di licenza Enterprise su fino a 15 server Borg UI."
+        "it": "Usa la stessa chiave di licenza Enterprise su fino a 15 server BorgScale."
       },
       "availability": "included"
     },
@@ -402,11 +402,11 @@
         "de": "Zentrales Backup-Management",
         "it": "Gestione centralizzata dei backup"
       },
-      "description": "Monitor, control, and run backups across multiple Borg UI instances from one web interface without storing repository passphrases on backup servers.",
+      "description": "Monitor, control, and run backups across multiple BorgScale instances from one web interface without storing repository passphrases on backup servers.",
       "description_localized": {
-        "es": "Supervisa, controla y ejecuta copias de seguridad en varias instancias de Borg UI desde una sola interfaz web sin almacenar frases de paso de repositorio en los servidores de backup.",
+        "es": "Supervisa, controla y ejecuta copias de seguridad en varias instancias de BorgScale desde una sola interfaz web sin almacenar frases de paso de repositorio en los servidores de backup.",
         "de": "Überwachen, steuern und starten Sie Backups über mehrere Borg-UI-Instanzen hinweg von einer einzigen Weboberfläche aus, ohne Repository-Passphrasen auf Backup-Servern zu speichern.",
-        "it": "Monitora, controlla ed esegui backup su più istanze Borg UI da un'unica interfaccia web senza archiviare le passphrase dei repository sui server di backup."
+        "it": "Monitora, controlla ed esegui backup su più istanze BorgScale da un'unica interfaccia web senza archiviare le passphrase dei repository sui server di backup."
       },
       "availability": "coming_soon"
     },
@@ -453,11 +453,11 @@
         "de": "Enterprise-Feature-Anfragen",
         "it": "Richieste di funzionalità Enterprise"
       },
-      "description": "Reach out to support@borgui.com for enterprise-specific roadmap requests.",
+      "description": "Reach out to https://github.com/thekozugroup/BorgScale/issues for enterprise-specific roadmap requests.",
       "description_localized": {
-        "es": "Contacta con support@borgui.com para solicitudes específicas de la hoja de ruta Enterprise.",
-        "de": "Wenden Sie sich an support@borgui.com für Enterprise-spezifische Roadmap-Anfragen.",
-        "it": "Contatta support@borgui.com per richieste specifiche della roadmap Enterprise."
+        "es": "Contacta con https://github.com/thekozugroup/BorgScale/issues para solicitudes específicas de la hoja de ruta Enterprise.",
+        "de": "Wenden Sie sich an https://github.com/thekozugroup/BorgScale/issues für Enterprise-spezifische Roadmap-Anfragen.",
+        "it": "Contatta https://github.com/thekozugroup/BorgScale/issues per richieste specifiche della roadmap Enterprise."
       },
       "availability": "coming_soon"
     }

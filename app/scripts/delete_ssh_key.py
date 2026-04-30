@@ -158,7 +158,7 @@ def delete_ssh_key(key_id=None, key_name=None, is_system=False, force=False):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Delete SSH keys from Borg UI database",
+        description="Delete SSH keys from BorgScale database",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

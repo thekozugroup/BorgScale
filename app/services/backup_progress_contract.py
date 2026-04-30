@@ -3,7 +3,7 @@
 This module is the backend source of truth for which backup progress fields
 are supported per Borg major version.
 
-Observed contract in the live `borg-ui-web-dev` Borg 2 environment:
+Observed contract in the live `borgscale-web-dev` Borg 2 environment:
 - Running `archive_progress` emits: `original_size`, `nfiles`, `path`,
   `hashing_time`, `chunking_time`, `files_stats`, `finished`
 - Running `archive_progress` does not emit: `compressed_size`,

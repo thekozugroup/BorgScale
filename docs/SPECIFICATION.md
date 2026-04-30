@@ -5,7 +5,7 @@ nav_order: 8
 description: "Architecture and technical details"
 ---
 
-# Borg Web UI - Technical Specification
+# BorgScale - Technical Specification
 
 ## 1. Executive Summary
 
@@ -606,7 +606,7 @@ CMD ["gunicorn", "app.main:app", "--bind", "0.0.0.0:8000", "--workers", "2", "--
 version: '3.8'
 
 services:
-  borg-ui:
+  borgscale:
     build: .
     container_name: borg-web-ui
     ports:

@@ -89,7 +89,7 @@ jobs:
 
       - name: Create test directories
         run: |
-          mkdir -p /tmp/borg-ui-tests
+          mkdir -p /tmp/borgscale-tests
           mkdir -p data
           mkdir -p logs
 
@@ -172,7 +172,7 @@ jobs:
 
       - name: Create test directories
         run: |
-          mkdir -p /tmp/borg-ui-tests
+          mkdir -p /tmp/borgscale-tests
           mkdir -p data
           mkdir -p logs
 
@@ -424,11 +424,11 @@ jobs:
           chmod +x tests/setup_test_env.sh
           ./tests/setup_test_env.sh
 
-      - name: Start Borg UI backend
+      - name: Start BorgScale backend
         run: |
           mkdir -p data logs
           uvicorn app.main:app --host 0.0.0.0 --port 8082 &
-          echo $! > /tmp/borg-ui.pid
+          echo $! > /tmp/borgscale.pid
         env:
           DATA_DIR: ${{ github.workspace }}/data
           SECRET_KEY: test-secret-key-for-ci-only
@@ -447,11 +447,11 @@ jobs:
         env:
           BORG_UI_CONTAINER: false
 
-      - name: Stop Borg UI
+      - name: Stop BorgScale
         if: always()
         run: |
-          if [ -f /tmp/borg-ui.pid ]; then
-            kill "$(cat /tmp/borg-ui.pid)" || true
+          if [ -f /tmp/borgscale.pid ]; then
+            kill "$(cat /tmp/borgscale.pid)" || true
           fi
 
       - name: Upload smoke artifacts
@@ -460,7 +460,7 @@ jobs:
         with:
           name: smoke-core-artifacts
           path: |
-            /tmp/borg-ui-tests/TEST_INFO.txt
+            /tmp/borgscale-tests/TEST_INFO.txt
             logs/
           if-no-files-found: ignore
           retention-days: 7
@@ -530,11 +530,11 @@ jobs:
           chmod +x tests/setup_test_env.sh
           ./tests/setup_test_env.sh
 
-      - name: Start Borg UI backend
+      - name: Start BorgScale backend
         run: |
           mkdir -p data logs
           uvicorn app.main:app --host 0.0.0.0 --port 8082 &
-          echo $! > /tmp/borg-ui.pid
+          echo $! > /tmp/borgscale.pid
         env:
           DATA_DIR: ${{ github.workspace }}/data
           SECRET_KEY: test-secret-key-for-ci-only
@@ -553,11 +553,11 @@ jobs:
         env:
           BORG_UI_CONTAINER: false
 
-      - name: Stop Borg UI
+      - name: Stop BorgScale
         if: always()
         run: |
-          if [ -f /tmp/borg-ui.pid ]; then
-            kill "$(cat /tmp/borg-ui.pid)" || true
+          if [ -f /tmp/borgscale.pid ]; then
+            kill "$(cat /tmp/borgscale.pid)" || true
           fi
 
       - name: Upload smoke artifacts
@@ -566,7 +566,7 @@ jobs:
         with:
           name: smoke-extended-artifacts
           path: |
-            /tmp/borg-ui-tests/TEST_INFO.txt
+            /tmp/borgscale-tests/TEST_INFO.txt
             logs/
           if-no-files-found: ignore
           retention-days: 7
@@ -648,11 +648,11 @@ jobs:
             exit 1
           fi
 
-      - name: Start Borg UI backend
+      - name: Start BorgScale backend
         run: |
           mkdir -p data logs
           uvicorn app.main:app --host 0.0.0.0 --port 8082 &
-          echo $! > /tmp/borg-ui.pid
+          echo $! > /tmp/borgscale.pid
         env:
           DATA_DIR: ${{ github.workspace }}/data
           SECRET_KEY: test-secret-key-for-ci-only
@@ -676,11 +676,11 @@ jobs:
           SSH_SMOKE_AUTH_KEYS: /home/borgsmoke/.ssh/authorized_keys
           SSH_SMOKE_REMOTE_REPO: /home/borgsmoke/remote-repo
 
-      - name: Stop Borg UI
+      - name: Stop BorgScale
         if: always()
         run: |
-          if [ -f /tmp/borg-ui.pid ]; then
-            kill "$(cat /tmp/borg-ui.pid)" || true
+          if [ -f /tmp/borgscale.pid ]; then
+            kill "$(cat /tmp/borgscale.pid)" || true
           fi
 
       - name: Upload smoke artifacts

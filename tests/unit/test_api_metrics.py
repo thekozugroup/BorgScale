@@ -58,7 +58,7 @@ class TestMetricsEndpoint:
 
         content = response.text
         # Should still have headers and system metrics
-        assert "# Prometheus metrics for borg-ui" in content
+        assert "# Prometheus metrics for borgscale" in content
         assert "borg_ui_repositories_total 0" in content
 
     def test_endpoint_returns_404_when_metrics_disabled(self, test_client, test_db):

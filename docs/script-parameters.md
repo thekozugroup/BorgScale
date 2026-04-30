@@ -4,7 +4,7 @@ Script parameters allow you to create reusable scripts that can be customized fo
 
 ## Overview
 
-Script parameters use bash's native `${PARAM}` or `${PARAM:-default}` syntax. When you create a script, Borg UI automatically detects parameter placeholders and generates a configuration interface for them.
+Script parameters use bash's native `${PARAM}` or `${PARAM:-default}` syntax. When you create a script, BorgScale automatically detects parameter placeholders and generates a configuration interface for them.
 
 ## Parameter Syntax
 
@@ -50,7 +50,7 @@ This script has 5 parameters:
 
 ## Parameter Types
 
-Borg UI automatically detects parameter types based on naming conventions:
+BorgScale automatically detects parameter types based on naming conventions:
 
 ### Text Parameters
 
@@ -122,7 +122,7 @@ echo "Database backed up to $BACKUP_FILE"
 
 ### 2. Save and Review Parameters
 
-After saving, Borg UI automatically detects 6 parameters:
+After saving, BorgScale automatically detects 6 parameters:
 - `PG_HOST` (text, optional)
 - `PG_PORT` (text, optional)
 - `PG_DATABASE` (text, required)

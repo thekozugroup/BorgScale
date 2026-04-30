@@ -13,7 +13,7 @@ Set up SSH keys for remote backup repositories.
 
 ## Overview
 
-SSH keys allow Borg Web UI to access remote backup repositories securely without storing passwords. This is essential for:
+SSH keys allow BorgScale to access remote backup repositories securely without storing passwords. This is essential for:
 
 - Backing up to remote servers
 - Storing backups on NAS devices
@@ -22,7 +22,7 @@ SSH keys allow Borg Web UI to access remote backup repositories securely without
 
 **🎯 UI-First Approach:** Everything is done through the web interface - no terminal commands needed! Just click **Deploy Key to Server**, enter your server password, and the UI handles the rest.
 
-**Single-Key System:** Borg Web UI uses one system SSH key for all remote connections, simplifying key management while maintaining security.
+**Single-Key System:** BorgScale uses one system SSH key for all remote connections, simplifying key management while maintaining security.
 
 ---
 
@@ -330,7 +330,7 @@ Many hosting providers and NAS systems have web interfaces to add SSH keys:
 4. Confirm deletion
 
 **What happens:**
-- Connection is removed from Borg Web UI
+- Connection is removed from BorgScale
 - SSH key remains on the remote server (in `~/.ssh/authorized_keys`)
 - Repositories using this connection may still work (if using the same host/username)
 
@@ -374,7 +374,7 @@ When creating or importing a repository:
    user@hostname:/path/to/repo
    ```
 
-2. Borg Web UI automatically uses your system SSH key
+2. BorgScale automatically uses your system SSH key
 
 3. Examples:
    ```
@@ -489,7 +489,7 @@ Rotate SSH keys periodically for security:
 
 If you generate keys externally:
 1. Generate new key on host system
-2. Delete old key in Borg Web UI
+2. Delete old key in BorgScale
 3. Import new key from filesystem
 4. Re-deploy to all servers
 
@@ -637,7 +637,7 @@ docker exec borg-web-ui ls -la /root/.ssh
 
 ### Hetzner Storage Box
 
-1. Generate ED25519 key in Borg Web UI
+1. Generate ED25519 key in BorgScale
 2. Copy public key
 3. Login to [Hetzner Robot](https://robot.your-server.de/)
 4. Go to your Storage Box
@@ -653,7 +653,7 @@ docker exec borg-web-ui ls -la /root/.ssh
 
 1. Enable SSH: Control Panel > Terminal & SNMP
 2. Create backup user with home directory
-3. Generate key in Borg Web UI
+3. Generate key in BorgScale
 4. Add public key to NAS:
    ```bash
    ssh admin@nas-ip
@@ -673,7 +673,7 @@ docker exec borg-web-ui ls -la /root/.ssh
 
 1. Set up SSH on Pi: `sudo raspi-config` > Interface Options > SSH
 2. Create backup directory: `mkdir -p ~/backups`
-3. Generate key in Borg Web UI
+3. Generate key in BorgScale
 4. Deploy key to Pi:
    ```bash
    ssh pi@raspberry-pi
@@ -690,7 +690,7 @@ docker exec borg-web-ui ls -la /root/.ssh
 
 ## Single-Key System
 
-Borg Web UI uses a **single system SSH key** for all remote connections. This simplifies key management:
+BorgScale uses a **single system SSH key** for all remote connections. This simplifies key management:
 
 1. **Generate one key**: Create the system SSH key once via **Remote Machines** page
 2. **Deploy to multiple servers**: Deploy the same key to all your remote servers

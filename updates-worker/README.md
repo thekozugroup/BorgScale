@@ -1,6 +1,6 @@
-# Borg UI Updates Worker
+# BorgScale Updates Worker
 
-Cloudflare Worker for serving OTA manifests on `updates.borgui.com`.
+Cloudflare Worker for serving OTA manifests on `updates.borgscale.thekozugroup.com`.
 
 Endpoints:
 

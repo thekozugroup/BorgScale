@@ -1,8 +1,8 @@
 <div align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borg-ui/main/assets/logo-dark.png" />
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borg-ui/main/assets/logo-light.png" />
-    <img alt="Borg UI Logo v2" src="https://raw.githubusercontent.com/karanhudia/borg-ui/main/assets/logo-light.png" width="360" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/assets/logo-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/assets/logo-light.png" />
+    <img alt="BorgScale Logo v2" src="https://raw.githubusercontent.com/karanhudia/borgscale/main/assets/logo-light.png" width="360" />
   </picture>
 </div>
 
@@ -10,21 +10,21 @@
 
 <div align="center">
   <h5>
-    <a href="https://borgui.com">Website</a>
+    <a href="https://github.com/thekozugroup/BorgScale">Website</a>
     <span> | </span>
-    <a href="https://docs.borgui.com">Documentation</a>
+    <a href="https://github.com/thekozugroup/BorgScale">Documentation</a>
     <span> | </span>
-    <a href="https://hub.docker.com/r/ainullcode/borg-ui">Docker Hub</a>
+    <a href="https://hub.docker.com/r/ainullcode/borgscale">Docker Hub</a>
   </h5>
 </div>
 
 <div align="center">
 
-[![Docker Hub](https://img.shields.io/docker/pulls/ainullcode/borg-ui)](https://hub.docker.com/r/ainullcode/borg-ui)
+[![Docker Hub](https://img.shields.io/docker/pulls/ainullcode/borgscale)](https://hub.docker.com/r/ainullcode/borgscale)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%203.0-blue.svg)](LICENSE)
-[![GitHub Actions](https://github.com/karanhudia/borg-ui/workflows/Build%20and%20Publish%20Docker%20Images/badge.svg)](https://github.com/karanhudia/borg-ui/actions)
-[![Tests](https://github.com/karanhudia/borg-ui/workflows/Tests/badge.svg)](https://github.com/karanhudia/borg-ui/actions/workflows/tests.yml)
-[![codecov](https://codecov.io/gh/karanhudia/borg-ui/branch/main/graph/badge.svg)](https://codecov.io/gh/karanhudia/borg-ui)
+[![GitHub Actions](https://github.com/karanhudia/borgscale/workflows/Build%20and%20Publish%20Docker%20Images/badge.svg)](https://github.com/karanhudia/borgscale/actions)
+[![Tests](https://github.com/karanhudia/borgscale/workflows/Tests/badge.svg)](https://github.com/karanhudia/borgscale/actions/workflows/tests.yml)
+[![codecov](https://codecov.io/gh/karanhudia/borgscale/branch/main/graph/badge.svg)](https://codecov.io/gh/karanhudia/borgscale)
 [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/5KfVa5QkdQ)
 
 </div>
@@ -46,13 +46,13 @@
 - Multi-architecture containers for `amd64`, `arm64`, and `armv7`
 
 > [!NOTE]
-> Borg UI is developed with modern AI tooling as part of the workflow. Architecture, security, and release decisions are reviewed before merge.
+> BorgScale is developed with modern AI tooling as part of the workflow. Architecture, security, and release decisions are reviewed before merge.
 
 ## Release Readiness
 
 - Current generated line coverage reports: backend `58.82%`, frontend `81.66%`, combined `64.36%`
 - Release confidence is built on multiple test lanes: backend unit coverage, backend API integration, frontend unit coverage, frontend build validation, and core, extended, and SSH smoke suites against a built app
-- Docker Hub publishes the user-facing app image `ainullcode/borg-ui`; the separate `borg-ui-runtime-base` image is an internal CI artifact and should remain private
+- Docker Hub publishes the user-facing app image `ainullcode/borgscale`; the separate `borgscale-runtime-base` image is an internal CI artifact and should remain private
 
 ## Interface
 
@@ -61,15 +61,15 @@
 Track repository health, recent activity, storage, and day-to-day backup execution from the main product surfaces.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/dashboard-dark.png" />
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/dashboard-light.png" />
-  <img alt="Borg UI dashboard" src="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/dashboard-light.png" width="100%" />
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/dashboard-dark.png" />
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/dashboard-light.png" />
+  <img alt="BorgScale dashboard" src="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/dashboard-light.png" width="100%" />
 </picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/repositories-dark.png" />
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/repositories-light.png" />
-  <img alt="Repository management" src="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/repositories-light.png" width="100%" />
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/repositories-dark.png" />
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/repositories-light.png" />
+  <img alt="Repository management" src="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/repositories-light.png" width="100%" />
 </picture>
 
 ### Backup and Restore Workflows
@@ -77,15 +77,15 @@ Track repository health, recent activity, storage, and day-to-day backup executi
 Monitor live backup progress, inspect archives, and work through restore flows without dropping to the CLI.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/backup-progress-dark.png" />
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/backup-progress-light.png" />
-  <img alt="Live backup progress" src="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/backup-progress-light.png" width="100%" />
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/backup-progress-dark.png" />
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/backup-progress-light.png" />
+  <img alt="Live backup progress" src="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/backup-progress-light.png" width="100%" />
 </picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/archive-browser-dark.png" />
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/archive-browser-light.png" />
-  <img alt="Archive browser" src="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/archive-browser-light.png" width="100%" />
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/archive-browser-dark.png" />
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/archive-browser-light.png" />
+  <img alt="Archive browser" src="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/archive-browser-light.png" width="100%" />
 </picture>
 
 ### Automation and Integrations
@@ -93,21 +93,21 @@ Monitor live backup progress, inspect archives, and work through restore flows w
 Automate schedules, manage remote machines, and configure notifications for ongoing backup operations.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/schedule-dark.png" />
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/schedule-light.png" />
-  <img alt="Backup schedule management" src="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/schedule-light.png" width="100%" />
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/schedule-dark.png" />
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/schedule-light.png" />
+  <img alt="Backup schedule management" src="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/schedule-light.png" width="100%" />
 </picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/remote-machines-dark.png" />
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/remote-machines-light.png" />
-  <img alt="Remote machines management" src="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/remote-machines-light.png" width="100%" />
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/remote-machines-dark.png" />
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/remote-machines-light.png" />
+  <img alt="Remote machines management" src="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/remote-machines-light.png" width="100%" />
 </picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/notifications-dark.png" />
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/notifications-light.png" />
-  <img alt="Notification services" src="https://raw.githubusercontent.com/karanhudia/borg-ui/main/screenshots/readme/notifications-light.png" width="100%" />
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/notifications-dark.png" />
+  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/notifications-light.png" />
+  <img alt="Notification services" src="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/notifications-light.png" width="100%" />
 </picture>
 
 ## Getting Started
@@ -119,41 +119,41 @@ docker run -d \
   -v borg_data:/data \
   -v borg_cache:/home/borg/.cache/borg \
   -v /home/yourusername:/local:rw \
-  ainullcode/borg-ui:latest
+  ainullcode/borgscale:latest
 ```
 
 Access the app at `http://localhost:8081` with `admin` / `admin123`.
 
-For setup details, see the [installation guide](https://docs.borgui.com/installation).
+For setup details, see the [installation guide](https://github.com/thekozugroup/BorgScale
 
 ## Documentation
 
-- [Full documentation](https://docs.borgui.com)
-- [Development guide](https://docs.borgui.com/development)
-- [Testing guide](https://docs.borgui.com/testing)
+- [Full documentation](https://github.com/thekozugroup/BorgScale)
+- [Development guide](https://github.com/thekozugroup/BorgScale)
+- [Testing guide](https://github.com/thekozugroup/BorgScale)
 
 ## Enterprise
 
-For teams that need commercial support, larger rollouts, or an enterprise conversation, Borg UI can also support evaluation and deployment beyond the core open source setup.
+For teams that need commercial support, larger rollouts, or an enterprise conversation, BorgScale can also support evaluation and deployment beyond the core open source setup.
 
-- [Learn more](https://borgui.com/buy)
-- Contact: [sales@borgui.com](mailto:sales@borgui.com)
-- You can also explore the live product and documentation at [borgui.com](https://borgui.com)
+- [Learn more](https://github.com/thekozugroup/BorgScale)
+- Contact: [GitHub Issues](https://github.com/thekozugroup/BorgScale/issues)
+- You can also explore the project at [github.com/thekozugroup/BorgScale](https://github.com/thekozugroup/BorgScale)
 
 ## Support
 
 - [Discord community](https://discord.gg/5KfVa5QkdQ)
-- [GitHub issues](https://github.com/karanhudia/borg-ui/issues)
+- [GitHub issues](https://github.com/karanhudia/borgscale/issues)
 
 ## Star History
 
 <div align="center">
 
-<a href="https://star-history.com/#karanhudia/borg-ui&Date">
+<a href="https://star-history.com/#karanhudia/borgscale&Date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=karanhudia/borg-ui&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=karanhudia/borg-ui&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=karanhudia/borg-ui&type=Date" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=karanhudia/borgscale&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=karanhudia/borgscale&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=karanhudia/borgscale&type=Date" />
   </picture>
 </a>
 
@@ -161,7 +161,7 @@ For teams that need commercial support, larger rollouts, or an enterprise conver
 
 ## Contributing
 
-See the [contributing guide](.github/CONTRIBUTING.md) and the [development guide](https://docs.borgui.com/development).
+See the [contributing guide](.github/CONTRIBUTING.md) and the [development guide](https://github.com/thekozugroup/BorgScale
 
 ## License
 

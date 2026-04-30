@@ -4,10 +4,10 @@
 
 set -e
 
-TEST_DIR="${1:-/tmp/borg-ui-tests}"
+TEST_DIR="${1:-/tmp/borgscale-tests}"
 
 echo "=================================================="
-echo "Fixing Docker Permissions for Borg UI Tests"
+echo "Fixing Docker Permissions for BorgScale Tests"
 echo "=================================================="
 echo ""
 echo "Test directory: $TEST_DIR"

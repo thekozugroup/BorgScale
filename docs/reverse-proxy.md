@@ -2,12 +2,12 @@
 layout: default
 title: Reverse Proxy Setup
 nav_order: 4
-description: "Configure Nginx, Traefik, Caddy, or Apache as a reverse proxy for Borg Web UI"
+description: "Configure Nginx, Traefik, Caddy, or Apache as a reverse proxy for BorgScale"
 ---
 
 # Reverse Proxy Setup Guide
 
-Complete guide for running Borg Web UI behind a reverse proxy with Nginx, Traefik, Caddy, or Apache. You can serve the app at the root of a (sub)domain (e.g., `backups.example.com`) or under a subfolder (e.g., `example.com/borg-ui`).
+Complete guide for running BorgScale behind a reverse proxy with Nginx, Traefik, Caddy, or Apache. You can serve the app at the root of a (sub)domain (e.g., `backups.example.com`) or under a subfolder (e.g., `example.com/borgscale`).
 
 ---
 
@@ -63,13 +63,13 @@ server {
 }
 ```
 
-### Subfolder Deployment (e.g., /borg-ui)
+### Subfolder Deployment (e.g., /borgscale)
 
-To serve Borg Web UI under a sub-path such as `https://example.com/borg-ui`:
+To serve BorgScale under a sub-path such as `https://example.com/borgscale`:
 
-1. **Set the `BASE_PATH` environment variable** to the sub-path (no trailing slash), e.g. `/borg-ui`.
+1. **Set the `BASE_PATH` environment variable** to the sub-path (no trailing slash), e.g. `/borgscale`.
 
-2. **Configure NGINX** to strip the path prefix when proxying. Use a trailing slash on `proxy_pass` so that `/borg-ui` is removed before the request reaches the backend:
+2. **Configure NGINX** to strip the path prefix when proxying. Use a trailing slash on `proxy_pass` so that `/borgscale` is removed before the request reaches the backend:
 
 ```nginx
 server {
@@ -78,7 +78,7 @@ server {
 
     # SSL configuration...
 
-    location /borg-ui/ {
+    location /borgscale/ {
         proxy_pass http://localhost:8081/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -98,12 +98,12 @@ server {
 
 ```yaml
 environment:
-  - BASE_PATH=/borg-ui
+  - BASE_PATH=/borgscale
 ```
 
-The app will then serve at `https://example.com/borg-ui` and use `/borg-ui` for all client-side routes and API calls.
+The app will then serve at `https://example.com/borgscale` and use `/borgscale` for all client-side routes and API calls.
 
-**Direct access:** With `BASE_PATH` set, you can also open the app at the same path on the container without a reverse proxy, e.g. `http://localhost:8081/borg-ui` (use the port you expose). Use this for local access or when the container port is exposed directly. Accessing the root URL (e.g. `http://localhost:8081/`) automatically redirects to the base path (e.g. `/borg-ui`).
+**Direct access:** With `BASE_PATH` set, you can also open the app at the same path on the container without a reverse proxy, e.g. `http://localhost:8081/borgscale` (use the port you expose). Use this for local access or when the container port is exposed directly. Accessing the root URL (e.g. `http://localhost:8081/`) automatically redirects to the base path (e.g. `/borgscale`).
 
 ### With SSL/HTTPS (Let's Encrypt)
 
@@ -156,7 +156,7 @@ server {
     include /path/to/authelia-authrequest.conf;
 
     location / {
-        # Forward authenticated username to Borg UI
+        # Forward authenticated username to BorgScale
         proxy_set_header X-Remote-User $remote_user;
         proxy_set_header X-Forwarded-User $remote_user;
 
@@ -222,8 +222,8 @@ Use Docker labels with automatic Let's Encrypt certificates:
 
 ```yaml
 services:
-  borg-ui:
-    image: ainullcode/borg-ui:latest
+  borgscale:
+    image: ainullcode/borgscale:latest
     container_name: borg-web-ui
     restart: unless-stopped
     volumes:
@@ -235,10 +235,10 @@ services:
       - PGID=1000
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.borg-ui.rule=Host(`backups.example.com`)"
-      - "traefik.http.routers.borg-ui.entrypoints=websecure"
-      - "traefik.http.routers.borg-ui.tls.certresolver=letsencrypt"
-      - "traefik.http.services.borg-ui.loadbalancer.server.port=8081"
+      - "traefik.http.routers.borgscale.rule=Host(`backups.example.com`)"
+      - "traefik.http.routers.borgscale.entrypoints=websecure"
+      - "traefik.http.routers.borgscale.tls.certresolver=letsencrypt"
+      - "traefik.http.services.borgscale.loadbalancer.server.port=8081"
     networks:
       - traefik
 
@@ -280,16 +280,16 @@ Disable the built-in login screen and let your reverse proxy handle authenticati
 environment:
   - DISABLE_AUTHENTICATION=true          # Disable built-in login screen
   - PROXY_AUTH_HEADER=X-Forwarded-User   # Header containing authenticated username (optional, default shown)
-  - PROXY_AUTH_ROLE_HEADER=X-Borg-Role   # Optional trusted Borg UI global role header
+  - PROXY_AUTH_ROLE_HEADER=X-Borg-Role   # Optional trusted BorgScale global role header
   - PROXY_AUTH_ALL_REPOSITORIES_ROLE_HEADER=X-Borg-All-Repositories-Role   # Optional trusted default repository role header
   - PROXY_AUTH_EMAIL_HEADER=X-Borg-Email   # Optional trusted email header
   - PROXY_AUTH_FULL_NAME_HEADER=X-Borg-Full-Name   # Optional trusted display-name header
 ```
 
 **How it works:**
-- Borg UI reads the authenticated username from HTTP headers set by your reverse proxy
+- BorgScale reads the authenticated username from HTTP headers set by your reverse proxy
 - Users are auto-created on first access as `viewer` by default
-- Optional trusted headers can assign Borg UI `viewer`, `operator`, or `admin` roles
+- Optional trusted headers can assign BorgScale `viewer`, `operator`, or `admin` roles
 - Optional trusted headers can assign a default repository role of `viewer` or `operator`
 - Optional trusted headers can populate `email` and `full_name`
 - Requests without a trusted identity header are rejected with HTTP 401
@@ -300,7 +300,7 @@ environment:
 - `Remote-User`
 - `X-authentik-username` (Authentik)
 
-If you set a custom `PROXY_AUTH_HEADER`, Borg UI trusts only that configured header for username resolution.
+If you set a custom `PROXY_AUTH_HEADER`, BorgScale trusts only that configured header for username resolution.
 
 **Supported authentication providers:**
 
@@ -318,8 +318,8 @@ If you set a custom `PROXY_AUTH_HEADER`, Borg UI trusts only that configured hea
 **docker-compose.yml:**
 ```yaml
 services:
-  borg-ui:
-    image: ainullcode/borg-ui:latest
+  borgscale:
+    image: ainullcode/borgscale:latest
     environment:
       - DISABLE_AUTHENTICATION=true
       - PROXY_AUTH_HEADER=X-authentik-username
@@ -340,20 +340,20 @@ services:
       - external
     labels:
       - "authentik.enabled=true"
-      - "authentik.upstream=http://borg-ui:8081"
+      - "authentik.upstream=http://borgscale:8081"
 ```
 
 **Authentik Application Setup:**
 1. Create new application in Authentik
 2. Select **Proxy Provider**
 3. Set External URL: `https://backups.example.com`
-4. Set Internal URL: `http://borg-ui:8081`
+4. Set Internal URL: `http://borgscale:8081`
 5. Enable **Forward auth (single application)**
 6. Set authorization flow and user/group bindings
 
 **Authentik header mapping example:**
 
-If you want Authentik or your proxy layer to assign Borg UI roles, emit separate trusted headers.
+If you want Authentik or your proxy layer to assign BorgScale roles, emit separate trusted headers.
 
 ```yaml
 environment:
@@ -383,7 +383,7 @@ location / {
 }
 ```
 
-Valid Borg UI values:
+Valid BorgScale values:
 - `X-Borg-Role`: `viewer`, `operator`, `admin`
 - `X-Borg-All-Repositories-Role`: `viewer`, `operator`
 - `X-Borg-Email`: any trusted email string
@@ -396,7 +396,7 @@ Valid Borg UI values:
 - Session duration: 24 hours
 - Add policies for users/groups
 
-**2. Configure Borg UI:**
+**2. Configure BorgScale:**
 ```yaml
 environment:
   - DISABLE_AUTHENTICATION=true
@@ -411,7 +411,7 @@ See [Security Guide - Proxy/OIDC Authentication](security.md#proxyoidc-authentic
 
 ## Docker Network Isolation
 
-When using proxy authentication, you **must** ensure Borg UI is only accessible through your authenticated proxy.
+When using proxy authentication, you **must** ensure BorgScale is only accessible through your authenticated proxy.
 
 **Bind to localhost only:**
 ```yaml
@@ -429,7 +429,7 @@ sudo ufw allow from 127.0.0.1 to any port 8081
 **Use Docker networks for isolation:**
 ```yaml
 services:
-  borg-ui:
+  borgscale:
     networks:
       - internal
     # NO ports exposed - only accessible via proxy network
@@ -447,13 +447,13 @@ networks:
   external:
 ```
 
-**Why this matters:** If Borg UI is directly accessible, anyone can spoof the authentication header (`X-Forwarded-User`) and impersonate any user. Your reverse proxy must be the only path to the application.
+**Why this matters:** If BorgScale is directly accessible, anyone can spoof the authentication header (`X-Forwarded-User`) and impersonate any user. Your reverse proxy must be the only path to the application.
 
 ---
 
 ## WebSocket and SSE Support
 
-Borg Web UI uses WebSocket and Server-Sent Events (SSE) for real-time updates (backup progress, log streaming, etc.). Your reverse proxy **must** forward these correctly.
+BorgScale uses WebSocket and Server-Sent Events (SSE) for real-time updates (backup progress, log streaming, etc.). Your reverse proxy **must** forward these correctly.
 
 **Required headers for Nginx configurations:**
 
@@ -502,7 +502,7 @@ docker logs borg-web-ui 2>&1 | grep "X-Forwarded-User"
 
 ### 502 Bad Gateway
 
-**Symptom:** Nginx returns 502 when accessing Borg UI.
+**Symptom:** Nginx returns 502 when accessing BorgScale.
 
 **Fix:**
 - Verify the container is running: `docker ps | grep borg`

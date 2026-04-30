@@ -2,13 +2,13 @@
 layout: default
 title: Development Guide
 nav_order: 10
-description: "Setting up a development environment for Borg Web UI"
+description: "Setting up a development environment for BorgScale"
 permalink: /development
 ---
 
 # Development Guide
 
-This guide covers setting up a development environment for Borg Web UI with hot reload support for both frontend and backend.
+This guide covers setting up a development environment for BorgScale with hot reload support for both frontend and backend.
 
 ---
 
@@ -26,8 +26,8 @@ This guide covers setting up a development environment for Borg Web UI with hot 
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/karanhudia/borg-ui.git
-cd borg-ui
+git clone https://github.com/karanhudia/borgscale.git
+cd borgscale
 ```
 
 ### Configure Ports (Optional)
@@ -95,7 +95,7 @@ Production and dev environments use different container names and ports, so they
 ## Project Structure
 
 ```
-borg-ui/
+borgscale/
 ├── app/                      # Python backend (FastAPI)
 │   ├── main.py               # Application entry point
 │   ├── api/                  # API route handlers

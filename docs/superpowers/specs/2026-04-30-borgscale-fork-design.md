@@ -126,7 +126,7 @@ delete the surrounding components:
 | location | content |
 | --- | --- |
 | `frontend/src/locales/{en,es,de,it}.json:3311` | `"buyLink": "Upgrade at borgui.com"` (deleted by Phase 1 plan-gating removal — the i18n key becomes orphaned and is removed in the same commit) |
-| `frontend/src/data/plan-content.json:456-460` | `support@borgui.com` references in four locales (whole file deleted in Phase 1) |
+| `frontend/src/data/plan-content.json:456-460` | `https://github.com/thekozugroup/BorgScale/issues` references in four locales (whole file deleted in Phase 1) |
 | `frontend/src/utils/externalLinks.ts:1` | `BUY_URL = 'https://borgui.com/buy'` (file deleted in Phase 1) |
 | `frontend/src/services/{announcements,planContent}.ts` | `https://updates.borgui.com/...` defaults (handled above) |
 | `frontend/src/components/__tests__/PlanGate.test.tsx` | references `borgui.com` (deleted with `PlanGate.tsx`) |
@@ -229,7 +229,7 @@ Components:
    OG tags, `manifest.json` (`name`, `short_name`, `theme_color`).
 4. **`borgui.com` URL sweep.** Replace any remaining mentions with
    `https://github.com/thekozugroup/BorgScale`. Old support contacts
-   (`support@borgui.com` etc.) become a single
+   (`https://github.com/thekozugroup/BorgScale/issues` etc.) become a single
    `https://github.com/thekozugroup/BorgScale/issues` link. Confirm
    `grep -rn 'borgui\.com' .` returns zero non-test matches.
 5. **i18n bundle sweep.** `frontend/src/locales/{en,es,de,it}.json`

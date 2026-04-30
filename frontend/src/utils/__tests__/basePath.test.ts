@@ -14,10 +14,10 @@ describe('basePath', () => {
   })
 
   it('returns a non-slash path as-is', async () => {
-    vi.stubGlobal('__BASE_PATH__', '/borg-ui')
+    vi.stubGlobal('__BASE_PATH__', '/borgscale')
     vi.resetModules()
     const { BASE_PATH } = await import('../basePath')
-    expect(BASE_PATH).toBe('/borg-ui')
+    expect(BASE_PATH).toBe('/borgscale')
   })
 
   it('defaults to empty string when unset', async () => {

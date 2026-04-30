@@ -1,6 +1,6 @@
-# Borg Web UI - Frontend
+# BorgScale - Frontend
 
-React frontend for the Borg Web UI application.
+React frontend for the BorgScale application.
 
 ## Development
 

@@ -604,7 +604,7 @@ async def begin_passkey_registration(
     ]
     options = webauthn["generate_registration_options"](
         rp_id=rp_id,
-        rp_name="Borg UI",
+        rp_name="BorgScale",
         user_id=str(current_user.id).encode("utf-8"),
         user_name=current_user.username,
         user_display_name=current_user.full_name or current_user.username,

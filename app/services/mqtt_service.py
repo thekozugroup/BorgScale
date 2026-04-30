@@ -1,5 +1,5 @@
 """
-MQTT service for Borg Web UI.
+MQTT service for BorgScale.
 
 Home Assistant sensor state is always published from database state so that:
 - state can be fully reconstructed from DB records
@@ -869,18 +869,18 @@ class MQTTService:
             "broker_port": 1883,
             "username": None,
             "password": None,
-            "client_id": "borg-ui",
+            "client_id": "borgscale",
             "keepalive": 60,
             "tls_enabled": False,
             "tls_ca_cert": None,
             "tls_client_cert": None,
             "tls_client_key": None,
-            "base_topic": "borg-ui",
+            "base_topic": "borgscale",
             "qos": 1,
             # Home Assistant settings
             "home_assistant_enabled": True,
             "home_assistant_device_name": "Borg",
-            "home_assistant_device_manufacturer": "Borg UI",
+            "home_assistant_device_manufacturer": "BorgScale",
             "home_assistant_device_model": "Backup",
             "home_assistant_device_identifiers": "borg_ui",
         }

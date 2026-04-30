@@ -1,4 +1,4 @@
-# Coverage.py configuration for Borg UI
+# Coverage.py configuration for BorgScale
 # https://coverage.readthedocs.io/
 
 [run]
@@ -83,7 +83,7 @@ exclude_lines =
 directory = htmlcov
 
 # Title for HTML report
-title = Borg UI Coverage Report
+title = BorgScale Coverage Report
 
 [xml]
 # Output file for XML report (for CI/CD tools)

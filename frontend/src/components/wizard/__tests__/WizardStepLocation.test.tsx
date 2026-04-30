@@ -80,7 +80,7 @@ describe('WizardStepLocation', () => {
         />
       )
 
-      expect(screen.getByText('Borg UI Server')).toBeInTheDocument()
+      expect(screen.getByText('BorgScale Server')).toBeInTheDocument()
       expect(screen.getByText('Remote Client')).toBeInTheDocument()
     })
 
@@ -219,7 +219,7 @@ describe('WizardStepLocation', () => {
   })
 
   describe('Location Card Selection', () => {
-    it('calls onChange when Borg UI Server is clicked', async () => {
+    it('calls onChange when BorgScale Server is clicked', async () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
       const sshData = { ...defaultData, repositoryLocation: 'ssh' as const }
@@ -234,7 +234,7 @@ describe('WizardStepLocation', () => {
         />
       )
 
-      const localCard = screen.getByText('Borg UI Server').closest('button')
+      const localCard = screen.getByText('BorgScale Server').closest('button')
       await user.click(localCard!)
 
       expect(onChange).toHaveBeenCalledWith(
@@ -344,7 +344,7 @@ describe('WizardStepLocation', () => {
   })
 
   describe('Path Placeholder', () => {
-    it('shows local path placeholder when Borg UI Server selected', () => {
+    it('shows local path placeholder when BorgScale Server selected', () => {
       render(
         <WizardStepLocation
           mode="create"

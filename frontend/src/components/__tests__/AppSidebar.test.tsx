@@ -82,7 +82,7 @@ describe('AppSidebar', () => {
 
   it('renders the app name', async () => {
     renderWithProviders(<AppSidebar mobileOpen={false} onClose={vi.fn()} />)
-    await waitFor(() => expect(screen.getAllByText('Borg UI').length).toBeGreaterThan(0))
+    await waitFor(() => expect(screen.getAllByText('BorgScale').length).toBeGreaterThan(0))
   })
 
   it('renders a link to the dashboard', async () => {

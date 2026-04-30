@@ -1,7 +1,7 @@
 """
 Remote Backup Service
 
-Executes Borg backups on remote hosts via SSH, allowing the Borg UI to orchestrate
+Executes Borg backups on remote hosts via SSH, allowing the BorgScale to orchestrate
 backups from remote machines without pulling data over the network.
 """
 

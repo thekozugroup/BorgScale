@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Borg Web UI Test Runner
+# BorgScale Test Runner
 # This script runs the comprehensive test suite for the application
 
 set -e  # Exit on any error
 
-echo "🧪 Borg Web UI Test Runner"
+echo "🧪 BorgScale Test Runner"
 echo "================================"
 
 # Check if Python 3 is available

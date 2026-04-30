@@ -579,7 +579,7 @@
   "schemaVersion": 41,
   "style": "dark",
   "tags": [
-    "borg-ui",
+    "borgscale",
     "monitoring",
     "overview"
   ],
@@ -616,8 +616,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Borg UI Overview",
-  "uid": "borg-ui-overview",
+  "title": "BorgScale Overview",
+  "uid": "borgscale-overview",
   "version": 2,
   "weekStart": ""
 }

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Release script for Borg UI
+# Release script for BorgScale
 # Usage: npm run release -- v1.51.0
 # Or directly: ./scripts/release.sh v1.51.0
 
