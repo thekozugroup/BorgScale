@@ -1,4 +1,5 @@
-import { Box, Skeleton, alpha, useTheme } from '@mui/material'
+import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
 
 interface RepositoryCardSkeletonProps {
   index?: number
@@ -8,168 +9,84 @@ const NAME_WIDTHS = [120, 148, 104, 136, 116, 152]
 const PATH_WIDTHS = [200, 240, 180, 220, 196, 232]
 
 export default function RepositoryCardSkeleton({ index = 0 }: RepositoryCardSkeletonProps) {
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
   const nameWidth = NAME_WIDTHS[index % NAME_WIDTHS.length]
   const pathWidth = PATH_WIDTHS[index % PATH_WIDTHS.length]
 
   return (
-    <Box
-      sx={{
-        position: 'relative',
-        borderRadius: 2,
-        bgcolor: 'background.paper',
-        overflow: 'hidden',
-        boxShadow: isDark
-          ? `0 0 0 1px ${alpha('#fff', 0.08)}, 0 4px 16px ${alpha('#000', 0.25)}`
-          : `0 0 0 1px ${alpha('#000', 0.08)}, 0 2px 8px ${alpha('#000', 0.07)}`,
-        opacity: 0,
-        animation: 'skeletonFadeIn 0.4s ease forwards',
-        animationDelay: `${index * 80}ms`,
-        '@keyframes skeletonFadeIn': {
-          from: { opacity: 0, transform: 'translateY(6px)' },
-          to: { opacity: 1, transform: 'translateY(0)' },
-        },
-      }}
+    <div
+      className={cn(
+        'relative overflow-hidden rounded-xl border bg-card',
+        'shadow-[0_0_0_1px_theme(colors.border),0_2px_8px_theme(colors.black/7%)] dark:shadow-[0_0_0_1px_theme(colors.border),0_4px_16px_theme(colors.black/25%)]',
+        'opacity-0 animate-[skeletonFadeIn_0.4s_ease_forwards]',
+        '[animation-delay:var(--delay)]'
+      )}
+      style={{ '--delay': `${index * 80}ms` } as React.CSSProperties}
     >
-      <Box sx={{ px: { xs: 1.75, sm: 2 }, pt: { xs: 1.75, sm: 2 }, pb: { xs: 1.5, sm: 1.75 } }}>
+      <div className="px-4 pb-3.5 pt-4 sm:px-5">
         {/* ── Header ── */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
-            gap: 1,
-            mb: 1.5,
-          }}
-        >
-          <Box sx={{ minWidth: 0, flex: 1 }}>
+        <div className="mb-3 flex items-start justify-between gap-2">
+          <div className="min-w-0 flex-1">
             {/* Name row */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.5 }}>
-              <Skeleton
-                variant="text"
-                width={nameWidth}
-                height={22}
-                sx={{ borderRadius: 0.5, transform: 'none' }}
-              />
-              <Skeleton
-                variant="rounded"
-                width={42}
-                height={18}
-                sx={{ borderRadius: 3, flexShrink: 0 }}
-              />
-            </Box>
+            <div className="mb-1 flex items-center gap-1.5">
+              <Skeleton className="h-5 rounded" style={{ width: nameWidth }} />
+              <Skeleton className="h-4.5 w-10 shrink-0 rounded-full" />
+            </div>
             {/* Path */}
-            <Skeleton
-              variant="text"
-              width={pathWidth}
-              height={14}
-              sx={{ borderRadius: 0.5, transform: 'none' }}
-            />
-          </Box>
-
+            <Skeleton className="h-3.5 rounded" style={{ width: pathWidth }} />
+          </div>
           {/* Edit button placeholder */}
-          <Skeleton
-            variant="rounded"
-            width={28}
-            height={28}
-            sx={{ borderRadius: 1, flexShrink: 0 }}
-          />
-        </Box>
+          <Skeleton className="size-7 shrink-0 rounded" />
+        </div>
 
         {/* ── Stats Band ── */}
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' },
-            borderRadius: 1.5,
-            border: '1px solid',
-            borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-            overflow: 'hidden',
-            mb: 1.5,
-            bgcolor: isDark ? alpha('#fff', 0.025) : alpha('#000', 0.018),
-          }}
-        >
+        <div className="mb-3 grid grid-cols-2 overflow-hidden rounded-lg border border-border/60 bg-muted/30 sm:grid-cols-4">
           {[0, 1, 2, 3].map((i) => {
             const isRightColXs = i % 2 === 1
             const isLastSm = i === 3
             const isFirstRowXs = i < 2
             return (
-              <Box
+              <div
                 key={i}
-                sx={{
-                  px: 1.5,
-                  py: 1.1,
-                  borderRight: isLastSm ? 0 : '1px solid',
-                  borderBottom: { xs: isFirstRowXs ? '1px solid' : 0, sm: 0 },
-                  borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-                  ...(isRightColXs && {
-                    borderRight: { xs: 0, sm: isLastSm ? 0 : '1px solid' },
-                  }),
-                }}
+                className={cn(
+                  'px-3 py-2.5',
+                  !isLastSm && 'border-r border-border/60',
+                  isFirstRowXs && 'border-b border-border/60 sm:border-b-0',
+                  isRightColXs && 'border-r-0 sm:border-r',
+                  isLastSm && 'border-r-0'
+                )}
               >
-                {/* Icon + label row */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
-                  <Skeleton
-                    variant="rounded"
-                    width={11}
-                    height={11}
-                    sx={{ borderRadius: 0.5, flexShrink: 0 }}
-                  />
-                  <Skeleton variant="text" width={40} height={10} sx={{ transform: 'none' }} />
-                </Box>
-                {/* Value */}
+                <div className="mb-1 flex items-center gap-1">
+                  <Skeleton className="size-2.5 shrink-0 rounded" />
+                  <Skeleton className="h-2.5 w-10 rounded" />
+                </div>
                 <Skeleton
-                  variant="text"
-                  width={[36, 48, 52, 44][i]}
-                  height={18}
-                  sx={{ transform: 'none' }}
+                  className="h-4 rounded"
+                  style={{ width: [36, 48, 52, 44][i] }}
                 />
-              </Box>
+              </div>
             )
           })}
-        </Box>
+        </div>
 
         {/* ── Secondary Metadata ── */}
-        <Box
-          sx={{ display: 'flex', gap: { xs: 1.25, sm: 1.75 }, flexWrap: 'wrap', mb: 1.5, px: 0.25 }}
-        >
+        <div className="mb-3 flex flex-wrap gap-3 px-0.5">
           {[56, 72, 68, 60].map((w, i) => (
-            <Skeleton key={i} variant="text" width={w} height={12} sx={{ transform: 'none' }} />
+            <Skeleton key={i} className="h-3 rounded" style={{ width: w }} />
           ))}
-        </Box>
+        </div>
 
         {/* ── Action Bar ── */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.5,
-            pt: 1.25,
-            borderTop: '1px solid',
-            borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-          }}
-        >
+        <div className="flex items-center gap-1.5 border-t border-border/60 pt-3">
           {/* Left icon cluster */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25, flex: 1 }}>
+          <div className="flex flex-1 items-center gap-0.5">
             {[0, 1, 2, 3, 4].map((i) => (
-              <Skeleton
-                key={i}
-                variant="rounded"
-                width={32}
-                height={32}
-                sx={{ borderRadius: 1.5 }}
-              />
+              <Skeleton key={i} className="size-8 rounded-md" />
             ))}
-          </Box>
-
-          {/* Right: primary action buttons */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexShrink: 0 }}>
-            <Skeleton variant="rounded" width={72} height={32} sx={{ borderRadius: 1.5 }} />
-            <Skeleton variant="rounded" width={96} height={32} sx={{ borderRadius: 1.5 }} />
-          </Box>
-        </Box>
-      </Box>
-    </Box>
+          </div>
+          {/* Right: primary action button */}
+          <Skeleton className="h-7.5 w-20 rounded-md" />
+        </div>
+      </div>
+    </div>
   )
 }

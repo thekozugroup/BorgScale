@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Box, Typography, Button, IconButton, Tooltip, Chip, useTheme, alpha } from '@mui/material'
 import { format, isTomorrow, isToday, isThisYear } from 'date-fns'
 import {
   Info,
@@ -25,6 +24,10 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useAnalytics } from '../hooks/useAnalytics'
 import { Repository } from '../types'
 import type { RepoAction } from '../hooks/usePermissions'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
 
 interface RepositoryCardProps {
   repository: Repository
@@ -43,9 +46,6 @@ interface RepositoryCardProps {
   onJobCompleted?: (repositoryId: number) => void
 }
 
-const ACCENT_IDLE = '#059669'
-const ACCENT_RUNNING = '#f59e0b'
-
 const STAT_ICONS = [
   <Archive size={11} />,
   <HardDrive size={11} />,
@@ -53,7 +53,12 @@ const STAT_ICONS = [
   <ScanSearch size={11} />,
 ]
 
-const STAT_COLORS = ['primary', 'success', 'warning', 'info'] as const
+const STAT_COLOR_CLASSES = [
+  'text-primary/70',
+  'text-emerald-500/70',
+  'text-amber-500/70',
+  'text-sky-500/70',
+] as const
 
 export default function RepositoryCard({
   repository,
@@ -71,8 +76,6 @@ export default function RepositoryCard({
   canDo,
   onJobCompleted,
 }: RepositoryCardProps) {
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
   const queryClient = useQueryClient()
   const { t } = useTranslation()
   const { trackRepository, trackBackup, trackArchive, EventAction } = useAnalytics()
@@ -162,9 +165,7 @@ export default function RepositoryCard({
         title: repository.schedule_name
           ? t('repositoryCard.schedulePausedWithName', { name: repository.schedule_name })
           : t('repositoryCard.schedulePaused'),
-        color: theme.palette.warning.main,
-        bg: alpha(theme.palette.warning.main, isDark ? 0.12 : 0.1),
-        border: alpha(theme.palette.warning.main, isDark ? 0.34 : 0.28),
+        variant: 'warning' as const,
       }
     }
 
@@ -189,538 +190,365 @@ export default function RepositoryCard({
             when: formatDateTimeFull(repository.next_run),
           })
         : t('repositoryCard.nextBackupBadge', { when: formatDateTimeFull(repository.next_run) }),
-      color: theme.palette.success.main,
-      bg: alpha(theme.palette.success.main, isDark ? 0.12 : 0.09),
-      border: alpha(theme.palette.success.main, isDark ? 0.32 : 0.24),
+      variant: 'success' as const,
     }
   })()
 
-  const iconBtnSx = {
-    width: 32,
-    height: 32,
-    borderRadius: 1.5,
-    color: 'text.secondary',
-    '&:hover': {
-      bgcolor: isDark ? alpha('#fff', 0.07) : alpha('#000', 0.06),
-      color: 'text.primary',
-    },
-    '&.Mui-disabled': { opacity: 0.28 },
-  }
-
-  const activeIconBtnSx = {
-    ...iconBtnSx,
-    color: theme.palette.primary.main,
-    bgcolor: alpha(theme.palette.primary.main, 0.1),
-    '&:hover': {
-      bgcolor: alpha(theme.palette.primary.main, 0.18),
-      color: theme.palette.primary.main,
-    },
-  }
-
-  const coloredIconBtnSx = (colorKey: 'primary' | 'success' | 'secondary' | 'warning' | 'info') => {
-    const color = (theme.palette[colorKey] as { main: string }).main
-    return {
-      ...iconBtnSx,
-      color: alpha(color, isDark ? 0.65 : 0.55),
-      '&:hover': {
-        bgcolor: alpha(color, isDark ? 0.12 : 0.09),
-        color: color,
-      },
-      '&.Mui-disabled': { opacity: 0.28 },
-    }
-  }
+  const iconBtnBase =
+    'inline-flex size-8 items-center justify-center rounded-md border-0 bg-transparent text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-30'
 
   return (
-    <Box
-      sx={{
-        position: 'relative',
-        borderRadius: 2,
-        bgcolor: 'background.paper',
-        overflow: 'hidden',
-        maxWidth: '100%',
-        minWidth: 0,
-        boxShadow: isMaintenanceRunning
-          ? `0 0 0 1px ${alpha(ACCENT_RUNNING, 0.4)}, 0 4px 16px ${alpha('#000', 0.2)}, 0 2px 6px ${alpha(ACCENT_RUNNING, 0.1)}`
-          : isDark
-            ? `0 0 0 1px ${alpha('#fff', 0.08)}, 0 4px 16px ${alpha('#000', 0.25)}`
-            : `0 0 0 1px ${alpha('#000', 0.08)}, 0 2px 8px ${alpha('#000', 0.07)}`,
-        transition: 'all 200ms cubic-bezier(0.16,1,0.3,1)',
-        '&:hover': {
-          transform: 'translateY(-2px)',
-          boxShadow: isMaintenanceRunning
-            ? `0 0 0 1px ${alpha(ACCENT_RUNNING, 0.55)}, 0 8px 24px ${alpha('#000', 0.28)}, 0 4px 12px ${alpha(ACCENT_RUNNING, 0.15)}`
-            : isDark
-              ? `0 0 0 1px ${alpha(ACCENT_IDLE, 0.4)}, 0 8px 24px ${alpha('#000', 0.3)}, 0 2px 8px ${alpha(ACCENT_IDLE, 0.1)}`
-              : `0 0 0 1px ${alpha(ACCENT_IDLE, 0.3)}, 0 8px 24px ${alpha('#000', 0.12)}, 0 2px 8px ${alpha(ACCENT_IDLE, 0.08)}`,
-        },
-      }}
+    <div
+      className={cn(
+        'relative overflow-hidden rounded-xl bg-card',
+        isMaintenanceRunning
+          ? 'shadow-[0_0_0_1px_theme(colors.amber.500/40),0_4px_16px_theme(colors.black/20),0_2px_6px_theme(colors.amber.500/10)]'
+          : 'shadow-[0_0_0_1px_theme(colors.border),0_2px_8px_theme(colors.black/7%)] dark:shadow-[0_0_0_1px_theme(colors.border),0_4px_16px_theme(colors.black/25%)]',
+        'transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5',
+        isMaintenanceRunning
+          ? 'hover:shadow-[0_0_0_1px_theme(colors.amber.500/55),0_8px_24px_theme(colors.black/28),0_4px_12px_theme(colors.amber.500/15)]'
+          : 'hover:shadow-[0_0_0_1px_theme(colors.emerald.600/30),0_8px_24px_theme(colors.black/12),0_2px_8px_theme(colors.emerald.600/8%)]'
+      )}
     >
-      {/* Subtle ambient glow — only visible when maintenance is running */}
+      {/* Ambient glow when maintenance running */}
       {isMaintenanceRunning && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: -30,
-            left: -30,
-            width: 160,
-            height: 100,
-            borderRadius: '50%',
-            bgcolor: alpha(ACCENT_RUNNING, isDark ? 0.18 : 0.1),
-            filter: 'blur(48px)',
-            pointerEvents: 'none',
-            animation: 'blobPulse 2s ease-in-out infinite',
-            '@keyframes blobPulse': {
-              '0%, 100%': { opacity: 1 },
-              '50%': { opacity: 0.35 },
-            },
-          }}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -left-8 -top-8 h-24 w-40 animate-pulse rounded-full bg-amber-500/15 blur-3xl dark:bg-amber-500/18"
         />
       )}
 
-      <Box sx={{ px: { xs: 1.75, sm: 2 }, pt: { xs: 1.75, sm: 2 }, pb: { xs: 1.5, sm: 1.75 } }}>
+      <div className="px-4 pb-3.5 pt-4 sm:px-5">
         {/* ── Header ── */}
-        <Box sx={{ mb: 1.5 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 1,
-              mb: 0.4,
-            }}
-          >
-            <Box sx={{ minWidth: 0, flex: 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap' }}>
-                <Typography variant="subtitle1" fontWeight={700} noWrap sx={{ lineHeight: 1.3 }}>
-                  {repository.name}
-                </Typography>
+        <div className="mb-3">
+          <div className="mb-1 flex items-center justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-[0.9rem] font-bold leading-snug">{repository.name}</span>
                 {repository.mode === 'observe' && (
-                  <Chip
-                    label={t('repositoryCard.observeOnly')}
-                    size="small"
-                    color="info"
-                    sx={{ height: 18, fontSize: '0.65rem', '& .MuiChip-label': { px: 0.75 } }}
-                  />
+                  <Badge variant="secondary" className="h-4.5 px-1.5 text-[0.65rem]">
+                    {t('repositoryCard.observeOnly')}
+                  </Badge>
                 )}
                 <BorgVersionChip borgVersion={repository.borg_version} />
-              </Box>
-            </Box>
+              </div>
+            </div>
 
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-                gap: 0.75,
-                flexShrink: 0,
-                minWidth: 0,
-                maxWidth: { xs: '46%', sm: '42%' },
-              }}
-            >
+            <div className="flex min-w-0 shrink-0 items-center justify-end gap-1.5 max-w-[46%] sm:max-w-[42%]">
               {scheduleBadge && (
-                <Tooltip title={scheduleBadge.title} arrow placement="left">
-                  <Chip
-                    label={scheduleBadge.label}
-                    size="small"
-                    sx={{
-                      height: 20,
-                      maxWidth: { xs: 140, sm: 170 },
-                      flexShrink: 1,
-                      minWidth: 0,
-                      bgcolor: scheduleBadge.bg,
-                      color: scheduleBadge.color,
-                      border: '1px solid',
-                      borderColor: scheduleBadge.border,
-                      fontSize: '0.64rem',
-                      fontWeight: 700,
-                      '& .MuiChip-label': {
-                        px: 0.9,
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      },
-                    }}
-                  />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge
+                      variant={scheduleBadge.variant === 'warning' ? 'outline' : 'outline'}
+                      className={cn(
+                        'h-5 max-w-[140px] shrink truncate px-2 text-[0.64rem] font-bold sm:max-w-[170px]',
+                        scheduleBadge.variant === 'warning'
+                          ? 'border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                          : 'border-emerald-500/25 bg-emerald-500/9 text-emerald-600 dark:text-emerald-400'
+                      )}
+                    >
+                      {scheduleBadge.label}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent side="left">{scheduleBadge.title}</TooltipContent>
                 </Tooltip>
               )}
 
               {canManageRepository && (
-                <Tooltip title={t('repositoryCard.edit')} arrow placement="left">
-                  <IconButton
-                    size="small"
-                    onClick={onEdit}
-                    aria-label={t('repositoryCard.edit')}
-                    sx={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: 1,
-                      flexShrink: 0,
-                      color: 'text.disabled',
-                      '&:hover': {
-                        color: 'text.primary',
-                        bgcolor: isDark ? alpha('#fff', 0.07) : alpha('#000', 0.06),
-                      },
-                    }}
-                  >
-                    <Pencil size={14} />
-                  </IconButton>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={onEdit}
+                      aria-label={t('repositoryCard.edit')}
+                      className="inline-flex size-7 shrink-0 items-center justify-center rounded border-0 bg-transparent text-muted-foreground/50 transition-colors hover:bg-accent hover:text-foreground"
+                    >
+                      <Pencil size={14} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="left">{t('repositoryCard.edit')}</TooltipContent>
                 </Tooltip>
               )}
-            </Box>
-          </Box>
+            </div>
+          </div>
 
-          <Typography
-            variant="body2"
+          <p
             title={repository.path}
-            sx={{
-              fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace',
-              fontSize: '0.7rem',
-              color: 'text.disabled',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
+            className="truncate font-mono text-[0.7rem] text-muted-foreground/60"
           >
             {repository.path}
-          </Typography>
-        </Box>
+          </p>
+        </div>
 
         {/* ── Key Stats Band ── */}
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' },
-            borderRadius: 1.5,
-            border: '1px solid',
-            borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-            overflow: 'hidden',
-            mb: 1.5,
-            bgcolor: isDark ? alpha('#fff', 0.025) : alpha('#000', 0.018),
-          }}
-        >
+        <div className="mb-3 grid grid-cols-2 overflow-hidden rounded-lg border border-border/60 bg-muted/30 sm:grid-cols-4">
           {keyStats.map((stat, i) => {
             const isRightColXs = i % 2 === 1
             const isLastSm = i === keyStats.length - 1
             const isFirstRowXs = i < 2
-            const colorKey = STAT_COLORS[i]
-            const statColor = (theme.palette[colorKey] as { main: string }).main
             return (
-              <Tooltip key={stat.label} title={stat.tooltip} arrow>
-                <Box
-                  sx={{
-                    px: 1.5,
-                    py: 1.1,
-                    cursor: stat.tooltip ? 'help' : 'default',
-                    borderRight: isLastSm ? 0 : '1px solid',
-                    borderBottom: { xs: isFirstRowXs ? '1px solid' : 0, sm: 0 },
-                    borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-                    ...(isRightColXs && {
-                      borderRight: { xs: 0, sm: isLastSm ? 0 : '1px solid' },
-                    }),
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.35 }}>
-                    <Box
-                      sx={{
-                        color: alpha(statColor, 0.7),
-                        display: 'flex',
-                        alignItems: 'center',
-                      }}
-                    >
-                      {STAT_ICONS[i]}
-                    </Box>
-                    <Typography
-                      sx={{
-                        fontSize: '0.58rem',
-                        fontWeight: 700,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.07em',
-                        color: alpha(statColor, 0.7),
-                        lineHeight: 1,
-                      }}
-                    >
-                      {stat.label}
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="body2"
-                    fontWeight={600}
-                    noWrap
-                    sx={{ fontVariantNumeric: 'tabular-nums', fontSize: '0.85rem' }}
+              <Tooltip key={stat.label}>
+                <TooltipTrigger asChild>
+                  <div
+                    className={cn(
+                      'cursor-default px-3 py-2.5',
+                      !isLastSm && 'border-r border-border/60 sm:border-r',
+                      isFirstRowXs && 'border-b border-border/60 sm:border-b-0',
+                      isRightColXs && 'border-r-0 sm:border-r',
+                      isLastSm && 'border-r-0',
+                      stat.tooltip && 'cursor-help'
+                    )}
                   >
-                    {stat.value}
-                  </Typography>
-                </Box>
+                    <div className="mb-1 flex items-center gap-1">
+                      <span className={cn('flex items-center', STAT_COLOR_CLASSES[i])}>
+                        {STAT_ICONS[i]}
+                      </span>
+                      <span
+                        className={cn(
+                          'text-[0.58rem] font-bold uppercase tracking-[0.07em] leading-none',
+                          STAT_COLOR_CLASSES[i]
+                        )}
+                      >
+                        {stat.label}
+                      </span>
+                    </div>
+                    <span className="text-[0.85rem] font-semibold tabular-nums leading-none">
+                      {stat.value}
+                    </span>
+                  </div>
+                </TooltipTrigger>
+                {stat.tooltip && <TooltipContent>{stat.tooltip}</TooltipContent>}
               </Tooltip>
             )
           })}
-        </Box>
+        </div>
 
         {/* ── Secondary Metadata ── */}
-        <Box
-          sx={{
-            display: 'flex',
-            gap: { xs: 1.25, sm: 1.75 },
-            flexWrap: 'wrap',
-            mb: 1.5,
-            px: 0.25,
-          }}
-        >
+        <div className="mb-3 flex flex-wrap gap-x-4 gap-y-1 px-0.5">
           {metaItems.map((m) => (
-            <Tooltip key={m.label} title={m.tooltip || ''} arrow>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.4,
-                  cursor: m.tooltip ? 'help' : 'default',
-                }}
-              >
-                <Typography sx={{ fontSize: '0.68rem', color: 'text.disabled', lineHeight: 1 }}>
-                  {m.label}:
-                </Typography>
-                <Typography
-                  sx={{
-                    fontSize: '0.68rem',
-                    fontWeight: 600,
-                    color: 'text.secondary',
-                    lineHeight: 1,
-                  }}
+            <Tooltip key={m.label}>
+              <TooltipTrigger asChild>
+                <div
+                  className={cn(
+                    'flex items-center gap-1',
+                    m.tooltip ? 'cursor-help' : 'cursor-default'
+                  )}
                 >
-                  {m.value}
-                </Typography>
-              </Box>
+                  <span className="text-[0.68rem] leading-none text-muted-foreground/70">
+                    {m.label}:
+                  </span>
+                  <span className="text-[0.68rem] font-semibold leading-none text-muted-foreground">
+                    {m.value}
+                  </span>
+                </div>
+              </TooltipTrigger>
+              {m.tooltip && <TooltipContent>{m.tooltip}</TooltipContent>}
             </Tooltip>
           ))}
-        </Box>
+        </div>
 
         {/* ── Action Bar ── */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.5,
-            pt: 1.25,
-            borderTop: '1px solid',
-            borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-          }}
-        >
-          {/* Secondary icon actions — left cluster */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25, flex: 1 }}>
+        <div className="flex items-center gap-1.5 border-t border-border/60 pt-3">
+          {/* Left icon cluster */}
+          <div className="flex flex-1 items-center gap-0.5">
             {canDo('view') && (
-              <Tooltip title={t('repositoryCard.buttons.info')} arrow>
-                <span>
-                  <IconButton
-                    size="small"
-                    onClick={() => {
-                      trackRepository(EventAction.VIEW, repository)
-                      onViewInfo()
-                    }}
-                    aria-label={t('repositoryCard.buttons.info')}
-                    disabled={isMaintenanceRunning}
-                    sx={coloredIconBtnSx('primary')}
-                  >
-                    <Info size={16} />
-                  </IconButton>
-                </span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        trackRepository(EventAction.VIEW, repository)
+                        onViewInfo()
+                      }}
+                      aria-label={t('repositoryCard.buttons.info')}
+                      disabled={isMaintenanceRunning}
+                      className={cn(
+                        iconBtnBase,
+                        'text-primary/55 hover:bg-primary/10 hover:text-primary'
+                      )}
+                    >
+                      <Info size={16} />
+                    </button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>{t('repositoryCard.buttons.info')}</TooltipContent>
               </Tooltip>
             )}
 
             {canDo('maintenance') && (
-              <Tooltip title={t('repositoryCard.buttons.check')} arrow>
-                <span>
-                  <IconButton
-                    size="small"
-                    onClick={onCheck}
-                    aria-label={t('repositoryCard.buttons.check')}
-                    disabled={isMaintenanceRunning}
-                    sx={checkJob ? activeIconBtnSx : coloredIconBtnSx('success')}
-                  >
-                    {checkJob ? (
-                      <RefreshCw size={16} className="animate-spin" />
-                    ) : (
-                      <ShieldCheck size={16} />
-                    )}
-                  </IconButton>
-                </span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <button
+                      type="button"
+                      onClick={onCheck}
+                      aria-label={t('repositoryCard.buttons.check')}
+                      disabled={isMaintenanceRunning}
+                      className={cn(
+                        iconBtnBase,
+                        checkJob
+                          ? 'bg-primary/10 text-primary hover:bg-primary/18 hover:text-primary'
+                          : 'text-emerald-600/55 hover:bg-emerald-500/10 hover:text-emerald-600 dark:text-emerald-400/55 dark:hover:text-emerald-400'
+                      )}
+                    >
+                      {checkJob ? (
+                        <RefreshCw size={16} className="animate-spin" />
+                      ) : (
+                        <ShieldCheck size={16} />
+                      )}
+                    </button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>{t('repositoryCard.buttons.check')}</TooltipContent>
               </Tooltip>
             )}
 
             {canDo('maintenance') && capabilities.canCompact && (
-              <Tooltip title={t('repositoryCard.buttons.compact')} arrow>
-                <span>
-                  <IconButton
-                    size="small"
-                    onClick={onCompact}
-                    aria-label={t('repositoryCard.buttons.compact')}
-                    disabled={isMaintenanceRunning}
-                    sx={compactJob ? activeIconBtnSx : coloredIconBtnSx('secondary')}
-                  >
-                    {compactJob ? (
-                      <RefreshCw size={16} className="animate-spin" />
-                    ) : (
-                      <Package2 size={16} />
-                    )}
-                  </IconButton>
-                </span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <button
+                      type="button"
+                      onClick={onCompact}
+                      aria-label={t('repositoryCard.buttons.compact')}
+                      disabled={isMaintenanceRunning}
+                      className={cn(
+                        iconBtnBase,
+                        compactJob
+                          ? 'bg-primary/10 text-primary hover:bg-primary/18 hover:text-primary'
+                          : 'text-neutral-500/55 hover:bg-neutral-500/10 hover:text-neutral-600 dark:hover:text-neutral-400'
+                      )}
+                    >
+                      {compactJob ? (
+                        <RefreshCw size={16} className="animate-spin" />
+                      ) : (
+                        <Package2 size={16} />
+                      )}
+                    </button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>{t('repositoryCard.buttons.compact')}</TooltipContent>
               </Tooltip>
             )}
 
             {canDo('maintenance') && capabilities.canPrune && (
-              <Tooltip title={t('repositoryCard.buttons.prune')} arrow>
-                <span>
-                  <IconButton
-                    size="small"
-                    onClick={onPrune}
-                    aria-label={t('repositoryCard.buttons.prune')}
-                    disabled={isMaintenanceRunning}
-                    sx={pruneJob ? activeIconBtnSx : coloredIconBtnSx('warning')}
-                  >
-                    {pruneJob ? (
-                      <RefreshCw size={16} className="animate-spin" />
-                    ) : (
-                      <Scissors size={16} />
-                    )}
-                  </IconButton>
-                </span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <button
+                      type="button"
+                      onClick={onPrune}
+                      aria-label={t('repositoryCard.buttons.prune')}
+                      disabled={isMaintenanceRunning}
+                      className={cn(
+                        iconBtnBase,
+                        pruneJob
+                          ? 'bg-primary/10 text-primary hover:bg-primary/18 hover:text-primary'
+                          : 'text-amber-600/55 hover:bg-amber-500/10 hover:text-amber-600 dark:text-amber-400/55 dark:hover:text-amber-400'
+                      )}
+                    >
+                      {pruneJob ? (
+                        <RefreshCw size={16} className="animate-spin" />
+                      ) : (
+                        <Scissors size={16} />
+                      )}
+                    </button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>{t('repositoryCard.buttons.prune')}</TooltipContent>
               </Tooltip>
             )}
 
             {canDo('view') && (
-              <Tooltip title={t('repositoryCard.buttons.viewArchives')} arrow>
-                <span>
-                  <IconButton
-                    size="small"
-                    onClick={() => {
-                      trackArchive(EventAction.VIEW, repository)
-                      onViewArchives()
-                    }}
-                    aria-label={t('repositoryCard.buttons.viewArchives')}
-                    disabled={isMaintenanceRunning}
-                    sx={coloredIconBtnSx('info')}
-                  >
-                    <FolderOpen size={16} />
-                  </IconButton>
-                </span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        trackArchive(EventAction.VIEW, repository)
+                        onViewArchives()
+                      }}
+                      aria-label={t('repositoryCard.buttons.viewArchives')}
+                      disabled={isMaintenanceRunning}
+                      className={cn(
+                        iconBtnBase,
+                        'text-sky-500/55 hover:bg-sky-500/10 hover:text-sky-600 dark:text-sky-400/55 dark:hover:text-sky-400'
+                      )}
+                    >
+                      <FolderOpen size={16} />
+                    </button>
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>{t('repositoryCard.buttons.viewArchives')}</TooltipContent>
               </Tooltip>
             )}
 
             {/* Delete — separated with a vertical rule */}
             {canManageRepository && capabilities.canDeleteRepository && (
               <>
-                <Box
-                  sx={{
-                    width: '1px',
-                    height: 18,
-                    bgcolor: isDark ? alpha('#fff', 0.1) : alpha('#000', 0.1),
-                    mx: 0.25,
-                    flexShrink: 0,
-                  }}
-                />
-                <Tooltip title={t('repositoryCard.buttons.delete')} arrow>
-                  <IconButton
-                    size="small"
-                    onClick={onDelete}
-                    aria-label={t('repositoryCard.buttons.delete')}
-                    sx={{
-                      ...iconBtnSx,
-                      color: alpha(theme.palette.error.main, 0.6),
-                      '&:hover': {
-                        color: theme.palette.error.main,
-                        bgcolor: alpha(theme.palette.error.main, 0.1),
-                      },
-                    }}
-                  >
-                    <Trash2 size={16} />
-                  </IconButton>
+                <div className="mx-0.5 h-4.5 w-px shrink-0 bg-border/70" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={onDelete}
+                      aria-label={t('repositoryCard.buttons.delete')}
+                      className={cn(
+                        iconBtnBase,
+                        'text-destructive/60 hover:bg-destructive/10 hover:text-destructive'
+                      )}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>{t('repositoryCard.buttons.delete')}</TooltipContent>
                 </Tooltip>
               </>
             )}
-          </Box>
+          </div>
 
           {/* Primary action — Backup Now */}
           {canDo('backup') && repository.mode === 'full' && (
-            <Tooltip
-              title={isMaintenanceRunning ? '' : t('repositoryCard.buttons.backupNow')}
-              arrow
-            >
-              <span>
-                <Button
-                  variant="contained"
-                  size="small"
-                  startIcon={<Play size={13} />}
-                  onClick={() => {
-                    trackBackup(EventAction.START, undefined, repository)
-                    onBackupNow()
-                  }}
-                  disabled={isMaintenanceRunning}
-                  sx={{
-                    bgcolor: ACCENT_IDLE,
-                    color: '#fff',
-                    fontSize: '0.78rem',
-                    height: 30,
-                    flexShrink: 0,
-                    px: { xs: 0.85, sm: 1.5 },
-                    minWidth: 'unset',
-                    boxShadow: `0 2px 10px ${alpha(ACCENT_IDLE, 0.38)}`,
-                    '& .MuiButton-startIcon': { mr: { xs: 0, sm: 0.5 }, ml: { xs: 0, sm: '-2px' } },
-                    '&:hover': {
-                      bgcolor: '#047857',
-                      boxShadow: `0 4px 18px ${alpha(ACCENT_IDLE, 0.5)}`,
-                    },
-                    '&.Mui-disabled': {
-                      bgcolor: isDark ? alpha('#fff', 0.08) : alpha('#000', 0.08),
-                      color: 'text.disabled',
-                      boxShadow: 'none',
-                    },
-                  }}
-                >
-                  <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                    {t('repositoryCard.buttons.backupNow')}
-                  </Box>
-                </Button>
-              </span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      trackBackup(EventAction.START, undefined, repository)
+                      onBackupNow()
+                    }}
+                    disabled={isMaintenanceRunning}
+                    className="h-7.5 shrink-0 bg-emerald-600 px-2 text-[0.78rem] text-white hover:bg-emerald-700 disabled:bg-muted disabled:text-muted-foreground sm:px-3"
+                  >
+                    <Play size={13} />
+                    <span className="hidden sm:inline">{t('repositoryCard.buttons.backupNow')}</span>
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              {!isMaintenanceRunning && (
+                <TooltipContent>{t('repositoryCard.buttons.backupNow')}</TooltipContent>
+              )}
             </Tooltip>
           )}
-        </Box>
+        </div>
 
         {/* ── Running State Message ── */}
         {(checkJob?.progress_message || compactJob?.progress_message || elapsedTime) && (
-          <Box
-            sx={{
-              mt: 1.25,
-              px: 1.5,
-              py: 0.875,
-              borderRadius: 1,
-              bgcolor: alpha(ACCENT_RUNNING, 0.07),
-              border: '1px solid',
-              borderColor: alpha(ACCENT_RUNNING, 0.22),
-            }}
-          >
+          <div className="mt-3 rounded-md border border-amber-500/22 bg-amber-500/7 px-3 py-2">
             {(checkJob?.progress_message || compactJob?.progress_message) && (
-              <Typography
-                variant="caption"
-                sx={{
-                  display: 'block',
-                  color: ACCENT_RUNNING,
-                  fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace',
-                  fontSize: '0.72rem',
-                }}
-              >
+              <p className="block font-mono text-[0.72rem] text-amber-600 dark:text-amber-400">
                 {checkJob?.progress_message || compactJob?.progress_message}
-              </Typography>
+              </p>
             )}
             {elapsedTime && (
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ display: 'block', mt: 0.25 }}
-              >
-                {elapsedTime}
-              </Typography>
+              <p className="mt-0.5 block text-xs text-muted-foreground">{elapsedTime}</p>
             )}
-          </Box>
+          </div>
         )}
-      </Box>
-    </Box>
+      </div>
+    </div>
   )
 }
