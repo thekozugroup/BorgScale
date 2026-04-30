@@ -65,7 +65,7 @@ The fork preserves git history. Tags and branches will be re-prefixed with
 
 ## Anti-features inventory (Phase 1 targets)
 
-The list below is exhaustive at fork commit `a4cee2b4`. The Phase 1
+The list below is exhaustive across the fork's working tree as of spec commit `a4cee2b4`; none have been removed at this point. The Phase 1
 QAQC agent verifies that no item from this table survives, and that
 no equivalent has been re-introduced in any new code.
 
@@ -88,7 +88,7 @@ no equivalent has been re-introduced in any new code.
 | --- | --- | --- |
 | Umami analytics | `frontend/src/utils/analytics.ts` | Delete. |
 | Analytics consent banner | `frontend/src/components/AnalyticsConsentBanner.tsx` (+ tests in `__tests__/`) | Delete. |
-| Analytics init | `frontend/src/main.tsx`, `frontend/src/contexts/AppContext.tsx` | Remove imports and conditional init blocks. |
+| Analytics init | `frontend/src/main.tsx`, `frontend/src/context/AppContext.tsx` | Remove imports and conditional init blocks. |
 | Analytics preference UI | `frontend/src/components/PreferencesTab.tsx` (+ tests) | Drop the analytics row. The mutation no longer sends `analytics_enabled`. |
 | Remote announcements service | `frontend/src/services/announcements.ts:8` (`DEFAULT_REMOTE_ANNOUNCEMENTS_URL`) | Replace remote URL with `null`. The service still loads `frontend/src/data/announcements.json` shipped in the bundle. The `VITE_ANNOUNCEMENTS_URL` env var is removed; the consumer (`useAnnouncementSurface`) only reads bundled JSON. The Umami-related entry in `announcements.json` is removed. |
 | Remote plan-content service | `frontend/src/services/planContent.ts:10` (`DEFAULT_REMOTE_PLAN_CONTENT_URL`) | Service is deleted along with the entire plan-gating subsystem (next section). |
@@ -107,6 +107,7 @@ removed from any callers.
 | Plan info drawer | `frontend/src/components/PlanInfoDrawer.tsx` (+ tests) |
 | Plan polling hook | `frontend/src/hooks/usePlan.ts` |
 | Plan content hook | `frontend/src/hooks/usePlanContent.ts` |
+| Plan content type definitions | `frontend/src/types/planContent.ts` |
 | External-link constants | `frontend/src/utils/externalLinks.ts` (`BUY_URL`, etc.) |
 | Plan content data | `frontend/src/data/plan-content.json` |
 | Frontend API client licensing surface | `frontend/src/services/api.ts` (the `licensingAPI` block exporting `activate`, `deactivate`, `refresh`) |
@@ -141,7 +142,7 @@ operator to offer the source. Phase 2 (NOT Phase 1) adds:
   `source` URL above.
 - A pytest case `tests/test_agpl_about_endpoint.py` asserting the
   endpoint returns 200 with the expected keys.
-- The Design Design Skeptic agent verifies the footer link is present and
+- The Design Skeptic agent verifies the footer link is present and
   reachable on every primary page.
 
 ## Phase plan
@@ -185,7 +186,7 @@ Components:
 5. **Existing tests.** All pre-existing pytest + vitest suites must
    still pass.
 6. **Docker container smoke test.** A separate test invoked from
-   `scripts/security-check.sh` (NOT from `pytest`) runs the built
+   `scripts/security-scan.sh` (NOT from `pytest`) runs the built
    container with `--network none` and asserts that the FastAPI app
    reports healthy via the in-container loopback within 30 seconds,
    that admin login succeeds, and that a fresh local borg repo can
@@ -240,7 +241,7 @@ Components:
    page wired to the same `source` URL; add `tests/test_agpl_about_endpoint.py`
    asserting the endpoint shape.
 
-QAQC gate: QAQC agent and Design Design Skeptic agent both 100/100. Skeptic
+QAQC gate: QAQC agent and Design Skeptic agent both 100/100. Skeptic
 verifies no remaining upstream branding in any rendered page and
 confirms the AGPL footer link renders on every page.
 
@@ -319,7 +320,7 @@ local security scan **before** the merge into `main` and **before**
   (`pip-audit` for Python, `npm audit --audit-level high` for the
   frontend).
 
-The scan is wrapped in `scripts/security-check.sh` (added in Phase 1
+The scan is wrapped in `scripts/security-scan.sh` (added in Phase 1
 along with the rest of the QAQC tooling) and invoked from the
 controller before every push, never from inside an implementation
 subagent. A failed scan blocks the merge and surfaces the violation
@@ -328,12 +329,12 @@ to the design skeptic / QAQC pair for re-evaluation.
 ## Reporting cadence
 
 The controller works waves to completion silently, only reporting back
-to the user when **both** the QAQC agent and the Design Design Skeptic agent
+to the user when **both** the QAQC agent and the Design Skeptic agent
 have independently graded the work at **100/100**. Intermediate grade
 trends are visible in the per-task notes but are not surfaced unless
 the user asks.
 
-## QAQC + Design Design Skeptic agents
+## QAQC + Design Skeptic agents
 
 Two specialised reviewer agents run after every commit batch.
 
@@ -352,7 +353,7 @@ Output:
 
 Pass condition: 100/100, zero items in any list.
 
-### Design Design Skeptic agent (UI polish + consistency)
+### Design Skeptic agent (UI polish + consistency)
 
 Inputs:
 - Built frontend, served from a headless Chromium.
@@ -379,7 +380,7 @@ Wave structure (mirrors Constellation pattern):
 
 | wave | scope | concurrency |
 | --- | --- | --- |
-| 0 | Repo housekeeping: write `CLAUDE.md` documenting BorgScale layout + grader contracts; rewrite `CONTRIBUTING.md` for the BorgScale fork (build commands, test commands, security gate, AGPL note); add `scripts/security-check.sh` (runs `gitleaks protect --staged`, scans for new outbound URLs not on the allowlist `github.com / ghcr.io / 127.0.0.1 / *.tailscale.com / docker.io`, runs `pip-audit` + `npm audit --audit-level high`); update `.github/workflows/ci.yml` to invoke the security script; commit the lucide `boxes` SVG to `frontend/src/assets/lucide-boxes.svg` for later phases. | 1 |
+| 0 | Repo housekeeping (see Wave 0 detail below). | 1 |
 | 1 | Phase 1 backend stub + route removal | 2 |
 | 2 | Phase 1 frontend cleanup + analytics removal | 2 |
 | 3 | Phase 1 network-isolation tests + image build | 1 |
@@ -390,8 +391,87 @@ Wave structure (mirrors Constellation pattern):
 | 8 | Phase 3 final cleanup, MUI removal | 1 |
 | 9 | Release: image build, README, GitHub Release | 1 |
 
-Between waves: critic + QAQC + design skeptic. Iterate fixes until
+Between waves: critic + QAQC + Design Skeptic. Iterate fixes until
 both 100/100.
+
+### Wave 0 detail (deliverables)
+
+The repository at fork time has neither `CLAUDE.md` nor `CONTRIBUTING.md`
+geared to BorgScale. Wave 0 creates them de novo and rewires the security
+gate. Concrete deliverables:
+
+1. **`CLAUDE.md`** at repo root. Required sections:
+   - "Project overview" — one paragraph naming BorgScale as the AGPL-3.0
+     fork of upstream `karanhudia/borg-ui`, with a link to the fork URL.
+   - "Repository layout" — table of `app/` (FastAPI), `frontend/`
+     (React + TS + Vite, MUI v7 → shadcn/ui), `tests/`, `docs/`,
+     `scripts/`, `.github/workflows/`.
+   - "Build & test" — exact commands: `cd frontend && npm ci && npm run build`,
+     `pip install -r requirements.txt`, `pytest`, `cd frontend && npm test`,
+     `npm run lint`, `npm run typecheck`.
+   - "Security gate" — describes `scripts/security-scan.sh` and the
+     four checks (gitleaks, outbound-URL allowlist, pip-audit, npm audit).
+   - "Grader agents" — section listing the QAQC agent and the Design
+     Skeptic agent, the inputs each receives, and the gate condition
+     (both 100/100).
+   - "AGPL note" — one paragraph clarifying the fork must remain AGPL-3.0
+     and that `/api/about` plus a footer link satisfy AGPL §13 for hosted
+     instances.
+
+2. **`CONTRIBUTING.md`** rewritten for BorgScale. Required sections:
+   - "Setup" — clone + install commands.
+   - "Branch + commit policy" — short branches, conventional commits.
+   - "Test requirements" — must pass `pytest`, `npm test`, `npm run lint`,
+     `npm run typecheck` before opening a PR.
+   - "Security gate" — must pass `scripts/security-scan.sh` before push.
+   - "Anti-feature reminder" — one paragraph reminding contributors that
+     phone-home, telemetry, and paywall scaffolding are out-of-scope and
+     blocked by the QAQC agent.
+   - "Upstream sync" — instructions to `git fetch upstream && git merge
+     upstream/main` for AGPL-era bugfixes only; expressly forbids merging
+     any post-relicense upstream commit.
+
+3. **`scripts/security-scan.sh`** is **modified, not created**. The file
+   already exists with `pip-audit` and `npm audit`. Wave 0 ADDS:
+   - `gitleaks protect --staged --no-banner --redact` (exits non-zero on
+     leak).
+   - A staged-diff outbound-URL allowlist scan: greps `git diff --cached`
+     for newly-introduced `https?://` URLs and fails the run if any new
+     host is not in the allowlist `github.com`, `ghcr.io`, `127.0.0.1`,
+     `localhost`, `*.tailscale.com`, `docker.io`, `pypi.org`,
+     `npmjs.org`, `npm.pkg.github.com`, `lucide.dev`, `ui.shadcn.com`,
+     `gnu.org`, `borgbackup.readthedocs.io`.
+   - Final exit 0 only if all four checks pass; prints a single-line
+     summary.
+
+4. **CI hook.** Modify the existing `.github/workflows/security.yml`
+   (NOT a non-existent `ci.yml`) to invoke `scripts/security-scan.sh`
+   on every push and pull request to `main`. Combine with the existing
+   Trivy / scheduled-scan steps already in that workflow.
+
+5. **`frontend/src/assets/lucide-boxes.svg`.** Commit the upstream
+   lucide `boxes` SVG (project under ISC; SVG is bundle-redistributable).
+   Used by Phase 2's `scripts/generate-logos.mjs` and Phase 3's React
+   components.
+
+6. **Spec-baseline correction.** The text "exhaustive at fork commit
+   `a4cee2b4`" in the anti-features section is rephrased to *"exhaustive
+   across the fork's working tree as of spec commit `a4cee2b4`; none
+   have been removed at this point."*
+
+7. **`VITE_*` env-var cleanup.** Phase 1 deletion list is amended to
+   include `frontend/src/vite-env.d.ts` (drop the `VITE_ANNOUNCEMENTS_URL`
+   and `VITE_PLAN_CONTENT_URL` interface properties). No `.env.example`
+   for the frontend exists, so no further `.env` updates required.
+
+Wave 0 controller workflow:
+- Wave 0 ships in a single feature branch off `main` named
+  `wave-0-housekeeping`.
+- Once it merges, `scripts/security-scan.sh` is the gate enforced by the
+  controller for every subsequent wave's merge — invoked from the
+  controller (NOT inside subagents). Subagents commit on their feature
+  branches; the controller runs the gate before merging each subagent
+  branch into `main` and before pushing.
 
 ## Risks + mitigations
 
@@ -432,12 +512,14 @@ Phase 1 (~50 files):
 - `frontend/src/data/plan-content.json` (delete)
 - `frontend/src/data/announcements.json` (drop "Umami analytics" entry)
 - `frontend/src/main.tsx` (drop analytics init)
-- `frontend/src/contexts/AppContext.tsx` (drop analytics conditional)
+- `frontend/src/context/AppContext.tsx` (drop analytics conditional)
 - `frontend/src/components/PreferencesTab.tsx` (drop analytics row)
 - `frontend/src/locales/{en,es,de,it}.json` (drop orphaned `buyLink` and any plan-gate keys)
+- `frontend/src/vite-env.d.ts` (drop `VITE_ANNOUNCEMENTS_URL` and `VITE_PLAN_CONTENT_URL` interface declarations)
+- `frontend/src/types/planContent.ts` (delete — type definitions for the deleted plan-content service)
 - every `frontend/src/**/__tests__/*.tsx` test file referencing the deleted components (delete or amend)
 - new: `tests/test_no_phone_home.py`
-- new: `scripts/security-check.sh` (Wave 0)
+- new: `scripts/security-scan.sh` (Wave 0)
 
 Phase 2 (~50 files; mostly text):
 
