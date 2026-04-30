@@ -16,7 +16,6 @@ import {
 } from '@mui/material'
 import { Shield, Key, FileKey, Upload, FileText, Eye, EyeOff } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { usePlan } from '../../hooks/usePlan'
 
 export interface SecurityStepData {
   encryption: string
@@ -68,7 +67,6 @@ export default function WizardStepSecurity({
   onChange,
 }: WizardStepSecurityProps) {
   const { t } = useTranslation()
-  const { can } = usePlan()
   const [keyfileMode, setKeyfileMode] = useState<'file' | 'paste'>('file')
   const [keyfileText, setKeyfileText] = useState('')
   const [showPassphrase, setShowPassphrase] = useState(false)
@@ -91,7 +89,7 @@ export default function WizardStepSecurity({
   }
 
   const encryptionOptions =
-    borgVersion === 2 && can('borg_v2') ? BORG2_ENCRYPTION_OPTIONS : BORG1_ENCRYPTION_OPTIONS
+    borgVersion === 2 ? BORG2_ENCRYPTION_OPTIONS : BORG1_ENCRYPTION_OPTIONS
   const isKeyfileEncryption = data.encryption.includes('keyfile')
 
   return (

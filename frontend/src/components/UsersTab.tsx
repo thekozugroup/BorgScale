@@ -16,7 +16,6 @@ import {
   MenuItem,
   Select,
   FormControl,
-  Tooltip,
   Divider,
   InputAdornment,
   alpha,
@@ -38,7 +37,6 @@ import { toast } from 'react-hot-toast'
 import { useAuth } from '../hooks/useAuth'
 import { useAnalytics } from '../hooks/useAnalytics'
 import { useAuthorization } from '../hooks/useAuthorization'
-import { usePlan } from '../hooks/usePlan'
 import { formatDateShort } from '../utils/dateUtils'
 import { formatRoleLabel, getGlobalRolePresentation } from '../utils/rolePresentation'
 import { translateBackendKey } from '../utils/translateBackendKey'
@@ -88,7 +86,6 @@ const UsersTab: React.FC = () => {
   const { hasGlobalPermission } = useAuth()
   const { roleHasGlobalPermission } = useAuthorization()
   const { trackSettings, EventAction } = useAnalytics()
-  const { can } = usePlan()
   const queryClient = useQueryClient()
   const canManageUsers = hasGlobalPermission('settings.users.manage')
 
@@ -494,19 +491,14 @@ const UsersTab: React.FC = () => {
               {t('settings.users.subtitle')}
             </Typography>
           </Box>
-          <Tooltip title={!can('multi_user') ? t('settings.users.planCaption') : ''} arrow>
-            <span>
-              <Button
-                variant="contained"
-                startIcon={<Plus size={18} />}
-                onClick={openCreateUser}
-                disabled={!can('multi_user')}
-                sx={{ width: { xs: '100%', sm: 'auto' } }}
-              >
-                {t('settings.users.addUser')}
-              </Button>
-            </span>
-          </Tooltip>
+          <Button
+            variant="contained"
+            startIcon={<Plus size={18} />}
+            onClick={openCreateUser}
+            sx={{ width: { xs: '100%', sm: 'auto' } }}
+          >
+            {t('settings.users.addUser')}
+          </Button>
         </Box>
 
         {/* Stat strip */}
