@@ -49,7 +49,7 @@ removed except the activation prompts and analytics opt-in.
 The fork preserves git history. Tags and branches will be re-prefixed with
 `borgscale-` to avoid collision when ingesting upstream tags later.
 
-## Stack inventory (taken from fork at HEAD `73d15ce0`)
+## Stack inventory (taken from fork at upstream HEAD `73d15ce0`; spec authored at `a4cee2b4`)
 
 | layer | tech |
 | --- | --- |
@@ -65,16 +65,84 @@ The fork preserves git history. Tags and branches will be re-prefixed with
 
 ## Anti-features inventory (Phase 1 targets)
 
+The list below is exhaustive at fork commit `a4cee2b4`. The Phase 1
+QAQC agent verifies that no item from this table survives, and that
+no equivalent has been re-introduced in any new code.
+
+### Backend
+
 | component | location | action |
 | --- | --- | --- |
-| Activation client | `app/services/licensing_service.py` | Replace public surface with a stub that always returns `tier=full`, no HTTP. |
-| Activation routes | `app/api/system.py:130+` | Remove `/api/system/licensing/*`. The OpenAPI spec must lose them. |
-| Activation settings | `app/config.py:46-52` + reads in `app/config.py:208-217` | Delete; remove env-var documentation. |
-| Startup auto-activation | `app/main.py:242` | Delete the call. Replace with a one-line log: "BorgScale runs unrestricted." |
-| `entitlement_id` column | `app/database/models.py` | Keep for migration safety (don't drop), but deprecate in code. New schema migration adds a comment. |
-| Umami analytics | `frontend/src/utils/analytics.ts`, `AnalyticsConsentBanner.tsx`, references in `main.tsx`, `PreferencesTab.tsx`, `AppContext.tsx`, fixtures in `__tests__` | Delete. PreferencesTab loses the analytics row. The `analytics_enabled` API field stays in the response with a hardcoded `false` and is ignored on write. Migration `051_add_analytics_enabled` stays (column safe to leave). |
-| User-visible "Premium / Upgrade" CTAs | grep frontend for `Upgrade`, `Premium`, `paid`, `License` | Audit + remove. Confirmed-empty patterns in audit go in the spec annex. |
-| `borgui.com` URLs | doc + footer + emails | Replace with `github.com/thekozugroup/BorgScale`. |
+| Activation client | `app/services/licensing_service.py` | Rewrite as a 30-line stub that always returns `{"tier": "full", "entitlement_id": "open-source", "expires_at": null, "status": "active", "features": ["all"]}`. Public function names preserved so callers compile. The internal `_apply_entitlement` / `_clear_entitlement` / `_post_activation` / `refresh_entitlement` functions are deleted; the stub does NOT touch the database. |
+| `entitlement_id` column | `app/database/models.py:`field on `User` (or wherever it lives) | Column is left in place to keep the migration history intact, but is never written and never read after Phase 1. The stub never persists anything to it. New migration `100_borgscale_drop_unused_entitlement_writes` does not drop the column; it only adds a comment row recording the deprecation. |
+| Activation routes | `app/api/system.py:130+` (`/api/system/licensing/activate`, `/api/system/licensing/deactivate`, `/api/system/licensing/status`, `/api/system/licensing/refresh`) | Delete `/activate`, `/deactivate`, `/refresh`. Keep `/status` returning the constant payload from the stub above so legacy frontend polling does not 404. OpenAPI schema must lose the deleted routes. |
+| Activation settings | `app/config.py:46-52` and reads at `app/config.py:208-217` | Delete the four `activation_*` settings and their `os.getenv` reads. Remove from any `.env.example`. |
+| Startup auto-activation | `app/main.py:242` (call into `attempt_auto_full_access_activation`) | Delete the call site. Log a single line at INFO: `"BorgScale runs unrestricted."`. |
+| Analytics columns | `app/database/models.py` (`analytics_enabled`, `analytics_consent_given`) | Columns retained for migration safety. Default values stay. Code paths that read them are removed. |
+| Analytics migrations | `app/database/migrations/051_add_analytics_enabled.py`, `052_add_analytics_consent_given.py` | Retained (do not delete) so historical migrations apply cleanly. Add a comment in each noting BorgScale ignores the column. |
+| Settings write path | `app/api/settings.py:99-100, 1137-1167` | The `analytics_enabled` and `analytics_consent_given` request fields are silently ignored on write. The response always returns `false` for both. The frontend caller of this endpoint loses the corresponding form rows in Phase 1 frontend cleanup. |
+
+### Frontend — phone-home and content-fetch services
+
+| component | location | action |
+| --- | --- | --- |
+| Umami analytics | `frontend/src/utils/analytics.ts` | Delete. |
+| Analytics consent banner | `frontend/src/components/AnalyticsConsentBanner.tsx` (+ tests in `__tests__/`) | Delete. |
+| Analytics init | `frontend/src/main.tsx`, `frontend/src/contexts/AppContext.tsx` | Remove imports and conditional init blocks. |
+| Analytics preference UI | `frontend/src/components/PreferencesTab.tsx` (+ tests) | Drop the analytics row. The mutation no longer sends `analytics_enabled`. |
+| Remote announcements service | `frontend/src/services/announcements.ts:8` (`DEFAULT_REMOTE_ANNOUNCEMENTS_URL`) | Replace remote URL with `null`. The service still loads `frontend/src/data/announcements.json` shipped in the bundle. The `VITE_ANNOUNCEMENTS_URL` env var is removed; the consumer (`useAnnouncementSurface`) only reads bundled JSON. The Umami-related entry in `announcements.json` is removed. |
+| Remote plan-content service | `frontend/src/services/planContent.ts:10` (`DEFAULT_REMOTE_PLAN_CONTENT_URL`) | Service is deleted along with the entire plan-gating subsystem (next section). |
+
+### Frontend — plan / entitlement / paywall scaffolding
+
+All of the following are unconditionally deleted; their imports are
+removed from any callers.
+
+| component | location |
+| --- | --- |
+| Licensing settings tab | `frontend/src/components/LicensingTab.tsx` (+ tests) |
+| Plan badge | `frontend/src/components/PlanBadge.tsx` (+ tests) |
+| Plan gate (entitlement-conditional rendering) | `frontend/src/components/PlanGate.tsx` (+ tests) |
+| Upgrade CTA prompt | `frontend/src/components/UpgradePrompt.tsx` (+ tests) — if absent, no-op |
+| Plan info drawer | `frontend/src/components/PlanInfoDrawer.tsx` (+ tests) |
+| Plan polling hook | `frontend/src/hooks/usePlan.ts` |
+| Plan content hook | `frontend/src/hooks/usePlanContent.ts` |
+| External-link constants | `frontend/src/utils/externalLinks.ts` (`BUY_URL`, etc.) |
+| Plan content data | `frontend/src/data/plan-content.json` |
+| Frontend API client licensing surface | `frontend/src/services/api.ts` (the `licensingAPI` block exporting `activate`, `deactivate`, `refresh`) |
+| System info entitlement type | `frontend/src/hooks/useSystemInfo.ts` (`EntitlementInfo`, `paid_active`, `community` types and any UI states gated on them) |
+
+After deletion, every call site is rewritten to assume "full access".
+A grep for `usePlan`, `EntitlementInfo`, `BUY_URL`, `LicensingTab`,
+`PlanBadge`, `PlanGate`, `PlanInfoDrawer`, `UpgradePrompt` in the
+frontend tree must return zero matches at the end of Phase 1.
+
+### Frontend — strings referencing `borgui.com`
+
+Mass rename in Phase 2, but tracked here so Phase 1 doesn't accidentally
+delete the surrounding components:
+
+| location | content |
+| --- | --- |
+| `frontend/src/locales/{en,es,de,it}.json:3311` | `"buyLink": "Upgrade at borgui.com"` (deleted by Phase 1 plan-gating removal — the i18n key becomes orphaned and is removed in the same commit) |
+| `frontend/src/data/plan-content.json:456-460` | `support@borgui.com` references in four locales (whole file deleted in Phase 1) |
+| `frontend/src/utils/externalLinks.ts:1` | `BUY_URL = 'https://borgui.com/buy'` (file deleted in Phase 1) |
+| `frontend/src/services/{announcements,planContent}.ts` | `https://updates.borgui.com/...` defaults (handled above) |
+| `frontend/src/components/__tests__/PlanGate.test.tsx` | references `borgui.com` (deleted with `PlanGate.tsx`) |
+| upstream `README.md`, `CHANGELOG.md`, doc site | Replaced in Phase 2 with `github.com/thekozugroup/BorgScale`. |
+
+### AGPL §13 compliance (Phase 2 deliverable)
+
+Because BorgScale is served over a network, AGPL §13 obliges the
+operator to offer the source. Phase 2 (NOT Phase 1) adds:
+
+- `GET /api/about` returning `{"name": "BorgScale", "version": "<SemVer>", "source": "https://github.com/thekozugroup/BorgScale", "license": "AGPL-3.0", "license_url": "https://www.gnu.org/licenses/agpl-3.0.html", "upstream": "https://github.com/karanhudia/borg-ui"}`.
+- A footer link "Source (AGPL)" on every page that resolves to the
+  `source` URL above.
+- A pytest case `tests/test_agpl_about_endpoint.py` asserting the
+  endpoint returns 200 with the expected keys.
+- The Design Design Skeptic agent verifies the footer link is present and
+  reachable on every primary page.
 
 ## Phase plan
 
@@ -98,21 +166,34 @@ Components:
    row. Remove any "Upgrade" CTAs, license tab, premium badges. Keep
    the `analytics_enabled` field in the API response shape so older
    clients don't break.
-4. **Network isolation test.** Add `tests/test_no_phone_home.py`:
+4. **Network-isolation test.** Add `tests/test_no_phone_home.py`:
    - imports every module in `app/`; asserts no live HTTP client is
      constructed during import.
-   - boots the FastAPI app in `pytest`'s in-process client with an
-     OS-level firewall that blocks `*.borgui.com`, `*.umami.is`,
-     `*.umami.cloud`, `*.posthog.com`, `*.sentry.io`, `*.segment.io`,
-     `*.mixpanel.com`. The full lifecycle (boot → admin login → list
-     repos → trigger backup) must complete without hitting any of
-     those hosts.
+   - patches `httpx.AsyncClient` (and `httpx.Client`) via `respx` so
+     any unexpected outbound HTTP attempt fails the test. `respx`
+     declares an empty allowlist; any unmocked call is a failure with
+     full request URL captured. The same test boots the FastAPI app
+     via `TestClient`, drives the full lifecycle (admin login → list
+     repos → register a local repo → run a backup against a tempdir
+     borg repo). Zero outbound HTTP attempts must occur.
+   - The list of denied hosts is documented as
+     `*.borgui.com`, `*.umami.is`, `*.umami.cloud`, `*.posthog.com`,
+     `*.sentry.io`, `*.segment.io`, `*.mixpanel.com`,
+     `*.amplitude.com`, `*.google-analytics.com`,
+     `*.googletagmanager.com`. The respx default-deny configuration
+     covers all of them by virtue of being a default-deny mock.
 5. **Existing tests.** All pre-existing pytest + vitest suites must
    still pass.
-6. **Docker build.** Image builds; `docker compose up` on a fresh DB
-   reaches a healthy state without external network access.
+6. **Docker container smoke test.** A separate test invoked from
+   `scripts/security-check.sh` (NOT from `pytest`) runs the built
+   container with `--network none` and asserts that the FastAPI app
+   reports healthy via the in-container loopback within 30 seconds,
+   that admin login succeeds, and that a fresh local borg repo can
+   be initialised and backed up. This is the real network-isolation
+   integration test; the respx-based unit tests cover the same
+   surface at the Python level.
 
-QAQC gate: both graders return 100/100 before Phase 2 begins.
+QAQC gate: both the QAQC agent and the Design Skeptic agent return 100/100 before Phase 2 begins.
 
 ### Phase 2 — Brand swap
 
@@ -121,22 +202,47 @@ replaced. No code changes that affect functionality.
 
 Components:
 
-1. Replace logo files (`LogoWithBackground.png`, `LogoWithName.png`,
-   `LogoWithNameWhite.png`, `borg-ui-logo.png`, `logo.png`,
-   `frontend/public/favicon-*.png`, `frontend/public/logo.png`,
-   `apple-touch-icon.png`).
-2. Replace strings: `Borg UI` → `BorgScale`; `borg-ui` slug →
-   `borgscale`; `Borg Web UI` → `BorgScale`. Preserve the lowercase
+1. **Logo asset replacement.** All raster logo files at the repo root
+   and under `frontend/public/`/`assets/` are regenerated from the
+   `lucide:boxes` SVG path at the original pixel sizes. A one-off
+   script `scripts/generate-logos.mjs` reads
+   `frontend/src/assets/lucide-boxes.svg` (committed alongside),
+   pads to a square, fills foreground `#000` on `#fff` (light) and
+   `#fff` on `#000` (white-on-black variant), and exports PNGs at
+   the same pixel sizes the upstream assets used. Files refreshed:
+   `LogoWithBackground.png`, `LogoWithName.png`, `LogoWithNameWhite.png`,
+   `borg-ui-logo.png` (renamed to `borgscale-logo.png` — old name
+   removed), `logo.png`, `frontend/public/favicon-{16x16,32x32}.png`,
+   `frontend/public/logo.png`, `frontend/public/apple-touch-icon.png`,
+   any references to those filenames. Until Phase 3 swaps the layout,
+   the wordmark next to the logo continues to read "BorgScale" via
+   the existing MUI `<Typography>` component.
+2. **String replacement.** `Borg UI` → `BorgScale`; `borg-ui` slug →
+   `borgscale`; `Borg Web UI` → `BorgScale`. Preserve lowercase
    `borg` references that name the underlying tool — those are
    correct usage of an unrelated trademark.
-3. Update `package.json`, `pyproject.toml`, Dockerfile labels,
-   `README.md`, doc site references, `index.html` `<title>`, OG
-   tags, manifest.
-4. Replace `borgui.com` URLs with `github.com/thekozugroup/BorgScale`.
-5. Sweep the i18n bundles for English strings to update.
+3. **Manifest, Docker, package metadata.** Update top-level
+   `package.json`, `frontend/package.json`, `pyproject.toml`,
+   `Dockerfile` labels (`org.opencontainers.image.*`), `README.md`,
+   `CHANGELOG.md`, every file under `docs/`, `index.html` `<title>`,
+   OG tags, `manifest.json` (`name`, `short_name`, `theme_color`).
+4. **`borgui.com` URL sweep.** Replace any remaining mentions with
+   `https://github.com/thekozugroup/BorgScale`. Old support contacts
+   (`support@borgui.com` etc.) become a single
+   `https://github.com/thekozugroup/BorgScale/issues` link. Confirm
+   `grep -rn 'borgui\.com' .` returns zero non-test matches.
+5. **i18n bundle sweep.** `frontend/src/locales/{en,es,de,it}.json`
+   updated for every translated string mentioning the old product
+   name. Orphaned keys (e.g. `buyLink`) deleted.
+6. **AGPL §13 endpoint and footer.** Add `GET /api/about` returning
+   the JSON contract specified earlier (name/version/source/license/
+   license_url/upstream); add a footer link "Source (AGPL)" on every
+   page wired to the same `source` URL; add `tests/test_agpl_about_endpoint.py`
+   asserting the endpoint shape.
 
-QAQC gate: both graders 100/100. Skeptic agent verifies no remaining
-upstream branding in any rendered page.
+QAQC gate: QAQC agent and Design Design Skeptic agent both 100/100. Skeptic
+verifies no remaining upstream branding in any rendered page and
+confirms the AGPL footer link renders on every page.
 
 ### Phase 3 — UI migration to shadcn/ui
 
@@ -150,6 +256,11 @@ Constraints:
   colour palette in v1). References: <https://ui.shadcn.com/>,
   <https://ui.shadcn.com/docs/components>, <https://ui.shadcn.com/blocks>,
   <https://ui.shadcn.com/charts/area>.
+- **Dark mode preserved.** shadcn/ui ships with light + dark CSS
+  variable sets out of the box; the existing `ThemeContext.tsx`
+  toggle (system / light / dark) is wired to the `class="dark"`
+  strategy on `<html>`. The Design Skeptic agent verifies both modes for
+  every migrated page.
 - The branding "logo" position is filled by the **lucide `boxes`**
   glyph (selected by the user 2026-04-30). Stacked-cubes mark evokes
   deduplicated chunks. Used at 16/24/64 px (favicon, sidebar, hero).
@@ -217,12 +328,12 @@ to the design skeptic / QAQC pair for re-evaluation.
 ## Reporting cadence
 
 The controller works waves to completion silently, only reporting back
-to the user when **both** the QAQC agent and the Design Skeptic agent
+to the user when **both** the QAQC agent and the Design Design Skeptic agent
 have independently graded the work at **100/100**. Intermediate grade
 trends are visible in the per-task notes but are not surfaced unless
 the user asks.
 
-## QAQC + Design Skeptic agents
+## QAQC + Design Design Skeptic agents
 
 Two specialised reviewer agents run after every commit batch.
 
@@ -241,7 +352,7 @@ Output:
 
 Pass condition: 100/100, zero items in any list.
 
-### Design Skeptic agent (UI polish + consistency)
+### Design Design Skeptic agent (UI polish + consistency)
 
 Inputs:
 - Built frontend, served from a headless Chromium.
@@ -261,21 +372,21 @@ Pass condition: 100/100, zero items in any list.
 
 The implementation team is **up to 7 concurrent subagents**. Each one
 operates in its own git worktree off of `main` to avoid index lock
-conflicts. The controller merges branches in order after both graders
+conflicts. The controller merges branches in order after both the QAQC agent and the Design Skeptic agent
 sign off on a phase.
 
 Wave structure (mirrors Constellation pattern):
 
 | wave | scope | concurrency |
 | --- | --- | --- |
-| 0 | Repo housekeeping (CLAUDE.md / contributing / CI rebrand stubs) | 1 |
+| 0 | Repo housekeeping: write `CLAUDE.md` documenting BorgScale layout + grader contracts; rewrite `CONTRIBUTING.md` for the BorgScale fork (build commands, test commands, security gate, AGPL note); add `scripts/security-check.sh` (runs `gitleaks protect --staged`, scans for new outbound URLs not on the allowlist `github.com / ghcr.io / 127.0.0.1 / *.tailscale.com / docker.io`, runs `pip-audit` + `npm audit --audit-level high`); update `.github/workflows/ci.yml` to invoke the security script; commit the lucide `boxes` SVG to `frontend/src/assets/lucide-boxes.svg` for later phases. | 1 |
 | 1 | Phase 1 backend stub + route removal | 2 |
 | 2 | Phase 1 frontend cleanup + analytics removal | 2 |
 | 3 | Phase 1 network-isolation tests + image build | 1 |
 | 4 | Phase 2 brand swap (assets, strings, docs split into 3 buckets) | 3 |
 | 5 | Phase 3 tooling + shell + login wizard | 2 |
 | 6 | Phase 3 settings + repository pages | 2 |
-| 7 | Phase 3 backup wizard + dashboard + archive browser (charts) | 3 |
+| 7 | Phase 3 backup wizard FIRST (defines shared shadcn primitives like `wizard`/`stepper`/`form` patterns), THEN dashboard + archive browser dispatched in parallel after the wizard branch merges | 3 (sequenced — wizard alone, then 2 parallel) |
 | 8 | Phase 3 final cleanup, MUI removal | 1 |
 | 9 | Release: image build, README, GitHub Release | 1 |
 
@@ -286,7 +397,7 @@ both 100/100.
 
 | risk | mitigation |
 | --- | --- |
-| Atmos's running `borg-ui` is a live production target — must not break it during migration | Build new image as `ghcr.io/thekozugroup/borgscale:dev` and stand it up on a separate port until Phase 1 ships green; cut over the compose entry only after passing both graders |
+| Atmos's running `borg-ui` is a live production target — must not break it during migration | Build new image as `ghcr.io/thekozugroup/borgscale:dev` and stand it up on a separate port until Phase 1 ships green; cut over the compose entry only after passing both the QAQC agent and the Design Skeptic agent |
 | Hidden license checks in unaudited paths | Phase 1 includes a network-isolation smoke test; container must complete a full backup against a local repo with no internet |
 | Upstream pushes AGPL bugfixes after fork | Track `upstream` remote, weekly `git merge upstream/main` until upstream relicenses |
 | MUI → shadcn migration breaks pages mid-flight | One page at a time; old + new components coexist via `tailwind` + `emotion` running in parallel; final cleanup deletes MUI only after the last component is migrated |
@@ -294,20 +405,39 @@ both 100/100.
 
 ## Files affected (high-level)
 
-Phase 1 (~30 files):
+Phase 1 (~50 files):
 
-- `app/services/licensing_service.py` (rewrite)
-- `app/api/system.py` (delete routes)
-- `app/config.py` (delete settings)
-- `app/main.py` (delete startup hook)
+- `app/services/licensing_service.py` (rewrite to stub)
+- `app/api/system.py` (delete `/licensing/{activate,deactivate,refresh}`; keep `/status` returning the constant)
+- `app/api/settings.py` (drop `analytics_enabled` / `analytics_consent_given` reads + writes; response always returns `false`)
+- `app/config.py` (delete `activation_*` settings + env-var reads)
+- `app/main.py` (delete startup activation hook)
+- `app/database/migrations/051_add_analytics_enabled.py` (add deprecation comment, leave logic intact)
+- `app/database/migrations/052_add_analytics_consent_given.py` (add deprecation comment, leave logic intact)
+- new: `app/database/migrations/100_borgscale_drop_unused_entitlement_writes.py` (no-op, comment-only)
 - `frontend/src/utils/analytics.ts` (delete)
 - `frontend/src/components/AnalyticsConsentBanner.tsx` (delete)
-- `frontend/src/main.tsx` (drop init call)
-- `frontend/src/contexts/AppContext.tsx` (drop conditional)
-- `frontend/src/components/PreferencesTab.tsx` (drop row)
-- `frontend/src/data/announcements.json` (drop the
-  "Umami analytics" announcement entry)
+- `frontend/src/components/LicensingTab.tsx` (delete)
+- `frontend/src/components/PlanBadge.tsx` (delete)
+- `frontend/src/components/PlanGate.tsx` (delete)
+- `frontend/src/components/PlanInfoDrawer.tsx` (delete)
+- `frontend/src/components/UpgradePrompt.tsx` (delete if present)
+- `frontend/src/hooks/usePlan.ts` (delete)
+- `frontend/src/hooks/usePlanContent.ts` (delete)
+- `frontend/src/hooks/useSystemInfo.ts` (drop `EntitlementInfo` and any `paid_active` / `community` UI states)
+- `frontend/src/utils/externalLinks.ts` (delete)
+- `frontend/src/services/api.ts` (drop `licensingAPI` block)
+- `frontend/src/services/announcements.ts` (drop remote URL default; bundled JSON only)
+- `frontend/src/services/planContent.ts` (delete)
+- `frontend/src/data/plan-content.json` (delete)
+- `frontend/src/data/announcements.json` (drop "Umami analytics" entry)
+- `frontend/src/main.tsx` (drop analytics init)
+- `frontend/src/contexts/AppContext.tsx` (drop analytics conditional)
+- `frontend/src/components/PreferencesTab.tsx` (drop analytics row)
+- `frontend/src/locales/{en,es,de,it}.json` (drop orphaned `buyLink` and any plan-gate keys)
+- every `frontend/src/**/__tests__/*.tsx` test file referencing the deleted components (delete or amend)
 - new: `tests/test_no_phone_home.py`
+- new: `scripts/security-check.sh` (Wave 0)
 
 Phase 2 (~50 files; mostly text):
 
