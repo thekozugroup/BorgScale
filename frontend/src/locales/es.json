@@ -59,7 +59,7 @@
     }
   },
   "login": {
-    "title": "Borg Web UI",
+    "title": "BorgScale",
     "subtitle": "Introduce tus credenciales para continuar",
     "username": "Usuario",
     "password": "Contraseña",
@@ -88,12 +88,12 @@
     "overline": "Primer inicio de sesión",
     "title": "Configura una nueva contraseña o continúa",
     "description": "Puedes configurar una nueva contraseña ahora o saltarte este paso y continuar al panel.",
-    "flowHint": "Después de este paso, Borg UI continuará con passkeys, consentimiento de analíticas y cualquier anuncio activo.",
+    "flowHint": "Después de este paso, BorgScale continuará con passkeys, consentimiento de analíticas y cualquier anuncio activo.",
     "skipHint": "Puedes omitir este paso por ahora y cambiarla más tarde desde la configuración de la cuenta.",
     "skip": "Omitir por ahora"
   },
   "navigation": {
-    "appName": "Borg UI",
+    "appName": "BorgScale",
     "sections": {
       "dashboard": "PANEL",
       "backup": "COPIA DE SEGURIDAD",
@@ -1475,8 +1475,8 @@
     "archiveBrowsingLimitsDescription": "Estos límites evitan errores de falta de memoria al navegar por archivos con millones de ficheros. El proceso borg se termina anticipadamente si se superan los límites.",
     "proxyAuthTitle": "Autenticación por proxy",
     "proxyAuthDescription": "Revisa la configuración activa de autenticación por proxy, las cabeceras de confianza y las advertencias de seguridad en tiempo de ejecución.",
-    "proxyAuthEnabledStatus": "La autenticación por proxy está habilitada. Borg UI espera que tu proxy inverso o proveedor de identidad autentique a los usuarios y reenvíe las cabeceras de confianza.",
-    "proxyAuthDisabledStatus": "La autenticación integrada de Borg UI está activa. La autenticación por proxy está deshabilitada actualmente.",
+    "proxyAuthEnabledStatus": "La autenticación por proxy está habilitada. BorgScale espera que tu proxy inverso o proveedor de identidad autentique a los usuarios y reenvíe las cabeceras de confianza.",
+    "proxyAuthDisabledStatus": "La autenticación integrada de BorgScale está activa. La autenticación por proxy está deshabilitada actualmente.",
     "proxyAuthUsernameHeader": "Cabecera de nombre de usuario",
     "proxyAuthRoleHeader": "Cabecera de rol global",
     "proxyAuthAllRepositoriesRoleHeader": "Cabecera de rol para todos los repositorios",
@@ -1665,7 +1665,7 @@
     "saving": "Guardando...",
     "updatedSuccessfully": "Preferencias actualizadas correctamente",
     "analyticsTitle": "Análisis de uso anónimo",
-    "analyticsDescription": "Ayúdanos a mejorar Borg UI compartiendo datos de uso anónimos. Recopilamos vistas de página, clics en funciones y tipo de navegador, sin rastrear direcciones IP, nombres de host, cookies ni información de identificación personal.",
+    "analyticsDescription": "Ayúdanos a mejorar BorgScale compartiendo datos de uso anónimos. Recopilamos vistas de página, clics en funciones y tipo de navegador, sin rastrear direcciones IP, nombres de host, cookies ni información de identificación personal.",
     "enableAnalytics": "Habilitar análisis",
     "languageTitle": "Idioma",
     "languageDescription": "Elige el idioma de la interfaz",
@@ -1713,7 +1713,7 @@
     "import": {
       "title": "Importar configuración",
       "subtitle": "Restaurar configuración desde un archivo",
-      "description": "Importa configuraciones YAML de borgmatic o exportaciones de Borg UI. Admite tanto el formato estándar de borgmatic como las exportaciones de Borg UI.",
+      "description": "Importa configuraciones YAML de borgmatic o exportaciones de BorgScale. Admite tanto el formato estándar de borgmatic como las exportaciones de BorgScale.",
       "button": "Importar configuración",
       "importing": "Importando...",
       "selectFile": "Seleccionar archivo..."
@@ -1934,8 +1934,8 @@
     "duration": "Duración:"
   },
   "analyticsConsent": {
-    "title": "Ayuda a mejorar Borg UI",
-    "message": "Recopilamos datos de uso anónimos para entender cómo se usa Borg UI y mejorarlo. No se recopila información personal, direcciones IP, nombres de host ni datos de copia de seguridad.",
+    "title": "Ayuda a mejorar BorgScale",
+    "message": "Recopilamos datos de uso anónimos para entender cómo se usa BorgScale y mejorarlo. No se recopila información personal, direcciones IP, nombres de host ni datos de copia de seguridad.",
     "accept": "Aceptar",
     "decline": "Rechazar",
     "learnMore": "Más información",
@@ -2073,7 +2073,7 @@
       "finish": "Finalizar",
       "cancel": "Cancelar"
     },
-    "borgUiServer": "Servidor Borg UI",
+    "borgUiServer": "Servidor BorgScale",
     "remoteClient": "Cliente remoto",
     "noSshConnections": "No hay conexiones SSH configuradas. Por favor configura las conexiones SSH en la página de Claves SSH primero.",
     "backupFlowPreview": {
@@ -2098,10 +2098,10 @@
       "remoteDescription": "Respaldar datos de una máquina remota mediante SSH",
       "removeLocalDirsFirst": "Elimina los directorios locales primero para cambiar",
       "remoteToRemoteTitle": "¿Por qué está deshabilitado \"Cliente remoto\"?",
-      "remoteToRemoteBody": "Cuando el repositorio está almacenado en un servidor remoto, la fuente de datos debe ser el servidor Borg UI. Las copias de seguridad remotas a remotas no son compatibles.",
+      "remoteToRemoteBody": "Cuando el repositorio está almacenado en un servidor remoto, la fuente de datos debe ser el servidor BorgScale. Las copias de seguridad remotas a remotas no son compatibles.",
       "selectRemoteClient": "Seleccionar cliente remoto",
       "browseRemoteNote": "Explora directorios remotos o introduce rutas completas manualmente (ej., /home/usuario/documentos, /var/www)",
-      "remoteSshNote": "El servidor Borg UI se conectará por SSH a la máquina remota para explorar y respaldar los directorios seleccionados. Asegúrate de que la conexión SSH esté correctamente configurada con los permisos necesarios."
+      "remoteSshNote": "El servidor BorgScale se conectará por SSH a la máquina remota para explorar y respaldar los directorios seleccionados. Asegúrate de que la conexión SSH esté correctamente configurada con los permisos necesarios."
     },
     "location": {
       "repositoryNameLabel": "Nombre del repositorio",
@@ -2117,7 +2117,7 @@
       "whereToStore": "¿Dónde deben almacenarse las copias de seguridad?",
       "borgUiServerDesc": "Almacenar copias de seguridad en el almacenamiento local de este servidor",
       "remoteClientDesc": "Almacenar copias de seguridad en una máquina remota mediante SSH",
-      "remoteDisabledInfo": "Este repositorio está configurado para respaldar datos de una máquina remota. Las copias de seguridad remotas a remotas (respaldar de una máquina remota a otra) no son compatibles. Por favor mantén el repositorio en el Servidor Borg UI.",
+      "remoteDisabledInfo": "Este repositorio está configurado para respaldar datos de una máquina remota. Las copias de seguridad remotas a remotas (respaldar de una máquina remota a otra) no son compatibles. Por favor mantén el repositorio en el Servidor BorgScale.",
       "selectSshConnection": "Seleccionar conexión SSH",
       "repositoryPathLabel": "Ruta del repositorio",
       "repositoryPathHelper": "Ruta donde se almacenará el repositorio",
@@ -2180,7 +2180,7 @@
       "readyFiles_other": "Listo para restaurar {{count}} archivos desde {{archiveName}}",
       "restoreDestination": "Destino de restauración",
       "destinationType": "Tipo de destino",
-      "borgUiServer": "Servidor Borg UI",
+      "borgUiServer": "Servidor BorgScale",
       "remoteMachine": "Máquina remota",
       "sshConnection": "Conexión SSH",
       "restoreStrategy": "Estrategia de restauración",
@@ -2210,7 +2210,7 @@
       "location": "Ubicación",
       "path": "Ruta",
       "notSet": "(no establecido)",
-      "borgUiServer": "Servidor Borg UI",
+      "borgUiServer": "Servidor BorgScale",
       "sshRemote": "SSH remoto",
       "dataSource": "FUENTE DE DATOS",
       "source": "Fuente",
@@ -2782,7 +2782,7 @@
   },
   "layout": {
     "systemInformation": "Información del sistema",
-    "logoAlt": "Logo de Borg UI"
+    "logoAlt": "Logo de BorgScale"
   },
   "logViewer": {
     "title": "Registros de {{label}} - Trabajo #{{jobId}}",
@@ -3237,78 +3237,10 @@
       }
     }
   },
-  "plan": {
-    "labels": {
-      "community": "Community",
-      "pro": "Pro",
-      "enterprise": "Enterprise"
-    },
-    "currentPlan": "Plan actual",
-    "fullAccessLabel": "Acceso completo",
-    "planSuffix": "Plan",
-    "activeStatus": "Activo",
-    "descriptionCommunity": "Funciones principales de copia de seguridad incluidas",
-    "descriptionPro": "Todas las funciones Pro desbloqueadas",
-    "descriptionEnterprise": "Todas las funciones Enterprise desbloqueadas",
-    "proFeatures": "Funciones Pro",
-    "plans": "Planes",
-    "fullAccessActiveNotice": "El acceso completo está incluido hasta {{date}}. Después de eso, esta instancia volverá automáticamente a Community, a menos que se active una licencia de pago.",
-    "fullAccessExpiredNotice": "El acceso completo ha terminado. Esta instancia ahora funciona con Community hasta que se active una licencia de pago.",
-    "paidActiveNotice": "Hay un derecho de pago activo en esta instancia.",
-    "lastRefreshError": "La última sincronización de la licencia falló: {{error}}",
-    "licenseManagement": "Gestión de licencias",
-    "instanceIdLabel": "ID de instancia",
-    "activeLicenseIdLabel": "Licencia activa",
-    "licenseKeyLabel": "Clave de licencia",
-    "licenseKeyPlaceholder": "BORG-XXXX-XXXX-XXXX",
-    "activateLicenseButton": "Activar licencia",
-    "replaceLicenseButton": "Reemplazar licencia",
-    "refreshLicenseButton": "Actualizar estado",
-    "deactivateLicenseButton": "Desactivar",
-    "licenseManagementHelp": "Usa la clave de licencia comprada para activar Pro en esta instancia de Borg UI. Actualizar comprueba el derecho actual con el servicio de licencias.",
-    "licenseKeyRequired": "Introduce primero una clave de licencia.",
-    "licenseActivationSuccess": "Licencia activada correctamente.",
-    "licenseActivationFailed": "No se pudo activar la licencia.",
-    "licenseRefreshSuccess": "Estado de la licencia actualizado.",
-    "licenseRefreshFailed": "No se pudo actualizar el estado de la licencia.",
-    "licenseDeactivationSuccess": "Licencia desactivada correctamente.",
-    "licenseDeactivationFailed": "No se pudo desactivar la licencia.",
-    "communityWarning": "Las funciones de {{plan}} no estarán disponibles en el plan gratuito Community cuando termine el acceso inicial.",
-    "featureUnavailableInCommunity": "No disponible en el plan gratuito Community cuando termine el acceso inicial.",
-    "comingSoon": "Próximamente",
-    "planFeatures": "Funciones de {{plan}}",
-    "plannedReleases": "Incluido en próximas versiones para {{plan}}",
-    "upcomingFeatures": "Próximamente para {{plan}}",
-    "availableIn": "Disponible en {{version}}",
-    "buyLink": "Actualizar a {{plan}}",
-    "yourPlanTab": "Tu plan",
-    "upgradeTab": "Mejorar",
-    "communityIncluded": "Gratis para siempre",
-    "fullAccessCountdown_one": "Queda {{count}} día de acceso completo",
-    "fullAccessCountdown_other": "Quedan {{count}} días de acceso completo",
-    "fullAccessEndsNotice": "El {{date}} se desactivarán las funciones Pro y Enterprise. Todo lo que aparece abajo será tuyo para siempre.",
-    "afterFullAccessEndsNotice": "Estas funciones estuvieron disponibles durante tu periodo de acceso completo, pero no están incluidas en la edición Community.",
-    "upgradeNudgeTitle": "¿Quieres más después del acceso completo?",
-    "upgradeNudgeAfterTitle": "Desbloquea más con Pro o Enterprise",
-    "upgradeNudgePro": "Pro",
-    "upgradeNudgeEnterprise": "Enterprise",
-    "viewUpgradeOptions": "Ver opciones de mejora"
-  },
-  "licensing": {
-    "title": "Licencias",
-    "subtitle": "Gestiona la licencia de esta instancia de Borg UI y activa el acceso de pago.",
-    "currentState": "Estado actual",
-    "currentPlanValue": "Acceso actual: {{plan}}",
-    "instanceIdValue": "ID de instancia: {{instanceId}}",
-    "licenseIdValue": "Licencia activa: {{licenseId}}",
-    "expiresAtValue": "Caduca el: {{date}}",
-    "viewPlanDetails": "Ver detalles del plan →"
-  },
   "upgradePrompt": {
     "featureLabel": "Función de {{plan}}",
     "defaultMessage": "Esta función requiere el plan {{plan}}.",
     "requiresPlan": "Requiere el plan {{plan}}",
-    "buyLink": "Actualizar en borgui.com",
     "learnMore": "See what's included →"
   },
   "announcements": {
