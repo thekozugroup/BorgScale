@@ -267,13 +267,6 @@ export const dashboardAPI = {
   getOverview: () => api.get('/dashboard/overview'),
 }
 
-export const licensingAPI = {
-  refresh: () => api.post('/system/licensing/refresh'),
-  activate: (licenseKey: string) =>
-    api.post('/system/licensing/activate', { license_key: licenseKey }),
-  deactivate: () => api.post('/system/licensing/deactivate'),
-}
-
 export const backupAPI = {
   startBackup: (repository?: string) => api.post('/backup/start', { repository }),
   getStatus: (jobId: string) => api.get(`/backup/status/${jobId}`),

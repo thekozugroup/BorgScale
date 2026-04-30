@@ -22,7 +22,6 @@ import {
 import { Server, Cloud } from 'lucide-react'
 import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 import { useTranslation } from 'react-i18next'
-import PlanGate from '../PlanGate'
 
 interface SSHConnection {
   id: number
@@ -95,7 +94,6 @@ export default function WizardStepLocation({
 
       {/* Borg Version Selector — only shown on create/import, not edit */}
       {mode !== 'edit' && (
-        <PlanGate feature="borg_v2" disabled>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
               <Typography variant="body2" color="text.secondary" sx={{ flexShrink: 0 }}>
@@ -148,7 +146,6 @@ export default function WizardStepLocation({
               )}
             </Box>
           </Box>
-        </PlanGate>
       )}
 
       {/* Repository Mode for Import */}

@@ -26,20 +26,10 @@ vi.mock('../../hooks/useAnalytics', () => ({
   useAnalytics: () => ({
     trackAuth: trackAuthMock,
     trackNavigation: trackNavigationMock,
-    trackPlan: vi.fn(),
     EventAction: {
       VIEW: 'View',
       LOGOUT: 'Logout',
     },
-  }),
-}))
-
-vi.mock('../../hooks/usePlan', () => ({
-  usePlan: () => ({
-    plan: 'pro',
-    features: {},
-    entitlement: undefined,
-    isLoading: false,
   }),
 }))
 
@@ -87,8 +77,8 @@ describe('AppHeader', () => {
 
     await user.click(screen.getByRole('button', { name: /user menu/i }))
 
-    expect(await screen.findByText('Pro Plan')).toBeInTheDocument()
-    expect(await screen.findByText('All Pro features unlocked')).toBeInTheDocument()
+    expect(await screen.findByText('Full Access Plan')).toBeInTheDocument()
+    expect(await screen.findByText('All Enterprise features unlocked')).toBeInTheDocument()
   })
 
   it('shows all three settings navigation links when menu opens', async () => {

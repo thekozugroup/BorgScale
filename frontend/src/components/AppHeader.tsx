@@ -16,10 +16,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { useAnalytics } from '../hooks/useAnalytics'
 import { formatRoleLabel } from '../utils/rolePresentation'
-import PlanInfoDrawer from './PlanInfoDrawer'
-import { usePlan } from '../hooks/usePlan'
 import { useNavigate } from 'react-router-dom'
-import { PLAN_LABEL } from '../core/features'
 
 const drawerWidth = 240
 const headerHeight = 64
@@ -52,12 +49,10 @@ function getRoleBadgeStyles(roleLabel: string, isDark: boolean) {
 export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
   const { t } = useTranslation()
   const { user, logout } = useAuth()
-  const { trackAuth, trackNavigation, trackPlan, EventAction } = useAnalytics()
+  const { trackAuth, trackNavigation, EventAction } = useAnalytics()
   const muiTheme = useMuiTheme()
   const isDark = muiTheme.palette.mode === 'dark'
-  const { plan, features, entitlement } = usePlan()
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
-  const [planDrawerOpen, setPlanDrawerOpen] = useState(false)
   const open = Boolean(anchorEl)
   const navigate = useNavigate()
 
@@ -69,14 +64,8 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
       ? user.enterprise_name?.trim() || 'Enterprise deployment'
       : ''
 
-  const isFullAccess = entitlement?.is_full_access && entitlement.status === 'active'
-  const planLabel = isFullAccess ? t('plan.fullAccessLabel', 'Full Access') : PLAN_LABEL[plan]
-  const planDescription =
-    plan === 'enterprise' || isFullAccess
-      ? t('plan.descriptionEnterprise', 'All Enterprise features unlocked')
-      : plan === 'pro'
-        ? t('plan.descriptionPro', 'All Pro features unlocked')
-        : t('plan.descriptionCommunity', 'Core backup features included')
+  const planLabel = t('plan.fullAccessLabel', 'Full Access')
+  const planDescription = t('plan.descriptionEnterprise', 'All Enterprise features unlocked')
 
   const initials = displayName
     .split(/\s+/)
@@ -270,12 +259,7 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
           {/* ── 2. Plan card ── */}
           <Box sx={{ px: 1.25, py: 1.125 }}>
             <Box
-              component="button"
-              onClick={() => {
-                setAnchorEl(null)
-                trackPlan(EventAction.VIEW, { surface: 'user_menu', operation: 'open_drawer' })
-                setPlanDrawerOpen(true)
-              }}
+              component="div"
               sx={{
                 display: 'flex',
                 alignItems: 'center',
@@ -284,18 +268,10 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
                 p: 1.25,
                 border: '1px solid rgba(99,102,241,0.22)',
                 borderRadius: 2.5,
-                cursor: 'pointer',
-                fontFamily: 'inherit',
                 background:
                   'linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(139,92,246,0.06) 100%)',
                 position: 'relative',
                 overflow: 'hidden',
-                transition: 'all 0.18s ease',
-                '&:hover': {
-                  background:
-                    'linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(139,92,246,0.1) 100%)',
-                  borderColor: 'rgba(99,102,241,0.38)',
-                },
                 '&::before': {
                   content: '""',
                   position: 'absolute',
@@ -366,16 +342,6 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
                   {planDescription}
                 </Typography>
               </Box>
-              <ChevronRight
-                size={14}
-                style={{
-                  color: '#a78bfa',
-                  opacity: 0.7,
-                  flexShrink: 0,
-                  position: 'relative',
-                  zIndex: 1,
-                }}
-              />
             </Box>
           </Box>
 
@@ -540,13 +506,6 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
           </Box>
         </Popover>
 
-        <PlanInfoDrawer
-          open={planDrawerOpen}
-          onClose={() => setPlanDrawerOpen(false)}
-          plan={plan}
-          features={features}
-          entitlement={entitlement}
-        />
       </Toolbar>
     </AppBar>
   )

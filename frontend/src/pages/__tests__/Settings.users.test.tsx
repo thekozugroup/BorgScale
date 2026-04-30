@@ -54,12 +54,6 @@ vi.mock('../../hooks/useAnalytics', () => ({
   }),
 }))
 
-vi.mock('../../hooks/usePlan', () => ({
-  usePlan: () => ({
-    can: () => true,
-  }),
-}))
-
 vi.mock('../../components/NotificationsTab', () => ({ default: () => null }))
 vi.mock('../../components/PreferencesTab', () => ({ default: () => null }))
 vi.mock('../../components/PackagesTab', () => ({ default: () => null }))
