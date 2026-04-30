@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
-import { Box } from '@mui/material'
 import { settingsAPI } from '../services/api'
 import { useAuth } from '../hooks/useAuth'
 import { useAnalytics } from '../hooks/useAnalytics'
@@ -112,7 +111,7 @@ const Settings: React.FC = () => {
   }, [currentTabId, trackSettings, EventAction])
 
   return (
-    <Box>
+    <div>
       {/* Account Tab */}
       {currentTabId === 'account' && (
         <SettingsTabContent>
@@ -213,7 +212,7 @@ const Settings: React.FC = () => {
           <Activity />
         </SettingsTabContent>
       )}
-    </Box>
+    </div>
   )
 }
 

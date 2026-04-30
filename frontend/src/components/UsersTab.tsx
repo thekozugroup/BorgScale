@@ -2,26 +2,6 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
-  Box,
-  Typography,
-  Button,
-  TextField,
-  CircularProgress,
-  Stack,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Chip,
-  MenuItem,
-  Select,
-  FormControl,
-  Divider,
-  InputAdornment,
-  alpha,
-  useTheme,
-} from '@mui/material'
-import {
   Users,
   Trash2,
   Plus,
@@ -31,6 +11,7 @@ import {
   ShieldCheck,
   UserCheck,
   Search,
+  Loader2,
 } from 'lucide-react'
 import { settingsAPI, repositoriesAPI } from '../services/api'
 import { toast } from 'react-hot-toast'
@@ -44,6 +25,26 @@ import { Column, ActionButton } from './DataTable'
 import DataTable from './DataTable'
 import UserPermissionsPanel from './UserPermissionsPanel'
 import ResponsiveDialog from './ResponsiveDialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
 
 interface UserType {
   id: number
@@ -81,8 +82,6 @@ type StatusFilter = 'all' | 'active' | 'inactive'
 
 const UsersTab: React.FC = () => {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
   const { hasGlobalPermission } = useAuth()
   const { roleHasGlobalPermission } = useAuthorization()
   const { trackSettings, EventAction } = useAnalytics()
@@ -318,41 +317,30 @@ const UsersTab: React.FC = () => {
         render: (user) => {
           const accent = getRoleAccentColor(user.role)
           return (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 0.25 }}>
-              <Box
-                sx={{
-                  width: 34,
-                  height: 34,
-                  borderRadius: '50%',
-                  bgcolor: alpha(accent, isDark ? 0.2 : 0.12),
-                  border: '1.5px solid',
-                  borderColor: alpha(accent, isDark ? 0.45 : 0.35),
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
+            <div className="flex items-center gap-3 py-0.5">
+              <div
+                className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full border-[1.5px]"
+                style={{
+                  backgroundColor: `${accent}1f`,
+                  borderColor: `${accent}59`,
                 }}
               >
-                <Typography
-                  sx={{ fontSize: '0.64rem', fontWeight: 800, color: accent, lineHeight: 1 }}
+                <span
+                  className="text-[0.64rem] font-extrabold leading-none"
+                  style={{ color: accent }}
                 >
                   {getInitials(user)}
-                </Typography>
-              </Box>
-              <Box sx={{ minWidth: 0 }}>
-                <Typography variant="body2" fontWeight={600} noWrap>
+                </span>
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold truncate">
                   {user.full_name || user.username}
-                </Typography>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  noWrap
-                  sx={{ display: 'block', lineHeight: 1.4 }}
-                >
+                </p>
+                <p className="text-xs text-muted-foreground truncate leading-[1.4]">
                   {user.email || `@${user.username}`}
-                </Typography>
-              </Box>
-            </Box>
+                </p>
+              </div>
+            </div>
           )
         },
       },
@@ -362,7 +350,11 @@ const UsersTab: React.FC = () => {
         width: '110px',
         render: (user) => {
           const rolePresentation = getRolePresentation(user.role)
-          return <Chip label={rolePresentation.label} color={rolePresentation.color} size="small" />
+          return (
+            <Badge variant="secondary" className="text-xs">
+              {rolePresentation.label}
+            </Badge>
+          )
         },
       },
       {
@@ -370,29 +362,24 @@ const UsersTab: React.FC = () => {
         label: t('settings.users.table.status'),
         width: '100px',
         render: (user) => (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-            <Box
-              sx={{
-                width: 7,
-                height: 7,
-                borderRadius: '50%',
-                bgcolor: user.is_active ? 'success.main' : 'error.main',
-                flexShrink: 0,
-              }}
+          <div className="flex items-center gap-2">
+            <div
+              className={cn(
+                'h-[7px] w-[7px] shrink-0 rounded-full',
+                user.is_active ? 'bg-green-500' : 'bg-red-500'
+              )}
             />
-            <Typography
-              variant="body2"
-              sx={{
-                color: user.is_active ? 'success.main' : 'error.main',
-                fontWeight: 500,
-                fontSize: '0.8rem',
-              }}
+            <span
+              className={cn(
+                'text-[0.8rem] font-medium',
+                user.is_active ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+              )}
             >
               {user.is_active
                 ? t('settings.users.status.active')
                 : t('settings.users.status.inactive')}
-            </Typography>
-          </Box>
+            </span>
+          </div>
         ),
       },
       {
@@ -400,9 +387,7 @@ const UsersTab: React.FC = () => {
         label: t('settings.users.table.created'),
         width: '110px',
         render: (user) => (
-          <Typography variant="body2" color="text.secondary">
-            {formatDateShort(user.created_at)}
-          </Typography>
+          <span className="text-sm text-muted-foreground">{formatDateShort(user.created_at)}</span>
         ),
       },
       {
@@ -410,13 +395,13 @@ const UsersTab: React.FC = () => {
         label: t('settings.users.table.lastLogin'),
         width: '120px',
         render: (user) => (
-          <Typography variant="body2" color="text.secondary">
+          <span className="text-sm text-muted-foreground">
             {user.last_login ? formatDateShort(user.last_login) : t('common.never')}
-          </Typography>
+          </span>
         ),
       },
     ],
-    [t, isDark, getRolePresentation]
+    [t, getRolePresentation]
   )
 
   // Table row actions
@@ -470,215 +455,132 @@ const UsersTab: React.FC = () => {
   const hasActiveFilters =
     searchQuery.trim() !== '' || roleFilter !== 'all' || statusFilter !== 'all'
 
+  const dotColor = (value: StatusFilter) => {
+    if (value === 'active') return 'bg-green-500'
+    if (value === 'inactive') return 'bg-red-500'
+    return null
+  }
+
   return (
     <>
-      <Stack spacing={3}>
+      <div className="space-y-6">
         {/* Header */}
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            justifyContent: 'space-between',
-            alignItems: { xs: 'stretch', sm: 'center' },
-            gap: 1.5,
-          }}
-        >
-          <Box>
-            <Typography variant="h6" fontWeight={600}>
-              {t('settings.users.title')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t('settings.users.subtitle')}
-            </Typography>
-          </Box>
-          <Button
-            variant="contained"
-            startIcon={<Plus size={18} />}
-            onClick={openCreateUser}
-            sx={{ width: { xs: '100%', sm: 'auto' } }}
-          >
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div>
+            <h2 className="text-base font-semibold">{t('settings.users.title')}</h2>
+            <p className="text-sm text-muted-foreground">{t('settings.users.subtitle')}</p>
+          </div>
+          <Button onClick={openCreateUser} className="w-full sm:w-auto">
+            <Plus size={18} className="mr-1" />
             {t('settings.users.addUser')}
           </Button>
-        </Box>
+        </div>
 
         {/* Stat strip */}
-        <Box sx={{ display: 'flex', gap: { xs: 3, sm: 4 }, flexWrap: 'wrap' }}>
+        <div className="flex flex-wrap gap-6 sm:gap-8">
           {[
-            { label: t('settings.users.stats.total'), value: totalUsers, color: 'text.primary' },
-            { label: t('settings.users.stats.active'), value: activeUsers, color: 'success.main' },
-            { label: t('settings.users.stats.admins'), value: adminUsers, color: 'secondary.main' },
-            {
-              label: t('settings.users.stats.operators'),
-              value: operatorUsers,
-              color: 'info.main',
-            },
-            {
-              label: t('settings.users.stats.viewers'),
-              value: viewerUsers,
-              color: 'text.secondary',
-            },
+            { label: t('settings.users.stats.total'), value: totalUsers, className: 'text-foreground' },
+            { label: t('settings.users.stats.active'), value: activeUsers, className: 'text-green-600 dark:text-green-400' },
+            { label: t('settings.users.stats.admins'), value: adminUsers, className: 'text-violet-600 dark:text-violet-400' },
+            { label: t('settings.users.stats.operators'), value: operatorUsers, className: 'text-cyan-600 dark:text-cyan-400' },
+            { label: t('settings.users.stats.viewers'), value: viewerUsers, className: 'text-muted-foreground' },
           ].map((stat) => (
-            <Box key={stat.label}>
-              <Typography
-                variant="h6"
-                fontWeight={700}
-                sx={{ color: stat.color, lineHeight: 1, mb: 0.25 }}
-              >
+            <div key={stat.label}>
+              <p className={cn('text-lg font-bold leading-none mb-0.5', stat.className)}>
                 {stat.value}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {stat.label}
-              </Typography>
-            </Box>
+              </p>
+              <p className="text-xs text-muted-foreground">{stat.label}</p>
+            </div>
           ))}
-        </Box>
+        </div>
 
         {/* Search + filter toolbar */}
         {!loadingUsers && users.length > 0 && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                gap: 1.5,
-                alignItems: 'center',
-                flexWrap: 'nowrap',
-                overflow: 'hidden',
-              }}
-            >
+          <div className="space-y-3">
+            <div className="flex gap-3 items-center flex-nowrap overflow-hidden">
               {/* Search */}
-              <TextField
-                size="small"
-                placeholder={t('settings.users.search.placeholder')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Search size={15} color={theme.palette.text.secondary} />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  width: 240,
-                  flexShrink: 0,
-                  '& .MuiOutlinedInput-root': { borderRadius: 1.5 },
-                }}
-              />
+              <div className="relative w-60 shrink-0">
+                <Search
+                  size={15}
+                  className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+                />
+                <Input
+                  className="pl-8 rounded-xl h-8"
+                  placeholder={t('settings.users.search.placeholder')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
 
               {/* Role filter chips */}
-              <Box sx={{ display: 'flex', gap: 0.75, flexShrink: 0 }}>
+              <div className="flex gap-2 shrink-0">
                 {roleFilterOptions.map((opt) => {
                   const isSelected = roleFilter === opt.value
-                  const chipColor = opt.color
+                  const color = opt.color
                   return (
-                    <Chip
+                    <button
                       key={opt.value}
-                      label={opt.label}
-                      size="small"
+                      type="button"
                       onClick={() => setRoleFilter(opt.value)}
-                      sx={{
-                        cursor: 'pointer',
-                        fontWeight: isSelected ? 600 : 400,
-                        transition: 'all 150ms ease',
-                        ...(isSelected && chipColor
-                          ? {
-                              bgcolor: alpha(chipColor, isDark ? 0.25 : 0.12),
-                              color: chipColor,
-                              border: '1px solid',
-                              borderColor: alpha(chipColor, 0.4),
-                              '&:hover': { bgcolor: alpha(chipColor, isDark ? 0.32 : 0.18) },
-                            }
+                      className={cn(
+                        'text-xs font-normal rounded-full border px-2.5 py-0.5 transition-all',
+                        isSelected && color
+                          ? 'font-semibold border-opacity-40'
                           : isSelected
-                            ? {
-                                bgcolor: isDark ? alpha('#fff', 0.12) : alpha('#000', 0.08),
-                                '&:hover': {
-                                  bgcolor: isDark ? alpha('#fff', 0.16) : alpha('#000', 0.12),
-                                },
-                              }
-                            : {
-                                bgcolor: 'transparent',
-                                border: '1px solid',
-                                borderColor: isDark ? alpha('#fff', 0.12) : alpha('#000', 0.1),
-                                color: 'text.secondary',
-                                '&:hover': {
-                                  bgcolor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.04),
-                                  borderColor: isDark ? alpha('#fff', 0.2) : alpha('#000', 0.18),
-                                },
-                              }),
-                      }}
-                    />
+                            ? 'font-semibold bg-foreground/10 border-foreground/20'
+                            : 'bg-transparent border-foreground/10 text-muted-foreground hover:bg-foreground/5 hover:border-foreground/20'
+                      )}
+                      style={
+                        isSelected && color
+                          ? {
+                              backgroundColor: `${color}1f`,
+                              color,
+                              borderColor: `${color}66`,
+                            }
+                          : undefined
+                      }
+                    >
+                      {opt.label}
+                    </button>
                   )
                 })}
-              </Box>
+              </div>
 
               {/* Status filter chips */}
-              <Box sx={{ display: 'flex', gap: 0.75, flexShrink: 0 }}>
+              <div className="flex gap-2 shrink-0">
                 {statusFilterOptions.map((opt) => {
                   const isSelected = statusFilter === opt.value
-                  const dotColor =
-                    opt.value === 'active'
-                      ? theme.palette.success.main
-                      : opt.value === 'inactive'
-                        ? theme.palette.error.main
-                        : undefined
+                  const dot = dotColor(opt.value)
                   return (
-                    <Chip
+                    <button
                       key={opt.value}
-                      size="small"
+                      type="button"
                       onClick={() => setStatusFilter(opt.value)}
-                      label={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.6 }}>
-                          {dotColor && (
-                            <Box
-                              sx={{
-                                width: 6,
-                                height: 6,
-                                borderRadius: '50%',
-                                bgcolor: dotColor,
-                                flexShrink: 0,
-                              }}
-                            />
-                          )}
-                          {opt.label}
-                        </Box>
-                      }
-                      sx={{
-                        cursor: 'pointer',
-                        fontWeight: isSelected ? 600 : 400,
-                        transition: 'all 150ms ease',
-                        ...(isSelected
-                          ? {
-                              bgcolor: isDark ? alpha('#fff', 0.12) : alpha('#000', 0.08),
-                              '&:hover': {
-                                bgcolor: isDark ? alpha('#fff', 0.16) : alpha('#000', 0.12),
-                              },
-                            }
-                          : {
-                              bgcolor: 'transparent',
-                              border: '1px solid',
-                              borderColor: isDark ? alpha('#fff', 0.12) : alpha('#000', 0.1),
-                              color: 'text.secondary',
-                              '&:hover': {
-                                bgcolor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.04),
-                              },
-                            }),
-                      }}
-                    />
+                      className={cn(
+                        'text-xs font-normal rounded-full border px-2.5 py-0.5 transition-all flex items-center gap-1.5',
+                        isSelected
+                          ? 'font-semibold bg-foreground/10 border-foreground/20'
+                          : 'bg-transparent border-foreground/10 text-muted-foreground hover:bg-foreground/5'
+                      )}
+                    >
+                      {dot && <span className={cn('h-1.5 w-1.5 rounded-full shrink-0', dot)} />}
+                      {opt.label}
+                    </button>
                   )
                 })}
-              </Box>
-            </Box>
+              </div>
+            </div>
 
             {/* Result count */}
             {hasActiveFilters && (
-              <Typography variant="caption" color="text.secondary" sx={{ pl: 0.5 }}>
+              <p className="text-xs text-muted-foreground pl-0.5">
                 {t('settings.users.filter.showing', {
                   count: filteredUsers.length,
                   total: totalUsers,
                 })}
-              </Typography>
+              </p>
             )}
-          </Box>
+          </div>
         )}
 
         {/* User table */}
@@ -705,7 +607,7 @@ const UsersTab: React.FC = () => {
                 }
           }
         />
-      </Stack>
+      </div>
 
       {/* Repository Access Dialog */}
       <ResponsiveDialog
@@ -714,55 +616,43 @@ const UsersTab: React.FC = () => {
         maxWidth="md"
         fullWidth
       >
-        <DialogTitle sx={{ pb: 1 }}>
-          <Typography variant="h6" fontWeight={600} lineHeight={1.2}>
-            {t('settings.users.repositoryAccess.title')}
-          </Typography>
+        <div className="p-4">
+          <DialogHeader>
+            <DialogTitle className="text-base font-semibold leading-tight">
+              {t('settings.users.repositoryAccess.title')}
+            </DialogTitle>
+            {accessUser && (
+              <p className="text-sm text-muted-foreground mt-1">
+                {accessUser.full_name || accessUser.username}
+              </p>
+            )}
+          </DialogHeader>
           {accessUser && (
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-              {accessUser.full_name || accessUser.username}
-            </Typography>
-          )}
-        </DialogTitle>
-        <DialogContent>
-          {accessUser && (
-            <Stack spacing={2.5} sx={{ pt: 1, pb: 1 }}>
-              <Box>
-                <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
-                  <ShieldCheck size={14} style={{ opacity: 0.6 }} />
-                  <Typography variant="body2" fontWeight={600}>
+            <div className="space-y-4 pt-4">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <ShieldCheck size={14} className="opacity-60" />
+                  <p className="text-sm font-semibold">
                     {getRolePresentation(accessUser.role).label}
-                  </Typography>
-                </Stack>
-                <Typography variant="body2" color="text.secondary">
+                  </p>
+                </div>
+                <p className="text-sm text-muted-foreground">
                   {getRepositoryAccessSummary(accessUser)}
-                </Typography>
-              </Box>
-              <Divider />
+                </p>
+              </div>
+              <Separator />
               {roleHasGlobalPermission(accessUser.role, 'repositories.manage_all') ? (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1.5,
-                    px: 2,
-                    py: 1.75,
-                    borderRadius: 2,
-                    border: '1px solid',
-                    borderColor: 'rgba(124,58,237,0.2)',
-                    bgcolor: 'rgba(124,58,237,0.05)',
-                  }}
-                >
-                  <ShieldCheck size={15} style={{ color: '#7c3aed', flexShrink: 0 }} />
-                  <Box>
-                    <Typography variant="body2" fontWeight={600}>
+                <div className="flex items-center gap-3 px-3 py-3.5 rounded-xl border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/20">
+                  <ShieldCheck size={15} className="text-violet-600 shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold">
                       {t('settings.users.repositoryAccess.globalAccess')}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
+                    </p>
+                    <p className="text-xs text-muted-foreground">
                       {t('settings.users.repositoryAccess.globalAccessDesc')}
-                    </Typography>
-                  </Box>
-                </Box>
+                    </p>
+                  </div>
+                </div>
               ) : (
                 <UserPermissionsPanel
                   userId={selectedAccessUserId ?? accessUser.id}
@@ -771,189 +661,206 @@ const UsersTab: React.FC = () => {
                   targetUserRole={accessUser.role}
                 />
               )}
-            </Stack>
+            </div>
           )}
-        </DialogContent>
+        </div>
       </ResponsiveDialog>
 
       {/* Create/Edit User Modal */}
       <Dialog
         open={showCreateUser || !!editingUser}
-        onClose={() => {
-          setShowCreateUser(false)
-          setEditingUser(null)
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowCreateUser(false)
+            setEditingUser(null)
+          }
         }}
-        maxWidth="sm"
-        fullWidth
       >
-        <DialogTitle>
-          {editingUser
-            ? t('settings.users.editDialog.title')
-            : t('settings.users.createDialog.title')}
-        </DialogTitle>
-        <form onSubmit={editingUser ? handleUpdateUser : handleCreateUser}>
-          <DialogContent>
-            <Stack spacing={3}>
-              <TextField
-                label={t('settings.users.fields.username')}
-                value={userForm.username}
-                onChange={(e) => setUserForm({ ...userForm, username: e.target.value })}
-                required
-                fullWidth
-              />
+        <DialogContent className="sm:max-w-md" aria-label={editingUser ? t('settings.users.editDialog.title') : t('settings.users.createDialog.title')}>
+          <DialogHeader>
+            <DialogTitle>
+              {editingUser
+                ? t('settings.users.editDialog.title')
+                : t('settings.users.createDialog.title')}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={editingUser ? handleUpdateUser : handleCreateUser}>
+            <div className="space-y-4 py-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="user-username">{t('settings.users.fields.username')} *</Label>
+                <Input
+                  id="user-username"
+                  value={userForm.username}
+                  onChange={(e) => setUserForm({ ...userForm, username: e.target.value })}
+                  required
+                />
+              </div>
 
-              <TextField
-                label={t('settings.users.fields.email')}
-                type="email"
-                value={userForm.email}
-                onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
-                required
-                fullWidth
-              />
+              <div className="space-y-1.5">
+                <Label htmlFor="user-email">{t('settings.users.fields.email')} *</Label>
+                <Input
+                  id="user-email"
+                  type="email"
+                  value={userForm.email}
+                  onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
+                  required
+                />
+              </div>
 
               {!editingUser && (
-                <TextField
-                  label={t('settings.users.fields.password')}
-                  type="password"
-                  value={userForm.password}
-                  onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
-                  required
-                  fullWidth
-                />
+                <div className="space-y-1.5">
+                  <Label htmlFor="user-password">{t('settings.users.fields.password')} *</Label>
+                  <Input
+                    id="user-password"
+                    type="password"
+                    value={userForm.password}
+                    onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+                    required
+                  />
+                </div>
               )}
 
-              <TextField
-                label={t('settings.users.fields.fullName')}
-                value={userForm.full_name}
-                onChange={(e) => setUserForm({ ...userForm, full_name: e.target.value })}
-                fullWidth
-              />
+              <div className="space-y-1.5">
+                <Label htmlFor="user-fullname">{t('settings.users.fields.fullName')}</Label>
+                <Input
+                  id="user-fullname"
+                  value={userForm.full_name}
+                  onChange={(e) => setUserForm({ ...userForm, full_name: e.target.value })}
+                />
+              </div>
 
-              <FormControl fullWidth>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                  {t('settings.users.fields.role')}
-                </Typography>
+              <div className="space-y-1.5">
+                <Label htmlFor="user-role">{t('settings.users.fields.role')}</Label>
                 <Select
                   value={userForm.role}
-                  onChange={(e) => setUserForm({ ...userForm, role: e.target.value })}
-                  size="small"
+                  onValueChange={(val) => setUserForm({ ...userForm, role: val })}
                 >
-                  <MenuItem value="admin">{t('settings.users.roles.adminDescription')}</MenuItem>
-                  <MenuItem value="operator">
-                    {t('settings.users.roles.operatorDescription')}
-                  </MenuItem>
-                  <MenuItem value="viewer">{t('settings.users.roles.viewerDescription')}</MenuItem>
+                  <SelectTrigger id="user-role" className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="admin">
+                      {t('settings.users.roles.adminDescription')}
+                    </SelectItem>
+                    <SelectItem value="operator">
+                      {t('settings.users.roles.operatorDescription')}
+                    </SelectItem>
+                    <SelectItem value="viewer">
+                      {t('settings.users.roles.viewerDescription')}
+                    </SelectItem>
+                  </SelectContent>
                 </Select>
-              </FormControl>
-            </Stack>
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={() => {
-                setShowCreateUser(false)
-                setEditingUser(null)
-              }}
-            >
-              {t('settings.users.buttons.cancel')}
-            </Button>
-            <Button type="submit" variant="contained">
-              {editingUser
-                ? t('settings.users.buttons.update')
-                : t('settings.users.buttons.create')}
-            </Button>
-          </DialogActions>
-        </form>
+              </div>
+            </div>
+            <DialogFooter className="mt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setShowCreateUser(false)
+                  setEditingUser(null)
+                }}
+              >
+                {t('settings.users.buttons.cancel')}
+              </Button>
+              <Button type="submit">
+                {editingUser
+                  ? t('settings.users.buttons.update')
+                  : t('settings.users.buttons.create')}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
       </Dialog>
 
       {/* Password Reset Modal */}
       <Dialog
         open={showUserPasswordModal}
-        onClose={() => {
-          setShowUserPasswordModal(false)
-          setSelectedUserId(null)
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowUserPasswordModal(false)
+            setSelectedUserId(null)
+          }
         }}
-        maxWidth="sm"
-        fullWidth
       >
-        <DialogTitle>{t('settings.users.resetPasswordDialog.title')}</DialogTitle>
-        <form onSubmit={handleResetPassword}>
-          <DialogContent>
-            <TextField
-              label={t('settings.password.new')}
-              type="password"
-              value={passwordForm.new_password}
-              onChange={(e) => setPasswordForm({ new_password: e.target.value })}
-              required
-              fullWidth
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={() => {
-                setShowUserPasswordModal(false)
-                setSelectedUserId(null)
-              }}
-            >
-              {t('settings.users.buttons.cancel')}
-            </Button>
-            <Button type="submit" variant="contained">
-              {t('settings.users.actions.resetPassword')}
-            </Button>
-          </DialogActions>
-        </form>
+        <DialogContent className="sm:max-w-md" aria-label={t('settings.users.resetPasswordDialog.title')}>
+          <DialogHeader>
+            <DialogTitle>{t('settings.users.resetPasswordDialog.title')}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleResetPassword}>
+            <div className="space-y-1.5 py-2">
+              <Label htmlFor="reset-password">{t('settings.password.new')}</Label>
+              <Input
+                id="reset-password"
+                type="password"
+                value={passwordForm.new_password}
+                onChange={(e) => setPasswordForm({ new_password: e.target.value })}
+                required
+              />
+            </div>
+            <DialogFooter className="mt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setShowUserPasswordModal(false)
+                  setSelectedUserId(null)
+                }}
+              >
+                {t('settings.users.buttons.cancel')}
+              </Button>
+              <Button type="submit">{t('settings.users.actions.resetPassword')}</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
       </Dialog>
 
       {/* Delete User Confirmation Dialog */}
       <Dialog
         open={!!deleteConfirmUser}
-        onClose={() => setDeleteConfirmUser(null)}
-        maxWidth="xs"
-        fullWidth
+        onOpenChange={(open) => {
+          if (!open) setDeleteConfirmUser(null)
+        }}
       >
-        <DialogTitle>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Box
-              sx={{
-                width: 48,
-                height: 48,
-                borderRadius: '50%',
-                backgroundColor: 'error.lighter',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
+        <DialogContent className="sm:max-w-xs" aria-label={t('settings.users.deleteDialog.title')}>
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-950/40 shrink-0">
+                <AlertCircle size={24} className="text-red-600" />
+              </div>
+              <DialogTitle className="text-base font-semibold">
+                {t('settings.users.deleteDialog.title')}
+              </DialogTitle>
+            </div>
+          </DialogHeader>
+          <div className="space-y-2 mt-2">
+            <p className="text-sm">
+              {t('settings.users.deleteDialog.message', {
+                username: deleteConfirmUser?.username,
+              })}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {t('settings.users.deleteDialog.warning')}
+            </p>
+          </div>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setDeleteConfirmUser(null)}>
+              {t('settings.users.buttons.cancel')}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteUser}
+              disabled={deleteUserMutation.isPending}
             >
-              <AlertCircle size={24} color="#d32f2f" />
-            </Box>
-            <Typography variant="h6" fontWeight={600}>
-              {t('settings.users.deleteDialog.title')}
-            </Typography>
-          </Stack>
-        </DialogTitle>
-        <DialogContent>
-          <Typography variant="body2">
-            {t('settings.users.deleteDialog.message', { username: deleteConfirmUser?.username })}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            {t('settings.users.deleteDialog.warning')}
-          </Typography>
+              {deleteUserMutation.isPending ? (
+                <Loader2 size={16} className="animate-spin mr-1" />
+              ) : null}
+              {deleteUserMutation.isPending
+                ? t('settings.users.deleteDialog.deleting')
+                : t('settings.users.deleteDialog.confirm')}
+            </Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteConfirmUser(null)}>
-            {t('settings.users.buttons.cancel')}
-          </Button>
-          <Button
-            onClick={handleDeleteUser}
-            variant="contained"
-            color="error"
-            disabled={deleteUserMutation.isPending}
-            startIcon={deleteUserMutation.isPending ? <CircularProgress size={16} /> : null}
-          >
-            {deleteUserMutation.isPending
-              ? t('settings.users.deleteDialog.deleting')
-              : t('settings.users.deleteDialog.confirm')}
-          </Button>
-        </DialogActions>
       </Dialog>
     </>
   )

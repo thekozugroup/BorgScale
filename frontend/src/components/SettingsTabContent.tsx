@@ -1,16 +1,20 @@
-import { Box } from '@mui/material'
-import type { SxProps, Theme } from '@mui/material'
 import type { ReactNode } from 'react'
+import { cn } from '@/lib/utils'
 
 interface SettingsTabContentProps {
   children: ReactNode
   /** Optional max width constraint — unconstrained by default */
   maxWidth?: number
-  sx?: SxProps<Theme>
+  className?: string
 }
 
-export default function SettingsTabContent({ children, maxWidth, sx }: SettingsTabContentProps) {
+export default function SettingsTabContent({ children, maxWidth, className }: SettingsTabContentProps) {
   return (
-    <Box sx={{ ...(maxWidth ? { maxWidth, mx: 'auto' } : {}), ...(sx as object) }}>{children}</Box>
+    <div
+      className={cn(className)}
+      style={maxWidth ? { maxWidth, marginLeft: 'auto', marginRight: 'auto' } : undefined}
+    >
+      {children}
+    </div>
   )
 }

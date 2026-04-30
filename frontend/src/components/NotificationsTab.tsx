@@ -1,31 +1,7 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  Box,
-  Card,
-  Typography,
-  Button,
-  IconButton,
-  TextField,
-  CircularProgress,
-  Skeleton,
-  Stack,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  FormControlLabel,
-  Switch,
-  Alert,
-  Link,
-  Tooltip,
-  FormControl,
-  FormLabel,
-  RadioGroup,
-  Radio,
-  alpha,
-} from '@mui/material'
-import { Plus, Bell, Info, ExternalLink, Archive, RotateCcw, Settings } from 'lucide-react'
+import { Plus, Bell, Info, ExternalLink, Archive, RotateCcw, Settings, Loader2 } from 'lucide-react'
 import { notificationsAPI, repositoriesAPI } from '../services/api'
 import { toast } from 'react-hot-toast'
 import { translateBackendKey } from '../utils/translateBackendKey'
@@ -34,6 +10,13 @@ import MultiRepositorySelector from './MultiRepositorySelector'
 import { useAnalytics } from '../hooks/useAnalytics'
 import NotificationCard from './NotificationCard'
 import ResponsiveDialog from './ResponsiveDialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface NotificationSetting {
   id: number
@@ -285,201 +268,107 @@ const NotificationsTab: React.FC = () => {
   const notifications = notificationsData || []
 
   return (
-    <Box>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          justifyContent: 'space-between',
-          alignItems: { xs: 'stretch', sm: 'center' },
-          gap: 1.5,
-          mb: 3,
-        }}
-      >
-        <Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Typography variant="h6" fontWeight={600}>
-              {t('notifications.title')}
-            </Typography>
-            <Tooltip title={t('notifications.serviceUrlExamples')} arrow>
-              <IconButton
-                size="small"
-                onClick={() => setShowInfoModal(true)}
-                sx={{ color: 'text.disabled', '&:hover': { color: 'text.secondary' }, p: 0.25 }}
-              >
-                <Info size={14} />
-              </IconButton>
-            </Tooltip>
-          </Box>
-          <Typography variant="body2" color="text.secondary">
-            {t('notifications.subtitle')}
-          </Typography>
-        </Box>
+    <div>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
+        <div>
+          <div className="flex items-center gap-1">
+            <h2 className="text-base font-semibold">{t('notifications.title')}</h2>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => setShowInfoModal(true)}
+                    className="p-0.5 text-muted-foreground/50 hover:text-muted-foreground rounded"
+                  >
+                    <Info size={14} />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>{t('notifications.serviceUrlExamples')}</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          <p className="text-sm text-muted-foreground">{t('notifications.subtitle')}</p>
+        </div>
         <Button
-          variant="contained"
-          startIcon={<Plus size={18} />}
           onClick={() => {
             resetForm()
             setEditingNotification(null)
             setShowDialog(true)
             trackNotifications(EventAction.VIEW, { source: 'create_dialog' })
           }}
-          sx={{ width: { xs: '100%', sm: 'auto' } }}
+          className="w-full sm:w-auto"
         >
+          <Plus size={18} className="mr-1" />
           {t('notifications.addService')}
         </Button>
-      </Box>
+      </div>
 
       {isLoading ? (
-        <Stack spacing={2}>
+        <div className="space-y-4">
           {[0, 1, 2].map((i) => (
-            <Box
+            <div
               key={i}
-              sx={{
-                borderRadius: 2,
-                bgcolor: 'background.paper',
-                overflow: 'hidden',
-                boxShadow: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? `0 0 0 1px ${alpha('#fff', 0.08)}, 0 4px 16px ${alpha('#000', 0.25)}`
-                    : `0 0 0 1px ${alpha('#000', 0.08)}, 0 2px 8px ${alpha('#000', 0.07)}`,
-                opacity: Math.max(0.4, 1 - i * 0.2),
-              }}
+              className="rounded-xl bg-card ring-1 ring-foreground/10 overflow-hidden"
+              style={{ opacity: Math.max(0.4, 1 - i * 0.2) }}
             >
-              <Box
-                sx={{ px: { xs: 1.75, sm: 2 }, pt: { xs: 1.75, sm: 2 }, pb: { xs: 1.5, sm: 1.75 } }}
-              >
+              <div className="px-4 pt-4 pb-3">
                 {/* Title row */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    justifyContent: 'space-between',
-                    gap: 1,
-                    mb: 1.5,
-                  }}
-                >
-                  <Box sx={{ flex: 1 }}>
-                    <Skeleton
-                      variant="text"
-                      width={[120, 160, 100][i]}
-                      height={20}
-                      sx={{ transform: 'none', borderRadius: 0.5, mb: 0.4 }}
-                    />
-                    <Skeleton
-                      variant="text"
-                      width={[200, 170, 220][i]}
-                      height={14}
-                      sx={{ transform: 'none', borderRadius: 0.5 }}
-                    />
-                  </Box>
-                  <Skeleton
-                    variant="rounded"
-                    width={20}
-                    height={20}
-                    sx={{ borderRadius: 0.5, flexShrink: 0 }}
-                  />
-                </Box>
-
-                {/* Stats grid — 4 columns matching EntityCard */}
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' },
-                    borderRadius: 1.5,
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    overflow: 'hidden',
-                    mb: 1.5,
-                  }}
-                >
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <div className="flex-1">
+                    <Skeleton className="h-4 mb-1" style={{ width: [120, 160, 100][i] }} />
+                    <Skeleton className="h-3" style={{ width: [200, 170, 220][i] }} />
+                  </div>
+                  <Skeleton className="h-5 w-5 rounded shrink-0" />
+                </div>
+                {/* Stats grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 rounded-xl border border-border overflow-hidden mb-3">
                   {[0, 1, 2, 3].map((j) => (
-                    <Box
+                    <div
                       key={j}
-                      sx={{
-                        px: 1.5,
-                        py: 1.1,
-                        borderRight: j < 3 ? '1px solid' : 0,
-                        borderColor: 'divider',
-                      }}
+                      className={`px-3 py-2 ${j < 3 ? 'border-r border-border' : ''}`}
                     >
-                      <Skeleton
-                        variant="text"
-                        width={38}
-                        height={10}
-                        sx={{ transform: 'none', borderRadius: 0.5, mb: 0.5 }}
-                      />
-                      <Skeleton
-                        variant="text"
-                        width={[55, 45, 60, 50][j]}
-                        height={16}
-                        sx={{ transform: 'none', borderRadius: 0.5 }}
-                      />
-                    </Box>
+                      <Skeleton className="h-2 w-10 mb-1" />
+                      <Skeleton className="h-3" style={{ width: [55, 45, 60, 50][j] }} />
+                    </div>
                   ))}
-                </Box>
-
-                {/* Event category tags row */}
-                <Box sx={{ display: 'flex', gap: 0.75, mb: 1.5 }}>
+                </div>
+                {/* Tags row */}
+                <div className="flex gap-2 mb-3">
                   {[52, 56, 46, 62].map((w, j) => (
-                    <Skeleton
-                      key={j}
-                      variant="rounded"
-                      width={w}
-                      height={20}
-                      sx={{ borderRadius: 1 }}
-                    />
+                    <Skeleton key={j} className="h-5 rounded" style={{ width: w }} />
                   ))}
-                </Box>
-
-                {/* Actions row — 4 icon buttons */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.5,
-                    pt: 1.25,
-                    borderTop: '1px solid',
-                    borderColor: 'divider',
-                  }}
-                >
+                </div>
+                {/* Actions row */}
+                <div className="flex items-center gap-1 pt-3 border-t border-border">
                   {[0, 1, 2, 3].map((j) => (
-                    <Skeleton
-                      key={j}
-                      variant="rounded"
-                      width={32}
-                      height={32}
-                      sx={{ borderRadius: 1.5 }}
-                    />
+                    <Skeleton key={j} className="h-8 w-8 rounded-xl" />
                   ))}
-                </Box>
-              </Box>
-            </Box>
+                </div>
+              </div>
+            </div>
           ))}
-        </Stack>
+        </div>
       ) : notifications.length === 0 ? (
-        <Card variant="outlined" sx={{ borderRadius: 3, p: 4, textAlign: 'center' }}>
-          <Bell size={48} style={{ opacity: 0.3, margin: '0 auto 16px' }} />
-          <Typography variant="h6" gutterBottom>
-            {t('notifications.noServicesTitle')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        <div className="rounded-xl border border-border p-8 text-center">
+          <Bell size={48} className="opacity-30 mx-auto mb-4" />
+          <h3 className="text-base font-semibold mb-1">{t('notifications.noServicesTitle')}</h3>
+          <p className="text-sm text-muted-foreground mb-4">
             {t('notifications.noServicesSubtitle')}
-          </Typography>
+          </p>
           <Button
-            variant="contained"
-            startIcon={<Plus size={18} />}
             onClick={() => {
               resetForm()
               setEditingNotification(null)
               setShowDialog(true)
             }}
           >
+            <Plus size={18} className="mr-1" />
             {t('notifications.addService')}
           </Button>
-        </Card>
+        </div>
       ) : (
-        <Stack spacing={2}>
+        <div className="space-y-4">
           {notifications.map((notification: NotificationSetting) => (
             <NotificationCard
               key={notification.id}
@@ -491,7 +380,7 @@ const NotificationsTab: React.FC = () => {
               isTesting={testing === notification.id}
             />
           ))}
-        </Stack>
+        </div>
       )}
 
       {/* Service URL Info Modal */}
@@ -501,25 +390,12 @@ const NotificationsTab: React.FC = () => {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>{t('notifications.appriseUrlExamplesTitle')}</DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        <div className="p-4">
+          <h2 className="text-base font-medium leading-none mb-1">{t('notifications.appriseUrlExamplesTitle')}</h2>
+          <p className="text-sm text-muted-foreground mb-3 mt-2">
             {t('notifications.alertDescription')}
-          </Typography>
-          <Box
-            sx={{
-              fontFamily: 'monospace',
-              fontSize: '0.75rem',
-              bgcolor: 'grey.900',
-              color: 'grey.100',
-              p: 1.5,
-              borderRadius: 1,
-              border: '1px solid',
-              borderColor: 'grey.700',
-              overflow: 'auto',
-              lineHeight: 1.8,
-            }}
-          >
+          </p>
+          <div className="font-mono text-xs bg-neutral-900 text-neutral-100 p-3 rounded-lg border border-neutral-700 overflow-auto leading-relaxed">
             {[
               {
                 label: t('notifications.exampleEmailGmail'),
@@ -542,24 +418,22 @@ const NotificationsTab: React.FC = () => {
                 value: 'json://hostname/path/to/endpoint',
               },
             ].map(({ label, value }) => (
-              <Box key={value}>
-                <Box component="span" sx={{ color: 'grey.500' }}>
-                  {label}{' '}
-                </Box>
-                <Box component="span">{value}</Box>
-              </Box>
+              <div key={value}>
+                <span className="text-neutral-500">{label} </span>
+                <span>{value}</span>
+              </div>
             ))}
-          </Box>
-          <Link
+          </div>
+          <a
             href="https://github.com/caronc/apprise/wiki"
             target="_blank"
             rel="noopener noreferrer"
-            sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1.5 }}
+            className="flex items-center gap-1 mt-3 text-sm underline underline-offset-2 hover:text-foreground text-muted-foreground"
           >
             <ExternalLink size={14} />
             {t('notifications.fullAppriseDocumentation')}
-          </Link>
-        </DialogContent>
+          </a>
+        </div>
       </ResponsiveDialog>
 
       {/* Add/Edit Dialog */}
@@ -569,282 +443,268 @@ const NotificationsTab: React.FC = () => {
         maxWidth="sm"
         fullWidth
         footer={
-          <DialogActions sx={{ px: 3, pb: 2 }}>
-            <Button onClick={() => setShowDialog(false)}>{t('notifications.cancel')}</Button>
-            <Box sx={{ flex: 1 }} />
+          <div className="flex items-center gap-2 px-4 py-3 border-t border-border">
+            <Button variant="outline" onClick={() => setShowDialog(false)}>
+              {t('notifications.cancel')}
+            </Button>
+            <div className="flex-1" />
             <Button
-              variant="contained"
               onClick={handleSubmit}
               disabled={createMutation.isPending || updateMutation.isPending}
             >
               {createMutation.isPending || updateMutation.isPending ? (
-                <CircularProgress size={20} />
-              ) : editingNotification ? (
-                t('notifications.update')
-              ) : (
-                t('notifications.add')
-              )}
+                <Loader2 size={16} className="animate-spin mr-1" />
+              ) : null}
+              {editingNotification ? t('notifications.update') : t('notifications.add')}
             </Button>
-          </DialogActions>
+          </div>
         }
       >
-        <DialogTitle>
-          {editingNotification ? t('notifications.editService') : t('notifications.addService')}
-        </DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField
-              label={t('notifications.form.serviceName')}
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder={t('notifications.form.serviceNamePlaceholder')}
-              fullWidth
-              required
-            />
+        <div className="p-4">
+          <h2 className="text-base font-medium leading-none mb-1">
+            {editingNotification
+              ? t('notifications.editService')
+              : t('notifications.addService')}
+          </h2>
 
-            <TextField
-              label={t('notifications.form.serviceUrl')}
-              value={formData.service_url}
-              onChange={(e) => setFormData({ ...formData, service_url: e.target.value })}
-              placeholder={t('notifications.form.serviceUrlPlaceholder')}
-              fullWidth
-              required
-              helperText={t('notifications.form.serviceUrlHelper')}
-            />
-
-            <Alert severity="info" sx={{ mt: 1 }}>
-              <strong>{t('notifications.form.tipLabel')}</strong> {t('notifications.form.tipText')}
-            </Alert>
-
-            <TextField
-              label={t('notifications.form.titlePrefix')}
-              value={formData.title_prefix}
-              onChange={(e) => setFormData({ ...formData, title_prefix: e.target.value })}
-              placeholder={t('notifications.form.titlePrefixPlaceholder')}
-              fullWidth
-              helperText={t('notifications.form.titlePrefixHelper')}
-            />
-
-            <Box sx={{ mt: 2, mb: 2 }}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={formData.enabled}
-                    onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
-                  />
-                }
-                label={t('notifications.form.enableNotifications')}
+          <div className="mt-4 space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="notif-name">{t('notifications.form.serviceName')} *</Label>
+              <Input
+                id="notif-name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder={t('notifications.form.serviceNamePlaceholder')}
+                required
               />
-            </Box>
+            </div>
 
-            <Box sx={{ mt: 2, mb: 1 }}>
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                {t('notifications.form.notificationEnhancements')}
-              </Typography>
-
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={formData.include_job_name_in_title}
-                    onChange={(e) =>
-                      setFormData({ ...formData, include_job_name_in_title: e.target.checked })
-                    }
-                  />
-                }
-                label={t('notifications.form.includeJobName')}
+            <div className="space-y-1.5">
+              <Label htmlFor="notif-url">{t('notifications.form.serviceUrl')} *</Label>
+              <Input
+                id="notif-url"
+                value={formData.service_url}
+                onChange={(e) => setFormData({ ...formData, service_url: e.target.value })}
+                placeholder={t('notifications.form.serviceUrlPlaceholder')}
+                required
               />
-              <Typography
-                variant="caption"
-                sx={{ display: 'block', pl: 4.5, mt: -0.5, mb: 1, color: 'text.secondary' }}
-              >
-                {t('notifications.form.includeJobNameHelper')}
-              </Typography>
-            </Box>
+              <p className="text-xs text-muted-foreground">
+                {t('notifications.form.serviceUrlHelper')}
+              </p>
+            </div>
 
-            <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>
-              {t('notifications.form.notifyOn')}
-            </Typography>
+            <div className="rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3 text-sm text-blue-900 dark:text-blue-200">
+              <strong>{t('notifications.form.tipLabel')}</strong>{' '}
+              {t('notifications.form.tipText')}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="notif-prefix">{t('notifications.form.titlePrefix')}</Label>
+              <Input
+                id="notif-prefix"
+                value={formData.title_prefix}
+                onChange={(e) => setFormData({ ...formData, title_prefix: e.target.value })}
+                placeholder={t('notifications.form.titlePrefixPlaceholder')}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t('notifications.form.titlePrefixHelper')}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 py-1">
+              <Switch
+                id="notif-enabled"
+                checked={formData.enabled}
+                onCheckedChange={(checked) => setFormData({ ...formData, enabled: checked })}
+              />
+              <Label htmlFor="notif-enabled">{t('notifications.form.enableNotifications')}</Label>
+            </div>
+
+            <div className="space-y-2 pt-1">
+              <p className="text-sm font-medium">{t('notifications.form.notificationEnhancements')}</p>
+              <div className="flex items-center gap-3">
+                <Switch
+                  id="notif-job-name"
+                  checked={formData.include_job_name_in_title}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, include_job_name_in_title: checked })
+                  }
+                />
+                <div>
+                  <Label htmlFor="notif-job-name">{t('notifications.form.includeJobName')}</Label>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {t('notifications.form.includeJobNameHelper')}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-sm font-medium pt-1">{t('notifications.form.notifyOn')}</p>
 
             {/* Backup Events Category */}
-            <Box sx={{ mb: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
+            <div className="space-y-2">
+              <div className="flex items-center gap-1.5">
                 <Archive size={16} />
-                <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                <span className="text-sm font-semibold text-muted-foreground">
                   {t('notifications.category.backupEvents')}
-                </Typography>
-              </Box>
-              <Box sx={{ pl: 2 }}>
-                <FormControlLabel
-                  control={
+                </span>
+              </div>
+              <div className="pl-5 space-y-2">
+                {[
+                  {
+                    id: 'notif-backup-start',
+                    key: 'notify_on_backup_start' as const,
+                    label: t('notifications.form.started'),
+                  },
+                  {
+                    id: 'notif-backup-success',
+                    key: 'notify_on_backup_success' as const,
+                    label: t('notifications.form.success'),
+                  },
+                  {
+                    id: 'notif-backup-warning',
+                    key: 'notify_on_backup_warning' as const,
+                    label: t('notifications.form.warning'),
+                  },
+                  {
+                    id: 'notif-backup-failure',
+                    key: 'notify_on_backup_failure' as const,
+                    label: t('notifications.form.failure'),
+                  },
+                ].map(({ id, key, label }) => (
+                  <div key={id} className="flex items-center gap-3">
                     <Switch
-                      checked={formData.notify_on_backup_start}
-                      onChange={(e) =>
-                        setFormData({ ...formData, notify_on_backup_start: e.target.checked })
-                      }
+                      id={id}
+                      checked={formData[key]}
+                      onCheckedChange={(checked) => setFormData({ ...formData, [key]: checked })}
                     />
-                  }
-                  label={t('notifications.form.started')}
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.notify_on_backup_success}
-                      onChange={(e) =>
-                        setFormData({ ...formData, notify_on_backup_success: e.target.checked })
-                      }
-                    />
-                  }
-                  label={t('notifications.form.success')}
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.notify_on_backup_warning}
-                      onChange={(e) =>
-                        setFormData({ ...formData, notify_on_backup_warning: e.target.checked })
-                      }
-                    />
-                  }
-                  label={t('notifications.form.warning')}
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.notify_on_backup_failure}
-                      onChange={(e) =>
-                        setFormData({ ...formData, notify_on_backup_failure: e.target.checked })
-                      }
-                    />
-                  }
-                  label={t('notifications.form.failure')}
-                />
-              </Box>
-            </Box>
+                    <Label htmlFor={id}>{label}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {/* Restore Events Category */}
-            <Box sx={{ mb: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
+            <div className="space-y-2">
+              <div className="flex items-center gap-1.5">
                 <RotateCcw size={16} />
-                <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                <span className="text-sm font-semibold text-muted-foreground">
                   {t('notifications.category.restoreEvents')}
-                </Typography>
-              </Box>
-              <Box sx={{ pl: 2 }}>
-                <FormControlLabel
-                  control={
+                </span>
+              </div>
+              <div className="pl-5 space-y-2">
+                {[
+                  {
+                    id: 'notif-restore-success',
+                    key: 'notify_on_restore_success' as const,
+                    label: t('notifications.form.success'),
+                  },
+                  {
+                    id: 'notif-restore-failure',
+                    key: 'notify_on_restore_failure' as const,
+                    label: t('notifications.form.failure'),
+                  },
+                ].map(({ id, key, label }) => (
+                  <div key={id} className="flex items-center gap-3">
                     <Switch
-                      checked={formData.notify_on_restore_success}
-                      onChange={(e) =>
-                        setFormData({ ...formData, notify_on_restore_success: e.target.checked })
-                      }
+                      id={id}
+                      checked={formData[key]}
+                      onCheckedChange={(checked) => setFormData({ ...formData, [key]: checked })}
                     />
-                  }
-                  label={t('notifications.form.success')}
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.notify_on_restore_failure}
-                      onChange={(e) =>
-                        setFormData({ ...formData, notify_on_restore_failure: e.target.checked })
-                      }
-                    />
-                  }
-                  label={t('notifications.form.failure')}
-                />
-              </Box>
-            </Box>
+                    <Label htmlFor={id}>{label}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {/* Check Jobs Category */}
-            <Box sx={{ mb: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
+            <div className="space-y-2">
+              <div className="flex items-center gap-1.5">
                 <Settings size={16} />
-                <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                <span className="text-sm font-semibold text-muted-foreground">
                   {t('notifications.category.checkJobs')}
-                </Typography>
-              </Box>
-              <Box sx={{ pl: 2 }}>
-                <FormControlLabel
-                  control={
+                </span>
+              </div>
+              <div className="pl-5 space-y-2">
+                {[
+                  {
+                    id: 'notif-check-success',
+                    key: 'notify_on_check_success' as const,
+                    label: t('notifications.form.success'),
+                  },
+                  {
+                    id: 'notif-check-failure',
+                    key: 'notify_on_check_failure' as const,
+                    label: t('notifications.form.failure'),
+                  },
+                ].map(({ id, key, label }) => (
+                  <div key={id} className="flex items-center gap-3">
                     <Switch
-                      checked={formData.notify_on_check_success}
-                      onChange={(e) =>
-                        setFormData({ ...formData, notify_on_check_success: e.target.checked })
-                      }
+                      id={id}
+                      checked={formData[key]}
+                      onCheckedChange={(checked) => setFormData({ ...formData, [key]: checked })}
                     />
-                  }
-                  label={t('notifications.form.success')}
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.notify_on_check_failure}
-                      onChange={(e) =>
-                        setFormData({ ...formData, notify_on_check_failure: e.target.checked })
-                      }
-                    />
-                  }
-                  label={t('notifications.form.failure')}
-                />
-              </Box>
-            </Box>
+                    <Label htmlFor={id}>{label}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {/* System Events Category */}
-            <Box sx={{ mb: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.5 }}>
+            <div className="space-y-2">
+              <div className="flex items-center gap-1.5">
                 <Settings size={16} />
-                <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                <span className="text-sm font-semibold text-muted-foreground">
                   {t('notifications.category.systemEvents')}
-                </Typography>
-              </Box>
-              <Box sx={{ pl: 2 }}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={formData.notify_on_schedule_failure}
-                      onChange={(e) =>
-                        setFormData({ ...formData, notify_on_schedule_failure: e.target.checked })
-                      }
-                    />
-                  }
-                  label={t('notifications.form.schedulerErrors')}
-                />
-                <Typography
-                  variant="caption"
-                  sx={{ display: 'block', pl: 4.5, mt: -0.5, mb: 1, color: 'text.secondary' }}
-                >
-                  {t('notifications.form.schedulerErrorsHelper')}
-                </Typography>
-              </Box>
-            </Box>
+                </span>
+              </div>
+              <div className="pl-5 space-y-2">
+                <div className="flex items-center gap-3">
+                  <Switch
+                    id="notif-schedule-failure"
+                    checked={formData.notify_on_schedule_failure}
+                    onCheckedChange={(checked) =>
+                      setFormData({ ...formData, notify_on_schedule_failure: checked })
+                    }
+                  />
+                  <div>
+                    <Label htmlFor="notif-schedule-failure">
+                      {t('notifications.form.schedulerErrors')}
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {t('notifications.form.schedulerErrorsHelper')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Repository Filter Section */}
-            <Box sx={{ mt: 3, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-              <FormControl component="fieldset">
-                <FormLabel component="legend" sx={{ mb: 1 }}>
-                  {t('notifications.form.applyToRepositories')}
-                </FormLabel>
-                <RadioGroup
-                  value={formData.monitor_all_repositories ? 'all' : 'selected'}
-                  onChange={(e) =>
-                    setFormData({ ...formData, monitor_all_repositories: e.target.value === 'all' })
-                  }
-                >
-                  <FormControlLabel
-                    value="all"
-                    control={<Radio />}
-                    label={t('notifications.form.allRepositories')}
-                  />
-                  <FormControlLabel
-                    value="selected"
-                    control={<Radio />}
-                    label={t('notifications.form.selectedRepositoriesOnly')}
-                  />
-                </RadioGroup>
-              </FormControl>
+            <div className="pt-4 border-t border-border space-y-3">
+              <p className="text-sm font-medium">{t('notifications.form.applyToRepositories')}</p>
+              <RadioGroup
+                value={formData.monitor_all_repositories ? 'all' : 'selected'}
+                onValueChange={(val) =>
+                  setFormData({ ...formData, monitor_all_repositories: val === 'all' })
+                }
+                className="gap-2"
+              >
+                <div className="flex items-center gap-2">
+                  <RadioGroupItem value="all" id="repo-all" />
+                  <Label htmlFor="repo-all">
+                    {t('notifications.form.allRepositories')}
+                  </Label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <RadioGroupItem value="selected" id="repo-selected" />
+                  <Label htmlFor="repo-selected">
+                    {t('notifications.form.selectedRepositoriesOnly')}
+                  </Label>
+                </div>
+              </RadioGroup>
 
               {!formData.monitor_all_repositories && (
-                <Box sx={{ mt: 2 }}>
+                <div className="mt-2">
                   <MultiRepositorySelector
                     repositories={repositories || []}
                     selectedIds={formData.repository_ids}
@@ -854,11 +714,11 @@ const NotificationsTab: React.FC = () => {
                     helperText={t('notifications.form.selectRepositoriesHelper')}
                     allowReorder={false}
                   />
-                </Box>
+                </div>
               )}
-            </Box>
-          </Stack>
-        </DialogContent>
+            </div>
+          </div>
+        </div>
       </ResponsiveDialog>
 
       {/* Delete Confirmation Dialog */}
@@ -868,33 +728,34 @@ const NotificationsTab: React.FC = () => {
         maxWidth="xs"
         fullWidth
         footer={
-          <DialogActions sx={{ px: 3, pb: 2 }}>
-            <Button onClick={() => setDeleteConfirm(null)}>{t('notifications.cancel')}</Button>
-            <Box sx={{ flex: 1 }} />
+          <div className="flex items-center gap-2 px-4 py-3 border-t border-border">
+            <Button variant="outline" onClick={() => setDeleteConfirm(null)}>
+              {t('notifications.cancel')}
+            </Button>
+            <div className="flex-1" />
             <Button
-              color="error"
-              variant="contained"
+              variant="destructive"
               onClick={() => deleteConfirm && deleteMutation.mutate(deleteConfirm.id)}
               disabled={deleteMutation.isPending}
             >
               {deleteMutation.isPending ? (
-                <CircularProgress size={20} />
-              ) : (
-                t('notifications.delete')
-              )}
+                <Loader2 size={16} className="animate-spin mr-1" />
+              ) : null}
+              {t('notifications.delete')}
             </Button>
-          </DialogActions>
+          </div>
         }
       >
-        <DialogTitle>{t('notifications.deleteServiceTitle')}</DialogTitle>
-        <DialogContent>
-          <Typography>
-            {t('notifications.confirmDelete.messagePrefix')} <strong>{deleteConfirm?.name}</strong>
+        <div className="p-4">
+          <h2 className="text-base font-medium leading-none mb-1">{t('notifications.deleteServiceTitle')}</h2>
+          <p className="mt-2 text-sm">
+            {t('notifications.confirmDelete.messagePrefix')}{' '}
+            <strong>{deleteConfirm?.name}</strong>
             {t('notifications.confirmDelete.messageSuffix')}
-          </Typography>
-        </DialogContent>
+          </p>
+        </div>
       </ResponsiveDialog>
-    </Box>
+    </div>
   )
 }
 
