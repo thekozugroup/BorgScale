@@ -44,12 +44,6 @@ class Settings(BaseSettings):
     )
 
     # Licensing / activation settings
-    activation_service_url: Optional[str] = "https://license.borgui.com"
-    activation_public_key: Optional[str] = (
-        "MCowBQYDK2VwAyEATF7UOvYKrNF6M8hZCrGwTRQjj7nhygMUr84AOYE7Zf8="
-    )
-    activation_timeout_seconds: int = 10
-    activation_refresh_interval_hours: int = 24
     enable_startup_license_sync: bool = False
 
     # Database settings - auto-derived from data_dir
@@ -205,15 +199,6 @@ else:
 settings.environment = os.getenv("ENVIRONMENT", settings.environment)
 settings.log_level = os.getenv("LOG_LEVEL", settings.log_level)
 settings.port = int(os.getenv("PORT", settings.port))
-settings.activation_service_url = os.getenv(
-    "ACTIVATION_SERVICE_URL", settings.activation_service_url
-)
-settings.activation_public_key = os.getenv(
-    "ACTIVATION_PUBLIC_KEY", settings.activation_public_key
-)
-settings.activation_timeout_seconds = int(
-    os.getenv("ACTIVATION_TIMEOUT_SECONDS", settings.activation_timeout_seconds)
-)
 settings.enable_startup_license_sync = os.getenv(
     "ENABLE_STARTUP_LICENSE_SYNC",
     "true" if settings.environment == "production" else "false",
