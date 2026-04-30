@@ -1,25 +1,24 @@
-import { Card, CardContent } from '@mui/material'
-import type { SxProps, Theme } from '@mui/material'
 import type { ReactNode } from 'react'
+import { cn } from '@/lib/utils'
+import { Card, CardContent } from '@/components/ui/card'
 
 interface SettingsCardProps {
   children: ReactNode
-  /** Card-level overrides — e.g. overflow, maxWidth, mb */
-  sx?: SxProps<Theme>
-  /** CardContent padding overrides */
-  contentSx?: SxProps<Theme>
+  /** Card-level overrides */
+  className?: string
+  /** CardContent overrides */
+  contentClassName?: string
+  // Legacy MUI sx props — ignored; use className instead
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  sx?: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  contentSx?: any
 }
 
-export default function SettingsCard({ children, sx, contentSx }: SettingsCardProps) {
+export default function SettingsCard({ children, className, contentClassName }: SettingsCardProps) {
   return (
-    <Card variant="outlined" sx={{ borderRadius: 3, ...(sx as object) }}>
-      <CardContent
-        sx={{
-          p: { xs: 2, md: 3 },
-          '&:last-child': { pb: { xs: 2, md: 3 } },
-          ...(contentSx as object),
-        }}
-      >
+    <Card className={cn('rounded-xl', className)}>
+      <CardContent className={cn('p-4 md:p-6', contentClassName)}>
         {children}
       </CardContent>
     </Card>

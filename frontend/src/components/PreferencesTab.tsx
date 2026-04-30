@@ -1,18 +1,17 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Box,
-  Typography,
-  Stack,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-} from '@mui/material'
 import { Globe } from 'lucide-react'
 import SettingsCard from './SettingsCard'
 import { toast } from 'react-hot-toast'
 import i18n from '../i18n'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Label } from '@/components/ui/label'
 
 const LANGUAGES = [
   { code: 'en', label: 'English' },
@@ -35,46 +34,43 @@ export default function PreferencesTab() {
   }
 
   return (
-    <Box>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" fontWeight={700} gutterBottom>
-          {t('preferences.title')}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {t('preferences.subtitle')}
-        </Typography>
-      </Box>
+    <div>
+      <div className="mb-6">
+        <h2 className="text-xl font-bold mb-1">{t('preferences.title')}</h2>
+        <p className="text-sm text-muted-foreground">{t('preferences.subtitle')}</p>
+      </div>
 
       {/* Language Section */}
-      <SettingsCard sx={{ mb: 3 }}>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="flex-start">
-          <Globe size={24} />
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="h6" fontWeight={600} gutterBottom>
-              {t('preferences.languageTitle')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+      <SettingsCard className="mb-6">
+        <div className="flex flex-col sm:flex-row gap-4 items-start">
+          <Globe size={24} className="shrink-0" />
+          <div className="flex-1">
+            <h3 className="text-base font-semibold mb-1">{t('preferences.languageTitle')}</h3>
+            <p className="text-sm text-muted-foreground mb-4">
               {t('preferences.languageDescription')}
-            </Typography>
-            <FormControl size="small" sx={{ width: { xs: '100%', sm: 200 } }}>
-              <InputLabel>{t('preferences.languageLabel')}</InputLabel>
-              <Select
-                value={currentLanguage}
-                label={t('preferences.languageLabel')}
-                onChange={(e) => handleLanguageChange(e.target.value)}
-              >
-                {LANGUAGES.map((lang) => (
-                  <MenuItem key={lang.code} value={lang.code}>
-                    {lang.label}
-                  </MenuItem>
-                ))}
+            </p>
+            <div className="w-full sm:w-48">
+              <Label htmlFor="language-select" className="sr-only">
+                {t('preferences.languageLabel')}
+              </Label>
+              <Select value={currentLanguage} onValueChange={handleLanguageChange}>
+                <SelectTrigger id="language-select" className="w-full">
+                  <SelectValue placeholder={t('preferences.languageLabel')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {LANGUAGES.map((lang) => (
+                    <SelectItem key={lang.code} value={lang.code}>
+                      {lang.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
-            </FormControl>
-          </Box>
-        </Stack>
+            </div>
+          </div>
+        </div>
       </SettingsCard>
 
       {/* Future preferences sections can be added here */}
-    </Box>
+    </div>
   )
 }
