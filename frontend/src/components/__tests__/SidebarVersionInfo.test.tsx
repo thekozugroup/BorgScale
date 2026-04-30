@@ -12,7 +12,7 @@ const fullSystemInfo = {
 describe('SidebarVersionInfo', () => {
   it('shows version skeletons when systemInfo is null', () => {
     const { container } = renderWithProviders(<SidebarVersionInfo systemInfo={null} />)
-    expect(container.querySelectorAll('.MuiSkeleton-root').length).toBeGreaterThan(0)
+    expect(container.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(0)
     expect(screen.queryByText(/loading/i)).not.toBeInTheDocument()
   })
 

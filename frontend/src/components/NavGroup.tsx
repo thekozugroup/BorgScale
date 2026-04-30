@@ -1,16 +1,19 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import {
-  Box,
-  Collapse,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Tooltip,
-} from '@mui/material'
 import { ChevronDown, ChevronRight } from 'lucide-react'
+import {
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
+} from '@/components/ui/sidebar'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
 interface SubItem {
   name: string
@@ -43,118 +46,68 @@ export default function NavGroup({
   const isAnySubItemActive = subItems.some((sub) => sub.href && currentPath.startsWith(sub.href))
 
   return (
-    <React.Fragment>
-      <ListItem disablePadding>
-        <ListItemButton
-          onClick={onToggle}
-          sx={{
-            pl: 2,
-            pr: 1.5,
-            py: 0.625,
-            minHeight: 36,
-            borderLeft: '2px solid transparent',
-            borderRadius: 0,
-            borderLeftColor: isAnySubItemActive ? '#059669' : 'transparent',
-            backgroundColor: isAnySubItemActive ? 'rgba(5,150,105,0.06)' : 'transparent',
-            transition: 'background-color 150ms ease, border-color 150ms ease',
-            '&:hover': { backgroundColor: 'rgba(255,255,255,0.04)' },
-          }}
-        >
-          <ListItemIcon
-            sx={{
-              color: isAnySubItemActive ? '#34d399' : 'text.secondary',
-              minWidth: 32,
-            }}
-          >
-            <Icon size={18} />
-          </ListItemIcon>
-          <ListItemText
-            primary={navLabel(name)}
-            primaryTypographyProps={{
-              fontSize: '0.8125rem',
-              fontWeight: isAnySubItemActive ? 500 : 400,
-              color: isAnySubItemActive ? 'text.primary' : 'text.secondary',
-            }}
-          />
-          {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-        </ListItemButton>
-      </ListItem>
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        onClick={onToggle}
+        isActive={isAnySubItemActive}
+        className="rounded-md"
+      >
+        <Icon size={18} />
+        <span>{navLabel(name)}</span>
+        {isExpanded ? (
+          <ChevronDown size={14} className="ml-auto shrink-0 opacity-60" />
+        ) : (
+          <ChevronRight size={14} className="ml-auto shrink-0 opacity-60" />
+        )}
+      </SidebarMenuButton>
 
-      <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-        <List
-          component="div"
-          disablePadding
-          sx={{
-            position: 'relative',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              left: '24px',
-              top: 0,
-              bottom: 0,
-              width: '1px',
-              backgroundColor: isAnySubItemActive ? 'rgba(5,150,105,0.28)' : 'divider',
-              opacity: isAnySubItemActive ? 1 : 0.5,
-            },
-          }}
-        >
+      {isExpanded && (
+        <SidebarMenuSub>
           {subItems.map((subItem) => {
             const isActive = subItem.href ? currentPath.startsWith(subItem.href) : false
             const SubIcon = subItem.icon
             const isDisabled = subItem.disabled === true
 
-            const button = (
-              <ListItemButton
-                component={isDisabled ? 'div' : Link}
-                to={isDisabled ? undefined : (subItem.href ?? '#')}
-                selected={isActive}
+            const subButton = (
+              <SidebarMenuSubButton
+                asChild={!isDisabled}
+                isActive={isActive}
                 aria-current={isActive ? 'page' : undefined}
-                sx={{
-                  pl: 5.5,
-                  pr: 1.5,
-                  py: 0.5,
-                  minHeight: 32,
-                  borderLeft: '2px solid transparent',
-                  borderRadius: 0,
-                  transition: 'background-color 150ms ease, border-color 150ms ease',
-                  ...(isDisabled ? { opacity: 0.4, pointerEvents: 'none' } : {}),
-                  '&.Mui-selected': {
-                    backgroundColor: 'rgba(5,150,105,0.08)',
-                    borderLeftColor: '#059669',
-                    '&:hover': { backgroundColor: 'rgba(5,150,105,0.12)' },
-                    '& .MuiListItemIcon-root': { color: '#34d399' },
-                  },
-                  '&:hover': { backgroundColor: 'rgba(255,255,255,0.04)' },
-                }}
+                {...(isDisabled ? { 'aria-disabled': true, style: { opacity: 0.4, pointerEvents: 'none' } } : {})}
               >
-                <ListItemIcon sx={{ color: isActive ? '#34d399' : 'text.secondary', minWidth: 28 }}>
-                  <SubIcon size={15} />
-                </ListItemIcon>
-                <ListItemText
-                  primary={navLabel(subItem.name)}
-                  primaryTypographyProps={{
-                    fontSize: '0.8rem',
-                    fontWeight: isActive ? 500 : 400,
-                    color: isActive ? 'text.primary' : 'text.secondary',
-                  }}
-                />
-              </ListItemButton>
+                {isDisabled ? (
+                  <div className="flex items-center gap-2">
+                    <SubIcon size={15} />
+                    <span>{navLabel(subItem.name)}</span>
+                  </div>
+                ) : (
+                  <Link to={subItem.href ?? '#'}>
+                    <SubIcon size={15} />
+                    <span>{navLabel(subItem.name)}</span>
+                  </Link>
+                )}
+              </SidebarMenuSubButton>
             )
 
             return (
-              <ListItem key={subItem.name} disablePadding>
+              <SidebarMenuSubItem key={subItem.name}>
                 {isDisabled ? (
-                  <Tooltip title="Coming soon" arrow placement="right">
-                    <Box sx={{ width: '100%' }}>{button}</Box>
-                  </Tooltip>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="w-full">{subButton}</div>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">Coming soon</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 ) : (
-                  button
+                  subButton
                 )}
-              </ListItem>
+              </SidebarMenuSubItem>
             )
           })}
-        </List>
-      </Collapse>
-    </React.Fragment>
+        </SidebarMenuSub>
+      )}
+    </SidebarMenuItem>
   )
 }

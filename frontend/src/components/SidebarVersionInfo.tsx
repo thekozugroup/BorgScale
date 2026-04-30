@@ -1,4 +1,4 @@
-import { Box, Skeleton } from '@mui/material'
+import { Skeleton } from '@/components/ui/skeleton'
 import VersionChip from './VersionChip'
 
 interface SystemInfo {
@@ -13,10 +13,9 @@ interface SidebarVersionInfoProps {
 
 export default function SidebarVersionInfo({ systemInfo }: SidebarVersionInfoProps) {
   return (
-    <Box sx={{ mt: 'auto', px: 2, pt: 1, pb: 1.5, borderTop: 1, borderColor: 'divider' }}>
-      {/* Version chips */}
+    <div className="mt-auto border-t border-border px-3 pt-2 pb-3">
       {systemInfo ? (
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+        <div className="flex flex-wrap gap-1">
           <VersionChip label="UI" version={systemInfo.app_version} />
           {systemInfo.borg_version && (
             <VersionChip label="B1" version={systemInfo.borg_version.replace(/^borg\s*/i, '')} />
@@ -28,14 +27,14 @@ export default function SidebarVersionInfo({ systemInfo }: SidebarVersionInfoPro
               accent
             />
           )}
-        </Box>
+        </div>
       ) : (
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-          <Skeleton variant="rounded" width={118} height={16} sx={{ borderRadius: '4px' }} />
-          <Skeleton variant="rounded" width={54} height={16} sx={{ borderRadius: '4px' }} />
-          <Skeleton variant="rounded" width={70} height={16} sx={{ borderRadius: '4px' }} />
-        </Box>
+        <div className="flex flex-wrap gap-1">
+          <Skeleton className="h-4 w-[118px] rounded" />
+          <Skeleton className="h-4 w-[54px] rounded" />
+          <Skeleton className="h-4 w-[70px] rounded" />
+        </div>
       )}
-    </Box>
+    </div>
   )
 }
