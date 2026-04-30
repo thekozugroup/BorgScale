@@ -1,24 +1,10 @@
 import React, { useRef, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAnalytics } from '../hooks/useAnalytics'
-import {
-  Box,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  Stack,
-  Select,
-  MenuItem,
-  InputBase,
-  Divider,
-  alpha,
-  useTheme,
-} from '@mui/material'
-import { Add, Storage, FileUpload, Search, FilterList } from '@mui/icons-material'
+import { Plus, HardDrive, Upload, Search, Filter } from 'lucide-react'
 import { repositoriesAPI, RepositoryData } from '../services/api'
 import { BorgApiClient } from '../services/borgApi'
 import { translateBackendKey } from '../utils/translateBackendKey'
@@ -35,6 +21,16 @@ import RepositoryWizard from '../components/RepositoryWizard'
 import PruneRepositoryDialog from '../components/PruneRepositoryDialog'
 import RepositoryInfoDialog from '../components/RepositoryInfoDialog'
 import { getJobDurationSeconds } from '../utils/analyticsProperties'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface Repository extends RepositoryData {
   id: number
@@ -85,8 +81,6 @@ interface PruneForm {
 
 export default function Repositories() {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
   const { hasGlobalPermission } = useAuth()
   const canManageRepositoriesGlobally = hasGlobalPermission('repositories.manage_all')
   const permissions = usePermissions()
@@ -396,8 +390,6 @@ export default function Repositories() {
         await repositoriesAPI.updateRepository(wizardRepository.id, data)
         toast.success(t('repositories.toasts.updated'))
       } else if (wizardMode === 'import') {
-        // Include keyfile content in the import request so the backend can write it
-        // to disk before running `borg info` to verify the repository.
         const importData = { ...data }
         if (keyfile) {
           importData.keyfile_content = await keyfile.text()
@@ -491,17 +483,15 @@ export default function Repositories() {
     const groups: { name: string; repositories: Repository[] }[] = []
 
     if (groupBy === 'location') {
-      // Group by hostname (for SSH) or "Local"
       const locationMap = new Map<string, Repository[]>()
 
       sorted.forEach((repo: Repository) => {
         let locationKey = t('repositories.groups.localMachine')
 
         if (repo.path?.startsWith('ssh://')) {
-          // Extract hostname from SSH URL: ssh://user@hostname:port/path
           const match = repo.path.match(/ssh:\/\/[^@]+@([^:/]+)/)
           if (match) {
-            locationKey = match[1] // hostname
+            locationKey = match[1]
           } else {
             locationKey = t('repositories.groups.remoteSsh')
           }
@@ -513,7 +503,6 @@ export default function Repositories() {
         locationMap.get(locationKey)!.push(repo)
       })
 
-      // Sort location keys: Local Machine first, then alphabetically
       const localMachineKey = t('repositories.groups.localMachine')
       const sortedKeys = Array.from(locationMap.keys()).sort((a, b) => {
         if (a === localMachineKey) return -1
@@ -572,89 +561,56 @@ export default function Repositories() {
   const repositories = repositoriesData?.data?.repositories || []
 
   return (
-    <Box>
+    <div>
       {/* Header */}
-      <Box sx={{ mb: 3 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', md: 'row' },
-            justifyContent: 'space-between',
-            alignItems: { xs: 'stretch', md: 'flex-start' },
-            gap: 2,
-            mb: 2,
-          }}
-        >
-          <Box sx={{ flex: 1, mr: { md: 2 } }}>
-            <Typography variant="h4" fontWeight={600} gutterBottom>
+      <div className="mb-6">
+        <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div className="flex-1 md:mr-4">
+            <h1 className="mb-1 text-2xl font-semibold tracking-tight">
               {t('repositories.title')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" paragraph>
-              {t('repositories.subtitle')}
-            </Typography>
-          </Box>
+            </h1>
+            <p className="text-sm text-muted-foreground">{t('repositories.subtitle')}</p>
+          </div>
           {canManageRepositoriesGlobally && (
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5}>
-              <Button
-                variant="contained"
-                startIcon={<Add />}
-                onClick={() => openWizard('create')}
-                sx={{
-                  width: { xs: '100%', md: 'auto' },
-                  boxShadow: '0 2px 8px rgba(37,99,235,0.3)',
-                }}
-              >
+            <div className="flex flex-col gap-2 md:flex-row">
+              <Button onClick={() => openWizard('create')} className="w-full md:w-auto">
+                <Plus size={16} />
                 {t('repositories.createRepository')}
               </Button>
               <Button
-                variant="outlined"
-                startIcon={<FileUpload />}
+                variant="outline"
                 onClick={() => openWizard('import')}
-                sx={{ width: { xs: '100%', md: 'auto' } }}
+                className="w-full md:w-auto"
               >
+                <Upload size={16} />
                 {t('repositories.importExisting')}
               </Button>
-            </Stack>
+            </div>
           )}
-        </Box>
-      </Box>
+        </div>
+      </div>
 
       {/* Filter, Sort, and Search Bar */}
       {(isLoading || repositories.length > 0) && (
-        <Box sx={{ mb: 3, display: 'flex', flexWrap: 'wrap', gap: 1.5, alignItems: 'center' }}>
+        <div className="mb-6 flex flex-wrap items-center gap-3">
           {/* Search */}
-          <Box
-            sx={{
-              flex: '1 1 100%',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              px: 1.5,
-              height: 40,
-              borderRadius: 1.5,
-              border: '1px solid',
-              borderColor: isDark ? alpha('#fff', 0.1) : alpha('#000', 0.12),
-              bgcolor: isDark ? alpha('#fff', 0.04) : alpha('#000', 0.02),
-              '&:focus-within': {
-                borderColor: isDark ? alpha('#fff', 0.2) : alpha('#000', 0.25),
-              },
-            }}
-          >
-            <Search sx={{ fontSize: 16, color: 'text.disabled', flexShrink: 0 }} />
-            <InputBase
+          <div className="relative min-w-0 flex-[1_1_100%]">
+            <Search
+              size={15}
+              className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+            />
+            <Input
               placeholder={t('repositories.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              sx={{ flex: 1, fontSize: '0.875rem', minWidth: 0 }}
+              className="pl-8 text-sm"
             />
-          </Box>
+          </div>
 
           {/* Sort By */}
           <Select
-            size="small"
             value={sortBy}
-            onChange={(e) => {
-              const nextSort = e.target.value
+            onValueChange={(nextSort) => {
               setSortBy(nextSort)
               const resultCount = processedRepositories.groups.reduce(
                 (total, group) => total + group.repositories.length,
@@ -669,38 +625,28 @@ export default function Repositories() {
                 result_count: resultCount,
               })
             }}
-            sx={{
-              flex: 1,
-              minWidth: 160,
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              borderRadius: 1.5,
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: isDark ? alpha('#fff', 0.1) : alpha('#000', 0.12),
-              },
-              '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: isDark ? alpha('#fff', 0.2) : alpha('#000', 0.25),
-              },
-            }}
           >
-            <MenuItem value="name-asc">{t('repositories.sort.nameAZ')}</MenuItem>
-            <MenuItem value="name-desc">{t('repositories.sort.nameZA')}</MenuItem>
-            <MenuItem value="last-backup-recent">
-              {t('repositories.sort.lastBackupRecent')}
-            </MenuItem>
-            <MenuItem value="last-backup-oldest">
-              {t('repositories.sort.lastBackupOldest')}
-            </MenuItem>
-            <MenuItem value="created-newest">{t('repositories.sort.createdNewest')}</MenuItem>
-            <MenuItem value="created-oldest">{t('repositories.sort.createdOldest')}</MenuItem>
+            <SelectTrigger className="min-w-[160px] flex-1 text-xs font-semibold">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="name-asc">{t('repositories.sort.nameAZ')}</SelectItem>
+              <SelectItem value="name-desc">{t('repositories.sort.nameZA')}</SelectItem>
+              <SelectItem value="last-backup-recent">
+                {t('repositories.sort.lastBackupRecent')}
+              </SelectItem>
+              <SelectItem value="last-backup-oldest">
+                {t('repositories.sort.lastBackupOldest')}
+              </SelectItem>
+              <SelectItem value="created-newest">{t('repositories.sort.createdNewest')}</SelectItem>
+              <SelectItem value="created-oldest">{t('repositories.sort.createdOldest')}</SelectItem>
+            </SelectContent>
           </Select>
 
           {/* Group By */}
           <Select
-            size="small"
             value={groupBy}
-            onChange={(e) => {
-              const nextGroup = e.target.value
+            onValueChange={(nextGroup) => {
               setGroupBy(nextGroup)
               const resultCount = processedRepositories.groups.reduce(
                 (total, group) => total + group.repositories.length,
@@ -715,123 +661,86 @@ export default function Repositories() {
                 result_count: resultCount,
               })
             }}
-            sx={{
-              flex: 1,
-              minWidth: 120,
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              borderRadius: 1.5,
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: isDark ? alpha('#fff', 0.1) : alpha('#000', 0.12),
-              },
-              '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: isDark ? alpha('#fff', 0.2) : alpha('#000', 0.25),
-              },
-            }}
           >
-            <MenuItem value="none">{t('repositories.group.none')}</MenuItem>
-            <MenuItem value="location">{t('repositories.group.hostname')}</MenuItem>
-            <MenuItem value="type">{t('repositories.group.type')}</MenuItem>
-            <MenuItem value="mode">{t('repositories.group.mode')}</MenuItem>
+            <SelectTrigger className="min-w-[120px] flex-1 text-xs font-semibold">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">{t('repositories.group.none')}</SelectItem>
+              <SelectItem value="location">{t('repositories.group.hostname')}</SelectItem>
+              <SelectItem value="type">{t('repositories.group.type')}</SelectItem>
+              <SelectItem value="mode">{t('repositories.group.mode')}</SelectItem>
+            </SelectContent>
           </Select>
-        </Box>
+        </div>
       )}
 
       {/* Repositories Grid */}
       {isLoading ? (
-        <Stack spacing={2}>
+        <div className="flex flex-col gap-4">
           {[0, 1, 2].map((i) => (
             <RepositoryCardSkeleton key={i} index={i} />
           ))}
-        </Stack>
+        </div>
       ) : repositories.length === 0 ? (
-        <Card>
-          <CardContent sx={{ textAlign: 'center', py: 8 }}>
-            <Storage sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
-            <Typography variant="h6" gutterBottom>
-              {t('repositories.empty.title')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-              {t('repositories.empty.subtitle')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              {t('repositories.empty.hint')}
-            </Typography>
-            {canManageRepositoriesGlobally && (
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} justifyContent="center">
-                <Button
-                  variant="contained"
-                  startIcon={<Add />}
-                  onClick={() => openWizard('create')}
-                  sx={{ width: { xs: '100%', sm: 'auto' } }}
-                >
-                  {t('repositories.createRepository')}
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<FileUpload />}
-                  onClick={() => openWizard('import')}
-                  sx={{ width: { xs: '100%', sm: 'auto' } }}
-                >
-                  {t('repositories.importExisting')}
-                </Button>
-              </Stack>
-            )}
-          </CardContent>
-        </Card>
+        <div className="rounded-xl border bg-card p-12 text-center">
+          <HardDrive size={48} className="mx-auto mb-4 text-muted-foreground/40" />
+          <h3 className="mb-1 text-base font-semibold">{t('repositories.empty.title')}</h3>
+          <p className="mb-1 text-sm text-muted-foreground">{t('repositories.empty.subtitle')}</p>
+          <p className="mb-6 text-sm text-muted-foreground">{t('repositories.empty.hint')}</p>
+          {canManageRepositoriesGlobally && (
+            <div className="flex flex-col items-center justify-center gap-2 sm:flex-row">
+              <Button onClick={() => openWizard('create')} className="w-full sm:w-auto">
+                <Plus size={16} />
+                {t('repositories.createRepository')}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => openWizard('import')}
+                className="w-full sm:w-auto"
+              >
+                <Upload size={16} />
+                {t('repositories.importExisting')}
+              </Button>
+            </div>
+          )}
+        </div>
       ) : processedRepositories.groups.length === 0 ||
         processedRepositories.groups.every((g) => g.repositories.length === 0) ? (
-        <Card>
-          <CardContent sx={{ textAlign: 'center', py: 8 }}>
-            <Storage sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
-            <Typography variant="h6" gutterBottom>
-              {t('repositories.noMatch.title')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              {searchQuery
-                ? t('repositories.noMatch.message', { search: searchQuery })
-                : t('repositories.noMatch.fallback')}
-            </Typography>
-            {searchQuery && (
-              <Button variant="outlined" onClick={() => setSearchQuery('')}>
-                {t('repositories.noMatch.clearSearch')}
-              </Button>
-            )}
-          </CardContent>
-        </Card>
+        <div className="rounded-xl border bg-card p-12 text-center">
+          <HardDrive size={48} className="mx-auto mb-4 text-muted-foreground/40" />
+          <h3 className="mb-1 text-base font-semibold">{t('repositories.noMatch.title')}</h3>
+          <p className="mb-6 text-sm text-muted-foreground">
+            {searchQuery
+              ? t('repositories.noMatch.message', { search: searchQuery })
+              : t('repositories.noMatch.fallback')}
+          </p>
+          {searchQuery && (
+            <Button variant="outline" onClick={() => setSearchQuery('')}>
+              {t('repositories.noMatch.clearSearch')}
+            </Button>
+          )}
+        </div>
       ) : (
-        <Stack spacing={3}>
+        <div className="flex flex-col gap-6">
           {processedRepositories.groups.map((group, groupIndex) => (
-            <Box key={groupIndex}>
+            <div key={groupIndex}>
               {/* Group Header */}
               {group.name && (
-                <Box sx={{ mb: 2 }}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontSize: '1rem',
-                      fontWeight: 600,
-                      color: 'primary.main',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                    }}
-                  >
-                    <FilterList fontSize="small" />
-                    {group.name}
-                    <Typography
-                      component="span"
-                      sx={{ ml: 0.5, fontSize: '0.875rem', color: 'text.secondary' }}
-                    >
+                <div className="mb-3">
+                  <div className="flex items-center gap-1.5 text-sm font-semibold text-primary">
+                    <Filter size={14} />
+                    <span>{group.name}</span>
+                    <span className="ml-0.5 text-xs font-normal text-muted-foreground">
                       ({group.repositories.length})
-                    </Typography>
-                  </Typography>
-                  <Divider sx={{ mt: 1 }} />
-                </Box>
+                    </span>
+                  </div>
+                  <Separator className="mt-2" />
+                </div>
               )}
 
               {/* Repository Cards */}
-              <Stack spacing={2} sx={{ minWidth: 0 }}>
+              <div className="flex min-w-0 flex-col gap-3">
                 {group.repositories.map((repository: Repository) => (
                   <RepositoryCard
                     key={repository.id}
@@ -851,10 +760,10 @@ export default function Repositories() {
                     onJobCompleted={handleJobCompleted}
                   />
                 ))}
-              </Stack>
-            </Box>
+              </div>
+            </div>
           ))}
-        </Stack>
+        </div>
       )}
 
       {/* Warning Dialogs */}
@@ -918,6 +827,6 @@ export default function Repositories() {
         repository={wizardRepository || undefined}
         onSubmit={handleWizardSubmit}
       />
-    </Box>
+    </div>
   )
 }

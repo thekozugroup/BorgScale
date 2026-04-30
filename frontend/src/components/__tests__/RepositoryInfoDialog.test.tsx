@@ -2,6 +2,13 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import RepositoryInfoDialog from '../RepositoryInfoDialog'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import type { ReactElement } from 'react'
+
+// Wrap renders in TooltipProvider (required by shadcn Tooltip)
+function renderDialog(ui: ReactElement) {
+  return render(<TooltipProvider>{ui}</TooltipProvider>)
+}
 
 vi.mock('../../services/api', () => ({
   repositoriesAPI: {
@@ -39,7 +46,7 @@ const mockRepositoryInfo = {
 describe('RepositoryInfoDialog', () => {
   describe('Rendering', () => {
     it('renders dialog when open', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={mockRepository}
@@ -53,7 +60,7 @@ describe('RepositoryInfoDialog', () => {
     })
 
     it('does not render when closed', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={false}
           repository={mockRepository}
@@ -69,7 +76,7 @@ describe('RepositoryInfoDialog', () => {
 
   describe('Loading State', () => {
     it('shows loading message when loading', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={mockRepository}
@@ -85,7 +92,7 @@ describe('RepositoryInfoDialog', () => {
 
   describe('Repository Details', () => {
     it('shows encryption mode', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={mockRepository}
@@ -100,7 +107,7 @@ describe('RepositoryInfoDialog', () => {
     })
 
     it('shows last modified date', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={mockRepository}
@@ -114,7 +121,7 @@ describe('RepositoryInfoDialog', () => {
     })
 
     it('shows repository location', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={mockRepository}
@@ -131,7 +138,7 @@ describe('RepositoryInfoDialog', () => {
 
   describe('Storage Statistics', () => {
     it('shows storage statistics header', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={mockRepository}
@@ -145,7 +152,7 @@ describe('RepositoryInfoDialog', () => {
     })
 
     it('shows total size', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={mockRepository}
@@ -159,7 +166,7 @@ describe('RepositoryInfoDialog', () => {
     })
 
     it('shows unique data', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={mockRepository}
@@ -173,7 +180,7 @@ describe('RepositoryInfoDialog', () => {
     })
 
     it('shows used on disk', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={mockRepository}
@@ -187,7 +194,7 @@ describe('RepositoryInfoDialog', () => {
     })
 
     it('shows chunk statistics', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={mockRepository}
@@ -220,7 +227,7 @@ describe('RepositoryInfoDialog', () => {
         },
       }
 
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={mockRepository}
@@ -248,7 +255,7 @@ describe('RepositoryInfoDialog', () => {
         },
       }
 
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={mockRepository}
@@ -264,7 +271,7 @@ describe('RepositoryInfoDialog', () => {
 
   describe('Error State', () => {
     it('shows error message when repository info is null', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={mockRepository}
@@ -280,7 +287,7 @@ describe('RepositoryInfoDialog', () => {
 
   describe('Close Button', () => {
     it('renders Close button', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={mockRepository}
@@ -297,7 +304,7 @@ describe('RepositoryInfoDialog', () => {
       const user = userEvent.setup()
       const onClose = vi.fn()
 
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={mockRepository}
@@ -338,7 +345,7 @@ describe('RepositoryInfoDialog', () => {
     }
 
     it('renders archive count for v2 repo', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={v2Repo}
@@ -351,7 +358,7 @@ describe('RepositoryInfoDialog', () => {
     })
 
     it('renders file count from latest archive for v2 repo', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={v2Repo}
@@ -364,7 +371,7 @@ describe('RepositoryInfoDialog', () => {
     })
 
     it('does not render v1 chunk count labels for v2 repo', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={v2Repo}
@@ -378,7 +385,7 @@ describe('RepositoryInfoDialog', () => {
     })
 
     it('shows no backups alert for v2 repo with empty archives', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={v2Repo}
@@ -395,7 +402,7 @@ describe('RepositoryInfoDialog', () => {
     const keyfileRepo = { id: 5, name: 'Keyfile Repo', path: '/repo/test', has_keyfile: true }
 
     it('shows export keyfile button when has_keyfile is true', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={keyfileRepo}
@@ -408,7 +415,7 @@ describe('RepositoryInfoDialog', () => {
     })
 
     it('does not show export button when has_keyfile is false', () => {
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={mockRepository}
@@ -428,7 +435,7 @@ describe('RepositoryInfoDialog', () => {
       URL.createObjectURL = vi.fn().mockReturnValue('blob:test')
       URL.revokeObjectURL = vi.fn()
 
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={keyfileRepo}
@@ -454,7 +461,7 @@ describe('RepositoryInfoDialog', () => {
         cache: { stats: { unique_size: 100 } },
       }
 
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={mockRepository}
@@ -476,7 +483,7 @@ describe('RepositoryInfoDialog', () => {
         cache: { stats: { unique_size: 100 } },
       }
 
-      render(
+      renderDialog(
         <RepositoryInfoDialog
           open={true}
           repository={mockRepository}

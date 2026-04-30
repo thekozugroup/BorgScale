@@ -7,6 +7,7 @@ import { Toaster } from 'react-hot-toast'
 import { I18nextProvider } from 'react-i18next'
 import i18n from '../i18n'
 import { SidebarProvider } from '@/components/ui/sidebar'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 // Create a theme for testing
 const theme = createTheme({
@@ -47,8 +48,10 @@ export function AllProviders({ children, queryClient }: AllProvidersProps) {
         <BrowserRouter>
           <ThemeProvider theme={theme}>
             <SidebarProvider defaultOpen>
-              {children}
-              <Toaster position="top-right" />
+              <TooltipProvider>
+                {children}
+                <Toaster position="top-right" />
+              </TooltipProvider>
             </SidebarProvider>
           </ThemeProvider>
         </BrowserRouter>
