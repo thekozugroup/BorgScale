@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import AnnouncementModal from './AnnouncementModal'
 import AppHeader from './AppHeader'
 import AppSidebar from './AppSidebar'
+import { Footer } from './Footer'
 import { useAuth } from '../hooks/useAuth'
 import { useAnnouncementSurface } from '../hooks/useAnnouncementSurface'
 import PasskeyEnrollmentPrompt from './PasskeyEnrollmentPrompt'
@@ -107,6 +108,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <Container maxWidth="xl" sx={{ mt: { xs: 1, sm: 2 }, px: { xs: 0, sm: 1 } }}>
           {children}
         </Container>
+        <Footer />
       </Box>
 
       <AnnouncementModal
