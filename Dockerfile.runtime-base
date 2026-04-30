@@ -10,10 +10,10 @@ ARG BORG2_VERSION=2.0.0b21
 ENV BORG1_VERSION=${BORG1_VERSION}
 ENV BORG2_VERSION=${BORG2_VERSION}
 
-LABEL org.opencontainers.image.title="Borg UI Runtime Base"
-LABEL org.opencontainers.image.description="Shared runtime base for Borg UI with Borg 1.x and Borg 2.x preinstalled"
-LABEL org.opencontainers.image.vendor="Borg UI"
-LABEL org.opencontainers.image.source="https://github.com/karanhudia/borg-ui"
+LABEL org.opencontainers.image.title="BorgScale Runtime Base"
+LABEL org.opencontainers.image.description="Shared runtime base for BorgScale with Borg 1.x and Borg 2.x preinstalled"
+LABEL org.opencontainers.image.vendor="BorgScale"
+LABEL org.opencontainers.image.source="https://github.com/karanhudia/borgscale"
 
 WORKDIR /app
 

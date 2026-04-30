@@ -27,8 +27,8 @@ concurrency:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/borg-ui
-  RUNTIME_IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/borg-ui-runtime-base
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/borgscale
+  RUNTIME_IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/borgscale-runtime-base
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
   NODE_VERSION: "22"
 
@@ -173,7 +173,7 @@ jobs:
           context: .
           platforms: linux/amd64
           load: true
-          tags: borg-ui-app:smoke-test
+          tags: borgscale-app:smoke-test
           cache-from: type=gha,scope=app-release
           build-args: |
             BASE_IMAGE=${{ steps.runtime.outputs.base_image }}
@@ -184,17 +184,17 @@ jobs:
 
       - name: Smoke test amd64 app image
         run: |
-          docker run -d --rm --name borg-ui-smoke -p 18081:8081 \
+          docker run -d --rm --name borgscale-smoke -p 18081:8081 \
             -e SECRET_KEY=test-secret-key-for-ci \
             -e ACTIVATION_SERVICE_URL= \
-            borg-ui-app:smoke-test
+            borgscale-app:smoke-test
           cleanup() {
-            docker rm -f borg-ui-smoke >/dev/null 2>&1 || true
+            docker rm -f borgscale-smoke >/dev/null 2>&1 || true
           }
           trap cleanup EXIT
           timeout 60 bash -c 'until curl -fsS http://127.0.0.1:18081/ >/dev/null; do sleep 2; done'
-          docker exec borg-ui-smoke borg --version
-          docker exec borg-ui-smoke borg2 --version
+          docker exec borgscale-smoke borg --version
+          docker exec borgscale-smoke borg2 --version
 
   build-and-push:
     runs-on: ubuntu-latest

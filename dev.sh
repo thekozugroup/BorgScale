@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Development helper script for Borg Web UI
+# Development helper script for BorgScale
 # Usage: ./dev.sh [command]
 
 set -e
@@ -72,7 +72,7 @@ cmd_logs() {
 
 cmd_shell() {
     print_info "Opening shell in container..."
-    docker-compose exec borg-ui bash
+    docker-compose exec borgscale bash
 }
 
 cmd_test() {
@@ -134,7 +134,7 @@ cmd_backend() {
 
 cmd_db() {
     print_info "Opening database shell..."
-    docker-compose exec borg-ui bash -c "cd /app/data && sqlite3 borg.db"
+    docker-compose exec borgscale bash -c "cd /app/data && sqlite3 borg.db"
 }
 
 cmd_init() {
@@ -177,7 +177,7 @@ cmd_init() {
 
 cmd_help() {
     cat << EOF
-Borg Web UI - Development Helper Script
+BorgScale - Development Helper Script
 
 Usage: ./dev.sh [command]
 

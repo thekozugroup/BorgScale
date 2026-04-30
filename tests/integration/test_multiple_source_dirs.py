@@ -89,7 +89,7 @@ class MultipleSourceDirTester:
             self.log(f"✓ Cleaned up test environment", "SUCCESS")
 
     def authenticate(self):
-        """Authenticate with Borg UI"""
+        """Authenticate with BorgScale"""
         try:
             response = self.session.post(
                 f"{self.base_url}/api/auth/login",
@@ -436,7 +436,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Test multiple source directories bug")
-    parser.add_argument("--url", default="http://localhost:8082", help="Borg UI URL")
+    parser.add_argument("--url", default="http://localhost:8082", help="BorgScale URL")
     args = parser.parse_args()
 
     tester = MultipleSourceDirTester(args.url)

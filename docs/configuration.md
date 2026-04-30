@@ -7,7 +7,7 @@ description: "Environment variables, volumes, and settings"
 
 # Configuration Guide
 
-Customize Borg Web UI for your environment.
+Customize BorgScale for your environment.
 
 ---
 
@@ -90,17 +90,17 @@ Disable the built-in login screen and use your reverse proxy for authentication:
 environment:
   - DISABLE_AUTHENTICATION=true          # Disable built-in login screen
   - PROXY_AUTH_HEADER=X-Forwarded-User   # Header containing authenticated username (optional, default shown)
-  - PROXY_AUTH_ROLE_HEADER=X-Borg-Role   # Optional trusted Borg UI global role header
+  - PROXY_AUTH_ROLE_HEADER=X-Borg-Role   # Optional trusted BorgScale global role header
   - PROXY_AUTH_ALL_REPOSITORIES_ROLE_HEADER=X-Borg-All-Repositories-Role   # Optional trusted default repository role header
   - PROXY_AUTH_EMAIL_HEADER=X-Borg-Email   # Optional trusted email header
   - PROXY_AUTH_FULL_NAME_HEADER=X-Borg-Full-Name   # Optional trusted display-name header
 ```
 
 **How it works:**
-- Borg UI reads the authenticated username from HTTP headers set by your reverse proxy
+- BorgScale reads the authenticated username from HTTP headers set by your reverse proxy
 - Users are auto-created on first access
 - New users are created as `viewer` by default
-- Optionally, trusted proxy headers can assign Borg UI `viewer`, `operator`, or `admin` roles
+- Optionally, trusted proxy headers can assign BorgScale `viewer`, `operator`, or `admin` roles
 - Optionally, trusted proxy headers can assign a default repository role (`viewer` or `operator`)
 - Optionally, trusted proxy headers can populate `email` and `full_name`
 
@@ -115,7 +115,7 @@ environment:
 
 **Security Requirements:**
 
-⚠️ **CRITICAL**: You MUST ensure Borg UI is only accessible through your authenticated proxy:
+⚠️ **CRITICAL**: You MUST ensure BorgScale is only accessible through your authenticated proxy:
 
 ```yaml
 ports:
@@ -129,7 +129,7 @@ sudo ufw deny 8081
 sudo ufw allow from 127.0.0.1 to any port 8081
 ```
 
-**Why:** If Borg UI is directly accessible, anyone can spoof the authentication header and gain access.
+**Why:** If BorgScale is directly accessible, anyone can spoof the authentication header and gain access.
 
 See [Security Guide - Proxy/OIDC Authentication](security.md#proxyoidc-authentication) for:
 - Complete setup examples (Authentik, Authelia, Cloudflare Access, etc.)
@@ -300,7 +300,7 @@ No need for a separate `borg_backups` volume!
 
 ### Using a Reverse Proxy
 
-Borg Web UI supports running behind a reverse proxy on a dedicated (sub)domain (e.g., `backups.example.com`).
+BorgScale supports running behind a reverse proxy on a dedicated (sub)domain (e.g., `backups.example.com`).
 
 **Quick Example (Nginx):**
 
@@ -341,7 +341,7 @@ networks:
     driver: bridge
 
 services:
-  borg-ui:
+  borgscale:
     networks:
       - borg-network
 ```
@@ -457,7 +457,7 @@ environment:
 {: .new }
 > **New in vX.Y.Z**: Redis-based archive caching for 600x faster browsing
 
-Borg Web UI includes Redis caching for dramatically faster archive browsing. Without cache, navigating folders in large archives (1M+ files) takes 60-90 seconds. With cache, it takes less than 100ms.
+BorgScale includes Redis caching for dramatically faster archive browsing. Without cache, navigating folders in large archives (1M+ files) takes 60-90 seconds. With cache, it takes less than 100ms.
 
 ### Default Setup (Local Redis)
 
@@ -490,7 +490,7 @@ services:
       # Or with password
       # - REDIS_URL=redis://:password@192.168.1.100:6379/0
 
-      # Or with Unix socket (when Redis and Borg UI are on same system)
+      # Or with Unix socket (when Redis and BorgScale are on same system)
       # - REDIS_URL=unix:///run/redis-socket/redis.sock?db=0&password=password
 
       # Cache settings
@@ -501,7 +501,7 @@ services:
 **When to use external Redis:**
 - Repositories with 5M+ files
 - Multiple large archives
-- Limited RAM on Borg Web UI host
+- Limited RAM on BorgScale host
 - NAS/workstation with spare RAM available
 
 **Full setup guide with examples:** [Cache Configuration](cache)
@@ -577,8 +577,8 @@ docker run --rm \
 version: '3.8'
 
 services:
-  borg-ui:
-    image: ainullcode/borg-ui:latest
+  borgscale:
+    image: ainullcode/borgscale:latest
     container_name: borg-web-ui
     restart: unless-stopped
     ports:
@@ -602,8 +602,8 @@ volumes:
 version: '3.8'
 
 services:
-  borg-ui:
-    image: ainullcode/borg-ui:latest
+  borgscale:
+    image: ainullcode/borgscale:latest
     container_name: borg-web-ui
     restart: unless-stopped
     ports:
@@ -625,8 +625,8 @@ services:
       - LOG_LEVEL=INFO
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.borg-ui.rule=Host(`backups.example.com`)"
-      - "traefik.http.routers.borg-ui.tls=true"
+      - "traefik.http.routers.borgscale.rule=Host(`backups.example.com`)"
+      - "traefik.http.routers.borgscale.tls=true"
 
 volumes:
   borg_data:
@@ -637,15 +637,15 @@ volumes:
 
 ```yaml
 services:
-  borg-ui:
-    image: ainullcode/borg-ui:latest
+  borgscale:
+    image: ainullcode/borgscale:latest
     container_name: borg-web-ui
     restart: unless-stopped
     ports:
       - "8081:8081"
     volumes:
-      - /mnt/user/appdata/borg-ui:/data
-      - /mnt/user/appdata/borg-ui/cache:/home/borg/.cache/borg
+      - /mnt/user/appdata/borgscale:/data
+      - /mnt/user/appdata/borgscale/cache:/home/borg/.cache/borg
       - /mnt/user/Documents:/local:ro         # Documents share
       - /mnt/user/Media:/local/media:ro       # Media share
       - /mnt/user/Backups:/local/backup:rw    # Backup destination

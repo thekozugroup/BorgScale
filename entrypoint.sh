@@ -5,7 +5,7 @@ set -e
 PUID=${PUID:-1001}
 PGID=${PGID:-1001}
 
-echo "[$(date)] Borg Web UI Entrypoint"
+echo "[$(date)] BorgScale Entrypoint"
 echo "[$(date)] PUID: $PUID | PGID: $PGID"
 
 # Get current borg user UID/GID
@@ -178,7 +178,7 @@ for GID in $(id -G); do
 done
 
 # Switch to borg user and start the application
-echo "[$(date)] Starting Borg Web UI as user borg (${PUID}:${PGID})..."
+echo "[$(date)] Starting BorgScale as user borg (${PUID}:${PGID})..."
 cd /app
 PORT=${PORT:-8081}
 

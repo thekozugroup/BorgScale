@@ -1,6 +1,6 @@
-# Borg UI Testing Suite
+# BorgScale Testing Suite
 
-Comprehensive testing infrastructure for Borg UI, including unit tests, API-driven integration tests, and live-server smoke tests with real Borg repositories.
+Comprehensive testing infrastructure for BorgScale, including unit tests, API-driven integration tests, and live-server smoke tests with real Borg repositories.
 
 ## Overview
 
@@ -18,7 +18,7 @@ This testing suite provides:
 
 - Python 3.8+
 - Borg backup installed (`brew install borgbackup` on macOS)
-- Borg UI running (default: `http://localhost:8081`)
+- BorgScale running (default: `http://localhost:8081`)
 - Required Python packages: `requests`
 
 ### Run Smoke Tests
@@ -54,7 +54,7 @@ Creates a comprehensive test environment with:
 
 **Usage:**
 ```bash
-# Use default location (/tmp/borg-ui-tests)
+# Use default location (/tmp/borgscale-tests)
 ./tests/setup_test_env.sh
 
 # Or specify custom location
@@ -62,16 +62,16 @@ Creates a comprehensive test environment with:
 ```
 
 **Output:**
-- Test repositories in `/tmp/borg-ui-tests/repositories/`
-- Source data in `/tmp/borg-ui-tests/source_data/`
-- Test info file: `/tmp/borg-ui-tests/TEST_INFO.txt`
+- Test repositories in `/tmp/borgscale-tests/repositories/`
+- Source data in `/tmp/borgscale-tests/source_data/`
+- Test info file: `/tmp/borgscale-tests/TEST_INFO.txt`
 
 ### 2. Archive Contents Testing (`tests/integration/test_archive_contents.py`)
 
-Validates that Borg UI displays archive contents correctly by:
+Validates that BorgScale displays archive contents correctly by:
 
 1. Querying borg CLI for actual archive contents
-2. Querying Borg UI API for displayed contents
+2. Querying BorgScale API for displayed contents
 3. Comparing results and reporting discrepancies
 
 **Usage:**
@@ -82,7 +82,7 @@ python3 tests/integration/test_archive_contents.py
 # Specify custom test directory
 python3 tests/integration/test_archive_contents.py /custom/test/dir
 
-# Test against different Borg UI instance
+# Test against different BorgScale instance
 python3 tests/integration/test_archive_contents.py --url http://localhost:7879
 ```
 
@@ -105,7 +105,7 @@ python3 tests/integration/test_archive_contents.py --url http://localhost:7879
 
 ### 3. API Testing (`tests/manual/test_app.py`)
 
-Tests all Borg UI API endpoints:
+Tests all BorgScale API endpoints:
 
 - Server availability
 - SPA routing
@@ -205,7 +205,7 @@ python3 tests/integration/test_archive_contents.py
 **Test:**
 ```bash
 ./tests/setup_test_env.sh
-# Then manually add repo3-large to Borg UI
+# Then manually add repo3-large to BorgScale
 # Browse archive: large-backup (100 folders, 5000 files)
 ```
 
@@ -220,11 +220,11 @@ python3 tests/integration/test_archive_contents.py
 ### 1. Setup Test Environment
 
 ```bash
-cd /Users/karanhudia/Documents/Projects/borg-ui
+cd /Users/karanhudia/Documents/Projects/borgscale
 ./tests/setup_test_env.sh
 ```
 
-### 2. Start Borg UI
+### 2. Start BorgScale
 
 ```bash
 # Using Docker
@@ -237,13 +237,13 @@ cd app && uvicorn main:app --reload
 
 ### 3. Add Test Repositories
 
-1. Open Borg UI: `http://localhost:8081`
+1. Open BorgScale: `http://localhost:8081`
 2. Login (admin/admin123)
 3. Go to Repositories
 4. Add repository:
    - **Name:** Test Repo 1
    - **Type:** Local
-   - **Path:** `/tmp/borg-ui-tests/repositories/repo1-unencrypted`
+   - **Path:** `/tmp/borgscale-tests/repositories/repo1-unencrypted`
    - **Encryption:** None
 
 ### 4. Test Archive Browsing
@@ -265,7 +265,7 @@ cd app && uvicorn main:app --reload
 
 ```bash
 # List root contents
-borg list --json-lines /tmp/borg-ui-tests/repositories/repo1-unencrypted::test-full-backup \
+borg list --json-lines /tmp/borgscale-tests/repositories/repo1-unencrypted::test-full-backup \
   | jq -r '.path' | sed 's|^/||' | cut -d'/' -f1 | sort -u
 
 # Should show same items as UI
@@ -310,7 +310,7 @@ sudo pacman -S borg
 **Error:** `Authentication failed`
 
 **Solution:**
-- Ensure Borg UI is running at `http://localhost:8081`
+- Ensure BorgScale is running at `http://localhost:8081`
 - Verify default credentials (admin/admin123) work
 - Check if you've changed the admin password
 
@@ -327,7 +327,7 @@ sudo pacman -S borg
 
 **Solution:**
 ```bash
-# Check if Borg UI is running
+# Check if BorgScale is running
 curl http://localhost:8081/
 
 # Check Docker status
@@ -416,10 +416,10 @@ Current high-signal coverage:
 Remove test environment:
 
 ```bash
-rm -rf /tmp/borg-ui-tests
+rm -rf /tmp/borgscale-tests
 ```
 
-Remove test repositories from Borg UI:
+Remove test repositories from BorgScale:
 
 1. Go to Repositories page
 2. Delete test repositories manually
@@ -428,6 +428,6 @@ Remove test repositories from Borg UI:
 
 For issues with tests:
 1. Check logs: `docker logs borg-web-ui`
-2. Verify test environment: `cat /tmp/borg-ui-tests/TEST_INFO.txt`
+2. Verify test environment: `cat /tmp/borgscale-tests/TEST_INFO.txt`
 3. Run manual borg commands to verify repos are valid
 4. Open an issue on GitHub with test output

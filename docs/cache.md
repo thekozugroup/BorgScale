@@ -51,7 +51,7 @@ Browse an archive twice - if the second time is instant, your cache is working.
 
 ## How It Works
 
-When you browse an archive, Borg Web UI runs `borg list` which parses the entire archive contents. For large archives, this is slow:
+When you browse an archive, BorgScale runs `borg list` which parses the entire archive contents. For large archives, this is slow:
 
 | Archive Size | Files | Without Cache | With Cache (after first load) |
 |-------------|-------|---------------|--------------------------------|
@@ -97,7 +97,7 @@ Connect to Redis running on a separate machine with more RAM.
 
 **Pros:**
 - Dedicated resources (more RAM available)
-- Can be shared across multiple Borg Web UI instances
+- Can be shared across multiple BorgScale instances
 - Better performance for very large repositories
 
 **Cons:**
@@ -163,7 +163,7 @@ docker exec redis-cache redis-cli ping
 # Should return: PONG
 ```
 
-**Configure in Borg Web UI:**
+**Configure in BorgScale:**
 1. Go to **Settings → Cache**
 2. Enter: `redis://192.168.1.100:6379/0`
 3. Click **Save Settings**
@@ -189,7 +189,7 @@ docker run -d \
   --maxmemory-policy allkeys-lru
 ```
 
-**Configure in Borg Web UI:**
+**Configure in BorgScale:**
 ```
 redis://:YOUR_PASSWORD@192.168.1.100:6379/0
 ```
@@ -234,7 +234,7 @@ redis-cli -h localhost ping
 # Should return: PONG
 ```
 
-**Configure in Borg Web UI:**
+**Configure in BorgScale:**
 - Without password: `redis://192.168.1.100:6379/0`
 - With password: `redis://:your-strong-password-here@192.168.1.100:6379/0`
 
@@ -274,21 +274,21 @@ rediss://:password@secure-redis.example.com:6380/0
 
 ### Option 6: Unix Socket Connections
 
-For connecting to Redis via Unix socket (useful when Redis and Borg UI are on the same system):
+For connecting to Redis via Unix socket (useful when Redis and BorgScale are on the same system):
 
 **Docker Compose Configuration:**
 
 ```yaml
 services:
-  borg-ui:
-    image: ainullcode/borg-ui:latest
-    container_name: borg-ui
+  borgscale:
+    image: ainullcode/borgscale:latest
+    container_name: borgscale
     volumes:
       - /path/to/redis/socket:/run/redis-socket # Ensure container has necessary privileges to access socket
 
-  redis-borg-ui:
+  redis-borgscale:
     image: redis:latest
-    container_name: redis-borg-ui
+    container_name: redis-borgscale
     network_mode: none
     volumes:
       - /path/to/redis/socket:/run/redis-socket
@@ -312,12 +312,12 @@ maxmemory 8gb
 maxmemory-policy allkeys-lru
 ```
 
-**Configure in Borg Web UI:**
+**Configure in BorgScale:**
 - Go to **Settings → Cache**
 - Enter: `unix:///run/redis-socket/redis.sock?db=0[&password=mypassword]`
 - Click **Save Settings**
 
-**Note:** Ensure the Borg UI container has the necessary privileges and volume mounts to access the Unix socket file.
+**Note:** Ensure the BorgScale container has the necessary privileges and volume mounts to access the Unix socket file.
 
 ---
 
@@ -547,7 +547,7 @@ redis-cli -h 192.168.1.100 ping
 redis-cli -h 192.168.1.100 -a your-password ping
 ```
 
-**Check if Borg Web UI is using Redis:**
+**Check if BorgScale is using Redis:**
 ```bash
 docker logs borg-web-ui | grep -i redis
 # Should show: "Cache service configured" with backend: redis
@@ -660,7 +660,7 @@ redis:
 
 **Firewall rules (if using external Redis):**
 ```bash
-# Allow only specific IP (Borg Web UI host)
+# Allow only specific IP (BorgScale host)
 sudo ufw allow from 192.168.1.50 to any port 6379
 
 # Or allow entire subnet
@@ -796,7 +796,7 @@ A: Rarely. Cache automatically expires based on TTL. Only clear if:
 - Testing cache functionality
 - Troubleshooting browsing issues
 
-**Q: Can multiple Borg Web UI instances share one Redis?**
+**Q: Can multiple BorgScale instances share one Redis?**
 A: Yes! Use different database numbers:
 ```
 Instance 1: redis://server:6379/0
@@ -808,7 +808,7 @@ Instance 3: redis://server:6379/2
 A: Only file paths and metadata (size, mtime). No file contents are cached.
 
 **Q: What happens if Redis crashes?**
-A: Borg Web UI automatically falls back to in-memory cache. Browsing continues working (but slower on first load).
+A: BorgScale automatically falls back to in-memory cache. Browsing continues working (but slower on first load).
 
 ---
 

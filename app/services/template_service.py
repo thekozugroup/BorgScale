@@ -22,7 +22,7 @@ def get_system_variables(
     """
     Build dict of system-provided variables for script rendering.
 
-    All variables use BORG_UI_ prefix as they are Borg UI specific job-related variables.
+    All variables use BORG_UI_ prefix as they are BorgScale specific job-related variables.
 
     Args:
         repository_id: Repository ID

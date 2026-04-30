@@ -5,7 +5,7 @@ This migration adds the analytics_enabled field to the users table
 to allow users to opt-out of analytics tracking.
 """
 
-# DEPRECATED in BorgScale (fork of borg-ui): the analytics columns
+# DEPRECATED in BorgScale (fork of borgscale): the analytics columns
 # created here are no longer read or written. The migration runs
 # unchanged to preserve historical replay; new schema work goes in
 # migration 100+.

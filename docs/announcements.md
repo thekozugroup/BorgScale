@@ -8,13 +8,13 @@ nav_order: 99
 
 The production announcement feed is published from:
 
-`https://docs.borgui.com/announcements.json`
+`https://github.com/thekozugroup/BorgScale
 
-This file is sourced from [docs/announcements.json](/Users/karanhudia/Documents/Redundancy/borg-ui/docs/announcements.json) because GitHub Pages in this repository publishes the `docs/` site.
+This file is sourced from [docs/announcements.json](/Users/karanhudia/Documents/Redundancy/borgscale/docs/announcements.json) because GitHub Pages in this repository publishes the `docs/` site.
 
 ## Update Flow
 
-1. Edit [docs/announcements.json](/Users/karanhudia/Documents/Redundancy/borg-ui/docs/announcements.json).
+1. Edit [docs/announcements.json](/Users/karanhudia/Documents/Redundancy/borgscale/docs/announcements.json).
 2. Commit and push to `main`.
 3. Wait for GitHub Pages to rebuild.
 4. Verify the live manifest URL returns JSON.
@@ -48,9 +48,9 @@ Example:
     "es": "Novedades de la version 2.0.0",
     "de": "Neu in 2.0.0"
   },
-  "message": "Borg UI 2.0.0 adds built-in plans and Borg 2 support.",
+  "message": "BorgScale 2.0.0 adds built-in plans and Borg 2 support.",
   "message_localized": {
-    "es": "Borg UI 2.0.0 agrega planes integrados y soporte para Borg 2."
+    "es": "BorgScale 2.0.0 agrega planes integrados y soporte para Borg 2."
   },
   "highlights": ["Built-in plans", "Borg 2 support"],
   "highlights_localized": {
@@ -72,7 +72,7 @@ Resolution order is:
 
 ## Local Development
 
-Local frontend development does not use [frontend/public/announcements.json](/Users/karanhudia/Documents/Redundancy/borg-ui/frontend/public/announcements.json) automatically.
+Local frontend development does not use [frontend/public/announcements.json](/Users/karanhudia/Documents/Redundancy/borgscale/frontend/public/announcements.json) automatically.
 
 The app defaults to the published GitHub Pages manifest unless `VITE_ANNOUNCEMENTS_URL` is explicitly set.
 

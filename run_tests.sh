@@ -1,5 +1,5 @@
 #!/bin/bash
-# Test runner script for Borg UI
+# Test runner script for BorgScale
 # This provides convenient commands for running tests locally
 
 set -e
@@ -12,7 +12,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}==================================${NC}"
-echo -e "${BLUE}   Borg UI Test Runner${NC}"
+echo -e "${BLUE}   BorgScale Test Runner${NC}"
 echo -e "${BLUE}==================================${NC}"
 echo ""
 
@@ -22,7 +22,7 @@ usage() {
     echo ""
     echo "Commands:"
     echo "  unit        - Run unit tests only (fast, no UI required)"
-    echo "  integration - Run integration tests (requires Borg UI running)"
+    echo "  integration - Run integration tests (requires BorgScale running)"
     echo "  coverage    - Run all tests with coverage report"
     echo "  quick       - Quick test run (unit tests only)"
     echo "  all         - Run all tests"
@@ -53,7 +53,7 @@ case $COMMAND in
 
     integration)
         echo -e "${GREEN}Running integration tests...${NC}"
-        echo -e "${YELLOW}Note: This requires Borg UI to be running${NC}"
+        echo -e "${YELLOW}Note: This requires BorgScale to be running${NC}"
         python3 -m pytest tests/ -m "requires_ui" -v
         ;;
 

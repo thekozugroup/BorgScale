@@ -174,11 +174,11 @@ describe('RepositoryWizard', () => {
         })
       })
 
-      it('shows location cards (Borg UI Server and Remote Client)', async () => {
+      it('shows location cards (BorgScale Server and Remote Client)', async () => {
         renderWizard('create')
 
         await waitFor(() => {
-          expect(screen.getByText('Borg UI Server')).toBeInTheDocument()
+          expect(screen.getByText('BorgScale Server')).toBeInTheDocument()
         })
         expect(screen.getByText('Remote Client')).toBeInTheDocument()
       })
@@ -314,7 +314,7 @@ describe('RepositoryWizard', () => {
         expect(screen.getByText(/Where is the data you want to back up/i)).toBeInTheDocument()
       })
 
-      it('shows Borg UI Server and Remote Client cards', async () => {
+      it('shows BorgScale Server and Remote Client cards', async () => {
         const user = userEvent.setup()
         renderWizard('create')
 
@@ -1537,13 +1537,13 @@ describe('RepositoryWizard', () => {
       const deleteButton = deleteIcon.closest('button')
       await user.click(deleteButton!)
 
-      // Now the local card should be enabled, switch to Borg UI Server (local)
+      // Now the local card should be enabled, switch to BorgScale Server (local)
       await waitFor(() => {
-        const localCard = screen.getByText('Borg UI Server').closest('button')
+        const localCard = screen.getByText('BorgScale Server').closest('button')
         expect(localCard).not.toBeDisabled()
       })
 
-      const localCard = screen.getByText('Borg UI Server').closest('button')
+      const localCard = screen.getByText('BorgScale Server').closest('button')
       await user.click(localCard!)
 
       // Add a local source directory
@@ -1787,7 +1787,7 @@ describe('RepositoryWizard', () => {
       setInputValue(screen.getByLabelText(/Repository Path/i), '/backups/test')
       await user.click(screen.getByRole('button', { name: /Next/i }))
 
-      // Step 2 - Borg UI Server (local) should still be selectable
+      // Step 2 - BorgScale Server (local) should still be selectable
       await waitFor(() => {
         expect(screen.getByText(/Where is the data you want to back up/i)).toBeInTheDocument()
       })
@@ -2055,7 +2055,7 @@ describe('RepositoryWizard', () => {
       // Should show info about SSH
       await waitFor(() => {
         expect(
-          screen.getByText(/The Borg UI server will SSH into the remote machine/i)
+          screen.getByText(/The BorgScale server will SSH into the remote machine/i)
         ).toBeInTheDocument()
       })
     })

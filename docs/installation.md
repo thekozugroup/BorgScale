@@ -2,12 +2,12 @@
 layout: default
 title: Installation
 nav_order: 2
-description: "How to install Borg Web UI on various platforms"
+description: "How to install BorgScale on various platforms"
 ---
 
 # Installation Guide
 
-Borg Web UI runs as a Docker container. Choose your setup below, configure your volume mounts, and run `docker compose up -d`.
+BorgScale runs as a Docker container. Choose your setup below, configure your volume mounts, and run `docker compose up -d`.
 
 ---
 
@@ -27,8 +27,8 @@ Good for occasional use. Uses in-memory caching.
 
 ```yaml
 services:
-  borg-ui:
-    image: ainullcode/borg-ui:latest
+  borgscale:
+    image: ainullcode/borgscale:latest
     container_name: borg-web-ui
     restart: unless-stopped
     ports:
@@ -55,8 +55,8 @@ Redis speeds up archive browsing ~600x. Recommended if you browse archives regul
 
 ```yaml
 services:
-  borg-ui:
-    image: ainullcode/borg-ui:latest
+  borgscale:
+    image: ainullcode/borgscale:latest
     container_name: borg-web-ui
     restart: unless-stopped
     ports:
@@ -102,7 +102,7 @@ volumes:
 
 ### Option 3 — External Redis
 
-If you want Redis on a separate machine or Docker stack. Run the Redis compose on the Redis machine, and the borg-ui compose on the borg-ui machine.
+If you want Redis on a separate machine or Docker stack. Run the Redis compose on the Redis machine, and the borgscale compose on the borgscale machine.
 
 **On the Redis machine** — `docker-compose.redis.yml`:
 
@@ -122,12 +122,12 @@ services:
       retries: 3
 ```
 
-**On the borg-ui machine** — `docker-compose.yml`:
+**On the borgscale machine** — `docker-compose.yml`:
 
 ```yaml
 services:
-  borg-ui:
-    image: ainullcode/borg-ui:latest
+  borgscale:
+    image: ainullcode/borgscale:latest
     container_name: borg-web-ui
     restart: unless-stopped
     ports:
@@ -177,7 +177,7 @@ environment:
 ## Portainer
 
 1. **Stacks** > **Add Stack**
-2. Name: `borg-ui`
+2. Name: `borgscale`
 3. Paste one of the Docker Compose configurations above (with your directories and timezone filled in)
 4. **Deploy the stack**
 5. Access: `http://your-server-ip:8081`
@@ -190,20 +190,20 @@ environment:
 
 1. Install **Compose Manager** plugin
 2. **Docker** > **Compose** > **Add New Stack**
-3. Name: `borg-ui`
+3. Name: `borgscale`
 4. Paste:
 
 ```yaml
 services:
-  borg-ui:
-    image: ainullcode/borg-ui:latest
+  borgscale:
+    image: ainullcode/borgscale:latest
     container_name: borg-web-ui
     restart: unless-stopped
     ports:
       - "8081:8081"
     volumes:
-      - /mnt/user/appdata/borg-ui:/data
-      - /mnt/user/appdata/borg-ui/cache:/home/borg/.cache/borg
+      - /mnt/user/appdata/borgscale:/data
+      - /mnt/user/appdata/borgscale/cache:/home/borg/.cache/borg
       - /mnt/user:/local:rw  # or mount specific shares
     environment:
       - TZ=America/Chicago   # replace with your timezone
@@ -241,7 +241,7 @@ networks:
 | Setting | Value |
 |---------|-------|
 | Name | `borg-web-ui` |
-| Repository | `ainullcode/borg-ui:latest` |
+| Repository | `ainullcode/borgscale:latest` |
 | Network Type | `Bridge` |
 
 **Port Mappings:**
@@ -250,8 +250,8 @@ networks:
 **Volume Mappings:**
 | Container Path | Host Path |
 |----------------|-----------|
-| `/data` | `/mnt/user/appdata/borg-ui` |
-| `/home/borg/.cache/borg` | `/mnt/user/appdata/borg-ui/cache` |
+| `/data` | `/mnt/user/appdata/borgscale` |
+| `/home/borg/.cache/borg` | `/mnt/user/appdata/borgscale/cache` |
 | `/local` | `/mnt/user` |
 
 **Environment:**
@@ -276,7 +276,7 @@ docker run -d \
   -v borg_data:/data \
   -v borg_cache:/home/borg/.cache/borg \
   -v /path/to/your/data:/local:rw \
-  ainullcode/borg-ui:latest
+  ainullcode/borgscale:latest
 ```
 
 Replace `/path/to/your/data` with the directory you want to back up (e.g. `/home/john` or `/mnt/photos`).
@@ -357,13 +357,13 @@ docker compose pull && docker compose up -d
 
 **Docker Run:**
 ```bash
-docker pull ainullcode/borg-ui:latest
+docker pull ainullcode/borgscale:latest
 docker stop borg-web-ui && docker rm borg-web-ui
 # Run the docker run command again
 ```
 
 **Portainer:**
-Stacks → Select `borg-ui` → Pull and redeploy
+Stacks → Select `borgscale` → Pull and redeploy
 
 ---
 

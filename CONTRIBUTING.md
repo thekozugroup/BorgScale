@@ -1,7 +1,7 @@
 # Contributing to BorgScale
 
 Thanks for your interest in BorgScale, the AGPL-3.0 fork of
-`karanhudia/borg-ui`.
+`karanhudia/borgscale`.
 
 ## Setup
 

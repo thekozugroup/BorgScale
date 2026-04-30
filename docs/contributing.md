@@ -2,12 +2,12 @@
 layout: default
 title: Contributing
 nav_order: 9
-description: "How to contribute to Borg Web UI"
+description: "How to contribute to BorgScale"
 ---
 
-# Contributing to Borg Web UI
+# Contributing to BorgScale
 
-Thank you for your interest in contributing to Borg Web UI!
+Thank you for your interest in contributing to BorgScale!
 
 ## Quick Start
 
@@ -15,11 +15,11 @@ Thank you for your interest in contributing to Borg Web UI!
 
 ```bash
 # Fork the repository on GitHub, then:
-git clone https://github.com/YOUR_USERNAME/borg-ui.git
-cd borg-ui
+git clone https://github.com/YOUR_USERNAME/borgscale.git
+cd borgscale
 
 # Add upstream remote
-git remote add upstream https://github.com/karanhudia/borg-ui.git
+git remote add upstream https://github.com/karanhudia/borgscale.git
 ```
 
 ### Create a Branch
@@ -136,7 +136,7 @@ When reporting issues, please include:
 3. **Expected Behavior** - What you expected to happen
 4. **Actual Behavior** - What actually happened
 5. **Environment**:
-   - Borg Web UI version
+   - BorgScale version
    - Docker version
    - OS and version
    - Browser (if frontend issue)
@@ -161,11 +161,11 @@ For feature requests, please provide:
 
 ## License
 
-By contributing to Borg Web UI, you agree that your contributions will be licensed under the GNU Affero General Public License v3.0.
+By contributing to BorgScale, you agree that your contributions will be licensed under the GNU Affero General Public License v3.0.
 
 ## Questions?
 
-- **GitHub Discussions** - [Ask questions](https://github.com/karanhudia/borg-ui/discussions)
-- **GitHub Issues** - [Report bugs](https://github.com/karanhudia/borg-ui/issues)
+- **GitHub Discussions** - [Ask questions](https://github.com/karanhudia/borgscale/discussions)
+- **GitHub Issues** - [Report bugs](https://github.com/karanhudia/borgscale/issues)
 
 We appreciate your contributions!

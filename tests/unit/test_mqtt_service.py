@@ -67,7 +67,7 @@ def _create_mqtt_service_configured() -> MQTTService:
             "enabled": True,
             "broker_url": "mqtt://test-broker",
             "broker_port": 1883,
-            "base_topic": "test-borg-ui",
+            "base_topic": "test-borgscale",
             "client_id": "test-client",
             "qos": 1,
         }
@@ -812,21 +812,21 @@ class TestHomeAssistantDiscoveryPublisher:
         mqtt_service = _create_mqtt_service_configured()
         mqtt_service.config["home_assistant_device_identifiers"] = "borg_ui"
         mqtt_service.config["home_assistant_device_name"] = "Borg Backup"
-        mqtt_service.config["home_assistant_device_manufacturer"] = "Borg UI"
+        mqtt_service.config["home_assistant_device_manufacturer"] = "BorgScale"
 
         publisher = HomeAssistantDiscoveryPublisher(mqtt_service)
         device_info = publisher.get_home_assistant_device_info(is_repository=False)
 
         assert device_info["identifiers"] == ["borg_ui"]
         assert device_info["name"] == "Borg Backup"
-        assert device_info["manufacturer"] == "Borg UI"
+        assert device_info["manufacturer"] == "BorgScale"
         assert device_info["model"] == "Server"
 
     def test_get_home_assistant_device_info_for_repository(self):
         """Should generate correct device info for repository."""
         mqtt_service = _create_mqtt_service_configured()
         mqtt_service.config["home_assistant_device_identifiers"] = "borg_ui"
-        mqtt_service.config["home_assistant_device_manufacturer"] = "Borg UI"
+        mqtt_service.config["home_assistant_device_manufacturer"] = "BorgScale"
 
         publisher = HomeAssistantDiscoveryPublisher(mqtt_service)
         device_info = publisher.get_home_assistant_device_info(
@@ -876,7 +876,7 @@ class TestHomeAssistantDiscoveryPublisher:
         status_topic = "homeassistant/sensor/borg_ui/borg_ui_repo_7_status/config"
         payload = _payload_for_topic(mqtt_service.publish, status_topic)
 
-        assert payload["json_attributes_topic"] == "test-borg-ui/repositories/7/status"
+        assert payload["json_attributes_topic"] == "test-borgscale/repositories/7/status"
         assert payload["value_template"] == "{{ value_json.status }}"
 
     def test_remove_repository_from_home_assistant(self):
@@ -917,8 +917,8 @@ class TestMQTTServiceConfiguration:
         assert service.config["enabled"] is False
         assert service.config["broker_port"] == 1883
         assert service.config["qos"] == 1
-        assert service.config["client_id"] == "borg-ui"
-        assert service.config["base_topic"] == "borg-ui"
+        assert service.config["client_id"] == "borgscale"
+        assert service.config["base_topic"] == "borgscale"
 
     def test_configure_updates_config(self):
         """Should update configuration."""
@@ -1233,7 +1233,7 @@ class TestMQTTServicePublishing:
         service = MQTTService()
         service.config["enabled"] = True
         service.config["broker_url"] = "mqtt://test"
-        service.config["base_topic"] = "borg-ui"
+        service.config["base_topic"] = "borgscale"
         service.connected = True
         service.client = Mock()
         service.client.publish = Mock(return_value=Mock(rc=mqtt.MQTT_ERR_SUCCESS))
@@ -1242,14 +1242,14 @@ class TestMQTTServicePublishing:
 
         assert result is True
         service.client.publish.assert_called_once()
-        assert service.client.publish.call_args[0][0] == "borg-ui/test/topic"
+        assert service.client.publish.call_args[0][0] == "borgscale/test/topic"
 
     def test_publish_without_base_topic(self):
         """Should not prepend base topic when use_base_topic=False."""
         service = MQTTService()
         service.config["enabled"] = True
         service.config["broker_url"] = "mqtt://test"
-        service.config["base_topic"] = "borg-ui"
+        service.config["base_topic"] = "borgscale"
         service.connected = True
         service.client = Mock()
         service.client.publish = Mock(return_value=Mock(rc=mqtt.MQTT_ERR_SUCCESS))

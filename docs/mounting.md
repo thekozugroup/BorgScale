@@ -8,7 +8,7 @@ permalink: /mounting/
 
 # Mounting Borg Archives
 
-Borg Web UI exposes Borg's `borg mount` and `borg umount` so you can mount a repository or a specific archive as a read-only filesystem inside the container. This lets you browse backup contents as normal directories and copy files out without using the in-app archive browser.
+BorgScale exposes Borg's `borg mount` and `borg umount` so you can mount a repository or a specific archive as a read-only filesystem inside the container. This lets you browse backup contents as normal directories and copy files out without using the in-app archive browser.
 
 ---
 
@@ -69,11 +69,11 @@ with `bind.propagation: shared` as shown below.
 ### Development Compose
 
 There is a Linux-only development override in
-[`docker-compose.dev.mount.yml`](/Users/karanhudia/Documents/Projects/borg-ui/docker-compose.dev.mount.yml).
+[`docker-compose.dev.mount.yml`](/Users/karanhudia/Documents/Projects/borgscale/docker-compose.dev.mount.yml).
 To test archive mounting in development:
 
 1. Start the normal dev stack. It now goes through the same
-   [`entrypoint.sh`](/Users/karanhudia/Documents/Projects/borg-ui/entrypoint.sh)
+   [`entrypoint.sh`](/Users/karanhudia/Documents/Projects/borgscale/entrypoint.sh)
    runtime setup as the regular compose path, while still enabling code reload.
 2. On a **native Linux Docker host**, add the FUSE override:
    `docker compose -f docker-compose.dev.yml -f docker-compose.dev.mount.yml up`
@@ -112,10 +112,10 @@ Engine rather than Docker Desktop.
 After mounting, use the path shown in the UI:
 
 ```bash
-docker exec -it borg-ui ls /data/mounts/my-backup
+docker exec -it borgscale ls /data/mounts/my-backup
 ```
 
-Replace `borg-ui` with your container name and `my-backup` with your mount name.
+Replace `borgscale` with your container name and `my-backup` with your mount name.
 
 ### Option 2: On the Host (Without `docker exec`)
 
@@ -125,9 +125,9 @@ You can make FUSE mounts created inside the container visible on the host by bin
 
 ```yaml
 services:
-  borg-ui:
-    image: ainullcode/borg-ui:latest
-    container_name: borg-ui
+  borgscale:
+    image: ainullcode/borgscale:latest
+    container_name: borgscale
     cap_add:
       - SYS_ADMIN   # Needed to mount borg archives and browse them
     devices:
@@ -161,7 +161,7 @@ sudo mount --make-rshared /path/to/host/mountpoint
 
 If the host path lives under another mount with restrictive propagation, you may need to make the parent mount `rshared` as well.
 
-If the archive is visible inside the container at `/data/mounts/...` but not on the host, this is almost always a host mount propagation issue rather than a Borg UI mount failure.
+If the archive is visible inside the container at `/data/mounts/...` but not on the host, this is almost always a host mount propagation issue rather than a BorgScale mount failure.
 
 ---
 

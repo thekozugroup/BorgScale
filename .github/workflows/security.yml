@@ -181,16 +181,16 @@ jobs:
           fi
 
       - name: Build runtime base image
-        run: docker build -f Dockerfile.runtime-base -t borg-ui-runtime-base:security-scan .
+        run: docker build -f Dockerfile.runtime-base -t borgscale-runtime-base:security-scan .
 
       - name: Build Docker image
-        run: docker build --build-arg BASE_IMAGE=borg-ui-runtime-base:security-scan -t borg-ui:${{ github.sha }} .
+        run: docker build --build-arg BASE_IMAGE=borgscale-runtime-base:security-scan -t borgscale:${{ github.sha }} .
 
       - name: Run Trivy vulnerability scanner (Docker image)
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'image'
-          image-ref: 'borg-ui:${{ github.sha }}'
+          image-ref: 'borgscale:${{ github.sha }}'
           format: 'sarif'
           output: 'trivy-docker-results.sarif'
           severity: 'CRITICAL,HIGH'
@@ -207,7 +207,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'image'
-          image-ref: 'borg-ui:${{ github.sha }}'
+          image-ref: 'borgscale:${{ github.sha }}'
           format: 'table'
           output: 'trivy-docker-report.txt'
           severity: 'CRITICAL,HIGH,MEDIUM'

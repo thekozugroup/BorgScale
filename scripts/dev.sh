@@ -9,7 +9,7 @@ set -e
 
 cd "$(dirname "$0")/.."
 
-echo "Starting Borg UI development environment..."
+echo "Starting BorgScale development environment..."
 
 # Read DEV_PORT from .env if present, fallback to 8083
 DEV_PORT=8083
@@ -19,14 +19,14 @@ if [ -f .env ]; then
 fi
 
 # Stop Docker services and background jobs on exit
-trap 'echo "Stopping dev environment..."; docker-compose -p borg-ui-dev -f docker-compose.dev.yml down 2>/dev/null; kill $(jobs -p) 2>/dev/null' EXIT
+trap 'echo "Stopping dev environment..."; docker-compose -p borgscale-dev -f docker-compose.dev.yml down 2>/dev/null; kill $(jobs -p) 2>/dev/null' EXIT
 
 # Create local data directory (mounted into Docker as /data)
 mkdir -p .local-data/ssh_keys .local-data/logs .local-data/borg_keys
 
 # Start dev backend in Docker with hot-reload
 echo "Starting dev backend (Docker, port $DEV_PORT)..."
-DEV_PORT=$DEV_PORT docker-compose -p borg-ui-dev -f docker-compose.dev.yml up -d --build --force-recreate
+DEV_PORT=$DEV_PORT docker-compose -p borgscale-dev -f docker-compose.dev.yml up -d --build --force-recreate
 
 # Wait for backend to be ready
 sleep 3

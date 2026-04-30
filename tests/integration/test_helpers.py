@@ -28,7 +28,7 @@ class DockerPathHelper:
     """
     Helper class for handling path conversions between host and Docker container.
 
-    When the Borg UI backend runs in a Docker container, it mounts the host's root
+    When the BorgScale backend runs in a Docker container, it mounts the host's root
     filesystem at /local inside the container. This helper detects the environment
     and converts paths accordingly.
     """

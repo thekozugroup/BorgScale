@@ -6,7 +6,7 @@ Metrics are disabled by default. If you enable them, the recommended setup is:
 
 - keep `/metrics` on a private network
 - require a shared metrics token
-- let Prometheus or Grafana be the public-facing consumer, not borg-ui itself
+- let Prometheus or Grafana be the public-facing consumer, not borgscale itself
 
 ## Enable Metrics
 
@@ -14,10 +14,10 @@ In `Settings -> System -> Metrics Access`:
 
 - turn on `Enable /metrics endpoint`
 - turn on `Require token for /metrics`
-- save to let borg-ui generate a token
+- save to let borgscale generate a token
 - copy the token from the one-time dialog and store it in Prometheus
 
-When token protection is enabled, borg-ui accepts either of these headers:
+When token protection is enabled, borgscale accepts either of these headers:
 
 - `X-Borg-Metrics-Token: <token>`
 - `Authorization: Bearer <token>`
@@ -27,7 +27,7 @@ If metrics remain disabled, `/metrics` returns `404`.
 ## Endpoint
 
 ```text
-GET http://your-borg-ui:8081/metrics
+GET http://your-borgscale:8081/metrics
 ```
 
 ## Prometheus Configuration
@@ -36,12 +36,12 @@ Add this to your `prometheus.yml`:
 
 ```yaml
 scrape_configs:
-  - job_name: borg-ui
+  - job_name: borgscale
     scrape_interval: 60s
     metrics_path: /metrics
     static_configs:
       - targets:
-          - borg-ui:8081
+          - borgscale:8081
     authorization:
       type: Bearer
       credentials: <your-generated-metrics-token>
@@ -51,10 +51,10 @@ If you prefer a custom header instead of bearer auth:
 
 ```yaml
 scrape_configs:
-  - job_name: borg-ui
+  - job_name: borgscale
     static_configs:
       - targets:
-          - borg-ui:8081
+          - borgscale:8081
     http_headers:
       X-Borg-Metrics-Token:
         values:
@@ -65,12 +65,12 @@ scrape_configs:
 
 An example monitoring stack is included in this repository:
 
-- [examples/monitoring/docker-compose.yml](/Users/karanhudia/Documents/Projects/borg-ui/examples/monitoring/docker-compose.yml)
-- [examples/monitoring/prometheus.yml](/Users/karanhudia/Documents/Projects/borg-ui/examples/monitoring/prometheus.yml)
-- [examples/monitoring/grafana/provisioning/datasources/prometheus.yml](/Users/karanhudia/Documents/Projects/borg-ui/examples/monitoring/grafana/provisioning/datasources/prometheus.yml)
-- [examples/monitoring/grafana/provisioning/dashboards/dashboards.yml](/Users/karanhudia/Documents/Projects/borg-ui/examples/monitoring/grafana/provisioning/dashboards/dashboards.yml)
-- [examples/monitoring/grafana/provisioning/dashboards/json/borg-ui-overview.json](/Users/karanhudia/Documents/Projects/borg-ui/examples/monitoring/grafana/provisioning/dashboards/json/borg-ui-overview.json)
-- [examples/monitoring/grafana/provisioning/dashboards/json/borg-ui-jobs.json](/Users/karanhudia/Documents/Projects/borg-ui/examples/monitoring/grafana/provisioning/dashboards/json/borg-ui-jobs.json)
+- [examples/monitoring/docker-compose.yml](/Users/karanhudia/Documents/Projects/borgscale/examples/monitoring/docker-compose.yml)
+- [examples/monitoring/prometheus.yml](/Users/karanhudia/Documents/Projects/borgscale/examples/monitoring/prometheus.yml)
+- [examples/monitoring/grafana/provisioning/datasources/prometheus.yml](/Users/karanhudia/Documents/Projects/borgscale/examples/monitoring/grafana/provisioning/datasources/prometheus.yml)
+- [examples/monitoring/grafana/provisioning/dashboards/dashboards.yml](/Users/karanhudia/Documents/Projects/borgscale/examples/monitoring/grafana/provisioning/dashboards/dashboards.yml)
+- [examples/monitoring/grafana/provisioning/dashboards/json/borgscale-overview.json](/Users/karanhudia/Documents/Projects/borgscale/examples/monitoring/grafana/provisioning/dashboards/json/borgscale-overview.json)
+- [examples/monitoring/grafana/provisioning/dashboards/json/borgscale-jobs.json](/Users/karanhudia/Documents/Projects/borgscale/examples/monitoring/grafana/provisioning/dashboards/json/borgscale-jobs.json)
 
 Bring it up with:
 
@@ -80,7 +80,7 @@ docker compose -f docker-compose.yml -f examples/monitoring/docker-compose.yml u
 
 Before starting Prometheus, set the generated metrics token in `examples/monitoring/prometheus.yml`.
 
-This example keeps Prometheus and Grafana on the same private Docker network as borg-ui while exposing:
+This example keeps Prometheus and Grafana on the same private Docker network as borgscale while exposing:
 
 - Prometheus on `http://localhost:9090`
 - Grafana on `http://localhost:3000`
@@ -94,8 +94,8 @@ Change those before using the stack beyond local testing.
 
 The example also provisions an official starter dashboard pack automatically:
 
-- `Borg UI / Borg UI Overview`
-- `Borg UI / Borg UI Jobs`
+- `BorgScale / BorgScale Overview`
+- `BorgScale / BorgScale Jobs`
 
 ## Available Metrics
 
@@ -193,7 +193,7 @@ If you want to build further custom dashboards, useful panel queries include:
 ### Metrics endpoint returns 404
 
 - check that metrics are enabled in `Settings -> System`
-- verify the request is hitting the correct borg-ui instance
+- verify the request is hitting the correct borgscale instance
 
 ### Metrics endpoint returns 401
 
@@ -201,9 +201,9 @@ If you want to build further custom dashboards, useful panel queries include:
 - check the exact token being sent by Prometheus
 - confirm you copied the new token after generation or rotation
 
-### Prometheus cannot scrape borg-ui
+### Prometheus cannot scrape borgscale
 
-- verify network connectivity between Prometheus and borg-ui
+- verify network connectivity between Prometheus and borgscale
 - check Prometheus targets at `http://localhost:9090/targets`
 - if auth is enabled, confirm the scrape job sends the token header
 

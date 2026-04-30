@@ -8,7 +8,7 @@ nav_order: 100
 
 The production plan-content feed is published from:
 
-`https://docs.borgui.com/plan-content.json`
+`https://github.com/thekozugroup/BorgScale
 
 This feed controls the text shown in the plan drawer for:
 
@@ -18,7 +18,7 @@ This feed controls the text shown in the plan drawer for:
 
 ## Update Flow
 
-1. Edit [docs/plan-content.json](/Users/karanhudia/Documents/Projects/borg-ui/docs/plan-content.json).
+1. Edit [docs/plan-content.json](/Users/karanhudia/Documents/Projects/borgscale/docs/plan-content.json).
 2. Commit and push to `main`.
 3. Wait for GitHub Pages to rebuild.
 4. Verify the live manifest URL returns JSON.

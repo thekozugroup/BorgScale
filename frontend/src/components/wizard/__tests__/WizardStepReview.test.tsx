@@ -95,13 +95,13 @@ describe('WizardStepReview', () => {
       expect(screen.getByText('Observe Only')).toBeInTheDocument()
     })
 
-    it('shows Borg UI Server for local location', () => {
+    it('shows BorgScale Server for local location', () => {
       render(
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
       // Multiple instances: location summary and data source
-      const borgUIServers = screen.getAllByText('Borg UI Server')
+      const borgUIServers = screen.getAllByText('BorgScale Server')
       expect(borgUIServers.length).toBeGreaterThanOrEqual(1)
     })
 

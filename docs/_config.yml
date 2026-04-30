@@ -1,11 +1,11 @@
-title: Borg Web UI
+title: BorgScale
 description: A modern, user-friendly web interface for Borg Backup management
 remote_theme: just-the-docs/just-the-docs
 baseurl: ""
-url: https://docs.borgui.com
+url: https://github.com/thekozugroup/BorgScale
 
 # GitHub metadata
-repository: karanhudia/borg-ui
+repository: karanhudia/borgscale
 
 # Color scheme
 color_scheme: dark
@@ -23,9 +23,9 @@ back_to_top_text: "Back to top"
 # Aux links (top right)
 aux_links:
   "GitHub":
-    - "//github.com/karanhudia/borg-ui"
+    - "//github.com/karanhudia/borgscale"
   "Docker Hub":
-    - "//hub.docker.com/r/ainullcode/borg-ui"
+    - "//hub.docker.com/r/ainullcode/borgscale"
 
 # Aux links new tab
 aux_links_new_tab: true

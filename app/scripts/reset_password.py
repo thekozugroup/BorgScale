@@ -9,7 +9,7 @@ Usage:
     python -m app.scripts.reset_password <username> <new_password>
 
     # Or within Docker:
-    docker exec -it borg-ui python -m app.scripts.reset_password admin newpassword123
+    docker exec -it borgscale python -m app.scripts.reset_password admin newpassword123
 
 Environment variables:
     BORG_DB_PATH  Path to the SQLite database file (default: /data/borg.db)

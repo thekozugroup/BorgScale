@@ -1,4 +1,4 @@
-name = "borg-ui-updates"
+name = "borgscale-updates"
 main = "src/index.ts"
 compatibility_date = "2026-04-08"
 workers_dev = false
@@ -7,5 +7,5 @@ workers_dev = false
 enabled = true
 
 [[routes]]
-pattern = "updates.borgui.com"
+pattern = "updates.borgscale.thekozugroup.com"
 custom_domain = true

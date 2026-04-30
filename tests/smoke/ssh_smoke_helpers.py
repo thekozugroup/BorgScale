@@ -37,7 +37,7 @@ def add_ssh_smoke_args(
     )
     parser.add_argument(
         "--remote-root",
-        default=os.environ.get("SSH_SMOKE_REMOTE_ROOT", "/tmp/borg-ui-ssh-smoke"),
+        default=os.environ.get("SSH_SMOKE_REMOTE_ROOT", "/tmp/borgscale-ssh-smoke"),
         help="Root directory on the SSH host used for smoke test repositories and restore destinations",
     )
 

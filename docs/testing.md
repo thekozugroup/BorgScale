@@ -2,13 +2,13 @@
 layout: default
 title: Testing
 nav_order: 11
-description: "What Borg Web UI tests before you trust it with production backups"
+description: "What BorgScale tests before you trust it with production backups"
 permalink: /testing
 ---
 
 # Testing
 
-Borg Web UI prioritizes API-driven tests for the Borg 1 workflows that can affect production backups and restores.
+BorgScale prioritizes API-driven tests for the Borg 1 workflows that can affect production backups and restores.
 
 ## API Integration Coverage
 

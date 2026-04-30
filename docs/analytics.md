@@ -1,6 +1,6 @@
 # Analytics & Privacy
 
-Borg UI collects **anonymous usage statistics** to help improve the product. We believe in **radical transparency**.
+BorgScale collects **anonymous usage statistics** to help improve the product. We believe in **radical transparency**.
 
 ## Full Transparency
 
@@ -66,7 +66,7 @@ We use analytics data to:
 
 Analytics stays disabled until you respond to the consent banner. After opting in, you can disable it anytime:
 
-1. Open Borg UI
+1. Open BorgScale
 2. Navigate to **Settings → Preferences**
 3. Toggle off **"Enable anonymous usage analytics"**
 4. Page will reload with tracking disabled
@@ -104,7 +104,7 @@ Your preference is stored in the database and respected across all sessions.
 
 - **Aggregate data:** Kept indefinitely for trend analysis (page view counts, feature usage stats)
 - **No individual-level data:** We do not collect any data that can identify individuals, so there is no individual data to delete
-- **User preferences:** Stored only in your local Borg UI database (not sent to analytics server)
+- **User preferences:** Stored only in your local BorgScale database (not sent to analytics server)
 
 ## Privacy Rights
 
@@ -112,14 +112,14 @@ You have the right to:
 - **Opt-out** at any time via Settings → Preferences
 - **View collected data** on the public dashboard (all data is aggregated and anonymous)
 - **Ask questions** about our practices
-- **Provide feedback** on what we track - If you disagree with any data collection, please [open an issue](https://github.com/karanhudia/borg-ui/issues) and we will consider adjusting our tracking practices
+- **Provide feedback** on what we track - If you disagree with any data collection, please [open an issue](https://github.com/karanhudia/borgscale/issues) and we will consider adjusting our tracking practices
 
 **Important:** Since we do not collect any personally identifiable information (no IPs, no user IDs, no cookies), there is no individual-level data to delete. All data is anonymous aggregate statistics only.
 
 ## Centralized Analytics Model
 
-**Important:** Borg UI uses a **centralized analytics model**:
-- ALL Borg UI installations worldwide send data to ONE Umami instance
+**Important:** BorgScale uses a **centralized analytics model**:
+- ALL BorgScale installations worldwide send data to ONE Umami instance
 - This allows us to understand global usage patterns
 - Individual installations are not identifiable
 - No tracking between instances (each install is anonymous)
@@ -136,8 +136,8 @@ This is different from per-install analytics setups where each user runs their o
 ## Contact
 
 Questions about analytics or privacy?
-- **Open an issue:** [GitHub Issues](https://github.com/karanhudia/borg-ui/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/karanhudia/borg-ui/discussions)
+- **Open an issue:** [GitHub Issues](https://github.com/karanhudia/borgscale/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/karanhudia/borgscale/discussions)
 - **View live data:** [Analytics Dashboard](https://analytics.nullcodeai.dev/)
 
 ---

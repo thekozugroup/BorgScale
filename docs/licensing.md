@@ -6,7 +6,7 @@ nav_order: 12
 
 # Licensing
 
-Borg UI is open-source software licensed under the GNU AGPL v3. On top of the open-source core, it offers three tiers that unlock additional features.
+BorgScale is open-source software licensed under the GNU AGPL v3. On top of the open-source core, it offers three tiers that unlock additional features.
 
 ---
 
@@ -51,7 +51,7 @@ Coming soon: centralized multi-instance management, immutable audit log export, 
 
 ## Full Access Period
 
-Every new Borg UI installation can receive a **full access period** on first boot. During this period, all Pro and Enterprise features are unlocked with no license key required. After it ends, the instance returns to Community tier automatically.
+Every new BorgScale installation can receive a **full access period** on first boot. During this period, all Pro and Enterprise features are unlocked with no license key required. After it ends, the instance returns to Community tier automatically.
 
 This applies to self-hosted instances including air-gapped and private network deployments.
 
@@ -59,11 +59,11 @@ This applies to self-hosted instances including air-gapped and private network d
 
 ## Activation Service
 
-When startup licensing sync is enabled, Borg UI contacts `license.borgui.com` to register the instance and activate the full access period. This call sends basic instance metadata only: a generated instance identifier and the application version. No personal data, repository contents, backup paths, or credentials are ever sent.
+When startup licensing sync is enabled, BorgScale contacts the activation service to register the instance and activate the full access period. This call sends basic instance metadata only: a generated instance identifier and the application version. No personal data, repository contents, backup paths, or credentials are ever sent.
 
-The activation endpoint is configured via the `ACTIVATION_SERVICE_URL` environment variable. It defaults to `https://license.borgui.com`.
+The activation endpoint is configured via the `ACTIVATION_SERVICE_URL` environment variable. It defaults to `https://github.com/thekozugroup/BorgScale`
 
-If you want to prevent Borg UI from contacting the activation service at startup, set:
+If you want to prevent BorgScale from contacting the activation service at startup, set:
 
 ```bash
 ENABLE_STARTUP_LICENSE_SYNC=false
@@ -85,4 +85,4 @@ Notes:
 
 ## Purchasing a License
 
-Visit [borgui.com](https://borgui.com) to purchase a Pro or Enterprise license key. Once purchased, enter the key in **Settings > System** to activate the corresponding tier.
+Visit [github.com/thekozugroup/BorgScale](https://github.com/thekozugroup/BorgScale) to learn more about licensing options. Once you have a license key, enter it in **Settings > System** to activate the corresponding tier.

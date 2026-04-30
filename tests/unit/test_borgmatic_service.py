@@ -12,7 +12,7 @@ from app.database.models import Repository, ScheduledJob
 
 
 class TestBorgmaticExportService:
-    """Tests for exporting Borg UI configurations to borgmatic format."""
+    """Tests for exporting BorgScale configurations to borgmatic format."""
 
     def test_export_local_repository(self, db_session, sample_repository):
         """Test exporting a local repository."""
@@ -124,7 +124,7 @@ class TestBorgmaticExportService:
 
 
 class TestBorgmaticImportService:
-    """Tests for importing borgmatic configurations into Borg UI."""
+    """Tests for importing borgmatic configurations into BorgScale."""
 
     def test_import_basic_borgmatic_config(self, db_session):
         """Test importing a basic borgmatic configuration."""
@@ -260,7 +260,7 @@ storage:
         )
 
     def test_import_borg_ui_export(self, db_session):
-        """Test importing Borg UI export format (round-trip) - new format."""
+        """Test importing BorgScale export format (round-trip) - new format."""
         yaml_content = """
 location:
   source_directories:

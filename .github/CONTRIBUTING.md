@@ -1,6 +1,6 @@
-# Contributing to Borg Web UI
+# Contributing to BorgScale
 
-Thank you for your interest in contributing to Borg Web UI!
+Thank you for your interest in contributing to BorgScale!
 
 ## Quick Start
 
@@ -8,11 +8,11 @@ Thank you for your interest in contributing to Borg Web UI!
 
 ```bash
 # Fork the repository on GitHub, then:
-git clone https://github.com/YOUR_USERNAME/borg-ui.git
-cd borg-ui
+git clone https://github.com/YOUR_USERNAME/borgscale.git
+cd borgscale
 
 # Add upstream remote
-git remote add upstream https://github.com/karanhudia/borg-ui.git
+git remote add upstream https://github.com/karanhudia/borgscale.git
 ```
 
 ### Create a Branch
@@ -181,8 +181,8 @@ Contributors will be recognized in:
 
 ## Need Help?
 
-- **Documentation**: [Full Documentation](https://karanhudia.github.io/borg-ui)
-- **Issues**: [GitHub Issues](https://github.com/karanhudia/borg-ui/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/karanhudia/borg-ui/discussions)
+- **Documentation**: [Full Documentation](https://karanhudia.github.io/borgscale)
+- **Issues**: [GitHub Issues](https://github.com/karanhudia/borgscale/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/karanhudia/borgscale/discussions)
 
-Thank you for contributing to Borg Web UI!
+Thank you for contributing to BorgScale!

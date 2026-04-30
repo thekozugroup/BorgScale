@@ -244,7 +244,7 @@ describe('Scripts page', () => {
     expect(trackScripts).toHaveBeenCalledWith('Delete', 'Cleanup', { category: 'custom' })
   })
 
-  it('detects custom parameters, ignores borg-ui reserved variables, and preserves secret toggles', async () => {
+  it('detects custom parameters, ignores borgscale reserved variables, and preserves secret toggles', async () => {
     const user = userEvent.setup()
 
     renderWithProviders(<Scripts />)

@@ -22,7 +22,7 @@ Implement: Dashboard.html
   black/white stock theme.
 - The mockup's logo slot must use the `lucide:boxes` icon (already
   committed at `frontend/src/assets/lucide-boxes.svg` from Wave 0).
-- Do NOT replicate any branding from upstream `borg-ui` even if it
+- Do NOT replicate any branding from upstream `borgscale` even if it
   appears in the mockup; the BorgScale brand swap (Wave 4) takes
   precedence.
 - The Design Skeptic gate (Impeccable + qualitative pass) still

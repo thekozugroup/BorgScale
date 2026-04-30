@@ -41,12 +41,12 @@ Implemented a new step-based wizard for repository creation/import/editing with 
 
 **Step 1: Repository Location**
 - Name and mode (Full/Observe Only)
-- Visual cards: Borg UI Server (local) vs SSH Remote Storage
+- Visual cards: BorgScale Server (local) vs SSH Remote Storage
 - SSH connections dropdown (no manual host/port entry)
 - Path input with file browser
 
 **Step 2: Data Source** (only for full mode, not import/observe)
-- Visual cards: Borg UI Server (local) vs Remote Machine
+- Visual cards: BorgScale Server (local) vs Remote Machine
 - For local: Shows SourceDirectoriesInput
 - For remote: SSH connections dropdown + note about remote execution
 
@@ -73,7 +73,7 @@ Implemented a new step-based wizard for repository creation/import/editing with 
 - **Step adaptation**: Steps dynamically adjust based on mode (full/observe/import)
 - **Validation**: Array.isArray() checks on sshConnections before .map() calls
 - **Client-to-client limitation**: If repository is on a remote client, data source can ONLY be:
-  - Local (Borg UI Server), OR
+  - Local (BorgScale Server), OR
   - The SAME remote client (same-machine backup)
   - Backing up from one remote client to another is NOT supported (too much overhead)
 

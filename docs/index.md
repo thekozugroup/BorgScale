@@ -6,11 +6,11 @@ description: "A modern web interface for Borg Backup"
 permalink: /
 ---
 
-# Borg Web UI
+# BorgScale
 
 A modern web interface for [Borg Backup](https://borgbackup.readthedocs.io/). Manage backups through a clean UI instead of complex terminal commands.
 
-**[GitHub](https://github.com/karanhudia/borg-ui)** • **[Docker Hub](https://hub.docker.com/r/ainullcode/borg-ui)** • **[Latest Release](https://github.com/karanhudia/borg-ui/releases)**
+**[GitHub](https://github.com/karanhudia/borgscale)** • **[Docker Hub](https://hub.docker.com/r/ainullcode/borgscale)** • **[Latest Release](https://github.com/karanhudia/borgscale/releases)**
 
 ---
 
@@ -23,7 +23,7 @@ docker run -d \
   -v borg_data:/data \
   -v borg_cache:/home/borg/.cache/borg \
   -v /home/yourusername:/local:rw \
-  ainullcode/borg-ui:latest
+  ainullcode/borgscale:latest
 ```
 
 **Note:** Replace `/home/yourusername` with your actual directory path.
@@ -104,8 +104,8 @@ Create `docker-compose.yml`:
 version: '3.8'
 
 services:
-  borg-ui:
-    image: ainullcode/borg-ui:latest
+  borgscale:
+    image: ainullcode/borgscale:latest
     container_name: borg-web-ui
     restart: unless-stopped
     ports:
@@ -229,15 +229,15 @@ See [Notifications Setup](notifications) for detailed configuration.
 
 **Documentation:** You're reading it!
 
-**Issues:** [GitHub Issues](https://github.com/karanhudia/borg-ui/issues)
+**Issues:** [GitHub Issues](https://github.com/karanhudia/borgscale/issues)
 
-**Discussions:** [GitHub Discussions](https://github.com/karanhudia/borg-ui/discussions)
+**Discussions:** [GitHub Discussions](https://github.com/karanhudia/borgscale/discussions)
 
 ---
 
 ## License
 
-GNU Affero General Public License v3.0 - See [LICENSE](https://github.com/karanhudia/borg-ui/blob/main/LICENSE)
+GNU Affero General Public License v3.0 - See [LICENSE](https://github.com/karanhudia/borgscale/blob/main/LICENSE)
 
 ---
 

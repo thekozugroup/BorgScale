@@ -248,7 +248,7 @@ def _build_test_notification_failure_message(service_url: str) -> str:
         return (
             "Failed to send test notification to ntfy. The URL format was accepted, "
             "but delivery failed. Possible causes:\n"
-            "• The ntfy server is unreachable from Borg UI\n"
+            "• The ntfy server is unreachable from BorgScale\n"
             "• TLS/certificate issues on the self-hosted ntfy server\n"
             "• Invalid username/password\n"
             "• Username or password contains reserved URL characters and must be percent-encoded"
@@ -1724,8 +1724,8 @@ class NotificationService:
             socket.setdefaulttimeout(60)
             try:
                 success = apobj.notify(
-                    title="🔔 Borg UI Test Notification",
-                    body="This is a test notification from Borg Web UI. If you received this, your notification service is configured correctly!",
+                    title="🔔 BorgScale Test Notification",
+                    body="This is a test notification from BorgScale. If you received this, your notification service is configured correctly!",
                 )
             finally:
                 socket.setdefaulttimeout(old_timeout)

@@ -73,7 +73,7 @@ describe('WizardStepDataSource', () => {
       expect(screen.getByText(/Where is the data you want to back up/i)).toBeInTheDocument()
     })
 
-    it('renders Borg UI Server and Remote Client cards', () => {
+    it('renders BorgScale Server and Remote Client cards', () => {
       render(
         <WizardStepDataSource
           repositoryLocation="local"
@@ -87,7 +87,7 @@ describe('WizardStepDataSource', () => {
         />
       )
 
-      expect(screen.getByText('Borg UI Server')).toBeInTheDocument()
+      expect(screen.getByText('BorgScale Server')).toBeInTheDocument()
       expect(screen.getByText('Remote Client')).toBeInTheDocument()
     })
 
@@ -165,7 +165,7 @@ describe('WizardStepDataSource', () => {
   })
 
   describe('Data Source Selection', () => {
-    it('calls onChange when Borg UI Server is clicked', async () => {
+    it('calls onChange when BorgScale Server is clicked', async () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
       // Start with remote selected but no directories yet
@@ -189,7 +189,7 @@ describe('WizardStepDataSource', () => {
         />
       )
 
-      const localCard = screen.getByText('Borg UI Server').closest('button')
+      const localCard = screen.getByText('BorgScale Server').closest('button')
       await user.click(localCard!)
 
       expect(onChange).toHaveBeenCalledWith(
@@ -292,9 +292,9 @@ describe('WizardStepDataSource', () => {
       expect(screen.getByText(/Remove remote directories first to switch/i)).toBeInTheDocument()
     })
 
-    it('enables Borg UI Server when remote directories are deleted', () => {
+    it('enables BorgScale Server when remote directories are deleted', () => {
       // Test for bug fix: when editing with remote client selected and source directory,
-      // deleting the source directory should enable Borg UI Server option
+      // deleting the source directory should enable BorgScale Server option
       const remoteDataWithoutDirs = {
         dataSource: 'remote' as const,
         sourceSshConnectionId: 1,
@@ -319,8 +319,8 @@ describe('WizardStepDataSource', () => {
         screen.queryByText(/Remove remote directories first to switch/i)
       ).not.toBeInTheDocument()
 
-      // Borg UI Server card should be enabled (not disabled)
-      const localCard = screen.getByText('Borg UI Server').closest('button')
+      // BorgScale Server card should be enabled (not disabled)
+      const localCard = screen.getByText('BorgScale Server').closest('button')
       expect(localCard).not.toBeDisabled()
     })
   })

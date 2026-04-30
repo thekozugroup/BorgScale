@@ -1,25 +1,25 @@
 #!/bin/bash
 ###############################################################################
-# Borg UI Test Environment Setup
+# BorgScale Test Environment Setup
 #
-# This script creates a comprehensive test environment for Borg UI including:
+# This script creates a comprehensive test environment for BorgScale including:
 # - Test Borg repositories with various structures
 # - Test data with multiple folders and files
 # - Archives with different content patterns
 #
 # Usage: ./setup_test_env.sh [test_dir]
-# Default test_dir: /tmp/borg-ui-tests
+# Default test_dir: /tmp/borgscale-tests
 ###############################################################################
 
 set -e  # Exit on error
 
-TEST_DIR="${1:-/tmp/borg-ui-tests}"
+TEST_DIR="${1:-/tmp/borgscale-tests}"
 REPO_DIR="$TEST_DIR/repositories"
 SOURCE_DIR="$TEST_DIR/source_data"
 TEMP_DIR="$TEST_DIR/temp"
 
 echo "=================================================="
-echo "Borg UI Test Environment Setup"
+echo "BorgScale Test Environment Setup"
 echo "=================================================="
 echo "Test directory: $TEST_DIR"
 echo ""
@@ -186,7 +186,7 @@ rm -rf "$LARGE_DATA"
 INFO_FILE="$TEST_DIR/TEST_INFO.txt"
 cat > "$INFO_FILE" << EOF
 ================================================
-Borg UI Test Environment Information
+BorgScale Test Environment Information
 ================================================
 Created: $(date)
 Location: $TEST_DIR
@@ -254,7 +254,7 @@ Test encrypted repo (repo2):
 BORG UI TESTING:
 ----------------
 
-1. Add repositories to Borg UI:
+1. Add repositories to BorgScale:
    - Type: Local
    - Path: $REPO1 (or repo2, repo3)
    - Passphrase: (none for repo1/repo3, "test123" for repo2)
@@ -309,6 +309,6 @@ echo ""
 echo "Next steps:"
 echo "  1. Read: cat $INFO_FILE"
 echo "  2. Test borg commands manually (see info file)"
-echo "  3. Add repositories to Borg UI and test browsing"
+echo "  3. Add repositories to BorgScale and test browsing"
 echo "  4. Run: python tests/test_archive_contents.py $TEST_DIR"
 echo ""

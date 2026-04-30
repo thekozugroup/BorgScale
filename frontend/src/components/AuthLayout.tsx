@@ -274,7 +274,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
                   lineHeight: 1.1,
                 }}
               >
-                Borg UI
+                BorgScale
               </h1>
               <span
                 style={{

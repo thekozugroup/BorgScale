@@ -519,7 +519,7 @@
   "schemaVersion": 41,
   "style": "dark",
   "tags": [
-    "borg-ui",
+    "borgscale",
     "monitoring",
     "jobs"
   ],
@@ -555,8 +555,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Borg UI Jobs",
-  "uid": "borg-ui-jobs",
+  "title": "BorgScale Jobs",
+  "uid": "borgscale-jobs",
   "version": 1,
   "weekStart": ""
 }

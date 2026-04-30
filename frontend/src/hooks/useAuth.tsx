@@ -158,7 +158,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   | { key: string; params?: Record<string, unknown> }
                   | null
                   | undefined
-              ) || 'Insecure no-auth mode is enabled but Borg UI could not resolve a local user.'
+              ) || 'Insecure no-auth mode is enabled but BorgScale could not resolve a local user.'
             )
           }
         } else if (proxy_auth_enabled) {
@@ -202,7 +202,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setAuthError(
               (existing) =>
                 existing ??
-                'Proxy authentication is enabled but Borg UI did not receive an authenticated user from the reverse proxy.'
+                'Proxy authentication is enabled but BorgScale did not receive an authenticated user from the reverse proxy.'
             )
           }
         } else {

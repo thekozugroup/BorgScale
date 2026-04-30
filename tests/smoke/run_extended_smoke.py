@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the slower live-server smoke checks against a built Borg UI instance."""
+"""Run the slower live-server smoke checks against a built BorgScale instance."""
 
 from __future__ import annotations
 
@@ -20,13 +20,13 @@ def run_script(*args: str) -> int:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Run Borg UI extended smoke tests")
+    parser = argparse.ArgumentParser(description="Run BorgScale extended smoke tests")
     parser.add_argument(
         "--url", default="http://localhost:8082", help="Base URL of the running app"
     )
     parser.add_argument(
         "--test-dir",
-        default="/tmp/borg-ui-tests",
+        default="/tmp/borgscale-tests",
         help="Prepared Borg smoke test directory",
     )
     args = parser.parse_args()

@@ -41,7 +41,7 @@ class SmokeClient:
         else:
             root = REPO_ROOT / ".tmp" / "smoke"
         root.mkdir(parents=True, exist_ok=True)
-        return Path(tempfile.mkdtemp(prefix="borg-ui-smoke-", dir=root))
+        return Path(tempfile.mkdtemp(prefix="borgscale-smoke-", dir=root))
 
     def cleanup(self) -> None:
         shutil.rmtree(self.temp_dir, ignore_errors=True)

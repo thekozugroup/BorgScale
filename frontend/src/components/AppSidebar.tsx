@@ -348,7 +348,7 @@ export default function AppSidebar({ mobileOpen, onClose }: AppSidebarProps) {
                   component="div"
                   sx={{ fontWeight: 700, letterSpacing: '0.14em', lineHeight: 1.1 }}
                 >
-                  Borg UI
+                  BorgScale
                 </Typography>
                 <Box
                   component="span"

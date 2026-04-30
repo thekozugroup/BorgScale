@@ -24,7 +24,7 @@ describe('BackupFlowPreview', () => {
       expect(screen.getByText(/Back up local data to local repository/i)).toBeInTheDocument()
     })
 
-    it('shows Borg UI Server as source', () => {
+    it('shows BorgScale Server as source', () => {
       render(
         <BackupFlowPreview
           repositoryLocation="local"
@@ -34,12 +34,12 @@ describe('BackupFlowPreview', () => {
         />
       )
 
-      // Both source and repo show "Borg UI Server" in local-to-local
-      const borgUIServers = screen.getAllByText('Borg UI Server')
+      // Both source and repo show "BorgScale Server" in local-to-local
+      const borgUIServers = screen.getAllByText('BorgScale Server')
       expect(borgUIServers.length).toBeGreaterThanOrEqual(1)
     })
 
-    it('shows Borg UI Server as repository location', () => {
+    it('shows BorgScale Server as repository location', () => {
       render(
         <BackupFlowPreview
           repositoryLocation="local"
@@ -49,8 +49,8 @@ describe('BackupFlowPreview', () => {
         />
       )
 
-      // Should show "Borg UI Server" twice - once for source and once for repo
-      const borgUIServers = screen.getAllByText('Borg UI Server')
+      // Should show "BorgScale Server" twice - once for source and once for repo
+      const borgUIServers = screen.getAllByText('BorgScale Server')
       expect(borgUIServers).toHaveLength(2)
     })
 

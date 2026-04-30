@@ -730,7 +730,7 @@ class SystemSettings(Base):
     mqtt_broker_port = Column(Integer, default=1883, nullable=False)  # MQTT broker port
     mqtt_username = Column(String, nullable=True)  # MQTT username
     mqtt_password = Column(String, nullable=True)  # MQTT password
-    mqtt_client_id = Column(String, default="borg-ui", nullable=False)  # MQTT client ID
+    mqtt_client_id = Column(String, default="borgscale", nullable=False)  # MQTT client ID
     mqtt_qos = Column(
         Integer, default=1, nullable=False
     )  # Quality of Service (0, 1, or 2)

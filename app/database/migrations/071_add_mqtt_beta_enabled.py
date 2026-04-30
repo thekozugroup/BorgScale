@@ -70,14 +70,14 @@ def upgrade(db):
             "mqtt_client_id",
             """
             ALTER TABLE system_settings
-            ADD COLUMN mqtt_client_id TEXT DEFAULT 'borg-ui' NOT NULL
+            ADD COLUMN mqtt_client_id TEXT DEFAULT 'borgscale' NOT NULL
         """,
         ),
         (
             "mqtt_base_topic",
             """
             ALTER TABLE system_settings
-            ADD COLUMN mqtt_base_topic TEXT DEFAULT 'borg-ui' NOT NULL
+            ADD COLUMN mqtt_base_topic TEXT DEFAULT 'borgscale' NOT NULL
         """,
         ),
         (

@@ -17,7 +17,7 @@ def upgrade(db):
         db.execute(
             text("""
             ALTER TABLE system_settings
-            ADD COLUMN mqtt_base_topic TEXT DEFAULT 'borg-ui' NOT NULL
+            ADD COLUMN mqtt_base_topic TEXT DEFAULT 'borgscale' NOT NULL
         """)
         )
         db.commit()

@@ -61,8 +61,8 @@ jobs:
             echo ""
             echo "Published to Docker Hub:"
             echo '```'
-            echo "docker pull ainullcode/borg-ui:${{ steps.version.outputs.version }}"
-            echo "docker pull ainullcode/borg-ui:latest"
+            echo "docker pull ainullcode/borgscale:${{ steps.version.outputs.version }}"
+            echo "docker pull ainullcode/borgscale:latest"
             echo '```'
             echo ""
             echo "**Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ steps.previous_tag.outputs.tag }}...${{ github.ref_name }}"

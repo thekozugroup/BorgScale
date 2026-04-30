@@ -3,7 +3,7 @@ Migration 050: Add source_ssh_connection_id to repositories table
 
 This migration adds the source_ssh_connection_id field to the repositories table
 to support pull-based backups where the data source is on a different machine
-than the Borg UI server.
+than the BorgScale server.
 """
 
 from sqlalchemy import text

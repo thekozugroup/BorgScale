@@ -39,7 +39,7 @@ logs/
 access.log
 error.log
 app.log
-borg-ui.log
+borgscale.log
 
 # Environment files (NEVER commit these!)
 .env

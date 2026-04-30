@@ -40,7 +40,7 @@ async def export_borgmatic_config(
     current_user=Depends(get_current_user),
 ):
     """
-    Export Borg UI configurations to borgmatic YAML format.
+    Export BorgScale configurations to borgmatic YAML format.
 
     Returns a ZIP file containing separate config files for each repository.
     """
@@ -127,13 +127,13 @@ async def import_borgmatic_config(
     current_user=Depends(get_current_user),
 ):
     """
-    Import borgmatic YAML configuration into Borg UI.
+    Import borgmatic YAML configuration into BorgScale.
 
     Accepts:
     - Single YAML files (.yaml, .yml)
     - ZIP files containing multiple YAML configs (.zip)
     - Standard borgmatic configuration files
-    - Borg UI exported configurations (for round-trip)
+    - BorgScale exported configurations (for round-trip)
 
     merge_strategy options:
     - skip_duplicates: Skip if repository/schedule name exists

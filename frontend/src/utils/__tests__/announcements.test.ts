@@ -16,7 +16,7 @@ const NOW = new Date('2026-04-10T12:00:00Z')
 const baseAnnouncement: Announcement = {
   id: 'release-1.70.0',
   type: 'update_available',
-  title: 'Borg UI 1.70.0 is available',
+  title: 'BorgScale 1.70.0 is available',
   message: 'A new release is available.',
   starts_at: '2026-04-01T00:00:00Z',
   ends_at: '2026-07-01T00:00:00Z',
@@ -104,7 +104,7 @@ describe('announcements utils', () => {
       id: 'release-1.71.0',
       priority: 50,
       starts_at: '2026-04-05T00:00:00Z',
-      title: 'Borg UI 1.71.0 is available',
+      title: 'BorgScale 1.71.0 is available',
     }
 
     expect(
@@ -209,7 +209,7 @@ describe('announcements utils', () => {
       {
         ...baseAnnouncement,
         title_localized: {
-          es: 'Borg UI 1.70.0 ya esta disponible',
+          es: 'BorgScale 1.70.0 ya esta disponible',
         },
         message_localized: {
           es: 'Hay una nueva version disponible.',
@@ -226,7 +226,7 @@ describe('announcements utils', () => {
       'es-ES'
     )
 
-    expect(localized.title).toBe('Borg UI 1.70.0 ya esta disponible')
+    expect(localized.title).toBe('BorgScale 1.70.0 ya esta disponible')
     expect(localized.message).toBe('Hay una nueva version disponible.')
     expect(localized.highlights).toEqual(['Punto destacado en espanol'])
     expect(localized.cta_label).toBe('Ver detalles')
@@ -237,7 +237,7 @@ describe('announcements utils', () => {
       {
         ...baseAnnouncement,
         title_localized: {
-          de: 'Borg UI 1.70.0 ist verfugbar',
+          de: 'BorgScale 1.70.0 ist verfugbar',
         },
       },
       'it'

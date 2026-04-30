@@ -67,7 +67,7 @@ function App() {
               </div>
               <p className="mt-3 text-sm leading-6 text-slate-600">{authError}</p>
               <p className="mt-3 text-sm leading-6 text-slate-600">
-                Ensure Borg UI is only reachable through your authenticated reverse proxy and that
+                Ensure BorgScale is only reachable through your authenticated reverse proxy and that
                 it forwards the expected user header{proxyAuthHeader ? ` (${proxyAuthHeader})` : ''}
                 .
               </p>

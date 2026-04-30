@@ -6,7 +6,7 @@ describe('AnnouncementModal', () => {
   const baseAnnouncement = {
     id: 'release-1.70.0',
     type: 'update_available' as const,
-    title: 'Borg UI 1.70.0 is available',
+    title: 'BorgScale 1.70.0 is available',
     message: 'A new release is available.',
   }
 
