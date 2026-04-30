@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useTabEnablement } from '../context/AppContext'
-import { BASE_PATH } from '@/utils/basePath'
 import { useQuery } from '@tanstack/react-query'
-import { Box, Drawer, Toolbar, List, Typography, Divider } from '@mui/material'
 import {
   Home,
   FileText,
@@ -26,14 +24,22 @@ import {
   HardDrive,
   Sliders,
   Wifi,
+  Boxes,
 } from 'lucide-react'
 import api, { settingsAPI } from '../services/api'
 import { useAuth } from '../hooks/useAuth'
 import NavItem from './NavItem'
 import NavGroup from './NavGroup'
 import SidebarVersionInfo from './SidebarVersionInfo'
-
-const drawerWidth = 240
+import {
+  SidebarMenu,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarProvider,
+} from '@/components/ui/sidebar'
+import { Sheet, SheetContent, SheetTitle, SheetDescription, SheetHeader as SheetHdr } from '@/components/ui/sheet'
+import { Separator } from '@/components/ui/separator'
 
 interface SystemInfo {
   app_version: string
@@ -61,73 +67,149 @@ interface AppSidebarProps {
   onClose: () => void
 }
 
-export default function AppSidebar({ mobileOpen, onClose }: AppSidebarProps) {
+function SidebarBrandMark() {
   const { t } = useTranslation()
-  const location = useLocation()
-  const { hasGlobalPermission } = useAuth()
-  const canManageUsers = hasGlobalPermission('settings.users.manage')
-  const canManageLicensing = hasGlobalPermission('settings.system.manage')
-  const canManageSystemSettings = hasGlobalPermission('settings.system.manage')
-  const canManageMqtt = hasGlobalPermission('settings.mqtt.manage')
-  const canManagePackages = hasGlobalPermission('settings.packages.manage')
-  const canManageScripts = hasGlobalPermission('settings.scripts.manage')
-  const canManageExportImport = hasGlobalPermission('settings.export_import.manage')
-  const canManageBeta = hasGlobalPermission('settings.beta.manage')
-  const canManageMounts = hasGlobalPermission('settings.mounts.manage')
-  const canManageSsh = hasGlobalPermission('settings.ssh.manage')
-  const { tabEnablement, getTabDisabledReason } = useTabEnablement()
-  const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null)
-  const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({})
+  return (
+    <Link
+      to="/dashboard"
+      className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sidebar-foreground no-underline transition-opacity hover:opacity-80"
+      aria-label="BorgScale"
+    >
+      <Boxes size={24} className="shrink-0" />
+      <span className="font-bold tracking-wide text-sm">BorgScale</span>
+      <span
+        className="select-none rounded border border-sidebar-border bg-sidebar-accent px-1 py-0.5 text-[0.6rem] font-bold leading-none text-sidebar-foreground/70"
+        aria-hidden="true"
+      >
+        {t('layout.version', '2.0')}
+      </span>
+    </Link>
+  )
+}
 
-  const navLabel = (name: string): string => {
-    const labels: Record<string, string> = {
-      Dashboard: t('navigation.items.dashboard'),
-      Activity: t('navigation.items.activity'),
-      'Remote Machines': t('navigation.items.remoteMachines'),
-      Repositories: t('navigation.items.repositories'),
-      Backup: t('navigation.items.backup'),
-      Archives: t('navigation.items.archives'),
-      Restore: t('navigation.items.restore'),
-      Schedule: t('navigation.items.schedule'),
-      Personal: t('navigation.settings.personal'),
-      System: t('navigation.settings.systemLabel'),
-      Management: t('navigation.settings.management'),
-      Advanced: t('navigation.settings.advanced'),
-      Account: t('navigation.settings.account'),
-      Appearance: t('navigation.settings.appearance'),
-      Preferences: t('navigation.settings.preferences'),
-      Notifications: t('navigation.settings.notifications'),
-      MQTT: t('navigation.settings.mqtt'),
-      Cache: t('navigation.settings.cache'),
-      Logs: t('navigation.settings.logs'),
-      Packages: t('navigation.settings.packages'),
-      Mounts: t('navigation.settings.mounts'),
-      Scripts: t('navigation.settings.scripts'),
-      Users: t('navigation.settings.users'),
-      Licensing: t('navigation.settings.licensing'),
-      'Export/Import': t('navigation.settings.exportImport'),
-      Beta: t('navigation.settings.beta'),
-    }
-    return labels[name] ?? name
-  }
+interface SidebarNavInnerProps {
+  systemInfo: SystemInfo | null
+  navigationSections: ReturnType<typeof useNavigationSections>
+  expandedMenus: Record<string, boolean>
+  toggleMenu: (name: string) => void
+  sectionHeadingLabel: (heading: string) => string
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  tabEnablement: any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getTabDisabledReason: (key: any) => string | null
+  location: { pathname: string }
+  navLabel: (name: string) => string
+}
 
-  const sectionHeadingLabel = (heading: string): string => {
-    if (heading === 'BACKUP') return t('navigation.sections.backup')
-    if (heading === 'SETTINGS') return t('navigation.sections.settings')
-    return heading
-  }
+function SidebarNavInner({
+  systemInfo,
+  navigationSections,
+  expandedMenus,
+  toggleMenu,
+  sectionHeadingLabel,
+  tabEnablement,
+  getTabDisabledReason,
+  location,
+  navLabel,
+}: SidebarNavInnerProps) {
+  return (
+    <div className="flex h-full flex-col overflow-y-auto">
+      {/* Brand header */}
+      <div className="px-2 py-3">
+        <SidebarBrandMark />
+      </div>
 
-  const { data: systemData } = useQuery({
-    queryKey: ['systemSettings'],
-    queryFn: async () => {
-      const response = await settingsAPI.getSystemSettings()
-      return response.data
-    },
-  })
+      <Separator className="mx-2 bg-sidebar-border" />
 
-  const showMqttNav = systemData?.settings?.mqtt_beta_enabled ?? false
+      {/* Navigation */}
+      <div className="flex-1 overflow-y-auto py-1">
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+        {navigationSections.map((section: any, sectionIndex: number) => (
+          <SidebarGroup key={section.heading || section.segment} className="py-0">
+            {section.heading && (
+              <SidebarGroupLabel className={sectionIndex === 0 ? 'mt-1' : 'mt-2'}>
+                {sectionHeadingLabel(section.heading)}
+              </SidebarGroupLabel>
+            )}
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {section.items.map((item: NavigationItem) => {
+                  const isEnabled = tabEnablement[item.key]
+                  const disabledReason = getTabDisabledReason(item.key)
 
-  const navigationSections = React.useMemo(() => {
+                  if (item.subItems) {
+                    return (
+                      <NavGroup
+                        key={item.name}
+                        name={item.name}
+                        icon={item.icon}
+                        subItems={item.subItems}
+                        isExpanded={expandedMenus[item.name] || false}
+                        onToggle={() => toggleMenu(item.name)}
+                        currentPath={location.pathname}
+                        navLabel={navLabel}
+                      />
+                    )
+                  }
+
+                  const isActive = Boolean(
+                    item.href &&
+                      (location.pathname === item.href ||
+                        location.pathname.startsWith(item.href + '/'))
+                  )
+
+                  return (
+                    <NavItem
+                      key={item.name}
+                      name={item.name}
+                      href={item.href!}
+                      icon={item.icon}
+                      isActive={isActive}
+                      isEnabled={isEnabled}
+                      disabledReason={disabledReason ?? undefined}
+                      navLabel={navLabel}
+                    />
+                  )
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
+      </div>
+
+      {/* Footer */}
+      <SidebarVersionInfo systemInfo={systemInfo} />
+    </div>
+  )
+}
+
+// Custom hook for navigation sections
+function useNavigationSections({
+  showMqttNav,
+  canManageUsers,
+  canManageLicensing,
+  canManageSystemSettings,
+  canManageMqtt,
+  canManagePackages,
+  canManageScripts,
+  canManageExportImport,
+  canManageBeta,
+  canManageMounts,
+  canManageSsh,
+}: {
+  showMqttNav: boolean
+  canManageUsers: boolean
+  canManageLicensing: boolean
+  canManageSystemSettings: boolean
+  canManageMqtt: boolean
+  canManagePackages: boolean
+  canManageScripts: boolean
+  canManageExportImport: boolean
+  canManageBeta: boolean
+  canManageMounts: boolean
+  canManageSsh: boolean
+}) {
+  return React.useMemo(() => {
     const backupItems: Array<{
       name: string
       href: string
@@ -149,7 +231,6 @@ export default function AppSidebar({ mobileOpen, onClose }: AppSidebarProps) {
       { name: 'Backup', href: '/backup', icon: FileText, key: 'backups' as const },
       { name: 'Archives', href: '/archives', icon: Archive, key: 'archives' as const },
     ]
-
     backupItems.push({ name: 'Schedule', href: '/schedule', icon: Clock, key: 'schedule' as const })
 
     return [
@@ -248,6 +329,87 @@ export default function AppSidebar({ mobileOpen, onClose }: AppSidebarProps) {
     canManageMounts,
     canManageSsh,
   ])
+}
+
+export default function AppSidebar({ mobileOpen, onClose }: AppSidebarProps) {
+  const { t } = useTranslation()
+  const location = useLocation()
+  const { hasGlobalPermission } = useAuth()
+  const canManageUsers = hasGlobalPermission('settings.users.manage')
+  const canManageLicensing = hasGlobalPermission('settings.system.manage')
+  const canManageSystemSettings = hasGlobalPermission('settings.system.manage')
+  const canManageMqtt = hasGlobalPermission('settings.mqtt.manage')
+  const canManagePackages = hasGlobalPermission('settings.packages.manage')
+  const canManageScripts = hasGlobalPermission('settings.scripts.manage')
+  const canManageExportImport = hasGlobalPermission('settings.export_import.manage')
+  const canManageBeta = hasGlobalPermission('settings.beta.manage')
+  const canManageMounts = hasGlobalPermission('settings.mounts.manage')
+  const canManageSsh = hasGlobalPermission('settings.ssh.manage')
+  const { tabEnablement, getTabDisabledReason } = useTabEnablement()
+  const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null)
+  const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({})
+
+  const navLabel = (name: string): string => {
+    const labels: Record<string, string> = {
+      Dashboard: t('navigation.items.dashboard'),
+      Activity: t('navigation.items.activity'),
+      'Remote Machines': t('navigation.items.remoteMachines'),
+      Repositories: t('navigation.items.repositories'),
+      Backup: t('navigation.items.backup'),
+      Archives: t('navigation.items.archives'),
+      Restore: t('navigation.items.restore'),
+      Schedule: t('navigation.items.schedule'),
+      Personal: t('navigation.settings.personal'),
+      System: t('navigation.settings.systemLabel'),
+      Management: t('navigation.settings.management'),
+      Advanced: t('navigation.settings.advanced'),
+      Account: t('navigation.settings.account'),
+      Appearance: t('navigation.settings.appearance'),
+      Preferences: t('navigation.settings.preferences'),
+      Notifications: t('navigation.settings.notifications'),
+      MQTT: t('navigation.settings.mqtt'),
+      Cache: t('navigation.settings.cache'),
+      Logs: t('navigation.settings.logs'),
+      Packages: t('navigation.settings.packages'),
+      Mounts: t('navigation.settings.mounts'),
+      Scripts: t('navigation.settings.scripts'),
+      Users: t('navigation.settings.users'),
+      Licensing: t('navigation.settings.licensing'),
+      'Export/Import': t('navigation.settings.exportImport'),
+      Beta: t('navigation.settings.beta'),
+    }
+    return labels[name] ?? name
+  }
+
+  const sectionHeadingLabel = (heading: string): string => {
+    if (heading === 'BACKUP') return t('navigation.sections.backup')
+    if (heading === 'SETTINGS') return t('navigation.sections.settings')
+    return heading
+  }
+
+  const { data: systemData } = useQuery({
+    queryKey: ['systemSettings'],
+    queryFn: async () => {
+      const response = await settingsAPI.getSystemSettings()
+      return response.data
+    },
+  })
+
+  const showMqttNav = systemData?.settings?.mqtt_beta_enabled ?? false
+
+  const navigationSections = useNavigationSections({
+    showMqttNav,
+    canManageUsers,
+    canManageLicensing,
+    canManageSystemSettings,
+    canManageMqtt,
+    canManagePackages,
+    canManageScripts,
+    canManageExportImport,
+    canManageBeta,
+    canManageMounts,
+    canManageSsh,
+  })
 
   // Auto-expand menus based on current route
   useEffect(() => {
@@ -297,173 +459,43 @@ export default function AppSidebar({ mobileOpen, onClose }: AppSidebarProps) {
     setExpandedMenus((prev) => ({ ...prev, [menuName]: !prev[menuName] }))
   }
 
-  const content = (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <Box>
-        <Toolbar sx={{ gap: 1.5, pl: { xs: 2, sm: 2 } }}>
-          <Box
-            component={Link}
-            to="/dashboard"
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1.5,
-              textDecoration: 'none',
-              color: 'inherit',
-              cursor: 'pointer',
-              '&:hover': { opacity: 0.8 },
-            }}
-          >
-            <Box
-              sx={{
-                width: 38,
-                height: 38,
-                borderRadius: 2,
-                background: 'linear-gradient(135deg, #065f46 0%, #059669 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '6px',
-                boxShadow: '0 4px 14px rgba(5,150,105,0.4)',
-                flexShrink: 0,
-              }}
-            >
-              <Box
-                component="img"
-                src={`${BASE_PATH}/logo.png`}
-                alt={t('layout.logoAlt')}
-                sx={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'contain',
-                  filter: 'brightness(2.2) contrast(1.1)',
-                }}
-              />
-            </Box>
-            <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                <Typography
-                  variant="overline"
-                  noWrap
-                  component="div"
-                  sx={{ fontWeight: 700, letterSpacing: '0.14em', lineHeight: 1.1 }}
-                >
-                  BorgScale
-                </Typography>
-                <Box
-                  component="span"
-                  sx={{
-                    fontSize: '0.6rem',
-                    fontWeight: 700,
-                    letterSpacing: '0.04em',
-                    px: 0.6,
-                    py: 0.2,
-                    borderRadius: 0.75,
-                    bgcolor: 'rgba(5,150,105,0.15)',
-                    border: '1px solid rgba(5,150,105,0.35)',
-                    color: '#34d399',
-                    lineHeight: 1.5,
-                    userSelect: 'none',
-                  }}
-                >
-                  2.0
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-        </Toolbar>
-        <Divider />
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-        {navigationSections.map((section: any, sectionIndex: number) => (
-          <React.Fragment key={section.heading || section.segment}>
-            {section.heading && (
-              <Typography
-                variant="caption"
-                sx={{
-                  px: 2,
-                  pt: sectionIndex === 0 ? 1.25 : 2,
-                  pb: 0.5,
-                  display: 'block',
-                  color: 'text.secondary',
-                  fontWeight: 700,
-                  fontSize: '0.625rem',
-                  letterSpacing: '0.8px',
-                  textTransform: 'uppercase',
-                }}
-              >
-                {sectionHeadingLabel(section.heading)}
-              </Typography>
-            )}
-            <List sx={{ pt: 0, pb: 0, '& .MuiListItem-root': { mb: 0.125 } }}>
-              {section.items.map((item: NavigationItem) => {
-                const isEnabled = tabEnablement[item.key]
-                const disabledReason = getTabDisabledReason(item.key)
-
-                if (item.subItems) {
-                  return (
-                    <NavGroup
-                      key={item.name}
-                      name={item.name}
-                      icon={item.icon}
-                      subItems={item.subItems}
-                      isExpanded={expandedMenus[item.name] || false}
-                      onToggle={() => toggleMenu(item.name)}
-                      currentPath={location.pathname}
-                      navLabel={navLabel}
-                    />
-                  )
-                }
-
-                const isActive = Boolean(
-                  item.href &&
-                  (location.pathname === item.href || location.pathname.startsWith(item.href + '/'))
-                )
-
-                return (
-                  <NavItem
-                    key={item.name}
-                    name={item.name}
-                    href={item.href!}
-                    icon={item.icon}
-                    isActive={isActive}
-                    isEnabled={isEnabled}
-                    disabledReason={disabledReason ?? undefined}
-                    navLabel={navLabel}
-                  />
-                )
-              })}
-            </List>
-          </React.Fragment>
-        ))}
-      </Box>
-      <SidebarVersionInfo systemInfo={systemInfo} />
-    </Box>
-  )
+  const navProps = {
+    systemInfo,
+    navigationSections,
+    expandedMenus,
+    toggleMenu,
+    sectionHeadingLabel,
+    tabEnablement,
+    getTabDisabledReason,
+    location,
+    navLabel,
+  }
 
   return (
-    <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}>
-      <Drawer
-        variant="temporary"
-        open={mobileOpen}
-        onClose={onClose}
-        ModalProps={{ keepMounted: true }}
-        sx={{
-          display: { xs: 'block', sm: 'none' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-        }}
-      >
-        {content}
-      </Drawer>
-      <Drawer
-        variant="permanent"
-        sx={{
-          display: { xs: 'none', sm: 'block' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-        }}
-        open
-      >
-        {content}
-      </Drawer>
-    </Box>
+    <SidebarProvider defaultOpen>
+      <nav aria-label="Application navigation">
+        {/* Desktop permanent sidebar */}
+        <div className="hidden w-60 shrink-0 sm:block">
+          <div className="fixed inset-y-0 left-0 z-10 flex w-60 flex-col border-r border-sidebar-border bg-sidebar">
+            <SidebarNavInner {...navProps} />
+          </div>
+        </div>
+
+        {/* Mobile overlay via Sheet */}
+        <Sheet open={mobileOpen} onOpenChange={(open) => { if (!open) onClose() }}>
+          <SheetContent
+            side="left"
+            className="w-60 p-0 bg-sidebar text-sidebar-foreground"
+            showCloseButton={false}
+          >
+            <SheetHdr className="sr-only">
+              <SheetTitle>Navigation</SheetTitle>
+              <SheetDescription>Application navigation sidebar</SheetDescription>
+            </SheetHdr>
+            <SidebarNavInner {...navProps} />
+          </SheetContent>
+        </Sheet>
+      </nav>
+    </SidebarProvider>
   )
 }

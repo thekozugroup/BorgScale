@@ -16,9 +16,7 @@ import {
   isPasskeyPromptSnoozed,
   snoozePasskeyPrompt,
 } from '../utils/passkeyPrompt'
-import { Box, Container, Toolbar } from '@mui/material'
 
-const drawerWidth = 240
 type ActivePostLoginSurface = 'passkey' | 'announcement' | null
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -87,29 +85,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       : null
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <AppHeader onToggleMobileMenu={() => setMobileOpen(!mobileOpen)} />
-
+    <div className="flex min-h-screen">
       <AppSidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
 
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          minWidth: 0,
-          px: { xs: 1.5, sm: 2.5, md: 3 },
-          py: { xs: 2, sm: 3 },
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          minHeight: '100vh',
-          backgroundColor: 'background.default',
-        }}
-      >
-        <Toolbar />
-        <Container maxWidth="xl" sx={{ mt: { xs: 1, sm: 2 }, px: { xs: 0, sm: 1 } }}>
-          {children}
-        </Container>
-        <Footer />
-      </Box>
+      <div className="flex flex-1 flex-col min-w-0">
+        <AppHeader onToggleMobileMenu={() => setMobileOpen(!mobileOpen)} />
+
+        <main className="flex-1 px-4 py-6 pt-20 sm:px-6 sm:py-8 sm:pt-20 md:px-8 bg-background">
+          <div className="mx-auto max-w-screen-xl">
+            {children}
+          </div>
+          <Footer />
+        </main>
+      </div>
 
       <AnnouncementModal
         announcement={announcement}
@@ -124,6 +112,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         onIgnore={handlePasskeyPromptIgnore}
         onSuccess={handlePasskeyPromptSuccess}
       />
-    </Box>
+    </div>
   )
 }
