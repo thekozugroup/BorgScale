@@ -150,22 +150,12 @@ Constraints:
   colour palette in v1). References: <https://ui.shadcn.com/>,
   <https://ui.shadcn.com/docs/components>, <https://ui.shadcn.com/blocks>,
   <https://ui.shadcn.com/charts/area>.
-- The branding "logo" position is filled by a single
-  [Lucide](https://lucide.dev/icons/) or
-  [Radix Icons](https://www.radix-ui.com/icons) glyph. Final pick is
-  TBD pending user choice from the candidate shortlist below.
-- Icon candidate shortlist (lucide unless noted):
-  - `boxes` — stacked archives, evokes deduplicated dedup chunks
-  - `layers-3` — versioned snapshots, layered concept
-  - `archive-restore` — emphasises restore capability
-  - `shield-check` — integrity / safety framing
-  - `database-backup` — explicit tool-of-domain
-  - `network` — multi-host topology
-  - `git-branch` — versioning analogue
-  - `compass` — generic but elegant; pairs with "BorgScale" name
-  - `scale` (lucide `scaling`) — literal name match
-- Icon must work as 16px, 24px, and 64px favicon. Stroke-only Lucide
-  icons cleanly satisfy that.
+- The branding "logo" position is filled by the **lucide `boxes`**
+  glyph (selected by the user 2026-04-30). Stacked-cubes mark evokes
+  deduplicated chunks. Used at 16/24/64 px (favicon, sidebar, hero).
+- Use it via `<Boxes />` from `lucide-react` (already present in the
+  upstream dependency set). Favicon generated from the same SVG path
+  for consistency.
 
 Migration order (each step ships behind a feature flag, then enabled):
 
@@ -348,13 +338,13 @@ Phase 3 (~120 files):
 
 ## Open questions (resolved)
 
-- Phase 3 visual identity: black/white shadcn stock theme. Confirmed.
-- Phase 3 logo: TBD — user picks from the lucide/radix candidate
-  shortlist above. (Spec will be amended in place once selected.)
+- Phase 3 visual identity: black/white shadcn stock theme. Confirmed
+  2026-04-30.
+- Phase 3 logo: `lucide:boxes`. Confirmed 2026-04-30.
+- Spec review gate: must be graded 100/100 by a critic agent before
+  any implementation work begins; the user has pre-approved that gate
+  outcome and does not need to re-confirm.
 
 ## Open questions (still pending)
 
-- None blocking writing-plans. Logo selection is the only outstanding
-  user input; Phase 3 work can begin in parallel with that decision
-  because the icon is one variable in one component
-  (`AppHeader/Sidebar`).
+- None.
