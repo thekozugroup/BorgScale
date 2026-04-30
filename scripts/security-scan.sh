@@ -58,10 +58,21 @@ else
   echo "frontend lockfile missing; skipping npm audit"
 fi
 
-# Optional Docker smoke test
-if [ "${BORGSCALE_DOCKER_SMOKE:-}" = "1" ]; then
-  echo "==> Docker smoke test"
-  docker run --network none --rm borg-ui:latest echo "smoke ok"
+if [ "${BORGSCALE_DOCKER_SMOKE:-0}" = "1" ]; then
+  echo "==> 5/5 docker --network none smoke"
+  docker build -t borgscale:smoke .
+  CID=$(docker run -d --rm --network none borgscale:smoke)
+  trap 'docker stop "$CID" >/dev/null 2>&1 || true' EXIT
+  for _ in $(seq 1 30); do
+    if docker exec "$CID" curl -fsS http://127.0.0.1:8081/api/health >/dev/null 2>&1; then
+      echo "  container healthy"
+      break
+    fi
+    sleep 1
+  done
+  docker exec "$CID" curl -fsS http://127.0.0.1:8081/api/health >/dev/null
+  docker stop "$CID" >/dev/null
+  trap - EXIT
 fi
 
 echo "OK"
