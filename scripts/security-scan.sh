@@ -19,7 +19,7 @@ else
 fi
 
 echo "==> 2/4 outbound-URL allowlist scan"
-ALLOW='github\.com|ghcr\.io|127\.0\.0\.1|localhost|tailscale\.com|docker\.io|pypi\.org|npmjs\.org|npm\.pkg\.github\.com|lucide\.dev|ui\.shadcn\.com|gnu\.org|borgbackup\.readthedocs\.io|impeccable\.style|w3\.org|anthropic\.com|opencollective\.com|paulmillr\.com|paypal\.me|polar\.sh|dotenvx\.com|fontsource\.org|radix-ui\.com|vaul\.emilkowal\.ski|cmdk\.dev'
+ALLOW='github\.com|ghcr\.io|127\.0\.0\.1|localhost|tailscale\.com|docker\.io|pypi\.org|npmjs\.org|npm\.pkg\.github\.com|lucide\.dev|ui\.shadcn\.com|gnu\.org|borgbackup\.readthedocs\.io|impeccable\.style|w3\.org|anthropic\.com|opencollective\.com|paulmillr\.com|paypal\.me|polar\.sh|dotenvx\.com|fontsource\.org|radix-ui\.com|vaul\.emilkowal\.ski|cmdk\.dev|tidelift\.com'
 
 if [ -n "$STAGED" ]; then
   # Developer pre-push: scan staged diff
