@@ -1134,12 +1134,8 @@ async def get_preferences(current_user: User = Depends(get_current_user)):
     return {
         "success": True,
         "preferences": {
-            "analytics_enabled": current_user.analytics_enabled
-            if hasattr(current_user, "analytics_enabled")
-            else True,
-            "analytics_consent_given": current_user.analytics_consent_given
-            if hasattr(current_user, "analytics_consent_given")
-            else False,
+            "analytics_enabled": False,
+            "analytics_consent_given": False,
         },
     }
 
@@ -1152,10 +1148,9 @@ async def update_preferences(
 ):
     """Update current user's preferences"""
     try:
-        if preferences.analytics_enabled is not None:
-            current_user.analytics_enabled = preferences.analytics_enabled
-        if preferences.analytics_consent_given is not None:
-            current_user.analytics_consent_given = preferences.analytics_consent_given
+        # BorgScale: analytics fields are accepted for back-compat but ignored.
+        _ = preferences.analytics_enabled
+        _ = preferences.analytics_consent_given
 
         current_user.updated_at = datetime.utcnow()
         db.commit()

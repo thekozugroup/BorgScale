@@ -6,6 +6,10 @@ the user has seen and responded to the analytics consent banner.
 Changes analytics from opt-out to opt-in model.
 """
 
+# DEPRECATED in BorgScale (fork of borg-ui): the analytics columns
+# created here are no longer read or written. The migration runs
+# unchanged to preserve historical replay; new schema work goes in
+# migration 100+.
 from sqlalchemy import text
 
 
