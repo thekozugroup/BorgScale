@@ -10,6 +10,7 @@ import os
 from dotenv import load_dotenv
 
 from app.api import (
+    about as about_routes,
     auth,
     dashboard,
     backup,
@@ -216,6 +217,7 @@ app.include_router(tokens.router, prefix="/api")
 app.include_router(permissions.router, prefix="/api")
 
 app.include_router(v2_router, prefix="/api/v2")  # Borg 2 versioned API
+app.include_router(about_routes.router, prefix="/api", tags=["about"])
 
 
 @app.on_event("startup")
