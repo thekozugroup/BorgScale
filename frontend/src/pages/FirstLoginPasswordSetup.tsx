@@ -7,6 +7,9 @@ import { useAuth } from '../hooks/useAuth'
 import { useAnalytics } from '../hooks/useAnalytics'
 import { getApiErrorDetail } from '../utils/apiErrors'
 import { translateBackendKey } from '../utils/translateBackendKey'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 /**
  * Card content shown inside the Login page's AuthLayout when the user
@@ -93,184 +96,84 @@ export default function PasswordSetupCard({ onComplete }: { onComplete: () => vo
   return (
     <>
       {/* Heading */}
-      <div style={{ marginBottom: 28 }}>
-        <h2
-          style={{
-            fontSize: '1.375rem',
-            fontWeight: 600,
-            color: '#f1f5f9',
-            margin: '0 0 6px',
-            letterSpacing: '-0.01em',
-          }}
-        >
+      <div className="mb-7">
+        <h2 className="text-[1.375rem] font-semibold tracking-tight text-foreground mb-1.5">
           {t('firstLoginSetup.title')}
         </h2>
-        <p style={{ margin: 0, fontSize: 14, color: '#64748b' }}>
-          {t('firstLoginSetup.description')}
-        </p>
+        <p className="text-sm text-muted-foreground">{t('firstLoginSetup.description')}</p>
       </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit} noValidate>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <div className="flex flex-col gap-[18px]">
           {/* New password */}
-          <div>
-            <label
-              htmlFor="new-password"
-              style={{
-                display: 'block',
-                fontSize: 13,
-                fontWeight: 500,
-                color: '#94a3b8',
-                marginBottom: 6,
-                letterSpacing: '0.01em',
-              }}
-            >
-              {t('settings.password.new')}
-            </label>
-            <div style={{ position: 'relative' }}>
-              <input
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="new-password">{t('settings.password.new')}</Label>
+            <div className="relative">
+              <Input
                 id="new-password"
                 type={showNewPassword ? 'text' : 'password'}
                 autoComplete="new-password"
                 placeholder="••••••••"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="borg-card-input"
-                style={{ paddingRight: 42 }}
+                className="pr-10"
               />
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 onClick={() => setShowNewPassword((v) => !v)}
                 aria-label={showNewPassword ? 'Hide password' : 'Show password'}
-                style={{
-                  position: 'absolute',
-                  right: 12,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: '#64748b',
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: 4,
-                  borderRadius: 4,
-                  transition: 'color 0.15s ease',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#94a3b8')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#64748b')}
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground hover:text-foreground"
               >
                 {showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
+              </Button>
             </div>
           </div>
 
           {/* Confirm password */}
-          <div>
-            <label
-              htmlFor="confirm-password"
-              style={{
-                display: 'block',
-                fontSize: 13,
-                fontWeight: 500,
-                color: '#94a3b8',
-                marginBottom: 6,
-                letterSpacing: '0.01em',
-              }}
-            >
-              {t('settings.password.confirm')}
-            </label>
-            <div style={{ position: 'relative' }}>
-              <input
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="confirm-password">{t('settings.password.confirm')}</Label>
+            <div className="relative">
+              <Input
                 id="confirm-password"
                 type={showConfirmPassword ? 'text' : 'password'}
                 autoComplete="new-password"
                 placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className={`borg-card-input${passwordsMismatch ? ' error' : ''}`}
-                style={{ paddingRight: 42 }}
+                className="pr-10"
+                aria-invalid={passwordsMismatch ? true : undefined}
               />
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon"
                 onClick={() => setShowConfirmPassword((v) => !v)}
                 aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-                style={{
-                  position: 'absolute',
-                  right: 12,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: '#64748b',
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: 4,
-                  borderRadius: 4,
-                  transition: 'color 0.15s ease',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#94a3b8')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#64748b')}
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground hover:text-foreground"
               >
                 {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
+              </Button>
             </div>
             {passwordsMismatch && (
-              <p style={{ margin: '5px 0 0', fontSize: 12, color: '#f87171' }} role="alert">
+              <p className="text-xs text-destructive mt-0.5" role="alert">
                 {t('settings.password.noMatch')}
               </p>
             )}
           </div>
 
           {/* Primary action */}
-          <button
+          <Button
             type="submit"
             disabled={!canSubmit}
-            style={{
-              marginTop: 4,
-              width: '100%',
-              padding: '11px 20px',
-              borderRadius: 8,
-              border: 'none',
-              background: !canSubmit
-                ? 'rgba(0,221,0,0.25)'
-                : isLoading
-                  ? 'rgba(0,221,0,0.4)'
-                  : 'linear-gradient(135deg, #00dd00 0%, #00b800 100%)',
-              color: !canSubmit ? 'rgba(0,0,0,0.4)' : '#000',
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: !canSubmit ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              transition: 'opacity 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease',
-              fontFamily: 'inherit',
-              letterSpacing: '0.01em',
-              boxShadow: canSubmit ? '0 4px 16px rgba(0,221,0,0.25)' : 'none',
-            }}
-            onMouseEnter={(e) => {
-              if (canSubmit) {
-                e.currentTarget.style.opacity = '0.9'
-                e.currentTarget.style.transform = 'translateY(-1px)'
-                e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,221,0,0.35)'
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = '1'
-              e.currentTarget.style.transform = 'translateY(0)'
-              e.currentTarget.style.boxShadow = canSubmit ? '0 4px 16px rgba(0,221,0,0.25)' : 'none'
-            }}
-            onMouseDown={(e) => {
-              if (canSubmit) e.currentTarget.style.transform = 'translateY(0)'
-            }}
+            className="mt-1 w-full"
+            size="lg"
           >
             {isLoading ? (
               <>
-                <Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />
+                <Loader2 className="animate-spin" size={15} />
                 {t('login.submitting')}
               </>
             ) : (
@@ -279,33 +182,31 @@ export default function PasswordSetupCard({ onComplete }: { onComplete: () => vo
                 <ArrowRight size={15} />
               </>
             )}
-          </button>
+          </Button>
 
           {/* Skip */}
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={handleSkip}
             disabled={isLoading}
-            style={{
-              width: '100%',
-              padding: '11px 20px',
-              borderRadius: 8,
-              border: '1px solid rgba(255,255,255,0.12)',
-              background: 'transparent',
-              color: '#cbd5e1',
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: isLoading ? 'not-allowed' : 'pointer',
-              fontFamily: 'inherit',
-            }}
+            className="w-full"
+            size="lg"
           >
-            {skipSetupMutation.isPending ? 'Loading...' : t('firstLoginSetup.skip')}
-          </button>
+            {skipSetupMutation.isPending ? (
+              <>
+                <Loader2 className="animate-spin" size={15} />
+                {t('login.submitting')}
+              </>
+            ) : (
+              t('firstLoginSetup.skip')
+            )}
+          </Button>
         </div>
       </form>
 
       {/* Skip hint */}
-      <p style={{ margin: '16px 0 0', fontSize: 12, color: '#4a5568', textAlign: 'center' }}>
+      <p className="mt-4 text-xs text-muted-foreground text-center">
         {t('firstLoginSetup.skipHint')}
       </p>
     </>
