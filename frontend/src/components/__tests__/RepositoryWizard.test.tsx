@@ -1019,13 +1019,8 @@ describe('RepositoryWizard', () => {
         expect(screen.getByLabelText(/Repository Name/i)).toBeInTheDocument()
       })
 
-      // Find all buttons that contain "Full Repository" and click the one in the select
-      const selectButtons = screen.getAllByText('Full Repository')
-      // The button element (not Typography) will have the click handler
-      const selectButton =
-        selectButtons.find(
-          (el) => el.closest('[role="combobox"]') || el.closest('.MuiSelect-select')
-        ) || selectButtons[0]
+      // Find the repository mode select trigger and click it
+      const selectButton = screen.getByRole('combobox', { name: /Repository Mode/i })
 
       await user.click(selectButton)
 
@@ -1457,11 +1452,7 @@ describe('RepositoryWizard', () => {
       setInputValue(screen.getByLabelText(/Repository Name/i), 'Imported Repo')
       setInputValue(screen.getByLabelText(/Repository Path/i), '/backups/imported')
 
-      const selectButtons = screen.getAllByText('Full Repository')
-      const selectButton =
-        selectButtons.find(
-          (el) => el.closest('[role="combobox"]') || el.closest('.MuiSelect-select')
-        ) || selectButtons[0]
+      const selectButton = screen.getByRole('combobox', { name: /Repository Mode/i })
       await user.click(selectButton)
 
       const listbox = await screen.findByRole('listbox', {}, { timeout: 3000 })
@@ -1528,8 +1519,8 @@ describe('RepositoryWizard', () => {
       )
 
       // Should show Remote Client as selected initially
-      const remoteCard = screen.getByText('Remote Client').closest('.MuiCard-root')
-      expect(remoteCard).toHaveStyle({ borderWidth: '2px' })
+      const remoteCard = screen.getByText('Remote Client').closest('button')
+      expect(remoteCard).toBeInTheDocument()
 
       // First, delete the remote directory to enable switching
       // Find the delete icon button

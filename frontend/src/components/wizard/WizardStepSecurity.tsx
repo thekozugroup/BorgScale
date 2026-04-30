@@ -1,21 +1,18 @@
 import { useState } from 'react'
-import {
-  Box,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Typography,
-  Alert,
-  Button,
-  ToggleButton,
-  ToggleButtonGroup,
-  InputAdornment,
-  IconButton,
-} from '@mui/material'
 import { Shield, Key, FileKey, Upload, FileText, Eye, EyeOff } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { cn } from '@/lib/utils'
+import { Textarea } from '@/components/ui/textarea'
 
 export interface SecurityStepData {
   encryption: string
@@ -24,7 +21,6 @@ export interface SecurityStepData {
   selectedKeyfile: File | null
 }
 
-// Encryption options grouped by borg version — defined once, used in the Select below
 const BORG1_ENCRYPTION_OPTIONS = [
   { value: 'repokey', label: 'Repository Key', desc: 'Key stored in repository (recommended)' },
   { value: 'repokey-blake2', label: 'Repository Key (BLAKE2)', desc: 'Faster hashing variant' },
@@ -71,13 +67,6 @@ export default function WizardStepSecurity({
   const [keyfileText, setKeyfileText] = useState('')
   const [showPassphrase, setShowPassphrase] = useState(false)
 
-  const handleKeyfileModeChange = (_: unknown, newMode: 'file' | 'paste' | null) => {
-    if (newMode === null) return
-    setKeyfileMode(newMode)
-    setKeyfileText('')
-    onChange({ selectedKeyfile: null })
-  }
-
   const handleKeyfileTextChange = (text: string) => {
     setKeyfileText(text)
     if (text.trim()) {
@@ -93,38 +82,40 @@ export default function WizardStepSecurity({
   const isKeyfileEncryption = data.encryption.includes('keyfile')
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <div className="flex flex-col gap-4">
       {/* Encryption Selection - create and import mode */}
       {(mode === 'create' || mode === 'import') && (
         <>
-          <FormControl fullWidth>
-            <InputLabel>{t('wizard.security.encryptionMethodLabel')}</InputLabel>
+          <div className="flex flex-col gap-1.5">
+            {mode === 'create' && (
+              <Label htmlFor="encryption-method">
+                {t('wizard.security.encryptionMethodLabel')}
+              </Label>
+            )}
             <Select
               value={data.encryption}
-              label={t('wizard.security.encryptionMethodLabel')}
-              onChange={(e) => onChange({ encryption: e.target.value })}
+              onValueChange={(v) => onChange({ encryption: v })}
             >
-              {encryptionOptions.map((opt) => (
-                <MenuItem key={opt.value} value={opt.value}>
-                  <Box>
-                    <Typography variant="body2" fontWeight={600}>
-                      {opt.label}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {opt.desc}
-                    </Typography>
-                  </Box>
-                </MenuItem>
-              ))}
+              <SelectTrigger id={mode === 'create' ? 'encryption-method' : undefined} className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {encryptionOptions.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    <div>
+                      <div className="text-sm font-semibold">{opt.label}</div>
+                      <div className="text-xs text-muted-foreground">{opt.desc}</div>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
-          </FormControl>
+          </div>
 
           {data.encryption === 'none' && (
-            <Alert severity="warning">
-              <Typography variant="body2" fontWeight={600} gutterBottom>
-                {t('wizard.security.securityWarningTitle')}
-              </Typography>
-              <Typography variant="body2">{t('wizard.security.securityWarningBody')}</Typography>
+            <Alert variant="destructive">
+              <AlertTitle>{t('wizard.security.securityWarningTitle')}</AlertTitle>
+              <AlertDescription>{t('wizard.security.securityWarningBody')}</AlertDescription>
             </Alert>
           )}
         </>
@@ -132,152 +123,158 @@ export default function WizardStepSecurity({
 
       {/* Encryption info for edit mode only */}
       {mode === 'edit' && (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-          <Shield size={14} style={{ color: 'inherit', opacity: 0.45, flexShrink: 0 }} />
-          <Typography variant="body2" color="text.secondary">
-            {t('wizard.security.encryptionReadonly')}
-          </Typography>
-        </Box>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Shield size={14} className="opacity-45 shrink-0" />
+          <span>{t('wizard.security.encryptionReadonly')}</span>
+        </div>
       )}
 
       {/* Passphrase Input */}
       {data.encryption !== 'none' && (
-        <TextField
-          label={
-            mode === 'edit'
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="passphrase">
+            {mode === 'edit'
               ? t('wizard.security.passphraseOptional')
-              : t('wizard.security.passphraseRequired')
-          }
-          type={showPassphrase ? 'text' : 'password'}
-          value={data.passphrase}
-          onChange={(e) => onChange({ passphrase: e.target.value })}
-          placeholder={
-            mode === 'edit'
-              ? t('wizard.security.passphrasePlaceholderEdit')
-              : t('wizard.security.passphrasePlaceholderCreate')
-          }
-          required={mode !== 'edit'}
-          fullWidth
-          helperText={
-            mode === 'edit'
+              : t('wizard.security.passphraseRequired')}
+          </Label>
+          <div className="relative flex items-center">
+            <span className="absolute left-2.5 text-muted-foreground pointer-events-none">
+              <Key size={16} />
+            </span>
+            <Input
+              id="passphrase"
+              type={showPassphrase ? 'text' : 'password'}
+              value={data.passphrase}
+              onChange={(e) => onChange({ passphrase: e.target.value })}
+              placeholder={
+                mode === 'edit'
+                  ? t('wizard.security.passphrasePlaceholderEdit')
+                  : t('wizard.security.passphrasePlaceholderCreate')
+              }
+              required={mode !== 'edit'}
+              className="pl-8 pr-9"
+              aria-label={
+                mode === 'edit'
+                  ? t('wizard.security.passphraseOptional')
+                  : t('wizard.security.passphraseRequired')
+              }
+            />
+            <button
+              type="button"
+              aria-label={showPassphrase ? 'Hide passphrase' : 'Show passphrase'}
+              onClick={() => setShowPassphrase((v) => !v)}
+              className="absolute right-2.5 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {showPassphrase ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {mode === 'edit'
               ? t('wizard.security.passphraseHelperEdit')
-              : t('wizard.security.passphraseHelperCreate')
-          }
-          InputProps={{
-            startAdornment: (
-              <Box sx={{ mr: 1, display: 'flex', color: 'text.secondary' }}>
-                <Key size={18} />
-              </Box>
-            ),
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label={showPassphrase ? 'Hide passphrase' : 'Show passphrase'}
-                  onClick={() => setShowPassphrase((v) => !v)}
-                  edge="end"
-                  size="small"
-                >
-                  {showPassphrase ? <EyeOff size={18} /> : <Eye size={18} />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
+              : t('wizard.security.passphraseHelperCreate')}
+          </p>
+        </div>
       )}
 
       {/* Keyfile Upload - import mode only, and only when encryption is keyfile-based */}
       {mode === 'import' && isKeyfileEncryption && (
-        <Box>
-          <Typography
-            variant="subtitle2"
-            gutterBottom
-            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <FileKey size={18} />
-            {t('wizard.security.borgKeyfileTitle')}
-          </Typography>
-          <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1.5 }}>
-            {t('wizard.security.borgKeyfileDesc')}
-          </Typography>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <FileKey size={16} />
+            <span>{t('wizard.security.borgKeyfileTitle')}</span>
+          </div>
+          <p className="text-xs text-muted-foreground">{t('wizard.security.borgKeyfileDesc')}</p>
 
-          <ToggleButtonGroup
-            value={keyfileMode}
-            exclusive
-            onChange={handleKeyfileModeChange}
-            size="small"
-            sx={{ mb: 1.5 }}
-          >
-            <ToggleButton value="file">
-              <Upload size={16} style={{ marginRight: 6 }} />
-              {t('wizard.security.uploadFile')}
-            </ToggleButton>
-            <ToggleButton value="paste">
-              <FileText size={16} style={{ marginRight: 6 }} />
-              {t('wizard.security.pasteContent')}
-            </ToggleButton>
-          </ToggleButtonGroup>
+          {/* Toggle buttons: Upload File / Paste Content */}
+          <div className="flex p-0.5 bg-muted rounded-lg gap-0.5 w-fit">
+            {(['file', 'paste'] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => {
+                  setKeyfileMode(m)
+                  setKeyfileText('')
+                  onChange({ selectedKeyfile: null })
+                }}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1 rounded-md text-xs transition-all',
+                  keyfileMode === m
+                    ? 'bg-background text-foreground shadow font-semibold'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                {m === 'file' ? (
+                  <>
+                    <Upload size={14} />
+                    {t('wizard.security.uploadFile')}
+                  </>
+                ) : (
+                  <>
+                    <FileText size={14} />
+                    {t('wizard.security.pasteContent')}
+                  </>
+                )}
+              </button>
+            ))}
+          </div>
 
           {keyfileMode === 'file' ? (
-            <Button
-              variant="outlined"
-              component="label"
-              fullWidth
-              startIcon={<FileKey size={18} />}
-              sx={{
-                justifyContent: 'flex-start',
-                py: 1.5,
-                borderStyle: 'dashed',
-                '&:hover': {
-                  borderStyle: 'solid',
-                },
-              }}
+            <label
+              className={cn(
+                'flex items-center gap-2 px-3 py-3 border-2 border-dashed rounded-lg cursor-pointer text-sm',
+                'text-muted-foreground hover:border-foreground/30 hover:text-foreground transition-colors'
+              )}
             >
-              {data.selectedKeyfile
-                ? t('wizard.security.selectedKeyfile', { name: data.selectedKeyfile.name })
-                : t('wizard.security.chooseKeyfile')}
+              <FileKey size={18} />
+              <span>
+                {data.selectedKeyfile
+                  ? t('wizard.security.selectedKeyfile', { name: data.selectedKeyfile.name })
+                  : t('wizard.security.chooseKeyfile')}
+              </span>
               <input
                 type="file"
-                hidden
+                className="hidden"
                 onChange={(e) => {
                   if (e.target.files && e.target.files[0]) {
                     onChange({ selectedKeyfile: e.target.files[0] })
                   }
                 }}
               />
-            </Button>
+            </label>
           ) : (
-            <TextField
-              multiline
+            <Textarea
               rows={6}
-              fullWidth
               placeholder="BORG_KEY ..."
               value={keyfileText}
               onChange={(e) => handleKeyfileTextChange(e.target.value)}
-              inputProps={{
-                style: { fontFamily: 'monospace', fontSize: '0.85rem' },
-              }}
+              className="font-mono text-xs"
             />
           )}
 
           {data.selectedKeyfile && (
-            <Alert severity="success" sx={{ mt: 1.5 }}>
-              {keyfileMode === 'file'
-                ? t('wizard.security.keyfileUploadNote')
-                : t('wizard.security.keyfileContentNote')}
+            <Alert>
+              <AlertDescription>
+                {keyfileMode === 'file'
+                  ? t('wizard.security.keyfileUploadNote')
+                  : t('wizard.security.keyfileContentNote')}
+              </AlertDescription>
             </Alert>
           )}
-        </Box>
+        </div>
       )}
 
       {/* Remote Path */}
-      <TextField
-        label={t('wizard.security.remoteBorgPath')}
-        value={data.remotePath}
-        onChange={(e) => onChange({ remotePath: e.target.value })}
-        placeholder={borgVersion === 2 ? '/usr/local/bin/borg2' : '/usr/local/bin/borg'}
-        fullWidth
-        helperText={t('wizard.security.remoteBorgPathHelper')}
-      />
-    </Box>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="remote-borg-path">{t('wizard.security.remoteBorgPath')}</Label>
+        <Input
+          id="remote-borg-path"
+          value={data.remotePath}
+          onChange={(e) => onChange({ remotePath: e.target.value })}
+          placeholder={borgVersion === 2 ? '/usr/local/bin/borg2' : '/usr/local/bin/borg'}
+          aria-label={t('wizard.security.remoteBorgPath')}
+        />
+        <p className="text-xs text-muted-foreground">{t('wizard.security.remoteBorgPathHelper')}</p>
+      </div>
+    </div>
   )
 }

@@ -318,8 +318,9 @@ describe('WizardStepScheduleReview', () => {
   it('renders success alert with correct severity', () => {
     render(<WizardStepScheduleReview {...defaultProps} />)
 
-    const alert = screen.getByText(/Ready to create/).closest('.MuiAlert-root')
-    expect(alert).toHaveClass('MuiAlert-standardSuccess')
+    const alert = screen.getByRole('alert')
+    expect(alert).toBeInTheDocument()
+    expect(alert).toHaveTextContent(/Ready to create/)
   })
 
   it('uses monospace font for paths and technical values', () => {

@@ -1,6 +1,9 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { TextField, Stack, Alert } from '@mui/material'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import MultiRepositorySelector from '../../MultiRepositorySelector'
 import { Repository } from '../../../types'
 
@@ -24,39 +27,35 @@ const WizardStepBasicInfo: React.FC<WizardStepBasicInfoProps> = ({
   const { t } = useTranslation()
 
   return (
-    <Stack spacing={2}>
-      <TextField
-        label={t('wizard.scheduleWizard.basicInfo.jobNameLabel')}
-        value={data.name}
-        onChange={(e) => onChange({ name: e.target.value })}
-        required
-        fullWidth
-        placeholder={t('wizard.scheduleWizard.basicInfo.jobNamePlaceholder')}
-        size="medium"
-        InputProps={{
-          sx: { fontSize: '1.1rem' },
-        }}
-        InputLabelProps={{
-          sx: { fontSize: '1.1rem' },
-        }}
-      />
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="job-name">
+          {t('wizard.scheduleWizard.basicInfo.jobNameLabel')} *
+        </Label>
+        <Input
+          id="job-name"
+          value={data.name}
+          onChange={(e) => onChange({ name: e.target.value })}
+          required
+          placeholder={t('wizard.scheduleWizard.basicInfo.jobNamePlaceholder')}
+          className="text-base"
+          aria-label={t('wizard.scheduleWizard.basicInfo.jobNameLabel')}
+        />
+      </div>
 
-      <TextField
-        label={t('wizard.scheduleWizard.basicInfo.descriptionLabel')}
-        value={data.description}
-        onChange={(e) => onChange({ description: e.target.value })}
-        multiline
-        rows={2}
-        placeholder={t('wizard.scheduleWizard.basicInfo.descriptionPlaceholder')}
-        fullWidth
-        size="medium"
-        InputProps={{
-          sx: { fontSize: '1.1rem' },
-        }}
-        InputLabelProps={{
-          sx: { fontSize: '1.1rem' },
-        }}
-      />
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="job-description">
+          {t('wizard.scheduleWizard.basicInfo.descriptionLabel')}
+        </Label>
+        <Textarea
+          id="job-description"
+          value={data.description}
+          onChange={(e) => onChange({ description: e.target.value })}
+          placeholder={t('wizard.scheduleWizard.basicInfo.descriptionPlaceholder')}
+          rows={2}
+          className="text-base resize-none"
+        />
+      </div>
 
       <MultiRepositorySelector
         repositories={repositories}
@@ -72,11 +71,13 @@ const WizardStepBasicInfo: React.FC<WizardStepBasicInfoProps> = ({
       />
 
       {data.repositoryIds.length === 0 && (
-        <Alert severity="warning" sx={{ py: 0.5 }}>
-          {t('wizard.scheduleWizard.basicInfo.selectAtLeastOne')}
+        <Alert>
+          <AlertDescription>
+            {t('wizard.scheduleWizard.basicInfo.selectAtLeastOne')}
+          </AlertDescription>
         </Alert>
       )}
-    </Stack>
+    </div>
   )
 }
 

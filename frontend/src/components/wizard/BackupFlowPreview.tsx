@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { Box, Typography, Tooltip, useTheme, alpha } from '@mui/material'
 import { Server, Cloud, HardDrive, Laptop, ArrowRight, MoveRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
@@ -19,138 +18,68 @@ interface BackupFlowPreviewProps {
   sourceSshConnection?: SSHConnection | null
 }
 
-const BLUE = '#3b82f6'
-const EMERALD = '#10b981'
-const AMBER = '#f59e0b'
-
-// Compact horizontal node card: [icon badge] label / subtitle
+// Compact horizontal node card
 function FlowNode({
   icon,
   label,
   subtitle,
-  accentColor,
   path,
+  colorClass,
+  bgClass,
 }: {
   icon: ReactNode
   label: string
   subtitle?: string
-  accentColor: string
   path?: string
+  colorClass: string
+  bgClass: string
 }) {
-  const theme = useTheme()
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 1,
-        flex: 1,
-        minWidth: 0,
-        overflow: 'hidden',
-        borderRadius: 1.5,
-        bgcolor: alpha(accentColor, theme.palette.mode === 'dark' ? 0.1 : 0.07),
-        px: 1.25,
-        py: 1,
-      }}
-    >
+    <div className={`flex items-center gap-2 flex-1 min-w-0 overflow-hidden rounded-lg px-3 py-2 ${bgClass}`}>
       {/* Icon badge */}
-      <Box
-        sx={{
-          width: 32,
-          height: 32,
-          borderRadius: '9px',
-          bgcolor: alpha(accentColor, 0.18),
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: accentColor,
-          flexShrink: 0,
-        }}
-      >
+      <div className={`w-8 h-8 rounded-[9px] flex items-center justify-center shrink-0 ${colorClass}`}>
         {icon}
-      </Box>
+      </div>
 
       {/* Text */}
-      <Box sx={{ minWidth: 0, overflow: 'hidden' }}>
-        <Tooltip title={label} placement="top" disableHoverListener={label.length < 16}>
-          <Typography
-            variant="body2"
-            fontWeight={600}
-            fontSize="0.78rem"
-            noWrap
-            sx={{ color: 'text.primary' }}
-          >
-            {label}
-          </Typography>
-        </Tooltip>
+      <div className="min-w-0 overflow-hidden">
+        <p
+          className="text-sm font-semibold leading-tight text-foreground truncate"
+          title={label}
+        >
+          {label}
+        </p>
         {subtitle && (
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            fontSize="0.68rem"
-            display="block"
-            noWrap
-          >
-            {subtitle}
-          </Typography>
+          <p className="text-xs text-muted-foreground leading-tight truncate">{subtitle}</p>
         )}
         {path && (
-          <Tooltip title={path} placement="bottom">
-            <Typography
-              variant="caption"
-              fontFamily="monospace"
-              fontSize="0.65rem"
-              noWrap
-              display="block"
-              sx={{
-                color: accentColor,
-                opacity: 0.85,
-                cursor: 'default',
-                mt: 0.15,
-              }}
-            >
-              {path}
-            </Typography>
-          </Tooltip>
+          <p
+            className="text-xs font-mono truncate leading-tight text-blue-600 dark:text-blue-400 opacity-85 cursor-default mt-0.5"
+            title={path}
+          >
+            {path}
+          </p>
         )}
-      </Box>
-    </Box>
+      </div>
+    </div>
   )
 }
 
-// Dashed connector between nodes
+// Dashed connector
 function Connector({ double = false }: { double?: boolean }) {
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        flexShrink: 0,
-        gap: 0.25,
-        px: 0.5,
-      }}
-    >
-      <Box
-        sx={{
-          width: 20,
-          borderTop: `2px dashed ${alpha(BLUE, 0.4)}`,
-        }}
-      />
+    <div className="flex items-center shrink-0 gap-0.5 px-1">
+      <div className="w-4 border-t-2 border-dashed border-blue-400/40" />
       {double ? (
-        <Box sx={{ display: 'flex', color: alpha(BLUE, 0.7) }}>
+        <div className="flex text-blue-500/70">
           <ArrowRight size={13} />
-          <ArrowRight size={13} style={{ marginLeft: -6 }} />
-        </Box>
+          <ArrowRight size={13} className="-ml-1.5" />
+        </div>
       ) : (
-        <MoveRight size={14} color={alpha(BLUE, 0.75)} />
+        <MoveRight size={14} className="text-blue-500/75" />
       )}
-      <Box
-        sx={{
-          width: 20,
-          borderTop: `2px dashed ${alpha(BLUE, 0.4)}`,
-        }}
-      />
-    </Box>
+      <div className="w-4 border-t-2 border-dashed border-blue-400/40" />
+    </div>
   )
 }
 
@@ -163,7 +92,6 @@ export default function BackupFlowPreview({
   sourceSshConnection,
 }: BackupFlowPreviewProps) {
   const { t } = useTranslation()
-  const theme = useTheme()
 
   const getSummaryText = () => {
     if (dataSource === 'local' && repositoryLocation === 'local')
@@ -201,52 +129,26 @@ export default function BackupFlowPreview({
       : undefined
 
   return (
-    <Box
-      sx={{
-        borderRadius: 2,
-        bgcolor: alpha(BLUE, theme.palette.mode === 'dark' ? 0.06 : 0.04),
-        p: 1.5,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 1.25,
-        overflow: 'hidden',
-      }}
-    >
+    <div className="rounded-lg bg-blue-50/50 dark:bg-blue-950/10 p-3 flex flex-col gap-3 overflow-hidden">
       {/* Summary header */}
-      <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1, flexWrap: 'wrap' }}>
-        <Typography
-          variant="caption"
-          sx={{
-            color: 'text.disabled',
-            fontWeight: 700,
-            fontSize: '0.6rem',
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            flexShrink: 0,
-          }}
-        >
+      <div className="flex items-baseline gap-2 flex-wrap">
+        <span className="text-[0.6rem] text-muted-foreground font-bold uppercase tracking-widest shrink-0">
           Backup Flow
-        </Typography>
-        <Typography variant="caption" fontWeight={500} fontSize="0.72rem" sx={{ color: BLUE }}>
+        </span>
+        <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
           {getSummaryText()}
-        </Typography>
-      </Box>
+        </span>
+      </div>
 
       {/* Pipeline row */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 0.5,
-          minWidth: 0,
-        }}
-      >
+      <div className="flex items-center gap-1 min-w-0">
         {/* Source */}
         <FlowNode
           icon={getSourceIcon()}
           label={getSourceLabel()}
           subtitle={sourceSubtitle}
-          accentColor={BLUE}
+          colorClass="bg-blue-500/20 text-blue-600 dark:text-blue-400"
+          bgClass="bg-blue-500/5 dark:bg-blue-500/10"
         />
 
         <Connector double={showSshfsIntermediate} />
@@ -257,7 +159,8 @@ export default function BackupFlowPreview({
             <FlowNode
               icon={<Server size={16} />}
               label={t('wizard.backupFlowPreview.viaSSHFS')}
-              accentColor={AMBER}
+              colorClass="bg-amber-500/20 text-amber-600 dark:text-amber-400"
+              bgClass="bg-amber-500/5 dark:bg-amber-500/10"
             />
             <Connector />
           </>
@@ -267,10 +170,11 @@ export default function BackupFlowPreview({
         <FlowNode
           icon={getRepoIcon()}
           label={getRepoLabel()}
-          accentColor={EMERALD}
           path={repositoryPath || undefined}
+          colorClass="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
+          bgClass="bg-emerald-500/5 dark:bg-emerald-500/10"
         />
-      </Box>
-    </Box>
+      </div>
+    </div>
   )
 }

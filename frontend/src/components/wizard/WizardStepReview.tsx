@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { Box, Typography, Chip, IconButton, Tooltip, useTheme, alpha } from '@mui/material'
 import {
   FolderOpen,
   Shield,
@@ -18,6 +17,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import CommandPreview from '../CommandPreview'
 import BackupFlowPreview from './BackupFlowPreview'
+import { cn } from '@/lib/utils'
 
 interface SSHConnection {
   id: number
@@ -60,138 +60,66 @@ function getEncryptionLabelKey(encryption: string) {
   return 'wizard.review.encryptionNone'
 }
 
-// Colored app-icon-style badge square
-function IconBadge({ icon, accentColor }: { icon: React.ReactNode; accentColor: string }) {
+// Colored icon badge
+function IconBadge({ icon, className }: { icon: React.ReactNode; className?: string }) {
   return (
-    <Box
-      sx={{
-        width: 28,
-        height: 28,
-        borderRadius: '8px',
-        bgcolor: alpha(accentColor, 0.15),
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: accentColor,
-        flexShrink: 0,
-      }}
+    <div
+      className={cn(
+        'w-7 h-7 rounded-lg flex items-center justify-center shrink-0',
+        className
+      )}
     >
       {icon}
-    </Box>
+    </div>
   )
 }
 
-// Inline monospace pill for paths / technical values
+// Monospace code pill
 function CodePill({ children }: { children: React.ReactNode }) {
-  const theme = useTheme()
   return (
-    <Tooltip title={children} placement="top">
-      <Typography
-        component="span"
-        sx={{
-          fontFamily: 'monospace',
-          fontSize: '0.72rem',
-          px: 0.75,
-          py: 0.15,
-          borderRadius: '4px',
-          bgcolor: alpha(theme.palette.text.primary, theme.palette.mode === 'dark' ? 0.08 : 0.06),
-          color: 'text.primary',
-          maxWidth: '100%',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          display: 'inline-block',
-          verticalAlign: 'middle',
-          cursor: 'default',
-          lineHeight: 1.6,
-        }}
-      >
-        {children}
-      </Typography>
-    </Tooltip>
+    <span
+      title={typeof children === 'string' ? children : undefined}
+      className="font-mono text-[0.72rem] px-1.5 py-0.5 rounded bg-muted text-foreground max-w-full overflow-hidden text-ellipsis whitespace-nowrap inline-block align-middle cursor-default leading-relaxed"
+    >
+      {children}
+    </span>
   )
 }
 
-// Attribute row within a section card
+// Attribute row
 function AttrRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 1,
-        minWidth: 0,
-      }}
-    >
-      <Typography
-        variant="caption"
-        sx={{ color: 'text.disabled', fontSize: '0.7rem', flexShrink: 0 }}
-      >
-        {label}
-      </Typography>
-      <Box
-        sx={{
-          minWidth: 0,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 0.5,
-          flexWrap: 'wrap',
-          justifyContent: 'flex-end',
-        }}
-      >
-        {children}
-      </Box>
-    </Box>
+    <div className="flex items-center justify-between gap-2 min-w-0">
+      <span className="text-[0.7rem] text-muted-foreground shrink-0">{label}</span>
+      <div className="min-w-0 flex items-center gap-1 flex-wrap justify-end">{children}</div>
+    </div>
   )
 }
 
-// Section card: icon badge + label + rows
+// Section card
 function SectionCard({
   icon,
   label,
-  accentColor,
+  iconClass,
+  cardClass,
   children,
 }: {
   icon: React.ReactNode
   label: string
-  accentColor: string
+  iconClass?: string
+  cardClass?: string
   children: React.ReactNode
 }) {
-  const theme = useTheme()
   return (
-    <Box
-      sx={{
-        borderRadius: 2,
-        bgcolor: alpha(accentColor, theme.palette.mode === 'dark' ? 0.07 : 0.05),
-        p: 1.5,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 1.25,
-        minWidth: 0,
-        overflow: 'hidden',
-      }}
-    >
-      {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <IconBadge icon={icon} accentColor={accentColor} />
-        <Typography
-          variant="caption"
-          sx={{
-            color: 'text.secondary',
-            fontWeight: 700,
-            fontSize: '0.68rem',
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-          }}
-        >
+    <div className={cn('rounded-lg p-3 flex flex-col gap-2 min-w-0 overflow-hidden', cardClass)}>
+      <div className="flex items-center gap-2">
+        <IconBadge icon={icon} className={iconClass} />
+        <span className="text-[0.68rem] text-muted-foreground font-bold uppercase tracking-wide">
           {label}
-        </Typography>
-      </Box>
-
-      {/* Attribute rows */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.6 }}>{children}</Box>
-    </Box>
+        </span>
+      </div>
+      <div className="flex flex-col gap-1.5">{children}</div>
+    </div>
   )
 }
 
@@ -203,24 +131,17 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
     if (data.dataSource !== 'remote' || !data.sourceSshConnectionId) return null
     const conn = sshConnections.find((c) => c.id === data.sourceSshConnectionId)
     if (!conn) return null
-    return {
-      username: conn.username,
-      host: conn.host,
-      port: conn.port,
-      defaultPath: conn.default_path,
-    }
+    return { username: conn.username, host: conn.host, port: conn.port, defaultPath: conn.default_path }
   }
 
   const getRepoSshConnection = () => {
     if (data.repositoryLocation !== 'ssh' || !data.repoSshConnectionId) return null
-    const conn = sshConnections.find((c) => c.id === data.repoSshConnectionId)
-    return conn || null
+    return sshConnections.find((c) => c.id === data.repoSshConnectionId) || null
   }
 
   const getSourceSshConnectionForFlow = () => {
     if (data.dataSource !== 'remote' || !data.sourceSshConnectionId) return null
-    const conn = sshConnections.find((c) => c.id === data.sourceSshConnectionId)
-    return conn || null
+    return sshConnections.find((c) => c.id === data.sourceSshConnectionId) || null
   }
 
   const getRepoConnectionDetails = () => {
@@ -234,14 +155,8 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
   const repoDetails = getRepoConnectionDetails()
   const isEncrypted = data.encryption !== 'none'
 
-  const EMERALD = '#10b981'
-  const BLUE = '#3b82f6'
-  const AMBER = '#f59e0b'
-  const VIOLET = '#8b5cf6'
-  const ERROR = '#ef4444'
-
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <div className="flex flex-col gap-3">
       {/* Backup Flow Preview */}
       {data.repositoryMode === 'full' && (
         <BackupFlowPreview
@@ -278,99 +193,72 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
         )}
 
       {/* Manifest header + status chip */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography
-          variant="caption"
-          sx={{
-            color: 'text.disabled',
-            fontWeight: 700,
-            fontSize: '0.6rem',
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-          }}
-        >
+      <div className="flex items-center justify-between">
+        <span className="text-[0.6rem] text-muted-foreground font-bold uppercase tracking-widest">
           {t('wizard.review.configurationSummary')}
-        </Typography>
+        </span>
 
         {mode === 'create' && data.repositoryMode === 'full' && (
-          <Tooltip title={t('wizard.review.repositoryInitialized')} placement="top" arrow>
-            <Chip
-              icon={<Rocket size={11} />}
-              label="Ready to Initialize"
-              size="small"
-              sx={{
-                height: 20,
-                fontSize: '0.65rem',
-                fontWeight: 600,
-                bgcolor: alpha(EMERALD, 0.1),
-                color: EMERALD,
-                border: `1px solid ${alpha(EMERALD, 0.25)}`,
-                cursor: 'help',
-                '& .MuiChip-icon': { color: EMERALD, ml: '6px' },
-                '& .MuiChip-label': { px: '8px' },
-              }}
-            />
-          </Tooltip>
+          <span
+            title={t('wizard.review.repositoryInitialized')}
+            className="flex items-center gap-1 text-[0.65rem] font-semibold px-2 py-0.5 rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800 cursor-help"
+          >
+            <Rocket size={10} />
+            Ready to Initialize
+          </span>
         )}
-      </Box>
+      </div>
 
       {mode === 'create' && data.repositoryMode === 'full' && (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-          <Info size={14} style={{ opacity: 0.45, flexShrink: 0 }} />
-          <Typography variant="body2" color="text.secondary">
+        <div className="flex items-center gap-2">
+          <Info size={14} className="opacity-45 shrink-0" />
+          <span className="text-sm text-muted-foreground">
             {t('wizard.review.repositoryInitialized')}
-          </Typography>
-        </Box>
+          </span>
+        </div>
       )}
 
       {/* 2×2 section card grid */}
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
-          gap: 1.25,
-          minWidth: 0,
-          overflow: 'hidden',
-        }}
-      >
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 overflow-hidden">
         {/* REPOSITORY */}
         <SectionCard
           icon={<FolderOpen size={14} />}
           label={t('wizard.review.repository')}
-          accentColor={BLUE}
+          iconClass="bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400"
+          cardClass="bg-blue-50/60 dark:bg-blue-950/20"
         >
           <AttrRow label={t('wizard.review.name')}>
-            <Typography variant="body2" fontWeight={700} fontSize="0.8rem">
-              {data.name}
-            </Typography>
+            <span className="text-sm font-bold">{data.name}</span>
           </AttrRow>
 
           <AttrRow label={t('wizard.review.mode')}>
-            <Chip
-              label={
+            <span
+              className={cn(
+                'text-[0.62rem] font-semibold px-1.5 py-0.5 rounded-full',
                 data.repositoryMode === 'full'
-                  ? t('wizard.review.full')
-                  : t('wizard.review.observeOnly')
-              }
-              size="small"
-              color={data.repositoryMode === 'full' ? 'primary' : 'default'}
-              sx={{ height: 17, fontSize: '0.62rem', fontWeight: 600 }}
-            />
+                  ? 'bg-primary/10 text-primary'
+                  : 'bg-muted text-muted-foreground'
+              )}
+            >
+              {data.repositoryMode === 'full'
+                ? t('wizard.review.full')
+                : t('wizard.review.observeOnly')}
+            </span>
           </AttrRow>
 
           <AttrRow label={t('wizard.review.location')}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <div className="flex items-center gap-1">
               {data.repositoryLocation === 'local' ? (
-                <Server size={12} style={{ opacity: 0.6 }} />
+                <Server size={12} className="opacity-60" />
               ) : (
-                <Cloud size={12} style={{ opacity: 0.6 }} />
+                <Cloud size={12} className="opacity-60" />
               )}
-              <Typography variant="body2" fontSize="0.75rem">
+              <span className="text-sm">
                 {data.repositoryLocation === 'local'
                   ? t('wizard.review.borgUiServer')
                   : t('wizard.review.sshRemote')}
-              </Typography>
-            </Box>
+              </span>
+            </div>
           </AttrRow>
 
           <AttrRow label={t('wizard.review.path')}>
@@ -382,52 +270,63 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
         <SectionCard
           icon={<Shield size={14} />}
           label={t('wizard.review.security')}
-          accentColor={isEncrypted ? EMERALD : ERROR}
+          iconClass={cn(
+            isEncrypted
+              ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400'
+              : 'bg-red-100 text-red-600 dark:bg-red-950/40 dark:text-red-400'
+          )}
+          cardClass={cn(
+            isEncrypted
+              ? 'bg-emerald-50/60 dark:bg-emerald-950/20'
+              : 'bg-red-50/60 dark:bg-red-950/20'
+          )}
         >
           {mode === 'create' && (
             <AttrRow label={t('wizard.review.encryption')}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
+              <div className="flex items-center gap-1">
                 {isEncrypted ? (
-                  <Lock size={11} color={EMERALD} />
+                  <Lock size={11} className="text-emerald-600 dark:text-emerald-400" />
                 ) : (
-                  <Unlock size={11} color={ERROR} />
+                  <Unlock size={11} className="text-red-600 dark:text-red-400" />
                 )}
-                <Chip
-                  label={t(getEncryptionLabelKey(data.encryption))}
-                  size="small"
-                  color={isEncrypted ? 'success' : 'error'}
-                  sx={{ height: 17, fontSize: '0.62rem', fontWeight: 600 }}
-                />
-              </Box>
+                <span
+                  className={cn(
+                    'text-[0.62rem] font-semibold px-1.5 py-0.5 rounded-full',
+                    isEncrypted
+                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
+                      : 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400'
+                  )}
+                >
+                  {t(getEncryptionLabelKey(data.encryption))}
+                </span>
+              </div>
             </AttrRow>
           )}
 
           <AttrRow label={t('wizard.review.passphrase')}>
             {data.passphrase ? (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
-                <Typography
-                  variant="body2"
-                  fontFamily={showPassphrase ? 'inherit' : 'monospace'}
-                  fontSize="0.75rem"
-                  letterSpacing={showPassphrase ? 'normal' : '0.1em'}
+              <div className="flex items-center gap-1">
+                <span
+                  className={cn(
+                    'text-sm',
+                    !showPassphrase && 'font-mono tracking-widest'
+                  )}
                 >
                   {showPassphrase ? data.passphrase : '••••••••'}
-                </Typography>
-                <Tooltip title={showPassphrase ? 'Hide passphrase' : 'Show passphrase'}>
-                  <IconButton
-                    aria-label={showPassphrase ? 'Hide passphrase' : 'Show passphrase'}
-                    onClick={() => setShowPassphrase((v) => !v)}
-                    size="small"
-                    sx={{ p: 0.2 }}
-                  >
-                    {showPassphrase ? <EyeOff size={11} /> : <Eye size={11} />}
-                  </IconButton>
-                </Tooltip>
-              </Box>
+                </span>
+                <button
+                  type="button"
+                  aria-label={showPassphrase ? 'Hide passphrase' : 'Show passphrase'}
+                  onClick={() => setShowPassphrase((v) => !v)}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showPassphrase ? <EyeOff size={11} /> : <Eye size={11} />}
+                </button>
+              </div>
             ) : (
-              <Typography variant="body2" fontSize="0.75rem" color="text.secondary">
+              <span className="text-sm text-muted-foreground">
                 {t('wizard.review.passphraseNotSet')}
-              </Typography>
+              </span>
             )}
           </AttrRow>
         </SectionCard>
@@ -437,28 +336,28 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
           <SectionCard
             icon={data.dataSource === 'local' ? <HardDrive size={14} /> : <Laptop size={14} />}
             label={t('wizard.review.dataSource')}
-            accentColor={AMBER}
+            iconClass="bg-amber-100 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400"
+            cardClass="bg-amber-50/60 dark:bg-amber-950/20"
           >
             <AttrRow label={t('wizard.review.source')}>
-              <Typography variant="body2" fontSize="0.75rem" fontWeight={500}>
+              <span className="text-sm font-medium">
                 {data.dataSource === 'local'
                   ? t('wizard.review.borgUiServer')
                   : t('wizard.review.remoteClient')}
-              </Typography>
+              </span>
             </AttrRow>
 
             {data.dataSource === 'local' && (
               <>
                 <AttrRow label={t('wizard.review.directories')}>
-                  <Typography variant="body2" fontSize="0.75rem">
+                  <span className="text-sm">
                     {t('wizard.review.directoriesCount', { count: data.sourceDirs.length })}
-                  </Typography>
+                  </span>
                 </AttrRow>
-
                 <AttrRow label={t('wizard.review.excludePatterns')}>
-                  <Typography variant="body2" fontSize="0.75rem">
+                  <span className="text-sm">
                     {t('wizard.review.directoriesCount', { count: data.excludePatterns.length })}
-                  </Typography>
+                  </span>
                 </AttrRow>
               </>
             )}
@@ -470,7 +369,8 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
           <SectionCard
             icon={<Settings size={14} />}
             label={t('wizard.review.backupConfiguration')}
-            accentColor={VIOLET}
+            iconClass="bg-violet-100 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400"
+            cardClass="bg-violet-50/60 dark:bg-violet-950/20"
           >
             <AttrRow label={t('wizard.review.compression')}>
               <CodePill>{data.compression}</CodePill>
@@ -483,26 +383,26 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
             )}
           </SectionCard>
         )}
-      </Box>
+      </div>
 
       {/* Import / edit notes */}
       {mode === 'import' && (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-          <Info size={14} style={{ opacity: 0.45, flexShrink: 0 }} />
-          <Typography variant="body2" color="text.secondary">
+        <div className="flex items-center gap-2">
+          <Info size={14} className="opacity-45 shrink-0" />
+          <span className="text-sm text-muted-foreground">
             {t('wizard.review.repositoryImportNote')}
-          </Typography>
-        </Box>
+          </span>
+        </div>
       )}
 
       {mode === 'edit' && (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-          <Info size={14} style={{ opacity: 0.45, flexShrink: 0 }} />
-          <Typography variant="body2" color="text.secondary">
+        <div className="flex items-center gap-2">
+          <Info size={14} className="opacity-45 shrink-0" />
+          <span className="text-sm text-muted-foreground">
             {t('wizard.review.repositoryEditNote')}
-          </Typography>
-        </Box>
+          </span>
+        </div>
       )}
-    </Box>
+    </div>
   )
 }

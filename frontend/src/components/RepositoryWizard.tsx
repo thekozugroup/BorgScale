@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Box,
-  Button,
-  Typography,
-  CircularProgress,
-} from '@mui/material'
-import ResponsiveDialog from './ResponsiveDialog'
+import { Loader2 } from 'lucide-react'
 import { FolderOpen, Database, Shield, Settings, CheckCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import {
   WizardStepIndicator,
   WizardStepLocation,
@@ -120,7 +119,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
   const [wizardState, setWizardState] = useState<WizardState>(() => createInitialState())
   const [sshConnections, setSshConnections] = useState<SSHConnection[]>([])
 
-  // File explorer states
   const [showPathExplorer, setShowPathExplorer] = useState(false)
   const [showSourceExplorer, setShowSourceExplorer] = useState(false)
   const [showRemoteSourceExplorer, setShowRemoteSourceExplorer] = useState(false)
@@ -137,7 +135,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
       },
     ]
 
-    // Add data source step only for full mode (not observe) and not import
     if (wizardState.repositoryMode === 'full' || mode === 'import') {
       baseSteps.push({
         key: 'source',
@@ -152,7 +149,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
       icon: <Shield size={14} />,
     })
 
-    // Add backup config step only for full mode
     if (wizardState.repositoryMode === 'full') {
       baseSteps.push({
         key: 'config',
@@ -170,7 +166,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
     return baseSteps
   }, [wizardState.repositoryMode, mode, t])
 
-  // Load SSH connections
   const loadSshData = async () => {
     try {
       const connectionsRes = await sshKeysAPI.getSSHConnections()
@@ -182,13 +177,11 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
     }
   }
 
-  // Populate form data for edit mode
   const populateEditData = React.useCallback(() => {
     if (!repository) return
 
     let repoPath = repository.path || ''
 
-    // Extract plain path from SSH URL if needed
     if (repoPath.startsWith('ssh://')) {
       const sshUrlMatch = repoPath.match(/^ssh:\/\/[^@]+@[^:/]+(?::\d+)?(.*)$/)
       if (sshUrlMatch) {
@@ -196,13 +189,10 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
       }
     }
 
-    // Determine repository location
-    // If connection_id field exists (even if null), trust it as source of truth
-    // Otherwise fall back to legacy detection for old repos not yet edited
     const isSSH =
       repository.connection_id !== undefined
-        ? !!repository.connection_id // Trust connection_id if it exists
-        : repository.repository_type === 'ssh' || (repository.path || '').startsWith('ssh://') // Legacy fallback
+        ? !!repository.connection_id
+        : repository.repository_type === 'ssh' || (repository.path || '').startsWith('ssh://')
 
     const repoVersion = (repository.borg_version === 2 ? 2 : 1) as 1 | 2
     setWizardState({
@@ -235,16 +225,13 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
     })
   }, [repository])
 
-  // Reset form
   const resetForm = () => {
     setActiveStep(0)
     setWizardState(createInitialState())
   }
 
-  // Handle state changes
   const handleStateChange = (updates: Partial<WizardState>) => {
     setWizardState((prev) => {
-      // When borg version changes, reset encryption to a sensible default for that version
       if (updates.borgVersion !== undefined && updates.borgVersion !== prev.borgVersion) {
         updates.encryption = updates.borgVersion === 2 ? 'repokey-aes-ocb' : 'repokey'
       }
@@ -252,7 +239,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
     })
   }
 
-  // Handle SSH connection selection for repository
   const handleRepoSshConnectionSelect = (connectionId: number) => {
     const connection = sshConnections.find((c) => c.id === connectionId)
     if (connection) {
@@ -263,7 +249,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
     }
   }
 
-  // Handle path change with SSH URL detection
   const handlePathChange = (newPath: string) => {
     if (newPath.startsWith('ssh://')) {
       const matchWithPort = newPath.match(/^ssh:\/\/([^@]+)@([^:/]+):(\d+)(\/.*)$/)
@@ -277,7 +262,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
             c.host === parsedHost &&
             c.port === parseInt(parsedPort)
         )
-
         handleStateChange({
           repositoryLocation: 'ssh',
           path: remotePath || '/',
@@ -289,7 +273,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
         const matchingConnection = sshConnections.find(
           (c) => c.username === parsedUsername && c.host === parsedHost && c.port === 22
         )
-
         handleStateChange({
           repositoryLocation: 'ssh',
           path: remotePath || '/',
@@ -298,7 +281,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
         return
       }
     }
-
     handleStateChange({ path: newPath })
   }
 
@@ -348,7 +330,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
     }
   }
 
-  // Handle source directories change with SSH URL detection
   const handleSourceDirsChange = (paths: string[]) => {
     const { processedPaths, detectedSshConnectionId } = normalizeSourceDirs(paths)
 
@@ -366,7 +347,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
     })
   }
 
-  // Initialize on dialog open
   useEffect(() => {
     if (open) {
       setActiveStep(0)
@@ -384,7 +364,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
     }
   }, [open, mode, repository, populateEditData])
 
-  // Auto-select SSH connection for edit mode
   useEffect(() => {
     if (mode === 'edit' && repository && sshConnections.length > 0) {
       if (!wizardState.repoSshConnectionId && wizardState.repositoryLocation === 'ssh') {
@@ -419,7 +398,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
     wizardState.repositoryLocation,
   ])
 
-  // Validation
   const canProceed = () => {
     const currentStepKey = steps[activeStep]?.key
 
@@ -451,13 +429,8 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
     }
   }
 
-  const handleNext = () => {
-    setActiveStep((prev) => prev + 1)
-  }
-
-  const handleBack = () => {
-    setActiveStep((prev) => prev - 1)
-  }
+  const handleNext = () => setActiveStep((prev) => prev + 1)
+  const handleBack = () => setActiveStep((prev) => prev - 1)
 
   const handleSubmit = async () => {
     const data: RepositoryData = {
@@ -479,7 +452,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
       continue_on_hook_failure: wizardState.hookFailureMode === 'continue',
       skip_on_hook_failure: wizardState.hookFailureMode === 'skip',
       bypass_lock: wizardState.bypassLock,
-      // Connection IDs - single source of truth for SSH
       connection_id: wizardState.repoSshConnectionId || null,
       source_connection_id:
         wizardState.dataSource === 'remote' && wizardState.sourceSshConnectionId
@@ -505,7 +477,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
       { name: wizardState.name }
     )
 
-    // Pass keyfile for import mode
     setIsSubmitting(true)
     try {
       await onSubmit(data, mode === 'import' ? wizardState.selectedKeyfile : null)
@@ -514,7 +485,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
     }
   }
 
-  // Render current step content
   const renderStepContent = () => {
     const currentStepKey = steps[activeStep]?.key
 
@@ -540,8 +510,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
                 handlePathChange(updates.path)
                 return
               }
-
-              // Handle SSH connection selection
               if (
                 updates.repoSshConnectionId &&
                 updates.repoSshConnectionId !== wizardState.repoSshConnectionId
@@ -583,7 +551,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
                 })
                 return
               }
-
               handleStateChange(updates)
             }}
             onBrowseSource={() => setShowSourceExplorer(true)}
@@ -658,82 +625,36 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
     }
   }
 
+  const finalButtonLabel = () => {
+    if (isSubmitting) {
+      return t(
+        `repositoryWizard.finalButton${mode === 'create' ? 'Creating' : mode === 'edit' ? 'Saving' : 'Importing'}`
+      )
+    }
+    if (mode === 'create') return t('repositoryWizard.finalButtonCreate')
+    if (mode === 'edit') return t('repositoryWizard.finalButtonEdit')
+    return t('repositoryWizard.finalButtonImport')
+  }
+
+  const dialogTitle =
+    mode === 'create'
+      ? t('repositoryWizard.titleCreate')
+      : mode === 'edit'
+        ? t('repositoryWizard.titleEdit')
+        : t('repositoryWizard.titleImport')
+
   return (
     <>
-      <ResponsiveDialog
-        open={open}
-        onClose={onClose}
-        maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: 3,
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            height: { xs: 'auto', md: 'min(860px, calc(100vh - 64px))' },
-            backdropFilter: 'blur(10px)',
-            backgroundImage:
-              'linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))',
-            boxShadow: (theme) =>
-              theme.palette.mode === 'dark'
-                ? '0 24px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1)'
-                : '0 24px 48px rgba(0,0,0,0.1)',
-          },
-        }}
-        footer={
-          <DialogActions sx={{ px: { xs: 1, sm: 3 }, pb: { xs: 1, sm: 2 } }}>
-            <Button onClick={onClose} disabled={isSubmitting}>
-              {t('common.buttons.cancel')}
-            </Button>
-            <Box sx={{ flex: 1 }} />
-            <Button disabled={activeStep === 0 || isSubmitting} onClick={handleBack}>
-              {t('common.buttons.back')}
-            </Button>
-            {activeStep < steps.length - 1 ? (
-              <Button
-                variant="contained"
-                onClick={handleNext}
-                disabled={!canProceed()}
-                sx={{ boxShadow: '0 2px 8px rgba(37,99,235,0.3)' }}
-              >
-                {t('common.buttons.next')}
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                onClick={handleSubmit}
-                disabled={!canProceed() || isSubmitting}
-                startIcon={
-                  isSubmitting ? <CircularProgress size={16} color="inherit" /> : undefined
-                }
-                sx={{ boxShadow: isSubmitting ? 'none' : '0 2px 8px rgba(37,99,235,0.3)' }}
-              >
-                {isSubmitting
-                  ? t(
-                      `repositoryWizard.finalButton${mode === 'create' ? 'Creating' : mode === 'edit' ? 'Saving' : 'Importing'}`
-                    )
-                  : mode === 'create'
-                    ? t('repositoryWizard.finalButtonCreate')
-                    : mode === 'edit'
-                      ? t('repositoryWizard.finalButtonEdit')
-                      : t('repositoryWizard.finalButtonImport')}
-              </Button>
-            )}
-          </DialogActions>
-        }
-      >
-        <DialogTitle sx={{ pt: 3, pb: 1 }}>
-          <Typography variant="h5" component="div" fontWeight={700}>
-            {mode === 'create'
-              ? t('repositoryWizard.titleCreate')
-              : mode === 'edit'
-                ? t('repositoryWizard.titleEdit')
-                : t('repositoryWizard.titleImport')}
-          </Typography>
-        </DialogTitle>
-        <DialogContent sx={{ pb: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+      <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+        <DialogContent
+          className="max-w-2xl w-full p-0 gap-0 overflow-hidden flex flex-col max-h-[min(860px,calc(100vh-64px))]"
+          showCloseButton={false}
+        >
+          <DialogHeader className="px-6 pt-5 pb-2 shrink-0">
+            <DialogTitle className="text-xl font-bold">{dialogTitle}</DialogTitle>
+          </DialogHeader>
+
+          <div className="flex flex-col flex-1 min-h-0 px-6">
             {/* Step Indicator */}
             <WizardStepIndicator
               steps={steps}
@@ -741,20 +662,40 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
               onStepClick={setActiveStep}
             />
 
-            {/* Step Content - natural height on mobile, fixed on desktop */}
-            <Box
-              sx={{
-                minHeight: { xs: 'auto', md: 450 },
-                flex: { xs: '0 0 auto', md: 1 },
-                overflow: 'auto',
-                p: { xs: 1, sm: 3 },
-              }}
-            >
+            {/* Step Content */}
+            <div className="flex-1 overflow-auto pb-4">
               {renderStepContent()}
-            </Box>
-          </Box>
+            </div>
+          </div>
+
+          <DialogFooter className="px-6 py-3 border-t flex-row gap-2 shrink-0">
+            <Button variant="ghost" onClick={onClose} disabled={isSubmitting}>
+              {t('common.buttons.cancel')}
+            </Button>
+            <div className="flex-1" />
+            <Button
+              variant="outline"
+              disabled={activeStep === 0 || isSubmitting}
+              onClick={handleBack}
+            >
+              {t('common.buttons.back')}
+            </Button>
+            {activeStep < steps.length - 1 ? (
+              <Button onClick={handleNext} disabled={!canProceed()}>
+                {t('common.buttons.next')}
+              </Button>
+            ) : (
+              <Button
+                onClick={handleSubmit}
+                disabled={!canProceed() || isSubmitting}
+              >
+                {isSubmitting && <Loader2 size={16} className="animate-spin mr-1" />}
+                {finalButtonLabel()}
+              </Button>
+            )}
+          </DialogFooter>
         </DialogContent>
-      </ResponsiveDialog>
+      </Dialog>
 
       {/* File Explorer Dialogs */}
       <FileExplorerDialog
@@ -854,7 +795,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
 
       {showExcludeExplorer &&
         (() => {
-          // For remote source, build SSH config
           const isRemote = wizardState.dataSource === 'remote'
           const conn = isRemote
             ? sshConnections.find((c) => c.id === wizardState.sourceSshConnectionId)
