@@ -47,7 +47,7 @@ function App() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary-600 border-t-transparent"></div>
       </div>
     )
   }
@@ -88,7 +88,7 @@ function App() {
               ) : null}
             </div>
           ) : (
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
+            <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary-600 border-t-transparent"></div>
           )}
         </div>
       )
@@ -108,7 +108,7 @@ function App() {
               <p className="mt-3 text-sm leading-6 text-slate-600">{authError}</p>
             </div>
           ) : (
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
+            <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary-600 border-t-transparent"></div>
           )}
         </div>
       )
