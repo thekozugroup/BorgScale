@@ -44,8 +44,11 @@ fi
 echo "==> 3/4 pip-audit"
 if command -v pip-audit >/dev/null; then
   pip-audit -r requirements.txt
+elif [ -n "${CI:-}" ]; then
+  echo "pip-audit missing in CI environment — install via 'pip install pip-audit'" >&2
+  exit 1
 else
-  echo "pip-audit missing; skipping"
+  echo "pip-audit missing locally; skipping (install: pip install pip-audit)" >&2
 fi
 
 echo "==> 4/4 npm audit (frontend)"
