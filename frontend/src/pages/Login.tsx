@@ -10,6 +10,9 @@ import { useAnalytics } from '../hooks/useAnalytics'
 import { getApiErrorDetail } from '../utils/apiErrors'
 import { translateBackendKey } from '../utils/translateBackendKey'
 import { authAPI } from '../services/api'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 interface LoginForm {
   username: string
@@ -178,41 +181,21 @@ export default function Login() {
   return (
     <>
       {/* Heading */}
-      <div style={{ marginBottom: 28 }}>
-        <h2
-          style={{
-            fontSize: '1.375rem',
-            fontWeight: 600,
-            color: '#f1f5f9',
-            margin: '0 0 6px',
-            letterSpacing: '-0.01em',
-          }}
-        >
+      <div className="mb-7">
+        <h2 className="text-[1.375rem] font-semibold tracking-tight text-foreground mb-1.5">
           {t('login.submit')}
         </h2>
-        <p style={{ margin: 0, fontSize: 14, color: '#64748b' }}>{t('login.subtitle')}</p>
+        <p className="text-sm text-muted-foreground">{t('login.subtitle')}</p>
       </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <div className="flex flex-col gap-[18px]">
           {!pendingChallengeToken ? (
             <>
-              <div>
-                <label
-                  htmlFor="username"
-                  style={{
-                    display: 'block',
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: '#94a3b8',
-                    marginBottom: 6,
-                    letterSpacing: '0.01em',
-                  }}
-                >
-                  {t('login.username')}
-                </label>
-                <input
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="username">{t('login.username')}</Label>
+                <Input
                   {...register('username', {
                     required: t('login.errors.usernameRequired'),
                   })}
@@ -220,31 +203,19 @@ export default function Login() {
                   type="text"
                   autoComplete="username webauthn"
                   placeholder="admin"
-                  className={`borg-card-input${errors.username ? ' error' : ''}`}
+                  aria-invalid={errors.username ? true : undefined}
                 />
                 {errors.username && (
-                  <p style={{ margin: '5px 0 0', fontSize: 12, color: '#f87171' }} role="alert">
+                  <p className="text-xs text-destructive mt-0.5" role="alert">
                     {errors.username.message}
                   </p>
                 )}
               </div>
 
-              <div>
-                <label
-                  htmlFor="password"
-                  style={{
-                    display: 'block',
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: '#94a3b8',
-                    marginBottom: 6,
-                    letterSpacing: '0.01em',
-                  }}
-                >
-                  {t('login.password')}
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <input
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="password">{t('login.password')}</Label>
+                <div className="relative">
+                  <Input
                     {...register('password', {
                       required: t('login.errors.passwordRequired'),
                     })}
@@ -252,123 +223,59 @@ export default function Login() {
                     type={showPassword ? 'text' : 'password'}
                     autoComplete="current-password"
                     placeholder="••••••••"
-                    style={{ paddingRight: 42 }}
-                    className={`borg-card-input${errors.password ? ' error' : ''}`}
+                    className="pr-10"
+                    aria-invalid={errors.password ? true : undefined}
                   />
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon"
                     onClick={() => setShowPassword((v) => !v)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    style={{
-                      position: 'absolute',
-                      right: 12,
-                      top: '50%',
-                      transform: 'translateY(-50%)',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      color: '#64748b',
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: 4,
-                      borderRadius: 4,
-                      transition: 'color 0.15s ease',
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = '#94a3b8')}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = '#64748b')}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground hover:text-foreground"
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
+                  </Button>
                 </div>
                 {errors.password && (
-                  <p style={{ margin: '5px 0 0', fontSize: 12, color: '#f87171' }} role="alert">
+                  <p className="text-xs text-destructive mt-0.5" role="alert">
                     {errors.password.message}
                   </p>
                 )}
               </div>
             </>
           ) : (
-            <div style={{ display: 'grid', gap: 10 }}>
-              <p style={{ margin: 0, fontSize: 14, color: '#94a3b8', lineHeight: 1.6 }}>
+            <div className="flex flex-col gap-2.5">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 {t('login.totpPrompt')}
               </p>
-              <div>
-                <label
-                  htmlFor="totp-code"
-                  style={{
-                    display: 'block',
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: '#94a3b8',
-                    marginBottom: 6,
-                    letterSpacing: '0.01em',
-                  }}
-                >
-                  {t('login.totpLabel')}
-                </label>
-                <input
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="totp-code">{t('login.totpLabel')}</Label>
+                <Input
                   id="totp-code"
                   type="text"
                   inputMode="numeric"
                   autoComplete="one-time-code"
                   placeholder="123456"
-                  className="borg-card-input"
                   value={totpCode}
                   onChange={(event) => setTotpCode(event.target.value)}
                 />
-                <p style={{ margin: '5px 0 0', fontSize: 12, color: '#64748b' }}>
-                  {t('login.totpHint')}
-                </p>
+                <p className="text-xs text-muted-foreground">{t('login.totpHint')}</p>
               </div>
             </div>
           )}
 
           {/* Submit */}
-          <button
+          <Button
             type={pendingChallengeToken ? 'button' : 'submit'}
             onClick={pendingChallengeToken ? () => void onSubmitTotp() : undefined}
             disabled={isLoading}
-            style={{
-              marginTop: 4,
-              width: '100%',
-              padding: '11px 20px',
-              borderRadius: 8,
-              border: 'none',
-              background: isLoading
-                ? 'rgba(0,221,0,0.4)'
-                : 'linear-gradient(135deg, #00dd00 0%, #00b800 100%)',
-              color: isLoading ? 'rgba(0,0,0,0.5)' : '#000',
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: isLoading ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              transition: 'opacity 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease',
-              fontFamily: 'inherit',
-              letterSpacing: '0.01em',
-              boxShadow: isLoading ? 'none' : '0 4px 16px rgba(0,221,0,0.25)',
-            }}
-            onMouseEnter={(e) => {
-              if (!isLoading) {
-                e.currentTarget.style.opacity = '0.9'
-                e.currentTarget.style.transform = 'translateY(-1px)'
-                e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,221,0,0.35)'
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = '1'
-              e.currentTarget.style.transform = 'translateY(0)'
-              e.currentTarget.style.boxShadow = isLoading ? 'none' : '0 4px 16px rgba(0,221,0,0.25)'
-            }}
-            onMouseDown={(e) => {
-              if (!isLoading) e.currentTarget.style.transform = 'translateY(0)'
-            }}
+            className="mt-1 w-full"
+            size="lg"
           >
             {isLoading ? (
               <>
-                <Loader2 size={15} style={{ animation: 'spin 1s linear infinite' }} />
+                <Loader2 className="animate-spin" size={15} />
                 {t('login.submitting')}
               </>
             ) : pendingChallengeToken ? (
@@ -376,52 +283,36 @@ export default function Login() {
             ) : (
               t('login.submit')
             )}
-          </button>
+          </Button>
+
           {pendingChallengeToken && (
-            <button
+            <Button
               type="button"
+              variant="outline"
               disabled={isLoading}
+              className="w-full"
+              size="lg"
               onClick={() => {
                 setPendingChallengeToken(null)
                 setPendingUsername(null)
                 setTotpCode('')
               }}
-              style={{
-                width: '100%',
-                padding: '11px 20px',
-                borderRadius: 8,
-                border: '1px solid rgba(255,255,255,0.12)',
-                background: 'transparent',
-                color: '#cbd5e1',
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: isLoading ? 'not-allowed' : 'pointer',
-                fontFamily: 'inherit',
-              }}
             >
               {t('common.buttons.back')}
-            </button>
+            </Button>
           )}
+
           {!pendingChallengeToken && (
-            <button
+            <Button
               type="button"
+              variant="outline"
               disabled={isLoading}
+              className="w-full"
+              size="lg"
               onClick={() => void onSubmitPasskey()}
-              style={{
-                width: '100%',
-                padding: '11px 20px',
-                borderRadius: 8,
-                border: '1px solid rgba(255,255,255,0.12)',
-                background: 'transparent',
-                color: '#cbd5e1',
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: isLoading ? 'not-allowed' : 'pointer',
-                fontFamily: 'inherit',
-              }}
             >
               {t('login.passkeySubmit')}
-            </button>
+            </Button>
           )}
         </div>
       </form>
