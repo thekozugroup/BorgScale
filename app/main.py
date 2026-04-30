@@ -40,7 +40,6 @@ from app.database.models import Base
 from app.config import get_runtime_app_version, settings
 from app.core.proxy_auth import inspect_proxy_auth_config
 from app.core.security import create_first_user
-from app.services.licensing_service import sync_licensing_state
 
 # Load environment variables
 load_dotenv()
@@ -84,7 +83,6 @@ def _prepare_index_html() -> str | None:
 
 
 _cached_index_html = _prepare_index_html()
-licensing_refresh_task: asyncio.Task | None = None
 
 
 def _spawn_background_task(coro):
@@ -237,38 +235,8 @@ async def startup_event():
         logger.error("Failed to run migrations", error=str(e))
         # Don't fail startup, just log the error
 
-    app_version = get_runtime_app_version()
-
-    # Initialize local licensing state and attempt hidden full access activation
-    # only when explicitly enabled for this runtime.
-    if settings.enable_startup_license_sync:
-        try:
-            db = SessionLocal()
-            try:
-                await sync_licensing_state(db, app_version=app_version)
-            finally:
-                db.close()
-        except Exception as e:
-            logger.warning("Failed to initialize licensing state", error=str(e))
-    else:
-        logger.info("Startup licensing sync disabled", environment=settings.environment)
-
-    async def licensing_refresh_loop():
-        while True:
-            try:
-                await asyncio.sleep(60 * 60)
-                db = SessionLocal()
-                try:
-                    await sync_licensing_state(db, app_version=app_version)
-                finally:
-                    db.close()
-            except asyncio.CancelledError:
-                raise
-            except Exception as e:
-                logger.warning("Background licensing refresh failed", error=str(e))
-
-    global licensing_refresh_task
-    licensing_refresh_task = _spawn_background_task(licensing_refresh_loop())
+    # BorgScale runs unrestricted; no activation step.
+    logger.info("BorgScale runs unrestricted.")
 
     # Create first user if no users exist
     await create_first_user()
@@ -419,15 +387,6 @@ async def startup_event():
 async def shutdown_event():
     """Cleanup on application shutdown"""
     logger.info("Shutting down Borg Web UI")
-
-    global licensing_refresh_task
-    if licensing_refresh_task:
-        licensing_refresh_task.cancel()
-        try:
-            await licensing_refresh_task
-        except asyncio.CancelledError:
-            pass
-        licensing_refresh_task = None
 
     # Cancel background tasks
     tasks = getattr(app.state, "background_tasks", [])
