@@ -113,6 +113,7 @@ describe('RepositoryCard', () => {
       EXPORT: 'Export',
       COMPLETE: 'Complete',
       FAIL: 'Fail',
+      CANCEL: 'Cancel',
     } as const,
   }
 

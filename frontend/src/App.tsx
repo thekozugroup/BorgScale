@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { ShieldAlert, AlertTriangle } from 'lucide-react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './hooks/useAuth.tsx'
@@ -14,8 +13,6 @@ import SSHConnectionsSingleKey from './pages/SSHConnectionsSingleKey'
 import Activity from './pages/Activity'
 import Settings from './pages/Settings'
 import AuthLayout from './components/AuthLayout'
-import { UmamiTracker } from './components/UmamiTracker'
-import { loadUserPreference, initAnalyticsIfEnabled, identifyUser } from './utils/analytics'
 
 function App() {
   const {
@@ -27,30 +24,12 @@ function App() {
     proxyAuthHeader,
     proxyAuthWarnings,
     authError,
-    user,
   } = useAuth()
-
-  // Load user analytics preference on mount and after login, then conditionally initialize Umami
-  useEffect(() => {
-    const initAnalytics = async () => {
-      await loadUserPreference()
-      initAnalyticsIfEnabled()
-    }
-    initAnalytics()
-  }, [isAuthenticated])
-
-  // Set stable anonymous user ID so Umami deduplicates sessions from the same user
-  useEffect(() => {
-    if (isAuthenticated && user?.username) {
-      identifyUser(user.username)
-    }
-  }, [isAuthenticated, user?.username])
 
   const shouldUseAuthShell = !insecureNoAuthEnabled && (!isAuthenticated || mustChangePassword)
 
   const authShell = (
     <>
-      <UmamiTracker />
       <Routes>
         <Route
           path="/login"
@@ -142,7 +121,6 @@ function App() {
 
   return (
     <Layout>
-      <UmamiTracker />
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         {insecureNoAuthEnabled ? (

@@ -18,7 +18,7 @@ type AnalyticsEntity =
     }
 
 /**
- * Custom hook for Umami analytics tracking.
+ * Custom hook for analytics event tracking.
  * Provides easy-to-use tracking functions for components.
  *
  * Entity names (repos, connections, etc.) are automatically hashed for privacy.
