@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import type { Announcement } from '../../types/announcements'
 import {
   acknowledgeAnnouncement,
@@ -10,6 +10,8 @@ import {
   selectAnnouncement,
   snoozeAnnouncement,
 } from '../announcements'
+
+const NOW = new Date('2026-04-10T12:00:00Z')
 
 const baseAnnouncement: Announcement = {
   id: 'release-1.70.0',
@@ -25,13 +27,10 @@ const baseAnnouncement: Announcement = {
 describe('announcements utils', () => {
   beforeEach(() => {
     localStorage.clear()
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-04-10T12:00:00Z'))
   })
 
   afterEach(() => {
-    vi.clearAllTimers()
-    vi.useRealTimers()
+    localStorage.clear()
   })
 
   it('compares semantic versions numerically', () => {
@@ -50,7 +49,7 @@ describe('announcements utils', () => {
       isAnnouncementEligible(baseAnnouncement, {
         appVersion: '1.60.0',
         plan: 'community',
-        now: new Date(),
+        now: NOW,
       })
     ).toBe(false)
   })
@@ -62,7 +61,7 @@ describe('announcements utils', () => {
       isAnnouncementEligible(baseAnnouncement, {
         appVersion: '1.60.0',
         plan: 'community',
-        now: new Date(),
+        now: NOW,
       })
     ).toBe(false)
   })
@@ -86,7 +85,7 @@ describe('announcements utils', () => {
       selectAnnouncement([updateNotice, securityNotice], {
         appVersion: '1.60.0',
         plan: 'community',
-        now: new Date(),
+        now: NOW,
       })?.id
     ).toBe('security-1')
   })
@@ -112,7 +111,7 @@ describe('announcements utils', () => {
       selectAnnouncement([releaseHighlight, newerUpdate], {
         appVersion: '1.60.0',
         plan: 'community',
-        now: new Date(),
+        now: NOW,
       })?.id
     ).toBe('release-1.71.0')
   })
@@ -135,7 +134,7 @@ describe('announcements utils', () => {
       selectAnnouncement([updateNotice, securityNotice], {
         appVersion: '1.60.0',
         plan: 'community',
-        now: new Date(),
+        now: NOW,
       })?.id
     ).toBe(baseAnnouncement.id)
   })
@@ -145,7 +144,7 @@ describe('announcements utils', () => {
       selectAnnouncement([baseAnnouncement], {
         appVersion: '1.70.0',
         plan: 'community',
-        now: new Date(),
+        now: NOW,
       })
     ).toBeNull()
   })
@@ -166,7 +165,7 @@ describe('announcements utils', () => {
       selectAnnouncement([releaseHighlight], {
         appVersion: '2.0.4',
         plan: 'community',
-        now: new Date(),
+        now: NOW,
       })
     ).toBeNull()
   })
@@ -199,7 +198,7 @@ describe('announcements utils', () => {
         {
           appVersion: '1.60.0',
           plan: 'community',
-          now: new Date(),
+          now: NOW,
         }
       )
     ).toBe(false)

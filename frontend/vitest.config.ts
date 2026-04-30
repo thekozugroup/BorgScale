@@ -50,6 +50,8 @@ export default defineConfig({
     isolate: true,
     // Multi-step wizard tests take 1-2s in isolation; give headroom under full suite load
     testTimeout: 15000,
+    // Allow fake-timer teardown in afterEach to restore real timers without timing out
+    hookTimeout: 30000,
     // Show test execution time
     slowTestThreshold: 300,
     // Fail tests on console errors

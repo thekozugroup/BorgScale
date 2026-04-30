@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import {
   DEFAULT_PLAN_CONTENT_MANIFEST,
   fetchPlanContentManifest,
-  getPlanContentUrl,
 } from '../services/planContent'
 import type { PlanContentFeature } from '../types/planContent'
 
@@ -43,11 +42,9 @@ function resolveFeatureLocale(feature: PlanContentFeature, locale?: string): Pla
 
 export function usePlanContent() {
   const { i18n } = useTranslation()
-  const planContentUrl = getPlanContentUrl()
-
   const { data, isLoading } = useQuery({
-    queryKey: ['plan-content-manifest', planContentUrl],
-    queryFn: () => fetchPlanContentManifest(planContentUrl),
+    queryKey: ['plan-content-manifest'],
+    queryFn: () => fetchPlanContentManifest(),
     initialData: DEFAULT_PLAN_CONTENT_MANIFEST,
     initialDataUpdatedAt: 0,
     staleTime: 60 * 60 * 1000,
