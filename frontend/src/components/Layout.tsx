@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { hasConsentBeenGiven, loadUserPreference } from '../utils/analytics'
-import AnalyticsConsentBanner from './AnalyticsConsentBanner'
 import AnnouncementModal from './AnnouncementModal'
 import AppHeader from './AppHeader'
 import AppSidebar from './AppSidebar'
@@ -20,7 +18,7 @@ import {
 import { Box, Container, Toolbar } from '@mui/material'
 
 const drawerWidth = 240
-type ActivePostLoginSurface = 'passkey' | 'announcement' | 'analytics' | null
+type ActivePostLoginSurface = 'passkey' | 'announcement' | null
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const {
@@ -33,20 +31,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const { announcement, acknowledgeAnnouncement, snoozeAnnouncement, trackAnnouncementCtaClick } =
     useAnnouncementSurface()
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [showConsentBanner, setShowConsentBanner] = useState(false)
   const [showPasskeyPrompt, setShowPasskeyPrompt] = useState(false)
-
-  useEffect(() => {
-    const checkConsent = async () => {
-      await loadUserPreference()
-      if (hasConsentBeenGiven() === false) {
-        setShowConsentBanner(true)
-      } else {
-        setShowConsentBanner(false)
-      }
-    }
-    checkConsent()
-  }, [])
 
   useEffect(() => {
     if (!user?.username) {
@@ -96,11 +81,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const activeSurface: ActivePostLoginSurface = showPasskeyPrompt
     ? 'passkey'
-    : showConsentBanner
-      ? 'analytics'
-      : announcement
-        ? 'announcement'
-        : null
+    : announcement
+      ? 'announcement'
+      : null
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -133,9 +116,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         onSnooze={snoozeAnnouncement}
         onCtaClick={trackAnnouncementCtaClick}
       />
-      {activeSurface === 'analytics' && (
-        <AnalyticsConsentBanner onConsentGiven={() => setShowConsentBanner(false)} />
-      )}
       <PasskeyEnrollmentPrompt
         open={activeSurface === 'passkey'}
         onSnooze={handlePasskeyPromptSnooze}

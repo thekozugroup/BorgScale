@@ -23,7 +23,7 @@
         "Borg 2 support across repository create, import, stats, and archive flows",
         "A revamped dashboard, cleaner navigation, improved settings, and auto theme mode",
         "RBAC, repository access controls, personal profiles, and API tokens for multi-user setups",
-        "Announcements, Umami analytics, and better product telemetry",
+        "Announcements and improved system visibility",
         "Stronger SSH, restore, testing, and CI reliability"
       ],
       "highlights_localized": {
@@ -32,7 +32,7 @@
           "Soporte para Borg 2 en creacion, importacion, estadisticas y archivos",
           "Panel renovado, navegacion mas limpia, mejor configuracion y modo de tema automatico",
           "RBAC, controles de acceso por repositorio, perfiles personales y tokens API para entornos multiusuario",
-          "Announcements, analitica Umami y mejor telemetria del producto",
+          "Announcements y mayor visibilidad del sistema",
           "Mayor fiabilidad en SSH, restauracion, pruebas y CI"
         ]
       },

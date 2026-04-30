@@ -5,15 +5,9 @@ import App from '../App'
 
 const {
   useAuthMock,
-  loadUserPreferenceMock,
-  initAnalyticsIfEnabledMock,
-  identifyUserMock,
   protectedRouteMock,
 } = vi.hoisted(() => ({
   useAuthMock: vi.fn(),
-  loadUserPreferenceMock: vi.fn().mockResolvedValue(undefined),
-  initAnalyticsIfEnabledMock: vi.fn(),
-  identifyUserMock: vi.fn(),
   protectedRouteMock: vi.fn(),
 }))
 
@@ -21,18 +15,8 @@ vi.mock('../hooks/useAuth.tsx', () => ({
   useAuth: () => useAuthMock(),
 }))
 
-vi.mock('../utils/analytics', () => ({
-  loadUserPreference: loadUserPreferenceMock,
-  initAnalyticsIfEnabled: initAnalyticsIfEnabledMock,
-  identifyUser: identifyUserMock,
-}))
-
 vi.mock('../components/Layout', () => ({
   default: ({ children }: { children: ReactNode }) => <div>Layout{children}</div>,
-}))
-
-vi.mock('../components/UmamiTracker', () => ({
-  UmamiTracker: () => <div>Umami Tracker</div>,
 }))
 
 vi.mock('../components/ProtectedRoute', () => ({
@@ -163,7 +147,6 @@ describe('App', () => {
     renderWithProviders(<App />, { initialRoute: '/backup' })
 
     expect(await screen.findByText('Login Page')).toBeInTheDocument()
-    expect(screen.getByText('Umami Tracker')).toBeInTheDocument()
     expect(screen.queryByText('Layout')).not.toBeInTheDocument()
   })
 
@@ -172,7 +155,6 @@ describe('App', () => {
 
     expect(await screen.findByText('Dashboard Page')).toBeInTheDocument()
     expect(screen.getByText('Layout')).toBeInTheDocument()
-    expect(screen.getByText('Umami Tracker')).toBeInTheDocument()
   })
 
   it('keeps authenticated first-login users on the auth screen until password setup is handled', async () => {
@@ -209,15 +191,6 @@ describe('App', () => {
     expect(await screen.findByText('Settings Page')).toBeInTheDocument()
     await waitFor(() => {
       expect(window.location.pathname).toBe('/settings/scripts')
-    })
-  })
-
-  it('loads analytics preferences and initializes analytics on mount', async () => {
-    renderWithProviders(<App />, { initialRoute: '/dashboard' })
-
-    await waitFor(() => {
-      expect(loadUserPreferenceMock).toHaveBeenCalledTimes(1)
-      expect(initAnalyticsIfEnabledMock).toHaveBeenCalledTimes(1)
     })
   })
 
