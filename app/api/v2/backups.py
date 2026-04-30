@@ -20,7 +20,6 @@ from app.api.maintenance_jobs import (
     start_background_maintenance_job,
 )
 from app.core.security import get_current_user
-from app.core.features import require_feature
 from app.core.borg_router import BorgRouter
 from app.services.backup_service import backup_service
 from app.services.v2.check_service import check_v2_service
@@ -28,7 +27,7 @@ from app.services.v2.compact_service import compact_v2_service
 from app.services.v2.prune_service import prune_v2_service
 
 logger = structlog.get_logger()
-router = APIRouter(tags=["Backup v2"], dependencies=[require_feature("borg_v2")])
+router = APIRouter(tags=["Backup v2"])
 
 
 # ── Schemas ────────────────────────────────────────────────────────────────────

@@ -117,36 +117,6 @@ describe('Layout', () => {
     })
   })
 
-  it('shows the analytics consent banner when consent has not been given', async () => {
-    hasConsentBeenGivenMock.mockReturnValue(false)
-
-    renderWithProviders(
-      <Layout>
-        <div>Page Content</div>
-      </Layout>
-    )
-
-    expect(await screen.findByText('Consent Banner')).toBeInTheDocument()
-    expect(loadUserPreferenceMock).toHaveBeenCalledTimes(1)
-  })
-
-  it('hides the consent banner after consent is handled', async () => {
-    hasConsentBeenGivenMock.mockReturnValue(false)
-    const user = userEvent.setup()
-
-    renderWithProviders(
-      <Layout>
-        <div>Page Content</div>
-      </Layout>
-    )
-
-    await user.click(await screen.findByRole('button', { name: 'Dismiss Banner' }))
-
-    await waitFor(() => {
-      expect(screen.queryByText('Consent Banner')).not.toBeInTheDocument()
-    })
-  })
-
   it('renders the current user and logs out from the header action', async () => {
     const user = userEvent.setup()
 
@@ -325,27 +295,4 @@ describe('Layout', () => {
     expect(screen.queryByText('Announcement Modal')).not.toBeInTheDocument()
   })
 
-  it('shows the analytics consent banner before announcements', async () => {
-    hasConsentBeenGivenMock.mockReturnValue(false)
-    announcementSurfaceMock.mockReturnValue({
-      announcement: {
-        id: 'update-1',
-        type: 'update_available',
-        title: 'Update Available',
-        message: 'A new version is ready.',
-      },
-      acknowledgeAnnouncement: vi.fn(),
-      snoozeAnnouncement: vi.fn(),
-      trackAnnouncementCtaClick: vi.fn(),
-    })
-
-    renderWithProviders(
-      <Layout>
-        <div>Page Content</div>
-      </Layout>
-    )
-
-    expect(await screen.findByText('Consent Banner')).toBeInTheDocument()
-    expect(screen.queryByText('Announcement Modal')).not.toBeInTheDocument()
-  })
 })

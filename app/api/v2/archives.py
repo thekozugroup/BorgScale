@@ -18,7 +18,6 @@ from app.api.archive_download import extract_file_download
 from app.database.database import get_db
 from app.database.models import User, Repository, DeleteArchiveJob
 from app.core.security import get_current_user, get_current_download_user
-from app.core.features import require_feature
 from app.core.borg2 import borg2
 from app.services.archive_browse_service import (
     build_browse_items,
@@ -30,7 +29,7 @@ from app.services.v2.archive_browse import get_browse_depth, is_fast_browse_enab
 from app.utils.borg_env import repository_borg_env
 
 logger = structlog.get_logger()
-router = APIRouter(tags=["Archives v2"], dependencies=[require_feature("borg_v2")])
+router = APIRouter(tags=["Archives v2"])
 
 ARCHIVE_ID_RE = re.compile(r"^[0-9a-fA-F]{16,}$")
 

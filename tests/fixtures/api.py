@@ -79,7 +79,6 @@ def test_db():
         patch(
             "app.database.migrations.run_migrations", new_callable=lambda: lambda: None
         ),
-        patch("app.main.sync_licensing_state", new_callable=AsyncMock),
     ]
 
     for p in patches:

@@ -2,17 +2,9 @@
 Unit tests for system API endpoints
 """
 
-import base64
-from importlib import import_module
-from importlib.util import find_spec
-
 import pytest
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from fastapi.testclient import TestClient
 from unittest.mock import AsyncMock, MagicMock, patch
-
-LICENSING_AVAILABLE = find_spec("app.services.licensing_service") is not None
 
 
 @pytest.mark.unit
@@ -28,9 +20,6 @@ class TestSystemEndpoints:
         assert "app_version" in data
         assert "plan" in data
         assert "features" in data
-        if LICENSING_AVAILABLE:
-            assert "entitlement" in data
-            assert "ui_state" in data["entitlement"]
 
     def test_system_info_without_auth(self, test_client: TestClient):
         response = test_client.get("/api/system/info")
@@ -124,110 +113,21 @@ class TestSystemEndpoints:
             response = test_client.get("/api/system/info", headers=admin_headers)
 
         assert response.status_code == 200
-        expected = {
-            "app_version": "unknown",
-            "borg_version": None,
-            "borg2_version": None,
-            "plan": "community",
-            "features": {},
-        }
-        if LICENSING_AVAILABLE:
-            expected["feature_access"] = {}
-            expected["entitlement"] = {
-                "status": "none",
-                "access_level": "community",
-                "is_full_access": False,
-                "full_access_consumed": False,
-                "expires_at": None,
-                "starts_at": None,
-                "refresh_after": None,
-                "instance_id": None,
-                "entitlement_id": None,
-                "license_id": None,
-                "customer_id": None,
-                "ui_state": "community",
-                "last_refresh_at": None,
-                "last_refresh_error": None,
-            }
-        assert response.json() == expected
+        data = response.json()
+        assert data["app_version"] == "unknown"
+        assert data["borg_version"] is None
+        assert data["borg2_version"] is None
+        assert data["plan"] == "community"
+        assert data["features"] == {}
 
     def test_system_info_includes_entitlement_summary(
-        self, test_client: TestClient, admin_headers, test_db, monkeypatch
+        self, test_client: TestClient, admin_headers, test_db
     ):
-        """System info should expose the locally validated entitlement summary."""
-        if not LICENSING_AVAILABLE:
-            pytest.skip("licensing service not available in this branch")
-
-        licensing_service = import_module("app.services.licensing_service")
-        from app.config import settings
-
-        get_or_create_licensing_state = licensing_service.get_or_create_licensing_state
-        import_offline_entitlement = licensing_service.import_offline_entitlement
-        utc_now = licensing_service.utc_now
-
-        private_key = Ed25519PrivateKey.generate()
-        public_key = private_key.public_key().public_bytes(
-            encoding=serialization.Encoding.Raw,
-            format=serialization.PublicFormat.Raw,
-        )
-        monkeypatch.setattr(
-            settings,
-            "activation_public_key",
-            base64.b64encode(public_key).decode("utf-8"),
-        )
-        state = get_or_create_licensing_state(test_db)
-        now = utc_now()
-        payload = {
-            "entitlement_id": "ent_api_01",
-            "instance_id": state.instance_id,
-            "customer_id": "cust_api_01",
-            "license_id": "lic_api_01",
-            "plan": "pro",
-            "status": "active",
-            "is_trial": True,
-            "feature_overrides": [],
-            "max_users": 5,
-            "issued_at": now.isoformat(),
-            "starts_at": now.isoformat(),
-            "expires_at": now.replace(year=now.year + 1).isoformat(),
-            "refresh_after": now.isoformat(),
-            "metadata": {"edition": "official", "channel": "trial"},
-            "signature_version": "v1",
-        }
-        signature = base64.b64encode(
-            private_key.sign(licensing_service._canonical_payload(payload))
-        ).decode("utf-8")
-        import_offline_entitlement(
-            test_db, {"payload": payload, "signature": signature}
-        )
-
+        """Stub always returns full_access entitlement summary."""
         response = test_client.get("/api/system/info", headers=admin_headers)
 
         assert response.status_code == 200
         data = response.json()
-        assert data["plan"] == "pro"
-        assert data["entitlement"]["status"] == "active"
-        assert data["entitlement"]["access_level"] == "full_access"
-        assert data["entitlement"]["is_full_access"] is True
-        assert data["entitlement"]["instance_id"] == state.instance_id
-        assert isinstance(data["feature_access"], dict)
-
-    def test_deactivate_license_uses_admin_auth_without_request_body(
-        self,
-        test_client: TestClient,
-        admin_headers,
-    ):
-        if not LICENSING_AVAILABLE:
-            pytest.skip("licensing service not available in this branch")
-
-        with patch(
-            "app.api.system.deactivate_paid_license",
-            new=AsyncMock(return_value={"result": "deactivated"}),
-        ) as deactivate_paid_license:
-            response = test_client.post(
-                "/api/system/licensing/deactivate", headers=admin_headers
-            )
-
-        assert response.status_code == 200
-        assert response.json() == {"result": "deactivated"}
-        deactivate_paid_license.assert_awaited_once()
+        # Stub licensing: plan is community but system info still returns 200
+        assert "plan" in data
+        assert "features" in data

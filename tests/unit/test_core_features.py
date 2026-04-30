@@ -9,7 +9,6 @@ from app.core.features import (
     plan_includes,
     require_feature,
 )
-from app.database.models import LicensingState
 
 
 @pytest.mark.unit
@@ -30,35 +29,8 @@ class TestPlanIncludes:
 
 @pytest.mark.unit
 class TestCurrentPlan:
-    def test_get_current_plan_defaults_to_community_when_missing_settings(
-        self, db_session: Session
-    ):
-        assert get_current_plan(db_session) == Plan.COMMUNITY
-
-    def test_get_current_plan_uses_saved_value(self, db_session: Session):
-        db_session.add(
-            LicensingState(
-                instance_id="test-instance-core-features-enterprise",
-                plan="enterprise",
-                status="active",
-            )
-        )
-        db_session.commit()
-
-        assert get_current_plan(db_session) == Plan.ENTERPRISE
-
-    def test_get_current_plan_defaults_inactive_state_to_community(
-        self, db_session: Session
-    ):
-        db_session.add(
-            LicensingState(
-                instance_id="test-instance-core-features-inactive",
-                plan="pro",
-                status="none",
-            )
-        )
-        db_session.commit()
-
+    def test_get_current_plan_defaults_to_community(self, db_session: Session):
+        """Stub always returns community (BorgScale is unrestricted at the stub layer)."""
         assert get_current_plan(db_session) == Plan.COMMUNITY
 
 
@@ -70,31 +42,11 @@ class TestRequireFeature:
         with pytest.raises(ValueError, match="Unknown feature"):
             dependency(db_session)
 
-    def test_require_feature_allows_included_plan(self, db_session: Session):
-        db_session.add(
-            LicensingState(
-                instance_id="test-instance-core-features-rbac",
-                plan="enterprise",
-                status="active",
-            )
-        )
-        db_session.commit()
-
+    def test_require_feature_blocks_community_from_enterprise_feature(
+        self, db_session: Session
+    ):
+        """The stub returns community; enterprise-gated features return 403."""
         dependency = require_feature("rbac").dependency
-
-        assert dependency(db_session) is None
-
-    def test_require_feature_blocks_missing_plan(self, db_session: Session):
-        db_session.add(
-            LicensingState(
-                instance_id="test-instance-core-features-community",
-                plan="community",
-                status="active",
-            )
-        )
-        db_session.commit()
-
-        dependency = require_feature("borg_v2").dependency
 
         with pytest.raises(HTTPException) as exc:
             dependency(db_session)
@@ -102,7 +54,14 @@ class TestRequireFeature:
         assert exc.value.status_code == 403
         assert exc.value.detail == {
             "key": "backend.errors.plan.featureNotAvailable",
-            "feature": "borg_v2",
-            "required": FEATURES["borg_v2"].value,
+            "feature": "rbac",
+            "required": FEATURES["rbac"].value,
             "current": Plan.COMMUNITY.value,
         }
+
+    def test_require_feature_allows_community_for_community_feature(
+        self, db_session: Session
+    ):
+        """borg_v2 is community-accessible; should not raise."""
+        dependency = require_feature("borg_v2").dependency
+        assert dependency(db_session) is None

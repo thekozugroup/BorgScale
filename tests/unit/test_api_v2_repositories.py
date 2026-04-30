@@ -65,19 +65,6 @@ def _create_v2_repo(
 
 @pytest.mark.unit
 class TestV2RepositoryRoutes:
-    def test_encryption_modes_are_feature_gated(
-        self, test_client: TestClient, admin_headers
-    ):
-        response = test_client.get(
-            "/api/v2/repositories/encryption-modes", headers=admin_headers
-        )
-
-        assert response.status_code == 403
-        assert (
-            response.json()["detail"]["key"]
-            == "backend.errors.plan.featureNotAvailable"
-        )
-
     def test_encryption_modes_success(
         self, test_client: TestClient, admin_headers, test_db
     ):
