@@ -183,13 +183,13 @@ describe('WizardStepScripts', () => {
     expect(tooltip).toBeInTheDocument()
   })
 
-  it('displays warning alert severity when no repositories', () => {
+  it('displays alert when no repositories', () => {
     render(<WizardStepScripts {...defaultProps} repositoryCount={0} />)
 
-    const alert = screen
-      .getByText(/Select at least one repository in Step 1 to configure scripts/)
-      .closest('.MuiAlert-root')
-    expect(alert).toHaveClass('MuiAlert-standardWarning')
+    // shadcn Alert renders as role="alert"
+    const alert = screen.getByRole('alert')
+    expect(alert).toBeInTheDocument()
+    expect(alert).toHaveTextContent(/Select at least one repository in Step 1 to configure scripts/)
   })
 
   it('provides concise script level explanation in info tooltip', () => {

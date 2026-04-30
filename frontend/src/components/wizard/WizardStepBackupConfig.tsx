@@ -1,4 +1,3 @@
-import { Box, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import CompressionSettings from '../CompressionSettings'
 import ExcludePatternInput from '../ExcludePatternInput'
@@ -38,14 +37,14 @@ export default function WizardStepBackupConfig({
   const { t } = useTranslation()
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <div className="flex flex-col gap-4">
       {/* Compression Settings */}
       <CompressionSettings
         value={data.compression}
         onChange={(value) => onChange({ compression: value })}
       />
 
-      {/* Exclude Patterns - Now works for both local and remote sources */}
+      {/* Exclude Patterns */}
       <ExcludePatternInput
         patterns={data.excludePatterns}
         onChange={(patterns) => onChange({ excludePatterns: patterns })}
@@ -54,9 +53,9 @@ export default function WizardStepBackupConfig({
 
       {/* Info for remote data source */}
       {dataSource === 'remote' && (
-        <Typography variant="body2" color="text.secondary">
+        <p className="text-sm text-muted-foreground">
           {t('wizard.backupConfig.remoteSshfsNote')}
-        </Typography>
+        </p>
       )}
 
       {/* Advanced Options */}
@@ -78,6 +77,6 @@ export default function WizardStepBackupConfig({
         onHookFailureModeChange={(value) => onChange({ hookFailureMode: value })}
         onCustomFlagsChange={(value) => onChange({ customFlags: value })}
       />
-    </Box>
+    </div>
   )
 }

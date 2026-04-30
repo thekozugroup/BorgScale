@@ -1,8 +1,14 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { DialogTitle, DialogContent, DialogActions, Box, Button, Typography } from '@mui/material'
-import ResponsiveDialog from './ResponsiveDialog'
 import { FileText, Clock, Code, Wrench, CheckCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import { WizardStepIndicator } from './wizard'
 import {
   WizardStepBasicInfo,
@@ -81,23 +87,16 @@ export interface ScheduleData {
 }
 
 interface WizardState {
-  // Step 1: Basic Info
   name: string
   description: string
   repositoryIds: number[]
-
-  // Step 2: Schedule
   cronExpression: string
   archiveNameTemplate: string
-
-  // Step 3: Scripts
   preBackupScriptId: number | null
   postBackupScriptId: number | null
   preBackupScriptParameters: Record<string, string>
   postBackupScriptParameters: Record<string, string>
   runRepositoryScripts: boolean
-
-  // Step 4: Maintenance
   runPruneAfter: boolean
   runCompactAfter: boolean
   pruneKeepHourly: number
@@ -144,7 +143,6 @@ const ScheduleWizard: React.FC<ScheduleWizardProps> = ({
   const [wizardState, setWizardState] = useState<WizardState>(initialState)
   const prevOpenRef = useRef(false)
 
-  // Step definitions
   const steps = useMemo(
     () => [
       { key: 'basic', label: t('scheduleWizard.steps.basic'), icon: <FileText size={14} /> },
@@ -160,11 +158,9 @@ const ScheduleWizard: React.FC<ScheduleWizardProps> = ({
     [t]
   )
 
-  // Populate form data for edit mode
   const populateEditData = React.useCallback(() => {
     if (!scheduledJob) return
 
-    // Handle converting old single-repo format to new multi-repo format
     let repository_ids: number[] = []
     if (scheduledJob.repository_ids && scheduledJob.repository_ids.length > 0) {
       repository_ids = scheduledJob.repository_ids
@@ -177,7 +173,6 @@ const ScheduleWizard: React.FC<ScheduleWizardProps> = ({
       }
     }
 
-    // Convert UTC cron expression from server to local time for editing
     const localCron = convertCronToLocal(scheduledJob.cron_expression)
 
     setWizardState({
@@ -202,18 +197,15 @@ const ScheduleWizard: React.FC<ScheduleWizardProps> = ({
     })
   }, [scheduledJob, repositories])
 
-  // Reset form
   const resetForm = () => {
     setActiveStep(0)
     setWizardState(initialState)
   }
 
-  // Handle state changes
   const handleStateChange = (updates: Partial<WizardState>) => {
     setWizardState((prev) => ({ ...prev, ...updates }))
   }
 
-  // Initialize on dialog open (only on false → true transition)
   useEffect(() => {
     const wasOpen = prevOpenRef.current
     prevOpenRef.current = open
@@ -228,7 +220,6 @@ const ScheduleWizard: React.FC<ScheduleWizardProps> = ({
     }
   }, [open, mode, scheduledJob, populateEditData])
 
-  // Validation
   const canProceed = () => {
     const currentStepKey = steps[activeStep]?.key
 
@@ -253,16 +244,10 @@ const ScheduleWizard: React.FC<ScheduleWizardProps> = ({
     }
   }
 
-  const handleNext = () => {
-    setActiveStep((prev) => prev + 1)
-  }
-
-  const handleBack = () => {
-    setActiveStep((prev) => prev - 1)
-  }
+  const handleNext = () => setActiveStep((prev) => prev + 1)
+  const handleBack = () => setActiveStep((prev) => prev - 1)
 
   const handleSubmit = () => {
-    // Convert cron expression from local time to UTC before sending to server
     const utcCron = convertCronToUTC(wizardState.cronExpression)
 
     const data: ScheduleData = {
@@ -298,7 +283,6 @@ const ScheduleWizard: React.FC<ScheduleWizardProps> = ({
     onClose()
   }
 
-  // Render current step content
   const renderStepContent = () => {
     const currentStepKey = steps[activeStep]?.key
 
@@ -375,78 +359,55 @@ const ScheduleWizard: React.FC<ScheduleWizardProps> = ({
     }
   }
 
+  const dialogTitle =
+    mode === 'create' ? t('scheduleWizard.titleCreate') : t('scheduleWizard.titleEdit')
+
   return (
-    <ResponsiveDialog
-      open={open}
-      onClose={onClose}
-      maxWidth="md"
-      fullWidth
-      PaperProps={{
-        sx: {
-          borderRadius: 3,
-          overflow: 'hidden',
-          backdropFilter: 'blur(10px)',
-          backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))',
-          boxShadow: (theme) =>
-            theme.palette.mode === 'dark'
-              ? '0 24px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1)'
-              : '0 24px 48px rgba(0,0,0,0.1)',
-        },
-      }}
-      footer={
-        <DialogActions sx={{ px: { xs: 1, sm: 3 }, pb: { xs: 1, sm: 2 } }}>
-          <Button onClick={onClose}>{t('common.buttons.cancel')}</Button>
-          <Box sx={{ flex: 1 }} />
-          <Button disabled={activeStep === 0} onClick={handleBack}>
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent
+        className="max-w-2xl w-full p-0 gap-0 overflow-hidden flex flex-col max-h-[min(860px,calc(100vh-64px))]"
+        showCloseButton={false}
+      >
+        <DialogHeader className="px-6 pt-5 pb-2 shrink-0">
+          <DialogTitle className="text-xl font-bold">{dialogTitle}</DialogTitle>
+        </DialogHeader>
+
+        <div className="flex flex-col flex-1 min-h-0 px-6">
+          {/* Step Indicator */}
+          <WizardStepIndicator
+            steps={steps}
+            currentStep={activeStep}
+            onStepClick={setActiveStep}
+          />
+
+          {/* Step Content */}
+          <div className="flex-1 overflow-auto pb-4">
+            {renderStepContent()}
+          </div>
+        </div>
+
+        <DialogFooter className="px-6 py-3 border-t flex-row gap-2 shrink-0">
+          <Button variant="ghost" onClick={onClose}>
+            {t('common.buttons.cancel')}
+          </Button>
+          <div className="flex-1" />
+          <Button variant="outline" disabled={activeStep === 0} onClick={handleBack}>
             {t('common.buttons.back')}
           </Button>
           {activeStep < steps.length - 1 ? (
-            <Button
-              variant="contained"
-              onClick={handleNext}
-              disabled={!canProceed()}
-              sx={{ boxShadow: '0 2px 8px rgba(37,99,235,0.3)' }}
-            >
+            <Button onClick={handleNext} disabled={!canProceed()}>
               {t('common.buttons.next')}
             </Button>
           ) : (
-            <Button
-              variant="contained"
-              onClick={handleSubmit}
-              disabled={!canProceed()}
-              sx={{ boxShadow: '0 2px 8px rgba(37,99,235,0.3)' }}
-            >
+            <Button onClick={handleSubmit} disabled={!canProceed()}>
               {mode === 'create'
                 ? t('scheduleWizard.finalButtonCreate')
                 : t('scheduleWizard.finalButtonEdit')}
             </Button>
           )}
-        </DialogActions>
-      }
-    >
-      <DialogTitle sx={{ pt: 3, pb: 1 }}>
-        <Typography variant="h5" component="div" fontWeight={700}>
-          {mode === 'create' ? t('scheduleWizard.titleCreate') : t('scheduleWizard.titleEdit')}
-        </Typography>
-      </DialogTitle>
-      <DialogContent sx={{ pb: 1 }}>
-        <Box sx={{ mt: 1.5 }}>
-          {/* Step Indicator */}
-          <WizardStepIndicator steps={steps} currentStep={activeStep} onStepClick={setActiveStep} />
-
-          {/* Step Content - natural height on mobile, fixed on desktop */}
-          <Box
-            sx={{
-              minHeight: { xs: 'auto', md: 450 },
-              overflow: 'auto',
-              p: { xs: 1, sm: 2.5 },
-            }}
-          >
-            {renderStepContent()}
-          </Box>
-        </Box>
+        </DialogFooter>
       </DialogContent>
-    </ResponsiveDialog>
+    </Dialog>
   )
 }
 

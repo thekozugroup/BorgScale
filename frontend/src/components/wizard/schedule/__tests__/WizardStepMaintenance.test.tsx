@@ -111,7 +111,7 @@ describe('WizardStepMaintenance', () => {
     render(<WizardStepMaintenance {...defaultProps} />)
 
     // Compact info icon is always rendered in the toggle label
-    const tooltip = screen.getByLabelText(/Compact reclaims disk space after prune/i)
+    const tooltip = screen.getByRole('button', { name: /Compact reclaims disk space after prune/i })
     expect(tooltip).toBeInTheDocument()
   })
 
@@ -213,8 +213,9 @@ describe('WizardStepMaintenance', () => {
 
     render(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} />)
 
-    const alert = screen.getByText(/Caution:/).closest('.MuiAlert-root')
-    expect(alert).toHaveClass('MuiAlert-standardWarning')
+    const alert = screen.getByRole('alert')
+    expect(alert).toBeInTheDocument()
+    expect(alert).toHaveTextContent(/Caution:/)
   })
 
   it('renders info tooltip for maintenance hint', () => {

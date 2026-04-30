@@ -152,8 +152,8 @@ describe('WizardStepSecurity', () => {
 
       render(<WizardStepSecurity mode="create" data={defaultData} onChange={onChange} />)
 
-      // Click on the select to open dropdown
-      const selectButton = screen.getByText('Repository Key')
+      // Click on the select trigger to open dropdown
+      const selectButton = screen.getByRole('combobox')
       await user.click(selectButton)
 
       // Find and click keyfile option in the listbox
@@ -174,8 +174,8 @@ describe('WizardStepSecurity', () => {
 
       render(<WizardStepSecurity mode="create" data={defaultData} onChange={onChange} />)
 
-      // Click on the select to open dropdown
-      const selectButton = screen.getByText('Repository Key')
+      // Click on the select trigger to open dropdown
+      const selectButton = screen.getByRole('combobox')
       await user.click(selectButton)
 
       // Find and click none option in the listbox

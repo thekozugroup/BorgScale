@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Stack, Typography, Box, Tooltip } from '@mui/material'
 import { Info } from 'lucide-react'
 import CronExpressionInput from '../../CronExpressionInput'
 import ArchiveNameTemplateInput from '../../ArchiveNameTemplateInput'
@@ -24,7 +23,6 @@ const WizardStepScheduleConfig: React.FC<WizardStepScheduleConfigProps> = ({
 }) => {
   const { t } = useTranslation()
 
-  // Calculate next 3 run times
   const nextRunTimes = useMemo(() => {
     try {
       const interval = CronExpressionParser.parse(data.cronExpression)
@@ -39,7 +37,7 @@ const WizardStepScheduleConfig: React.FC<WizardStepScheduleConfigProps> = ({
   }, [data.cronExpression])
 
   return (
-    <Stack spacing={2}>
+    <div className="flex flex-col gap-4">
       <CronExpressionInput
         value={data.cronExpression}
         onChange={(cron) => onChange({ cronExpression: cron })}
@@ -50,50 +48,29 @@ const WizardStepScheduleConfig: React.FC<WizardStepScheduleConfigProps> = ({
       />
 
       {nextRunTimes && (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, pl: 0.25 }}>
-          <Tooltip
-            title={
-              <Stack spacing={0.5} sx={{ py: 0.25 }}>
-                <Typography variant="caption" fontWeight={600}>
-                  {t('wizard.scheduleWizard.config.nextRunTimes')}
-                </Typography>
-                {nextRunTimes.map((time, index) => (
-                  <Typography
-                    key={index}
-                    variant="caption"
-                    sx={{ fontFamily: 'monospace', opacity: 0.9 }}
-                  >
-                    {time}
-                  </Typography>
-                ))}
-              </Stack>
-            }
-            arrow
-            placement="right"
-          >
-            <Box
-              component="span"
+        <div className="flex items-center gap-2 pl-0.5">
+          <div className="relative group">
+            <button
+              type="button"
               tabIndex={0}
               aria-label={t('wizard.scheduleWizard.config.nextRunTimes')}
-              sx={{
-                display: 'inline-flex',
-                cursor: 'help',
-                color: 'text.disabled',
-                '&:hover': { color: 'text.secondary' },
-                '&:focus-visible': {
-                  outline: '2px solid',
-                  outlineColor: 'primary.main',
-                  borderRadius: 0.5,
-                },
-              }}
+              className="inline-flex cursor-help text-muted-foreground hover:text-muted-foreground/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
             >
               <Info size={14} />
-            </Box>
-          </Tooltip>
-          <Typography variant="caption" color="text.secondary">
+            </button>
+            {/* Tooltip popup */}
+            <div className="absolute left-6 top-0 z-10 hidden group-hover:block group-focus-within:block w-max max-w-xs bg-popover text-popover-foreground text-xs rounded-lg border px-2.5 py-2 shadow-md">
+              {nextRunTimes.map((time, index) => (
+                <p key={index} className="font-mono opacity-90">
+                  {time}
+                </p>
+              ))}
+            </div>
+          </div>
+          <span className="text-xs text-muted-foreground">
             {t('wizard.scheduleWizard.config.nextRunTimes')} {nextRunTimes[0]}
-          </Typography>
-        </Box>
+          </span>
+        </div>
       )}
 
       <ArchiveNameTemplateInput
@@ -102,7 +79,7 @@ const WizardStepScheduleConfig: React.FC<WizardStepScheduleConfigProps> = ({
         jobName={jobName || 'example-job'}
         size="medium"
       />
-    </Stack>
+    </div>
   )
 }
 
