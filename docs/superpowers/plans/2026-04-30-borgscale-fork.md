@@ -1485,6 +1485,50 @@ git add -A
 git commit -m "build(frontend): install Tailwind + shadcn/ui (neutral stock theme)"
 ```
 
+### Task 6.1.5 — Install Impeccable (Design Skeptic backend)
+
+Files:
+- Modify: `frontend/package.json` (devDep)
+- Modify: `scripts/security-scan.sh` (append Impeccable check)
+- Modify: `.github/workflows/security.yml` (append CI step)
+
+- [ ] **Step 1: Install as devDep**
+
+```bash
+cd frontend
+npm install --save-dev impeccable
+npx impeccable --version
+```
+
+- [ ] **Step 2: Add Impeccable check to security-scan.sh**
+
+Append before the final `echo "OK"`:
+
+```bash
+echo "==> 5/5 impeccable design audit"
+if [ -d frontend/src ] && [ -f frontend/node_modules/.bin/impeccable ]; then
+  ( cd frontend && npx impeccable detect src/ --severity error ) \
+    || { echo "  impeccable: error-severity violations present" >&2; exit 1; }
+else
+  echo "  impeccable not installed yet (Phase 3 wave 6); skipping"
+fi
+```
+
+- [ ] **Step 3: CI step**
+
+In the `security-scan` job in `.github/workflows/security.yml`,
+ensure the `npm ci` step covers `frontend/`. The existing job already
+does (Task 0.4). The new check runs automatically via
+`scripts/security-scan.sh`.
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add frontend/package.json frontend/package-lock.json \
+        scripts/security-scan.sh
+git commit -m "build(skeptic): install Impeccable + wire into security-scan"
+```
+
 ### Task 6.2 — Install primitives needed by Phase 3
 
 ```bash
