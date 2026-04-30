@@ -56,11 +56,8 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     localStorage.setItem('theme', mode)
 
     // Update Tailwind dark mode class
-    if (effectiveMode === 'dark') {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
+    const root = document.documentElement
+    root.classList.toggle('dark', effectiveMode === 'dark')
   }, [effectiveMode, mode])
 
   const toggleTheme = () => {
