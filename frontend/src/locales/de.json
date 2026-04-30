@@ -59,7 +59,7 @@
     }
   },
   "login": {
-    "title": "Borg Web UI",
+    "title": "BorgScale",
     "subtitle": "Zugangsdaten eingeben, um fortzufahren",
     "username": "Benutzername",
     "password": "Passwort",
@@ -88,12 +88,12 @@
     "overline": "Erste Anmeldung",
     "title": "Neues Passwort setzen oder fortfahren",
     "description": "Du kannst jetzt ein neues Passwort setzen oder diesen Schritt überspringen und mit dem Dashboard fortfahren.",
-    "flowHint": "Nach diesem Schritt fährt Borg UI mit Passkeys, der Analyse-Einwilligung und aktiven Ankündigungen fort.",
+    "flowHint": "Nach diesem Schritt fährt BorgScale mit Passkeys, der Analyse-Einwilligung und aktiven Ankündigungen fort.",
     "skipHint": "Du kannst diesen Schritt überspringen und das Passwort später in den Kontoeinstellungen ändern.",
     "skip": "Jetzt überspringen"
   },
   "navigation": {
-    "appName": "Borg UI",
+    "appName": "BorgScale",
     "sections": {
       "dashboard": "DASHBOARD",
       "backup": "SICHERUNG",
@@ -1475,7 +1475,7 @@
     "archiveBrowsingLimitsDescription": "Diese Limits verhindern Speicherfehler beim Durchsuchen von Archiven mit Millionen von Dateien. Der Borg-Prozess wird vorzeitig beendet, wenn Limits überschritten werden.",
     "proxyAuthTitle": "Proxy-Authentifizierung",
     "proxyAuthDescription": "Überprüfe die aktive Proxy-Auth-Konfiguration, vertrauenswürdige Header und Sicherheitswarnungen zur Laufzeit.",
-    "proxyAuthEnabledStatus": "Die Proxy-Authentifizierung ist aktiviert. Borg UI erwartet, dass dein Reverse Proxy oder Identity Provider Benutzer authentifiziert und vertrauenswürdige Header weiterleitet.",
+    "proxyAuthEnabledStatus": "Die Proxy-Authentifizierung ist aktiviert. BorgScale erwartet, dass dein Reverse Proxy oder Identity Provider Benutzer authentifiziert und vertrauenswürdige Header weiterleitet.",
     "proxyAuthDisabledStatus": "Die integrierte Borg-UI-Authentifizierung ist aktiv. Die Proxy-Authentifizierung ist derzeit deaktiviert.",
     "proxyAuthUsernameHeader": "Benutzername-Header",
     "proxyAuthRoleHeader": "Header für globale Rolle",
@@ -1665,7 +1665,7 @@
     "saving": "Speichert...",
     "updatedSuccessfully": "Einstellungen erfolgreich aktualisiert",
     "analyticsTitle": "Anonyme Nutzungsanalyse",
-    "analyticsDescription": "Hilf uns, Borg UI zu verbessern, indem du anonyme Nutzungsdaten teilst. Wir erfassen Seitenaufrufe, Funktionsklicks und Browser-Typ – ohne IP-Adressen, Hostnamen, Cookies oder persönlich identifizierbare Informationen zu verfolgen.",
+    "analyticsDescription": "Hilf uns, BorgScale zu verbessern, indem du anonyme Nutzungsdaten teilst. Wir erfassen Seitenaufrufe, Funktionsklicks und Browser-Typ – ohne IP-Adressen, Hostnamen, Cookies oder persönlich identifizierbare Informationen zu verfolgen.",
     "enableAnalytics": "Analysen aktivieren",
     "languageTitle": "Sprache",
     "languageDescription": "Wähle die Sprache der Benutzeroberfläche",
@@ -1934,8 +1934,8 @@
     "duration": "Dauer:"
   },
   "analyticsConsent": {
-    "title": "Hilf uns, Borg UI zu verbessern",
-    "message": "Wir erfassen anonyme Nutzungsdaten, um zu verstehen, wie Borg UI verwendet wird, und es zu verbessern. Es werden keine persönlichen Informationen, IP-Adressen, Hostnamen oder Sicherungsdaten erfasst.",
+    "title": "Hilf uns, BorgScale zu verbessern",
+    "message": "Wir erfassen anonyme Nutzungsdaten, um zu verstehen, wie BorgScale verwendet wird, und es zu verbessern. Es werden keine persönlichen Informationen, IP-Adressen, Hostnamen oder Sicherungsdaten erfasst.",
     "accept": "Akzeptieren",
     "decline": "Ablehnen",
     "learnMore": "Mehr erfahren",
@@ -2782,7 +2782,7 @@
   },
   "layout": {
     "systemInformation": "Systeminformationen",
-    "logoAlt": "Borg UI Logo"
+    "logoAlt": "BorgScale Logo"
   },
   "logViewer": {
     "title": "{{label}} Protokolle - Aufgabe #{{jobId}}",
@@ -3237,78 +3237,10 @@
       }
     }
   },
-  "plan": {
-    "labels": {
-      "community": "Community",
-      "pro": "Pro",
-      "enterprise": "Enterprise"
-    },
-    "currentPlan": "Aktueller Plan",
-    "fullAccessLabel": "Voller Zugriff",
-    "planSuffix": "Plan",
-    "activeStatus": "Aktiv",
-    "descriptionCommunity": "Zentrale Backup-Funktionen enthalten",
-    "descriptionPro": "Alle Pro-Funktionen freigeschaltet",
-    "descriptionEnterprise": "Alle Enterprise-Funktionen freigeschaltet",
-    "proFeatures": "Pro-Funktionen",
-    "plans": "Pläne",
-    "fullAccessActiveNotice": "Voller Zugriff ist bis {{date}} inbegriffen. Danach wechselt diese Instanz automatisch zu Community, sofern keine kostenpflichtige Berechtigung aktiviert wird.",
-    "fullAccessExpiredNotice": "Voller Zugriff ist beendet. Diese Instanz läuft nun auf Community, bis eine kostenpflichtige Berechtigung aktiviert wird.",
-    "paidActiveNotice": "Auf dieser Instanz ist eine kostenpflichtige Berechtigung aktiv.",
-    "lastRefreshError": "Die letzte Lizenzsynchronisierung ist fehlgeschlagen: {{error}}",
-    "licenseManagement": "Lizenzverwaltung",
-    "instanceIdLabel": "Instanz-ID",
-    "activeLicenseIdLabel": "Aktive Lizenz",
-    "licenseKeyLabel": "Lizenzschlüssel",
-    "licenseKeyPlaceholder": "BORG-XXXX-XXXX-XXXX",
-    "activateLicenseButton": "Lizenz aktivieren",
-    "replaceLicenseButton": "Lizenz ersetzen",
-    "refreshLicenseButton": "Status aktualisieren",
-    "deactivateLicenseButton": "Deaktivieren",
-    "licenseManagementHelp": "Verwenden Sie den gekauften Lizenzschlüssel, um Pro auf dieser Borg-UI-Instanz zu aktivieren. Mit Aktualisieren wird die aktuelle Berechtigung beim Lizenzdienst geprüft.",
-    "licenseKeyRequired": "Geben Sie zuerst einen Lizenzschlüssel ein.",
-    "licenseActivationSuccess": "Lizenz erfolgreich aktiviert.",
-    "licenseActivationFailed": "Lizenz konnte nicht aktiviert werden.",
-    "licenseRefreshSuccess": "Lizenzstatus aktualisiert.",
-    "licenseRefreshFailed": "Lizenzstatus konnte nicht aktualisiert werden.",
-    "licenseDeactivationSuccess": "Lizenz erfolgreich deaktiviert.",
-    "licenseDeactivationFailed": "Lizenz konnte nicht deaktiviert werden.",
-    "communityWarning": "{{plan}}-Funktionen sind nach Ablauf des anfänglichen Zugangs im kostenlosen Community-Plan nicht verfügbar.",
-    "featureUnavailableInCommunity": "Nach Ablauf des anfänglichen Zugangs im kostenlosen Community-Plan nicht verfügbar.",
-    "comingSoon": "Demnächst",
-    "planFeatures": "{{plan}}-Funktionen",
-    "plannedReleases": "In kommenden Releases für {{plan}} enthalten",
-    "upcomingFeatures": "Demnächst für {{plan}}",
-    "availableIn": "Verfügbar in {{version}}",
-    "buyLink": "Upgrade auf {{plan}}",
-    "yourPlanTab": "Ihr Plan",
-    "upgradeTab": "Upgrade",
-    "communityIncluded": "Kostenlos fur immer",
-    "fullAccessCountdown_one": "Noch {{count}} Tag voller Zugriff",
-    "fullAccessCountdown_other": "Noch {{count}} Tage voller Zugriff",
-    "fullAccessEndsNotice": "Am {{date}} werden Pro- und Enterprise-Funktionen deaktiviert. Alles unten bleibt Ihnen dauerhaft erhalten.",
-    "afterFullAccessEndsNotice": "Diese Funktionen waren während Ihres Zeitraums mit vollem Zugriff verfügbar, sind aber nicht in der Community Edition enthalten.",
-    "upgradeNudgeTitle": "Möchten Sie nach dem vollen Zugriff mehr?",
-    "upgradeNudgeAfterTitle": "Schalten Sie mehr mit Pro oder Enterprise frei",
-    "upgradeNudgePro": "Pro",
-    "upgradeNudgeEnterprise": "Enterprise",
-    "viewUpgradeOptions": "Upgrade-Optionen anzeigen"
-  },
-  "licensing": {
-    "title": "Lizenzierung",
-    "subtitle": "Verwalten Sie die Berechtigung für diese Borg-UI-Instanz und aktivieren Sie kostenpflichtigen Zugriff.",
-    "currentState": "Aktueller Status",
-    "currentPlanValue": "Aktueller Zugriff: {{plan}}",
-    "instanceIdValue": "Instanz-ID: {{instanceId}}",
-    "licenseIdValue": "Aktive Lizenz: {{licenseId}}",
-    "expiresAtValue": "Läuft ab am: {{date}}",
-    "viewPlanDetails": "Plandetails anzeigen →"
-  },
   "upgradePrompt": {
     "featureLabel": "{{plan}}-Funktion",
     "defaultMessage": "Diese Funktion erfordert den {{plan}}-Plan.",
     "requiresPlan": "Erfordert den {{plan}}-Plan",
-    "buyLink": "Upgrade auf borgui.com",
     "learnMore": "See what's included →"
   },
   "announcements": {
