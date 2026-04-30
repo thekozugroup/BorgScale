@@ -355,19 +355,42 @@ Pass condition: 100/100, zero items in any list.
 
 ### Design Skeptic agent (UI polish + consistency)
 
+The Design Skeptic is implemented as a thin wrapper around
+[Impeccable](https://impeccable.style/) — a deterministic CLI that
+runs 25 design-quality checks (gradients, nested cards, low-contrast
+labels, gradient-text headings, broken focus rings, etc.) and emits
+JSON per-violation. Installed in Wave 6 alongside the Tailwind +
+shadcn tooling and used from Wave 7 onward.
+
 Inputs:
-- Built frontend, served from a headless Chromium.
-- Screenshots of every primary page at 1280×800 and 768×1024.
+- Built frontend (`frontend/dist/`).
+- `npx impeccable detect frontend/src/ --json` output.
+- Screenshots of every primary page at 1280×800 and 768×1024 (light
+  + dark) rendered in headless Chromium for the qualitative pass.
+
+Process per wave:
+1. `cd frontend && npm run build`.
+2. `npx impeccable detect src/ --json --severity all > /tmp/impeccable.json`.
+3. Parse JSON. If any violation has severity `error`, the wave is
+   blocked at 0 — implementer must fix.
+4. If only `warning` / `info` severities remain, the agent does a
+   second qualitative pass over the screenshots and reports any
+   remaining inconsistencies (visual states, dark-mode parity,
+   shadcn-conformance regressions) that Impeccable does not cover.
+5. Grade `100 - len(remaining_issues)` capped at `[0, 100]`.
 
 Output:
 - Grade 0–100.
-- List of inconsistencies: gradients, font drift, spacing drift,
-  colour drift, broken focus rings, missing dark mode, accessibility
-  contrast issues.
+- Impeccable JSON report attached.
+- List of remaining qualitative inconsistencies (if any) with the
+  page name, viewport, and theme.
 - List of missing visual states (hover, focus, disabled, loading,
   error).
 
-Pass condition: 100/100, zero items in any list.
+Pass condition: 100/100, zero error-severity Impeccable violations,
+zero qualitative issues. Impeccable's deterministic fail-on-severity
+gate runs in CI on every push (Wave 0 wires it into
+`scripts/security-scan.sh` once Impeccable is installed in Wave 6).
 
 ## Concurrency model
 
