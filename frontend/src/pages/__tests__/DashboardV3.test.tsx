@@ -187,7 +187,7 @@ describe('DashboardV3', () => {
     it('shows loading skeletons before data arrives', () => {
       getOverviewMock.mockReturnValueOnce(new Promise(() => {}) as never)
       renderDashboard()
-      expect(document.querySelectorAll('.MuiSkeleton-root').length).toBeGreaterThan(0)
+      expect(document.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(0)
     })
 
     it('shows error alert when fetch fails', async () => {
@@ -297,8 +297,8 @@ describe('DashboardV3', () => {
       mockFetchSuccess(makeOverview())
       renderDashboard()
       await waitFor(() => screen.getAllByText('my-server'))
-      // 'my-server' appears in both the storage legend (index 0) and the health grid card (index 1)
-      fireEvent.click(screen.getAllByText('my-server')[1])
+      // 'my-server' appears first in the repository health grid card (index 0)
+      fireEvent.click(screen.getAllByText('my-server')[0])
       expect(mockNavigate).toHaveBeenCalledWith('/repositories')
     })
 
