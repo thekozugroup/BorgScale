@@ -265,21 +265,22 @@ const CacheManagementTab: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <Label className="text-xs font-semibold mb-1.5 block">{t('cache.ttlLabel')}</Label>
-              <Input type="number" value={ttlMinutes} min={1} max={10080} onChange={(e) => setTtlMinutes(Number(e.target.value))} className="h-9 text-sm" />
+              <Label htmlFor="cache-ttl" className="text-xs font-semibold mb-1.5 block">{t('cache.ttlLabel')}</Label>
+              <Input id="cache-ttl" type="number" value={ttlMinutes} min={1} max={10080} onChange={(e) => setTtlMinutes(Number(e.target.value))} className="h-9 text-sm" />
               <p className="text-xs text-muted-foreground mt-1">{t('cache.ttlHelperText', { current: formatTtl(ttlMinutes) })}</p>
             </div>
             <div>
-              <Label className="text-xs font-semibold mb-1.5 block">{t('cache.maxSizeLabel')}</Label>
-              <Input type="number" value={maxSizeMb} min={100} max={10240} onChange={(e) => setMaxSizeMb(Number(e.target.value))} className="h-9 text-sm" />
+              <Label htmlFor="cache-max-size" className="text-xs font-semibold mb-1.5 block">{t('cache.maxSizeLabel')}</Label>
+              <Input id="cache-max-size" type="number" value={maxSizeMb} min={100} max={10240} onChange={(e) => setMaxSizeMb(Number(e.target.value))} className="h-9 text-sm" />
               <p className="text-xs text-muted-foreground mt-1">{t('cache.maxSizeHelperText', { current: (maxSizeMb / 1024).toFixed(2) })}</p>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 items-start">
             <div className="flex-1">
-              <Label className="text-xs font-semibold mb-1.5 block">{t('cache.redisUrlLabel')}</Label>
+              <Label htmlFor="cache-redis-url" className="text-xs font-semibold mb-1.5 block">{t('cache.redisUrlLabel')}</Label>
               <Input
+                id="cache-redis-url"
                 value={redisUrl}
                 onChange={(e) => setRedisUrl(e.target.value)}
                 placeholder="redis://192.168.1.100:6379/0"

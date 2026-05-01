@@ -218,7 +218,7 @@ export default function UserPermissionsPanel({
 
       {/* Scope section */}
       <div className="px-5 py-4 border-b border-border">
-        <p className="text-[0.68rem] font-bold uppercase tracking-[0.05em] text-muted-foreground mb-3">
+        <p className="text-2xs font-bold uppercase tracking-[0.05em] text-muted-foreground mb-3">
           {t('settings.permissions.scope.title')}
         </p>
         {canManageAssignments ? (
@@ -386,7 +386,7 @@ export default function UserPermissionsPanel({
         {/* Grant access section */}
         {canManageAssignments && scopeMode === 'selected' && (
           <div className="px-5 py-4 border-t border-border">
-            <p className="text-[0.68rem] font-bold uppercase tracking-[0.05em] text-muted-foreground mb-3">
+            <p className="text-2xs font-bold uppercase tracking-[0.05em] text-muted-foreground mb-3">
               {t('settings.permissions.grantAccess.title')}
             </p>
 

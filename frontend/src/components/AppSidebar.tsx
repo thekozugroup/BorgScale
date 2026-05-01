@@ -78,7 +78,7 @@ function SidebarBrandMark() {
       <Boxes size={24} className="shrink-0" />
       <span className="font-bold tracking-wide text-sm">BorgScale</span>
       <span
-        className="select-none rounded border border-sidebar-border bg-sidebar-accent px-1 py-0.5 text-[0.6rem] font-bold leading-none text-sidebar-foreground/70"
+        className="select-none rounded border border-sidebar-border bg-sidebar-accent px-1 py-0.5 text-2xs font-bold leading-none text-sidebar-foreground/70"
         aria-hidden="true"
       >
         {t('layout.version', '2.0')}

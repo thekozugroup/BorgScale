@@ -63,10 +63,10 @@ interface UserType {
 
 // Role accent uses CSS variable hex equivalents for the avatar border/bg.
 // These are intentional design tokens (foreground-based), not palette colours.
-const getRoleAccentColor = (role: string): string => {
-  if (role === 'admin' || role === 'superadmin') return 'hsl(var(--primary))'
-  if (role === 'operator') return 'hsl(var(--secondary-foreground))'
-  return 'hsl(var(--muted-foreground))'
+const getRoleAvatarClasses = (role: string): { wrapper: string; text: string } => {
+  if (role === 'admin' || role === 'superadmin') return { wrapper: 'border-primary/35 bg-primary/12', text: 'text-primary' }
+  if (role === 'operator') return { wrapper: 'border-secondary-foreground/35 bg-secondary-foreground/12', text: 'text-secondary-foreground' }
+  return { wrapper: 'border-muted-foreground/35 bg-muted-foreground/12', text: 'text-muted-foreground' }
 }
 
 const getInitials = (user: UserType): string => {
@@ -317,19 +317,14 @@ const UsersTab: React.FC = () => {
         id: 'user',
         label: t('settings.users.table.user'),
         render: (user) => {
-          const accent = getRoleAccentColor(user.role)
+          const avatarCls = getRoleAvatarClasses(user.role)
           return (
             <div className="flex items-center gap-3 py-0.5">
               <div
-                className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full border-[1.5px]"
-                style={{
-                  backgroundColor: `${accent}1f`,
-                  borderColor: `${accent}59`,
-                }}
+                className={cn('flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full border-[1.5px]', avatarCls.wrapper)}
               >
                 <span
-                  className="text-[0.64rem] font-extrabold leading-none"
-                  style={{ color: accent }}
+                  className={cn('text-2xs font-extrabold leading-none', avatarCls.text)}
                 >
                   {getInitials(user)}
                 </span>
@@ -373,7 +368,7 @@ const UsersTab: React.FC = () => {
             />
             <span
               className={cn(
-                'text-[0.8rem] font-medium',
+                'text-sm font-medium',
                 user.is_active ? 'text-foreground' : 'text-destructive'
               )}
             >

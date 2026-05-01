@@ -68,7 +68,7 @@ export default function AccountProfileSection({
                 <User size={16} />
               </div>
               <div>
-                <p className="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-0.5 text-muted-foreground">
+                <p className="text-2xs font-bold uppercase tracking-[0.08em] mb-0.5 text-muted-foreground">
                   {t('settings.account.profile.title')}
                 </p>
                 <p className="text-lg font-bold leading-tight">
@@ -108,7 +108,7 @@ export default function AccountProfileSection({
             </div>
           </div>
 
-          <p className="text-sm md:text-[0.95rem] text-muted-foreground max-w-2xl">
+          <p className="text-sm md:text-sm text-muted-foreground max-w-2xl">
             {t('settings.account.profile.description')}
           </p>
 
@@ -123,7 +123,7 @@ export default function AccountProfileSection({
                 key={item.label}
                 className="p-3.5 rounded-2xl border border-border bg-muted/30"
               >
-                <p className="text-[0.65rem] font-bold uppercase tracking-[0.06em] text-muted-foreground mb-1.5">
+                <p className="text-2xs font-bold uppercase tracking-[0.06em] text-muted-foreground mb-1.5">
                   {item.label}
                 </p>
                 <p className="text-sm font-bold truncate">{item.value}</p>

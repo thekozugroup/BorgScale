@@ -36,7 +36,7 @@ function StatCard({ label, value, icon, bgOpacity = '10', tooltip }: StatCardPro
     >
       <div className="flex justify-between items-start">
         <div>
-          <p className="text-[0.6rem] font-bold uppercase tracking-[0.06em] block mb-1.5 text-primary">
+          <p className="text-2xs font-bold uppercase tracking-[0.06em] block mb-1.5 text-primary">
             {label}
           </p>
           <p className="font-bold leading-tight text-[1.4rem] lg:text-[1.5rem] text-primary">

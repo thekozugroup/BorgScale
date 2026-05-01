@@ -65,7 +65,7 @@ export default function AccountSecuritySettingsSection({
             </div>
           </div>
 
-          <p className="text-sm text-muted-foreground max-w-2xl md:text-[0.95rem]">
+          <p className="text-sm text-muted-foreground max-w-2xl md:text-sm">
             {t('settings.account.security.description')}
           </p>
 

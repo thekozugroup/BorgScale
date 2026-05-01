@@ -58,13 +58,13 @@ const ScriptSelectorSection: React.FC<ScriptSelectorSectionProps> = ({
       <div className="flex flex-col gap-4">
         {/* Pre-backup script */}
         <div>
-          <Label className="mb-1 block">{t('scriptSelector.preBackup')}</Label>
+          <Label htmlFor="script-pre-backup" className="mb-1 block">{t('scriptSelector.preBackup')}</Label>
           <Select
             value={preBackupScriptId ? String(preBackupScriptId) : '__none__'}
             onValueChange={(v) => onPreChange(v === '__none__' ? null : Number(v))}
             disabled={disabled}
           >
-            <SelectTrigger>
+            <SelectTrigger id="script-pre-backup">
               <SelectValue placeholder={t('scriptSelector.none')} />
             </SelectTrigger>
             <SelectContent>
@@ -91,13 +91,13 @@ const ScriptSelectorSection: React.FC<ScriptSelectorSectionProps> = ({
 
         {/* Post-backup script */}
         <div>
-          <Label className="mb-1 block">{t('scriptSelector.postBackup')}</Label>
+          <Label htmlFor="script-post-backup" className="mb-1 block">{t('scriptSelector.postBackup')}</Label>
           <Select
             value={postBackupScriptId ? String(postBackupScriptId) : '__none__'}
             onValueChange={(v) => onPostChange(v === '__none__' ? null : Number(v))}
             disabled={disabled}
           >
-            <SelectTrigger>
+            <SelectTrigger id="script-post-backup">
               <SelectValue placeholder={t('scriptSelector.none')} />
             </SelectTrigger>
             <SelectContent>

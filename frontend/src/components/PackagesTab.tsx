@@ -396,6 +396,7 @@ export default function PackagesTab() {
           icon: <Package size={48} />,
           title: t('packages.empty'),
           description: t('packages.emptyDesc'),
+          action: <Button size="sm" onClick={() => setShowCreateDialog(true)}>{t('packages.addPackage')}</Button>,
         }}
         variant="outlined"
       />
@@ -410,8 +411,9 @@ export default function PackagesTab() {
           </DialogHeader>
           <form onSubmit={handleSubmitPackage} className="flex flex-col gap-4 pt-2">
             <div>
-              <Label className="text-xs font-semibold mb-1.5 block">{t('packages.fields.packageName')}</Label>
+              <Label htmlFor="packages-name" className="text-xs font-semibold mb-1.5 block">{t('packages.fields.packageName')}</Label>
               <Input
+                id="packages-name"
                 value={packageForm.name}
                 onChange={(e) => setPackageForm({ ...packageForm, name: e.target.value })}
                 required
@@ -435,8 +437,9 @@ export default function PackagesTab() {
 
             {advancedMode && (
               <div>
-                <Label className="text-xs font-semibold mb-1.5 block">{t('packages.fields.installCommand')}</Label>
+                <Label htmlFor="packages-install-command" className="text-xs font-semibold mb-1.5 block">{t('packages.fields.installCommand')}</Label>
                 <textarea
+                  id="packages-install-command"
                   value={packageForm.install_command}
                   onChange={(e) => setPackageForm({ ...packageForm, install_command: e.target.value })}
                   required={advancedMode}
@@ -448,8 +451,9 @@ export default function PackagesTab() {
             )}
 
             <div>
-              <Label className="text-xs font-semibold mb-1.5 block">{t('packages.fields.description')}</Label>
+              <Label htmlFor="packages-description" className="text-xs font-semibold mb-1.5 block">{t('packages.fields.description')}</Label>
               <Input
+                id="packages-description"
                 value={packageForm.description}
                 onChange={(e) => setPackageForm({ ...packageForm, description: e.target.value })}
                 className="h-9 text-sm"

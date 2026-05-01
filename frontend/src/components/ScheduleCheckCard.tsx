@@ -99,7 +99,7 @@ export default function ScheduleCheckCard({
   ]
 
   const badge = (
-    <Badge variant="outline" className="text-[0.65rem] border-border text-muted-foreground">
+    <Badge variant="outline" className="text-2xs border-border text-muted-foreground">
       {t('schedule.checkCard.badge.healthCheck')}
     </Badge>
   )

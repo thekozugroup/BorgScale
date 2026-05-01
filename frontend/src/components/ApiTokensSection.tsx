@@ -100,6 +100,9 @@ export default function ApiTokensSection() {
             <div className="p-6 text-center">
               <Key size={32} className="opacity-30 mx-auto mb-2" />
               <p className="text-sm text-muted-foreground">No tokens yet</p>
+              <div className="mt-4">
+                <Button size="sm" onClick={() => setGenerateOpen(true)}>Create token</Button>
+              </div>
             </div>
           ) : (
             <table className="w-full border-collapse">
@@ -117,7 +120,7 @@ export default function ApiTokensSection() {
                   <tr key={token.id} className="border-b border-border last:border-b-0">
                     <td className="px-4 py-3 text-sm font-medium">{token.name}</td>
                     <td className="px-4 py-3">
-                      <span className="text-sm text-muted-foreground" style={{ fontFamily: 'monospace' }}>
+                      <span className="text-sm text-muted-foreground font-mono">
                         {token.prefix}…
                       </span>
                     </td>
@@ -159,8 +162,9 @@ export default function ApiTokensSection() {
             className="flex flex-col gap-4 pt-2"
           >
             <div>
-              <Label className="text-xs font-semibold mb-1.5 block">Token name</Label>
+              <Label htmlFor="api-token-name" className="text-xs font-semibold mb-1.5 block">Token name</Label>
               <Input
+                id="api-token-name"
                 value={tokenName}
                 onChange={(e) => setTokenName(e.target.value)}
                 placeholder="e.g. CI deploy, Home automation"

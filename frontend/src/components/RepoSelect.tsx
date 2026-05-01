@@ -88,8 +88,7 @@ export default function RepoSelect({
             <BorgVersionChip borgVersion={selectedRepo.borg_version} compact />
           </div>
           <p
-            className="text-[0.62rem] truncate leading-snug text-muted-foreground"
-            style={{ fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,SFMono-Regular,monospace' }}
+            className="text-2xs truncate leading-snug text-muted-foreground font-mono"
           >
             {selectedRepo.path}
           </p>

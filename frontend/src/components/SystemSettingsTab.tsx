@@ -40,6 +40,7 @@ function formatTimeout(seconds: number): string {
 }
 
 interface TimeoutFieldProps {
+  id: string
   label: string
   value: number
   onChange: (v: number) => void
@@ -50,12 +51,13 @@ interface TimeoutFieldProps {
   renderSourceLabel: (source: string | null | undefined) => React.ReactNode
 }
 
-function TimeoutField({ label, value, onChange, step, sourceKey, helperExtra, timeoutSources, renderSourceLabel }: TimeoutFieldProps) {
+function TimeoutField({ id, label, value, onChange, step, sourceKey, helperExtra, timeoutSources, renderSourceLabel }: TimeoutFieldProps) {
   const isErr = value < MIN_TIMEOUT || value > MAX_TIMEOUT
   return (
     <div>
-      <Label className={cn('text-xs font-semibold mb-1.5 block', isErr && 'text-destructive')}>{label}</Label>
+      <Label htmlFor={id} className={cn('text-xs font-semibold mb-1.5 block', isErr && 'text-destructive')}>{label}</Label>
       <Input
+        id={id}
         type="number"
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
@@ -141,20 +143,20 @@ const SystemSettingsTab: React.FC = () => {
   const renderSourceLabel = (source: string | null | undefined) => {
     if (source === 'saved') {
       return (
-        <span className="text-[0.7rem] font-medium text-primary">
+        <span className="text-xs font-medium text-primary">
           {' '}{t('systemSettings.sourceCustomized')}
         </span>
       )
     }
     if (source === 'env') {
       return (
-        <span className="text-[0.7rem] font-medium text-muted-foreground">
+        <span className="text-xs font-medium text-muted-foreground">
           {' '}{t('systemSettings.sourceFromEnv')}
         </span>
       )
     }
     return (
-      <span className="text-[0.7rem] font-medium text-muted-foreground">
+      <span className="text-xs font-medium text-muted-foreground">
         {' '}{t('systemSettings.sourceDefault')}
       </span>
     )
@@ -510,12 +512,12 @@ const SystemSettingsTab: React.FC = () => {
             {/* Section 0: Operation Timeouts */}
             {activeSection === 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                <TimeoutField label={t('systemSettings.mountTimeoutLabel')} value={mountTimeout} onChange={setMountTimeout} step={10} sourceKey="mount_timeout" helperExtra={t('systemSettings.mountTimeoutHelper')} renderSourceLabel={renderSourceLabel} timeoutSources={timeoutSources} />
-                <TimeoutField label={t('systemSettings.infoTimeoutLabel')} value={infoTimeout} onChange={setInfoTimeout} step={60} sourceKey="info_timeout" helperExtra={t('systemSettings.infoTimeoutHelper')} renderSourceLabel={renderSourceLabel} timeoutSources={timeoutSources} />
-                <TimeoutField label={t('systemSettings.listTimeoutLabel')} value={listTimeout} onChange={setListTimeout} step={60} sourceKey="list_timeout" helperExtra={t('systemSettings.listTimeoutHelper')} renderSourceLabel={renderSourceLabel} timeoutSources={timeoutSources} />
-                <TimeoutField label={t('systemSettings.initTimeoutLabel')} value={initTimeout} onChange={setInitTimeout} step={60} sourceKey="init_timeout" helperExtra={t('systemSettings.initTimeoutHelper')} renderSourceLabel={renderSourceLabel} timeoutSources={timeoutSources} />
-                <TimeoutField label={t('systemSettings.backupTimeoutLabel')} value={backupTimeout} onChange={setBackupTimeout} step={300} sourceKey="backup_timeout" helperExtra={t('systemSettings.backupTimeoutHelper')} renderSourceLabel={renderSourceLabel} timeoutSources={timeoutSources} />
-                <TimeoutField label={t('systemSettings.sourceSizeTimeoutLabel')} value={sourceSizeTimeout} onChange={setSourceSizeTimeout} step={300} sourceKey="source_size_timeout" helperExtra={t('systemSettings.sourceSizeTimeoutHelper')} renderSourceLabel={renderSourceLabel} timeoutSources={timeoutSources} />
+                <TimeoutField id="sys-timeout-mount" label={t('systemSettings.mountTimeoutLabel')} value={mountTimeout} onChange={setMountTimeout} step={10} sourceKey="mount_timeout" helperExtra={t('systemSettings.mountTimeoutHelper')} renderSourceLabel={renderSourceLabel} timeoutSources={timeoutSources} />
+                <TimeoutField id="sys-timeout-info" label={t('systemSettings.infoTimeoutLabel')} value={infoTimeout} onChange={setInfoTimeout} step={60} sourceKey="info_timeout" helperExtra={t('systemSettings.infoTimeoutHelper')} renderSourceLabel={renderSourceLabel} timeoutSources={timeoutSources} />
+                <TimeoutField id="sys-timeout-list" label={t('systemSettings.listTimeoutLabel')} value={listTimeout} onChange={setListTimeout} step={60} sourceKey="list_timeout" helperExtra={t('systemSettings.listTimeoutHelper')} renderSourceLabel={renderSourceLabel} timeoutSources={timeoutSources} />
+                <TimeoutField id="sys-timeout-init" label={t('systemSettings.initTimeoutLabel')} value={initTimeout} onChange={setInitTimeout} step={60} sourceKey="init_timeout" helperExtra={t('systemSettings.initTimeoutHelper')} renderSourceLabel={renderSourceLabel} timeoutSources={timeoutSources} />
+                <TimeoutField id="sys-timeout-backup" label={t('systemSettings.backupTimeoutLabel')} value={backupTimeout} onChange={setBackupTimeout} step={300} sourceKey="backup_timeout" helperExtra={t('systemSettings.backupTimeoutHelper')} renderSourceLabel={renderSourceLabel} timeoutSources={timeoutSources} />
+                <TimeoutField id="sys-timeout-source-size" label={t('systemSettings.sourceSizeTimeoutLabel')} value={sourceSizeTimeout} onChange={setSourceSizeTimeout} step={300} sourceKey="source_size_timeout" helperExtra={t('systemSettings.sourceSizeTimeoutHelper')} renderSourceLabel={renderSourceLabel} timeoutSources={timeoutSources} />
               </div>
             )}
 
@@ -524,10 +526,11 @@ const SystemSettingsTab: React.FC = () => {
               <div className="flex flex-col gap-4">
                 <div className="grid grid-cols-1 md:grid-cols-[minmax(280px,340px)_auto] gap-3 items-start">
                   <div>
-                    <Label className={cn('text-xs font-semibold mb-1.5 block', (statsRefreshInterval < 0 || statsRefreshInterval > MAX_STATS_REFRESH) && 'text-destructive')}>
+                    <Label htmlFor="sys-stats-refresh-interval" className={cn('text-xs font-semibold mb-1.5 block', (statsRefreshInterval < 0 || statsRefreshInterval > MAX_STATS_REFRESH) && 'text-destructive')}>
                       {t('systemSettings.statsRefreshIntervalLabel')}
                     </Label>
                     <Input
+                      id="sys-stats-refresh-interval"
                       type="number"
                       value={statsRefreshInterval}
                       onChange={(e) => setStatsRefreshInterval(Number(e.target.value))}
@@ -639,8 +642,7 @@ const SystemSettingsTab: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-border bg-background">
                         <span
-                          className="flex-1 text-[0.78rem] break-all select-all"
-                          style={{ fontFamily: 'ui-monospace,monospace', lineHeight: 1.6 }}
+                          className="flex-1 text-xs break-all select-all font-mono leading-relaxed"
                         >
                           {newMetricsToken}
                         </span>
@@ -674,10 +676,11 @@ const SystemSettingsTab: React.FC = () => {
             {activeSection === 3 && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div>
-                  <Label className={cn('text-xs font-semibold mb-1.5 block', (browseMaxItems < MIN_FILES || browseMaxItems > MAX_FILES) && 'text-destructive')}>
+                  <Label htmlFor="sys-browse-max-items" className={cn('text-xs font-semibold mb-1.5 block', (browseMaxItems < MIN_FILES || browseMaxItems > MAX_FILES) && 'text-destructive')}>
                     {t('systemSettings.maxFilesToLoadLabel')}
                   </Label>
                   <Input
+                    id="sys-browse-max-items"
                     type="number"
                     value={browseMaxItems}
                     onChange={(e) => setBrowseMaxItems(Number(e.target.value))}
@@ -694,10 +697,11 @@ const SystemSettingsTab: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label className={cn('text-xs font-semibold mb-1.5 block', (browseMaxMemoryMb < MIN_MEMORY || browseMaxMemoryMb > MAX_MEMORY) && 'text-destructive')}>
+                  <Label htmlFor="sys-browse-max-memory" className={cn('text-xs font-semibold mb-1.5 block', (browseMaxMemoryMb < MIN_MEMORY || browseMaxMemoryMb > MAX_MEMORY) && 'text-destructive')}>
                     {t('systemSettings.maxMemoryLabel')}
                   </Label>
                   <Input
+                    id="sys-browse-max-memory"
                     type="number"
                     value={browseMaxMemoryMb}
                     onChange={(e) => setBrowseMaxMemoryMb(Number(e.target.value))}
@@ -732,8 +736,7 @@ const SystemSettingsTab: React.FC = () => {
                       <div key={labelKey} className="p-3 rounded-xl border border-border">
                         <p className="text-xs text-muted-foreground mb-1">{t(labelKey)}</p>
                         <p
-                          className="text-sm break-words"
-                          style={{ fontFamily: 'ui-monospace,monospace' }}
+                          className="text-sm break-words font-mono"
                         >
                           {value || t('systemSettings.proxyAuthNotConfigured')}
                         </p>

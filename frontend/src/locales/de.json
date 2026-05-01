@@ -196,7 +196,7 @@
     "moreScheduled": "+{{count}} weitere geplant",
     "resources": "Ressourcen",
     "memAbbr": "ARBSP.",
-    "diskAbbr": "DISK",
+    "diskAbbr": "Disk",
     "recentActivity": {
       "title": "Letzte Aktivität",
       "empty": "Keine letzte Aktivität",
@@ -591,6 +591,7 @@
     }
   },
   "settings": {
+    "title": "Einstellungen",
     "password": {
       "title": "Passwort ändern",
       "subtitle": "Aktualisiere dein Passwort, um dein Konto sicher zu halten",
@@ -1180,7 +1181,7 @@
       "message": "Das Repository ist derzeit gesperrt. Dies kann auf einen unterbrochenen Vorgang zurückzuführen sein.",
       "breakLock": "Sperre aufheben",
       "cancel": "Abbrechen",
-      "breakLockWarning": "Bist du SICHER, dass gerade keine Sicherung oder Operation auf diesem Repository läuft? Das Aufheben der Sperre während einer laufenden Operation kann das Repository beschädigen!",
+      "breakLockWarning": "Bist du sicher, dass gerade keine Sicherung oder Operation auf diesem Repository läuft? Das Aufheben der Sperre während einer laufenden Operation kann das Repository beschädigen!",
       "lockRemovedSuccess": "Sperre erfolgreich entfernt! Du kannst den Vorgang jetzt erneut versuchen.",
       "lockedDescription": "{{repositoryName}} ist durch einen anderen Prozess gesperrt oder hat eine veraltete Sperre.",
       "staleLockInfo": "Wenn gerade keine Sicherung läuft, ist dies wahrscheinlich eine veraltete Sperre von einer abgebrochenen Sicherung.",
@@ -1288,9 +1289,9 @@
       "warningCompact": "Nach der Bereinigung 'Komprimieren' ausführen, um Speicherplatz tatsächlich freizugeben.",
       "dryRunButton": "Testlauf (Vorschau)",
       "resultsTitle": "Ergebnisse",
-      "dryRunPreviewBadge": "VORSCHAU",
-      "pruneCompleteBadge": "ABGESCHLOSSEN",
-      "pruneFailedBadge": "FEHLGESCHLAGEN",
+      "dryRunPreviewBadge": "Vorschau",
+      "pruneCompleteBadge": "Abgeschlossen",
+      "pruneFailedBadge": "Fehlgeschlagen",
       "runPruneNow": "Jetzt bereinigen",
       "done": "Fertig",
       "close": "Schließen",
@@ -2426,7 +2427,7 @@
   },
   "packages": {
     "title": "Systempakete",
-    "subtitle": "Installiere Systempakete, die in deinen Sicherungsskripten verwendet werden können. Pakete werden automatisch neu installiert, wenn der Container neu erstellt wird.",
+    "subtitle": "Installiere Systempakete, die in deinen Sicherungsskripten verwendet werden können. Pakete werden automatisch neu installiert, wenn die App aktualisiert wird.",
     "hint": "Gib einfach einen Paketnamen ein (z.B. wakeonlan, curl) und er wird mit sudo apt-get install -y installiert. Für erweiterte Fälle kannst du benutzerdefinierte Installationsbefehle aktivieren.",
     "installedPackages": "Installierte Pakete",
     "addPackage": "Paket hinzufügen",
@@ -2725,7 +2726,7 @@
     "clientKeyPathLabel": "Client-Schlüsselpfad",
     "clientKeyPathHelper": "Pfad zur Client-Schlüsseldatei (optional)",
     "noteLabel": "Hinweis:",
-    "dockerVolumesWarning": "Zertifikatspfade sind relativ zum Dateisystem des Containers. Für Docker-Bereitstellungen Zertifikate in ein Volume einbinden und den Container-Pfad referenzieren (z.B. /certs/ca.crt).",
+    "dockerVolumesWarning": "Zertifikatspfade sind relativ zum BorgScale-Datenordner. Zertifikate in den Datenordner einbinden und den eingebundenen Pfad referenzieren (zum Beispiel /certs/ca.crt).",
     "failedToSaveMqttSettings": "MQTT-Einstellungen konnten nicht gespeichert werden"
   },
   "remoteMachine": {
@@ -2817,6 +2818,10 @@
     "infoAlert": "Hinweis: Eingehängte Archive erscheinen als schreibgeschützte Dateisysteme im Dateimanager. Zugriff über den Einhängepunkt-Pfad. Einhängepunkte werden beim App-Neustart automatisch bereinigt.",
     "emptyDescription": "Archive von der Archive-Seite einhängen, um deren Inhalt direkt im Dateimanager zu durchsuchen.",
     "activeMounts": "Aktive Einhängepunkte"
+  },
+  "mountToast": {
+    "archiveMounted": "Archiv eingehängt",
+    "openInTerminal": "In einem Terminal öffnen:"
   },
   "terminalLog": {
     "inProgress": "{{type}} läuft..."

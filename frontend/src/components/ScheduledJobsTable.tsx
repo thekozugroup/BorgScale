@@ -1,4 +1,6 @@
 import { Clock } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 import { useTranslation } from 'react-i18next'
 import { Skeleton } from '@/components/ui/skeleton'
 import ScheduleJobCard from './ScheduleJobCard'
@@ -50,6 +52,7 @@ interface ScheduledJobsTableProps {
   onToggle: (job: ScheduledJob) => void
   isRunNowPending?: boolean
   isDuplicatePending?: boolean
+  onCreateNew?: () => void
 }
 
 const ScheduledJobsTable = ({
@@ -64,6 +67,7 @@ const ScheduledJobsTable = ({
   onToggle,
   isRunNowPending,
   isDuplicatePending,
+  onCreateNew,
 }: ScheduledJobsTableProps) => {
   const { t } = useTranslation()
 
@@ -92,8 +96,7 @@ const ScheduledJobsTable = ({
                   {[0, 1, 2, 3].map((j) => (
                     <div
                       key={j}
-                      className="px-3 py-2.5"
-                      style={{ borderRight: j < 3 ? '1px solid var(--border)' : 'none' }}
+                      className={cn('px-3 py-2.5', j < 3 ? 'border-r border-border' : '')}
                     >
                       <Skeleton className="h-2.5 mb-1.5 rounded" style={{ width: 38 }} />
                       <Skeleton className="h-4 rounded" style={{ width: [58, 48, 54, 44][j] }} />
@@ -121,6 +124,11 @@ const ScheduledJobsTable = ({
           <Clock size={40} style={{ opacity: 0.25, marginBottom: 12 }} />
           <p className="text-base mb-1">{t('scheduledJobsTableSection.noJobsFound')}</p>
           <p className="text-sm text-muted-foreground">{t('scheduledJobsTableSection.noJobsDesc')}</p>
+          {onCreateNew && (
+            <div className="mt-4">
+              <Button size="sm" onClick={onCreateNew}>{t('schedule.createBackup')}</Button>
+            </div>
+          )}
         </div>
       )
     }

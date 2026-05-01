@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { HardDrive, Copy, Check, X } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 
 interface MountSuccessToastProps {
   toastId: string
@@ -8,6 +9,7 @@ interface MountSuccessToastProps {
 }
 
 export default function MountSuccessToast({ toastId, command }: MountSuccessToastProps) {
+  const { t } = useTranslation()
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
@@ -25,12 +27,12 @@ export default function MountSuccessToast({ toastId, command }: MountSuccessToas
           <HardDrive size={15} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold leading-tight">Archive Mounted</p>
-          <p className="text-xs text-muted-foreground">Access via Docker:</p>
+          <p className="text-sm font-semibold leading-tight">{t('mountToast.archiveMounted')}</p>
+          <p className="text-xs text-muted-foreground">{t('mountToast.openInTerminal')}</p>
         </div>
         <button
           onClick={() => toast.dismiss(toastId)}
-          className="p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
+          className="size-11 inline-flex items-center justify-center rounded text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
         >
           <X size={13} />
         </button>
@@ -39,14 +41,14 @@ export default function MountSuccessToast({ toastId, command }: MountSuccessToas
       {/* Command block */}
       <div className="flex items-center gap-2 px-3 py-2 rounded border border-border bg-muted/40">
         <code
-          className="flex-1 text-[0.7rem] break-all leading-relaxed font-mono text-foreground"
+          className="flex-1 text-xs break-all leading-relaxed font-mono text-foreground"
         >
           {command}
         </code>
         <button
           onClick={handleCopy}
           title={copied ? 'Copied!' : 'Copy command'}
-          className={`flex-shrink-0 p-1 rounded transition-colors ${copied ? 'text-primary' : 'text-muted-foreground'}`}
+          className={`size-11 inline-flex items-center justify-center flex-shrink-0 rounded transition-colors ${copied ? 'text-primary' : 'text-muted-foreground'}`}
         >
           {copied ? <Check size={13} /> : <Copy size={13} />}
         </button>

@@ -23,13 +23,13 @@ describe('BorgVersionChip', () => {
     const { container } = renderWithProviders(<BorgVersionChip borgVersion={2} compact />)
     const chip = container.querySelector('span') as HTMLElement
     expect(chip).toBeInTheDocument()
-    expect(chip.style.height).toBe('16px')
+    expect(chip.className).toContain('h-4')
   })
 
   it('applies default sizing when compact is false', () => {
     const { container } = renderWithProviders(<BorgVersionChip borgVersion={2} />)
     const chip = container.querySelector('span') as HTMLElement
     expect(chip).toBeInTheDocument()
-    expect(chip.style.height).toBe('18px')
+    expect(chip.className).toContain('h-[18px]')
   })
 })

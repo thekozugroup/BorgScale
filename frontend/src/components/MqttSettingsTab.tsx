@@ -354,7 +354,7 @@ const MqttSettingsTab: React.FC = () => {
                   <p className="text-xs text-muted-foreground mt-1">{t('mqtt.clientKeyPathHelper')}</p>
                 </div>
 
-                <div className="flex items-start gap-2 p-3 rounded-xl text-sm bg-sky-500/10 border border-sky-500/25 text-sky-700 dark:text-sky-400">
+                <div className="flex items-start gap-2 p-3 rounded-xl text-sm bg-muted border border-border text-muted-foreground">
                   <AlertTriangle size={16} className="flex-shrink-0 mt-0.5" />
                   <span>
                     <strong>{t('mqtt.noteLabel')}</strong> {t('mqtt.dockerVolumesWarning')}

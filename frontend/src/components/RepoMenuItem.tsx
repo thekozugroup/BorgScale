@@ -32,7 +32,7 @@ export default function RepoMenuItem({
           {mode === 'observe' && (
             <Badge
               variant="secondary"
-              className="h-4 text-[0.6rem] font-semibold px-1 border-none"
+              className="h-4 text-2xs font-semibold px-1 border-none"
             >
               Observe Only
             </Badge>
@@ -43,8 +43,7 @@ export default function RepoMenuItem({
         </div>
         {!hidePath && (
           <p
-            className="text-xs text-muted-foreground truncate"
-            style={{ fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,SFMono-Regular,monospace' }}
+            className="text-xs text-muted-foreground truncate font-mono"
           >
             {path}
           </p>

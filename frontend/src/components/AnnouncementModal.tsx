@@ -83,7 +83,7 @@ export default function AnnouncementModal({
               <div className="flex flex-wrap gap-1.5 mb-3">
                 {/* Type chip */}
                 <span
-                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.72rem] font-bold bg-muted text-muted-foreground border border-border"
+                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-muted text-muted-foreground border border-border"
                   style={{ height: 24 }}
                 >
                   <Sparkles size={12} />
@@ -91,7 +91,7 @@ export default function AnnouncementModal({
                 </span>
                 {announcement.type === 'update_available' && (
                   <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.72rem] font-bold border ${accentCls.bg} ${accentCls.border}`}
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${accentCls.bg} ${accentCls.border}`}
                     style={{ height: 24 }}
                   >
                     Latest release
@@ -129,7 +129,7 @@ export default function AnnouncementModal({
         <div className="px-5 sm:px-6 pb-5 sm:pb-6">
           {announcement.highlights?.length ? (
             <div className={`p-4 mb-4 rounded-2xl border ${accentCls.border} bg-muted/30`}>
-              <p className={`text-[0.7rem] font-extrabold uppercase tracking-[0.12em] mb-2.5 ${accentCls.isPrimary ? 'text-primary' : 'text-muted-foreground'}`}>
+              <p className={`text-xs font-extrabold uppercase tracking-[0.12em] mb-2.5 ${accentCls.isPrimary ? 'text-primary' : 'text-muted-foreground'}`}>
                 {t('announcements.highlights')}
               </p>
 
@@ -155,7 +155,7 @@ export default function AnnouncementModal({
                 target="_blank"
                 rel="noreferrer"
                 onClick={onCtaClick}
-                className="inline-flex items-center gap-1.5 text-[0.95rem] font-bold transition-colors duration-150 text-primary hover:text-primary/80 no-underline"
+                className="inline-flex items-center gap-1.5 text-sm font-bold transition-colors duration-150 text-primary hover:text-primary/80 no-underline"
                 style={{ textDecoration: 'none' }}
               >
                 {announcement.cta_label || t('announcements.viewDetails')}

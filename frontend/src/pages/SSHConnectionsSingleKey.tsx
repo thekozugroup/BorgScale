@@ -644,7 +644,7 @@ export default function SSHConnectionsSingleKey() {
             <div key={stat.label} className={`px-3 sm:px-4 py-3 sm:py-4 ${i < 2 ? 'border-r border-border' : ''}`}>
               <div className="flex items-center gap-1 mb-1 sm:mb-1.5">
                 <span className={`${stat.cls} opacity-75`}>{stat.icon}</span>
-                <span className={`text-[0.6rem] font-bold uppercase tracking-wider whitespace-nowrap ${stat.cls} opacity-75`}>{stat.label}</span>
+                <span className={`text-2xs font-bold uppercase tracking-wider whitespace-nowrap ${stat.cls} opacity-75`}>{stat.label}</span>
               </div>
               <p className="text-2xl sm:text-3xl font-bold tabular-nums leading-none">{stat.value}</p>
             </div>

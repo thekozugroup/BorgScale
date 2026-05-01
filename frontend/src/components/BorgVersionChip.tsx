@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
 
 interface BorgVersionChipProps {
   borgVersion: number | undefined
@@ -11,14 +12,10 @@ export default function BorgVersionChip({ borgVersion, compact = false }: BorgVe
 
   return (
     <Badge
-      className="font-mono font-bold bg-primary text-primary-foreground border-transparent"
-      style={{
-        height: compact ? '16px' : '18px',
-        fontSize: compact ? '0.6rem' : '0.65rem',
-        letterSpacing: '0.5px',
-        paddingLeft: compact ? '3px' : '6px',
-        paddingRight: compact ? '3px' : '6px',
-      }}
+      className={cn(
+        'font-mono font-bold bg-primary text-primary-foreground border-transparent tracking-[0.5px]',
+        compact ? 'h-4 px-[3px] text-3xs' : 'h-[18px] px-1.5 text-2xs'
+      )}
     >
       v2
     </Badge>

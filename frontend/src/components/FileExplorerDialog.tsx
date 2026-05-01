@@ -503,17 +503,17 @@ export default function FileExplorerDialog({
                         <span className="flex items-center gap-1.5 flex-1 min-w-0">
                           <span className="text-sm truncate">{item.name}</span>
                           {item.is_mount_point && (
-                            <Badge className="h-4 text-[0.6rem] font-semibold px-1 bg-primary/10 text-primary border-primary/20">
+                            <Badge className="h-4 text-2xs font-semibold px-1 bg-primary/10 text-primary border-primary/20">
                               {t('fileExplorer.chips.remote')}
                             </Badge>
                           )}
                           {item.is_local_mount && (
-                            <Badge variant="outline" className="h-4 text-[0.6rem] font-semibold px-1">
+                            <Badge variant="outline" className="h-4 text-2xs font-semibold px-1">
                               {t('fileExplorer.chips.host')}
                             </Badge>
                           )}
                           {item.is_borg_repo && (
-                            <Badge className="h-4 text-[0.6rem] font-semibold px-1 bg-muted text-muted-foreground border-border">
+                            <Badge className="h-4 text-2xs font-semibold px-1 bg-muted text-muted-foreground border-border">
                               {t('fileExplorer.chips.borg')}
                             </Badge>
                           )}

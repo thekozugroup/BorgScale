@@ -87,9 +87,8 @@ describe('CronExpressionInput', () => {
     renderWithProviders(<CronExpressionInput {...defaultProps} />)
 
     const input = screen.getByRole('textbox', { name: /Schedule/i })
-    // shadcn Input uses inline style for font-family
     expect(input).toBeInTheDocument()
-    expect(input).toHaveStyle({ fontFamily: 'monospace' })
+    expect(input).toHaveClass('font-mono')
   })
 
   it('handles empty string value', () => {

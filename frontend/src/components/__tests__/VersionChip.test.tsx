@@ -26,6 +26,6 @@ describe('VersionChip', () => {
   it('renders version in monospace', () => {
     renderWithProviders(<VersionChip label="UI" version="0.9.1" />)
     const version = screen.getByText('0.9.1')
-    expect(version).toHaveStyle({ fontFamily: 'monospace' })
+    expect(version).toHaveClass('font-mono')
   })
 })

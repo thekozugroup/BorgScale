@@ -232,25 +232,25 @@ const LogManagementTab: React.FC = () => {
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
                   <div>
-                    <p className="text-[0.65rem] font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                    <p className="text-2xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                       Total Size
                     </p>
                     <p className="text-2xl font-bold">{logStorage?.total_size_mb || 0} MB</p>
                   </div>
                   <div>
-                    <p className="text-[0.65rem] font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                    <p className="text-2xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                       File Count
                     </p>
                     <p className="text-2xl font-bold">{logStorage?.file_count || 0}</p>
                   </div>
                   <div>
-                    <p className="text-[0.65rem] font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                    <p className="text-2xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                       Oldest Log
                     </p>
                     <p className="text-sm mt-1">{formatDate(logStorage?.oldest_log_date || null)}</p>
                   </div>
                   <div>
-                    <p className="text-[0.65rem] font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                    <p className="text-2xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                       Newest Log
                     </p>
                     <p className="text-sm mt-1">{formatDate(logStorage?.newest_log_date || null)}</p>
@@ -383,10 +383,11 @@ const LogManagementTab: React.FC = () => {
             </div>
 
             <div>
-              <Label className="text-xs font-semibold mb-1.5 block">
+              <Label htmlFor="log-max-total-size" className="text-xs font-semibold mb-1.5 block">
                 Maximum Total Size (MB)
               </Label>
               <Input
+                id="log-max-total-size"
                 type="number"
                 value={maxTotalSizeMb}
                 onChange={(e) => setMaxTotalSizeMb(Math.max(10, parseInt(e.target.value) || 10))}

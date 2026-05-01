@@ -197,7 +197,7 @@ export default function NotificationCard({
               className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border cursor-default transition-all duration-150 ${cat.active ? 'border-primary/50 bg-primary/10 text-primary' : 'border-foreground/[0.08] bg-transparent text-foreground/20'}`}
             >
               {cat.icon}
-              <span className="text-[0.62rem] font-semibold tracking-[0.04em] leading-none uppercase">
+              <span className="text-2xs font-semibold tracking-[0.04em] leading-none uppercase">
                 {cat.label}
               </span>
             </div>

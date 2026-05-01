@@ -52,7 +52,7 @@ export default function ArchiveCard({
         <div
           title={archive.name}
           className={cn(
-            'font-mono text-[0.78rem] font-semibold text-foreground overflow-hidden text-ellipsis whitespace-nowrap min-w-0',
+            'font-mono text-xs font-semibold text-foreground overflow-hidden text-ellipsis whitespace-nowrap min-w-0',
             'col-start-1 row-start-1'
           )}
         >
@@ -64,7 +64,7 @@ export default function ArchiveCard({
           <Badge
             variant="outline"
             className={cn(
-              'h-[18px] text-[0.6rem] font-bold tracking-wider uppercase px-1.5 shrink-0',
+              'h-[18px] text-2xs font-bold tracking-wider uppercase px-1.5 shrink-0',
               isManual
                 ? 'bg-primary/10 text-primary border-primary/20'
                 : 'bg-muted text-muted-foreground border-border'
@@ -75,13 +75,13 @@ export default function ArchiveCard({
               : t('archivesList.scheduledAbbr', 'SCH')}
           </Badge>
           {/* Date shown inline with badge on mobile */}
-          <span className="text-[0.72rem] text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis md:hidden">
+          <span className="text-xs text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis md:hidden">
             {formatDate(archiveTime)}
           </span>
         </div>
 
         {/* Date shown in its own column on desktop */}
-        <span className="hidden md:block text-[0.72rem] text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis">
+        <span className="hidden md:block text-xs text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis">
           {formatDate(archiveTime)}
         </span>
 

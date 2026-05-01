@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -77,6 +78,7 @@ interface BackupJob {
 
 const Schedule: React.FC = () => {
   const { t } = useTranslation()
+  usePageTitle(t('schedule.title'))
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const location = useLocation()
@@ -510,6 +512,7 @@ const Schedule: React.FC = () => {
             onToggle={handleToggleJob}
             isRunNowPending={runJobNowMutation.isPending}
             isDuplicatePending={duplicateJobMutation.isPending}
+            onCreateNew={canCreateSchedule ? openCreateWizard : undefined}
           />
 
           {/* Backup History */}

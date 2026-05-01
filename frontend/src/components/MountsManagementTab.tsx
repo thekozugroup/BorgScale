@@ -87,14 +87,13 @@ function MountCard({
       <div className="min-w-0">
         <div
           title={mount.source}
-          className="text-xs font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
-          style={{ fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace' }}
+          className="text-xs font-semibold overflow-hidden text-ellipsis whitespace-nowrap font-mono"
         >
           {archiveName}
         </div>
         {repoName && (
           <span
-            className="text-[0.68rem] text-muted-foreground opacity-70 block mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap"
+            className="text-2xs text-muted-foreground opacity-70 block mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap"
           >
             {repoName}
           </span>
@@ -104,14 +103,13 @@ function MountCard({
       {/* Mount point */}
       <span
         title={mount.mount_point}
-        className="text-[0.72rem] text-muted-foreground overflow-hidden text-ellipsis whitespace-nowrap min-w-0"
-        style={{ fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace' }}
+        className="text-xs text-muted-foreground overflow-hidden text-ellipsis whitespace-nowrap min-w-0 font-mono"
       >
         {mount.mount_point}
       </span>
 
       {/* Mounted date */}
-      <span className="text-[0.72rem] text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis min-w-0">
+      <span className="text-xs text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis min-w-0">
         {formatDate(mount.created_at)}
       </span>
 
@@ -217,7 +215,7 @@ export default function MountsManagementTab() {
 
   const tableHeader = (
     <div
-      className="hidden md:grid items-center gap-2 px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-widest text-muted-foreground bg-foreground/[0.02] border-b border-foreground/[0.08]"
+      className="hidden md:grid items-center gap-2 px-4 py-2 text-2xs font-semibold uppercase tracking-widest text-muted-foreground bg-foreground/[0.02] border-b border-foreground/[0.08]"
       style={{ gridTemplateColumns: desktopGridTemplate }}
     >
       <span>{t('mounts.columns.archive')}</span>
@@ -231,7 +229,7 @@ export default function MountsManagementTab() {
     <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-2 px-4 py-3 mb-6 rounded-xl bg-primary/[0.07] border border-primary/20">
       <div className="flex items-center gap-3 flex-shrink-0">
         <HardDrive size={16} style={{ opacity: 0.7 }} />
-        <p className="text-[0.95rem] font-bold">{t('mountsManagement.title')}</p>
+        <p className="text-sm font-bold">{t('mountsManagement.title')}</p>
         {countBadge}
       </div>
       <Tooltip>
@@ -265,7 +263,7 @@ export default function MountsManagementTab() {
 
   const countBadge = (
     <span
-      className="text-[0.72rem] font-semibold px-1.5 py-0.5 rounded text-muted-foreground bg-foreground/[0.07]"
+      className="text-xs font-semibold px-1.5 py-0.5 rounded text-muted-foreground bg-foreground/[0.07]"
       style={{ lineHeight: 1.6 }}
     >
       {mounts.length}

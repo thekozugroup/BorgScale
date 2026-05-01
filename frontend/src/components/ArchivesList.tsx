@@ -172,7 +172,7 @@ export default function ArchivesList({
         'hidden md:grid grid-cols-[minmax(0,1fr)_76px_minmax(180px,220px)_132px] items-center gap-2',
         'px-4 py-2 bg-muted/30',
         'border-b border-border',
-        'text-[0.65rem] font-semibold uppercase tracking-widest text-muted-foreground'
+        'text-2xs font-semibold uppercase tracking-widest text-muted-foreground'
       )}
     >
       <span>{t('archivesList.columnArchive', 'Archive')}</span>
@@ -191,8 +191,8 @@ export default function ArchivesList({
           className={cn(
             'flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-2',
             'px-4 py-[10px] mb-5 rounded-lg',
-            'bg-primary/6 dark:bg-primary/10',
-            'border border-primary/15 dark:border-primary/20'
+            'bg-primary/8',
+            'border border-primary/15'
           )}
         >
           <div className="flex items-baseline gap-3">
@@ -229,7 +229,7 @@ export default function ArchivesList({
   // Pill button helper
   const pillCls = (active: boolean, colorActive?: string) =>
     cn(
-      'flex items-center gap-1 px-3 py-1 rounded-xl border cursor-pointer select-none text-[0.72rem] font-semibold transition-all duration-150',
+      'flex items-center gap-1 px-3 py-1 rounded-xl border cursor-pointer select-none text-xs font-semibold transition-all duration-150',
       active
         ? colorActive
           ? colorActive
@@ -244,15 +244,15 @@ export default function ArchivesList({
         className={cn(
           'flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-2',
           'px-4 py-[10px] mb-5 rounded-lg',
-          'bg-primary/6 dark:bg-primary/10',
-          'border border-primary/15 dark:border-primary/20'
+          'bg-primary/8',
+          'border border-primary/15'
         )}
       >
         <div className="flex items-baseline gap-3 shrink-0">
-          <span className="text-[0.95rem] font-bold">Archives</span>
+          <span className="text-sm font-bold">Archives</span>
           <span
             className={cn(
-              'text-[0.72rem] font-semibold px-1.5 py-0.5 rounded',
+              'text-xs font-semibold px-1.5 py-0.5 rounded',
               'bg-border text-muted-foreground leading-[1.6]'
             )}
           >
@@ -274,7 +274,7 @@ export default function ArchivesList({
                     onClick={() => handleSortChange(opt)}
                     className={pillCls(
                       sortBy === opt,
-                      'border-primary/35 dark:border-primary/45 bg-primary/8 dark:bg-primary/14 text-primary'
+                      'border-primary/35 bg-primary/10 text-primary'
                     )}
                   >
                     {opt === 'date-desc'
@@ -300,7 +300,7 @@ export default function ArchivesList({
                 opt === 'scheduled'
                   ? 'border-primary/35 bg-primary/10 text-primary'
                   : opt === 'manual'
-                    ? 'border-primary/35 dark:border-primary/45 bg-primary/8 dark:bg-primary/14 text-primary'
+                    ? 'border-primary/35 bg-primary/10 text-primary'
                     : undefined
               return (
                 <button

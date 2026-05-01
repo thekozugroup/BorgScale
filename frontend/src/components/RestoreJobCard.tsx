@@ -101,11 +101,11 @@ export default function RestoreJobCard({ job, showJobId = true }: RestoreJobCard
       <div className="flex items-center gap-3 flex-wrap" style={{ rowGap: '6px' }}>
         {/* Archive → Destination */}
         <div className="flex items-center gap-1.5 min-w-0 flex-1">
-          <span className="text-sm font-semibold truncate font-mono text-[0.78rem]">
+          <span className="text-sm font-semibold truncate font-mono text-xs">
             {getArchiveName(job.archive)}
           </span>
-          <span className="text-muted-foreground text-[0.72rem] shrink-0">→</span>
-          <span className="text-sm text-muted-foreground truncate font-mono text-[0.72rem] min-w-0">
+          <span className="text-muted-foreground text-xs shrink-0">→</span>
+          <span className="text-sm text-muted-foreground truncate font-mono text-xs min-w-0">
             {job.destination}
           </span>
         </div>
@@ -114,7 +114,7 @@ export default function RestoreJobCard({ job, showJobId = true }: RestoreJobCard
         <Badge
           variant="outline"
           className={cn(
-            'h-[22px] text-[0.68rem] font-semibold tracking-[0.02em] gap-1 px-1.5 border',
+            'h-[22px] text-2xs font-semibold tracking-[0.02em] gap-1 px-1.5 border',
             getStatusColorCls(job.status)
           )}
         >
@@ -125,13 +125,13 @@ export default function RestoreJobCard({ job, showJobId = true }: RestoreJobCard
         {/* Time + duration */}
         {job.completed_at && (
           <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-sm text-muted-foreground text-[0.72rem]">
+            <span className="text-sm text-muted-foreground text-xs">
               {formatRelativeTime(job.completed_at)}
             </span>
             {getDurationText() && (
               <>
                 <span className="inline-block size-[3px] rounded-full bg-border shrink-0" />
-                <span className="text-sm text-muted-foreground text-[0.72rem]">
+                <span className="text-sm text-muted-foreground text-xs">
                   {getDurationText()}
                 </span>
               </>
@@ -142,7 +142,7 @@ export default function RestoreJobCard({ job, showJobId = true }: RestoreJobCard
 
       {/* Running: elapsed time */}
       {job.status === 'running' && job.started_at && !job.completed_at && (
-        <p className="text-sm text-muted-foreground text-[0.72rem] mt-1">
+        <p className="text-sm text-muted-foreground text-xs mt-1">
           {formatTimeRange(job.started_at, job.completed_at, job.status)}
         </p>
       )}

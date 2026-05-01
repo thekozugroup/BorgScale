@@ -113,8 +113,9 @@ export default function ScriptEditorDialog({
 
           <div className="flex gap-4 items-start flex-wrap">
             <div className="flex-1 min-w-[160px]">
-              <Label className="text-xs font-semibold mb-1.5 block">{t('scriptEditor.timeoutLabel')}</Label>
+              <Label htmlFor="script-editor-timeout" className="text-xs font-semibold mb-1.5 block">{t('scriptEditor.timeoutLabel')}</Label>
               <Input
+                id="script-editor-timeout"
                 type="number"
                 value={timeout}
                 onChange={(e) => onTimeoutChange?.(parseInt(e.target.value) || 300)}

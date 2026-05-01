@@ -326,13 +326,13 @@ export default function RepositoryScriptsTab({
               <p className="text-sm font-medium flex-1 min-w-0 truncate">{script.script_name}</p>
 
               {/* Badges */}
-              <span className="inline-flex items-center px-1.5 py-0 rounded text-[0.65rem] font-semibold bg-muted text-muted-foreground border border-border" style={{ height: 18 }}>
+              <span className="inline-flex items-center px-1.5 py-0 rounded text-2xs font-semibold bg-muted text-muted-foreground border border-border" style={{ height: 18 }}>
                 #{script.execution_order}
               </span>
               {script.parameters && script.parameters.length > 0 && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <span className="inline-flex items-center px-1.5 rounded text-[0.65rem] font-semibold bg-muted text-muted-foreground border border-border cursor-default" style={{ height: 18 }}>
+                    <span className="inline-flex items-center px-1.5 rounded text-2xs font-semibold bg-muted text-muted-foreground border border-border cursor-default" style={{ height: 18 }}>
                       {script.parameters.length} param{script.parameters.length > 1 ? 's' : ''}
                     </span>
                   </TooltipTrigger>
@@ -344,7 +344,7 @@ export default function RepositoryScriptsTab({
               {areParametersOutOfSync(script) && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <span className="inline-flex items-center gap-0.5 px-1.5 rounded text-[0.65rem] font-semibold bg-muted text-muted-foreground border border-border cursor-default" style={{ height: 18 }}>
+                    <span className="inline-flex items-center gap-0.5 px-1.5 rounded text-2xs font-semibold bg-muted text-muted-foreground border border-border cursor-default" style={{ height: 18 }}>
                       <AlertTriangle size={10} />
                       {t('repositoryScripts.chips.outOfSync')}
                     </span>
@@ -353,17 +353,17 @@ export default function RepositoryScriptsTab({
                 </Tooltip>
               )}
               {!isPreBackup && (
-                <span className={cn('inline-flex items-center px-1.5 rounded text-[0.65rem] font-semibold border cursor-default', RUN_ON_BADGE[effectiveRunOn] ?? 'bg-muted text-muted-foreground border-border')} style={{ height: 18 }}>
+                <span className={cn('inline-flex items-center px-1.5 rounded text-2xs font-semibold border cursor-default', RUN_ON_BADGE[effectiveRunOn] ?? 'bg-muted text-muted-foreground border-border')} style={{ height: 18 }}>
                   {effectiveRunOn}
                 </span>
               )}
               {isPreBackup && effectiveSkipOnFailure && (
-                <span className="inline-flex items-center px-1.5 rounded text-[0.65rem] font-semibold bg-muted text-muted-foreground border border-border" style={{ height: 18 }}>
+                <span className="inline-flex items-center px-1.5 rounded text-2xs font-semibold bg-muted text-muted-foreground border border-border" style={{ height: 18 }}>
                   {t('repositoryScripts.chips.skipsGracefully')}
                 </span>
               )}
               {isPreBackup && effectiveContinueOnError && (
-                <span className="inline-flex items-center px-1.5 rounded text-[0.65rem] font-semibold bg-muted text-muted-foreground border border-border" style={{ height: 18 }}>
+                <span className="inline-flex items-center px-1.5 rounded text-2xs font-semibold bg-muted text-muted-foreground border border-border" style={{ height: 18 }}>
                   {t('repositoryScripts.chips.continuesOnError')}
                 </span>
               )}

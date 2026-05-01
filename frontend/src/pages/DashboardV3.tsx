@@ -10,6 +10,7 @@
 
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -212,7 +213,7 @@ function ScheduleBadge({
     return (
       <span
         title={t('dashboard.scheduleBadge.noSchedule')}
-        className="font-mono text-[0.6rem] text-muted-foreground"
+        className="font-mono text-2xs text-muted-foreground"
       >
         {t('dashboard.scheduleBadge.manual')}
       </span>
@@ -223,7 +224,7 @@ function ScheduleBadge({
     return (
       <Badge
         variant="outline"
-        className="gap-1 font-mono text-[0.6rem] border-border text-muted-foreground bg-muted"
+        className="gap-1 font-mono text-2xs border-border text-muted-foreground bg-muted"
         title={
           scheduleName
             ? t('dashboard.scheduleBadge.pausedTitle', { name: scheduleName })
@@ -240,7 +241,7 @@ function ScheduleBadge({
     return (
       <Badge
         variant="outline"
-        className="gap-1 font-mono text-[0.6rem] border-border text-muted-foreground bg-muted"
+        className="gap-1 font-mono text-2xs border-border text-muted-foreground bg-muted"
         title={scheduleName ?? t('dashboard.scheduleBadge.scheduled')}
       >
         <RotateCw className="h-2.5 w-2.5" />
@@ -264,7 +265,7 @@ function ScheduleBadge({
   return (
     <Badge
       variant="outline"
-      className="gap-1 font-mono text-[0.6rem] border-border text-muted-foreground bg-muted/50"
+      className="gap-1 font-mono text-2xs border-border text-muted-foreground bg-muted/50"
       title={
         scheduleName
           ? t('dashboard.scheduleBadge.nextRunTitle', { name: scheduleName, label })
@@ -352,11 +353,11 @@ function DimStatusGrid({
         >
           <div className="flex items-center gap-0.5">
             <DimIcon status={item.status} />
-            <span className="text-[0.52rem] font-semibold text-muted-foreground tracking-wide">
+            <span className="text-3xs font-semibold text-muted-foreground tracking-wide">
               {item.label}
             </span>
           </div>
-          <span className="font-mono text-[0.62rem] font-semibold leading-none text-foreground">
+          <span className="font-mono text-2xs font-semibold leading-none text-foreground">
             {item.value}
           </span>
         </div>
@@ -516,7 +517,7 @@ function ResourceBar({ label, value, sub }: { label: string; value: number; sub?
         <span className="font-mono font-semibold">{value.toFixed(0)}%</span>
       </div>
       <Progress value={value} className="h-1.5" />
-      {sub && <span className="font-mono text-[0.6rem] text-muted-foreground">{sub}</span>}
+      {sub && <span className="font-mono text-2xs text-muted-foreground">{sub}</span>}
     </div>
   )
 }
@@ -583,6 +584,7 @@ function DashboardSkeleton() {
 export default function DashboardV3() {
   const navigate = useNavigate()
   const { t } = useTranslation()
+  usePageTitle(t('dashboard.pageTitle'))
   const { trackNavigation, EventAction } = useAnalytics()
   const [nowMs] = React.useState(() => Date.now())
 
@@ -871,13 +873,13 @@ export default function DashboardV3() {
                     <div className="mb-2 flex items-center justify-between gap-1">
                       <div className="flex items-center gap-1.5">
                         <StatusDot status={cardStatus} />
-                        <span className="font-mono text-[0.6rem] text-muted-foreground uppercase tracking-wide">
+                        <span className="font-mono text-2xs text-muted-foreground uppercase tracking-wide">
                           {repo.type}
                         </span>
                         {repo.mode === 'observe' && (
                           <Badge
                             variant="outline"
-                            className="font-mono text-[0.55rem] h-4 border-border text-muted-foreground"
+                            className="font-mono text-3xs h-4 border-border text-muted-foreground"
                           >
                             {t('repositories.observeOnly')}
                           </Badge>
@@ -899,7 +901,7 @@ export default function DashboardV3() {
                     </div>
 
                     {/* Stats */}
-                    <div className="mb-2 flex items-center gap-3 font-mono text-[0.62rem] text-muted-foreground">
+                    <div className="mb-2 flex items-center gap-3 font-mono text-2xs text-muted-foreground">
                       <span>
                         {t('dashboard.repositoryHealth.archiveCountShort', {
                           count: repo.archive_count,
@@ -1017,7 +1019,7 @@ export default function DashboardV3() {
                       <Badge
                         variant="outline"
                         className={cn(
-                          'font-mono text-[0.6rem]',
+                          'font-mono text-2xs',
                           a.status === 'failed'
                             ? STATUS_CLASSES.critical.badge
                             : STATUS_CLASSES.healthy.badge
