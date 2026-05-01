@@ -111,7 +111,7 @@ export default function SSHConnectionsSingleKey() {
   usePageTitle(t('sshConnections.title'))
   const queryClient = useQueryClient()
   const { track, EventCategory, EventAction } = useAnalytics()
-  const { hasGlobalPermission } = useAuth()
+  const { hasGlobalPermission, isLoading: authLoading } = useAuth()
   const canManageSsh = hasGlobalPermission('settings.ssh.manage')
 
   // State
@@ -429,7 +429,7 @@ export default function SSHConnectionsSingleKey() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connections?.length])
 
-  if (!canManageSsh) {
+  if (!authLoading && !canManageSsh) {
     return <Navigate to="/dashboard" replace />
   }
 

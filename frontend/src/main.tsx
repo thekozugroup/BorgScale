@@ -8,6 +8,7 @@ import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './hooks/useAuth.tsx'
 import { AppProvider } from './context/AppContext'
 import { ThemeProvider } from './context/ThemeContext'
+import { TooltipProvider } from './components/ui/tooltip'
 import App from './App.tsx'
 import './index.css'
 
@@ -60,12 +61,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter basename={BASE_PATH || '/'}>
-          <AuthProvider>
-            <AppProvider>
-              <App />
-              <Toaster position="top-right" />
-            </AppProvider>
-          </AuthProvider>
+          <TooltipProvider>
+            <AuthProvider>
+              <AppProvider>
+                <App />
+                <Toaster position="top-right" />
+              </AppProvider>
+            </AuthProvider>
+          </TooltipProvider>
         </BrowserRouter>
       </QueryClientProvider>
     </ThemeProvider>
