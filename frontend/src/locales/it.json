@@ -1265,7 +1265,7 @@
       "noBackupsYet": "Ancora nessun backup",
       "noBackupsDesc": "Questo repository è stato inizializzato ma non contiene archivi. Le statistiche di archiviazione appariranno qui dopo aver creato il primo backup.",
       "loadFailed": "Impossibile caricare le informazioni del repository. Assicurati che il repository sia accessibile e inizializzato correttamente.",
-      "v2PlanRequired": "This repository uses Borg 2. Your data is safe. Upgrade to Pro to view its details.",
+      "v2PlanRequired": "Questo repository usa Borg 2.",
       "exportKeyfileTooltip": "Esporta file chiave. conservalo al sicuro!"
     },
     "mountArchive": {
@@ -3282,12 +3282,6 @@
         "repositoryLocked": "Il repository è bloccato da un altro processo o ha un blocco obsoleto"
       }
     }
-  },
-  "upgradePrompt": {
-    "featureLabel": "Funzionalità {{plan}}",
-    "defaultMessage": "Questa funzionalità richiede il piano {{plan}}.",
-    "requiresPlan": "Richiede il piano {{plan}}",
-    "learnMore": "See what's included →"
   },
   "announcements": {
     "highlights": "What's new",

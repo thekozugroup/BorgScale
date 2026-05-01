@@ -22,5 +22,4 @@ def about() -> dict:
         "source": "https://github.com/thekozugroup/BorgScale",
         "license": "AGPL-3.0",
         "license_url": "https://www.gnu.org/licenses/agpl-3.0.html",
-        "upstream": "https://github.com/karanhudia/borg-ui",
     }

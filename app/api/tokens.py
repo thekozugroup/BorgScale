@@ -59,7 +59,7 @@ async def create_token(
             detail={"key": "backend.errors.tokens.nameRequired"},
         )
 
-    raw_token = "borgui_" + secrets.token_urlsafe(32)
+    raw_token = "borgscale_" + secrets.token_urlsafe(32)
     prefix = raw_token[:12]
     token_hash = get_password_hash(raw_token)
 

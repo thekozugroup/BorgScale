@@ -71,14 +71,14 @@ describe('AppHeader', () => {
     expect(await screen.findByText('Admin')).toBeInTheDocument()
   })
 
-  it('shows the plan card when menu opens', async () => {
+  it('shows the instance badge when menu opens', async () => {
     const user = userEvent.setup()
     renderWithProviders(<AppHeader onToggleMobileMenu={vi.fn()} />)
 
     await user.click(screen.getByRole('button', { name: /user menu/i }))
 
-    expect(await screen.findByText('Full Access Plan')).toBeInTheDocument()
-    expect(await screen.findByText('All Enterprise features unlocked')).toBeInTheDocument()
+    expect(await screen.findByText('BorgScale')).toBeInTheDocument()
+    expect(await screen.findByText('Free and open source (AGPL-3.0)')).toBeInTheDocument()
   })
 
   it('shows all three settings navigation links when menu opens', async () => {
