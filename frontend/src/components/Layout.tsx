@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import AnnouncementModal from './AnnouncementModal'
 import AppHeader from './AppHeader'
 import AppSidebar from './AppSidebar'
@@ -32,6 +33,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     useAnnouncementSurface()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showPasskeyPrompt, setShowPasskeyPrompt] = useState(false)
+  const { pathname } = useLocation()
+
+  // Defensive cleanup: if Radix Dialog leaves body pointer-events:none (e.g. due
+  // to unmount-during-transition), reset it on every route change so the UI
+  // never gets permanently locked after navigation.
+  useEffect(() => {
+    if (document.body.style.pointerEvents === 'none') {
+      document.body.style.pointerEvents = ''
+    }
+  }, [pathname])
 
   useEffect(() => {
     if (!user?.username) {

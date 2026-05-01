@@ -65,7 +65,9 @@ export default function LogViewerDialog<T extends JobWithLogs>({
     [jobType, jobId]
   )
 
-  if (!job) return null
+  // Keep ResponsiveDialog mounted even when job is null so Radix receives the
+  // open→false transition and releases body pointer-events before unmounting.
+  const realOpen = open && !!job
 
   const footer = (
     <div className="hidden md:flex justify-end px-5 py-3">
@@ -76,38 +78,42 @@ export default function LogViewerDialog<T extends JobWithLogs>({
   )
 
   return (
-    <ResponsiveDialog open={open} onClose={onClose} maxWidth="lg" fullWidth footer={footer}>
-      {/* Header */}
-      <div className="flex items-center gap-3 px-5 pt-5 pb-3">
-        <p className="text-base font-semibold">
-          {t('logViewer.title', { label: displayLabel, jobId: job.id })}
-        </p>
-        <StatusBadge status={currentStatus} />
-        <div className="flex-1" />
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-              onClick={() => logViewerRef.current?.copyLogs()}
-            >
-              <Copy size={16} />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>{t('terminalLogViewer.copyLogs')}</TooltipContent>
-        </Tooltip>
-      </div>
+    <ResponsiveDialog open={realOpen} onClose={onClose} maxWidth="lg" fullWidth footer={footer}>
+      {realOpen && job && (
+        <>
+          {/* Header */}
+          <div className="flex items-center gap-3 px-5 pt-5 pb-3">
+            <p className="text-base font-semibold">
+              {t('logViewer.title', { label: displayLabel, jobId: job.id })}
+            </p>
+            <StatusBadge status={currentStatus} />
+            <div className="flex-1" />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  onClick={() => logViewerRef.current?.copyLogs()}
+                >
+                  <Copy size={16} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{t('terminalLogViewer.copyLogs')}</TooltipContent>
+            </Tooltip>
+          </div>
 
-      {/* Body */}
-      <div className="px-5 pb-4 border-t border-border pt-3">
-        <TerminalLogViewer
-          ref={logViewerRef}
-          jobId={String(job.id)}
-          status={currentStatus}
-          jobType={jobType}
-          showHeader={false}
-          onFetchLogs={handleFetchLogs}
-        />
-      </div>
+          {/* Body */}
+          <div className="px-5 pb-4 border-t border-border pt-3">
+            <TerminalLogViewer
+              ref={logViewerRef}
+              jobId={String(job.id)}
+              status={currentStatus}
+              jobType={jobType}
+              showHeader={false}
+              onFetchLogs={handleFetchLogs}
+            />
+          </div>
+        </>
+      )}
     </ResponsiveDialog>
   )
 }

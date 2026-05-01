@@ -822,20 +822,20 @@ export default function Repositories() {
         results={pruneResults}
       />
 
-      {/* Lock Error Dialog */}
-      {lockError && (
-        <LockErrorDialog
-          open={!!lockError}
-          onClose={() => setLockError(null)}
-          repositoryId={lockError.repositoryId}
-          repositoryName={lockError.repositoryName}
-          borgVersion={lockError.borgVersion}
-          canBreakLock={canManageRepositoriesGlobally}
-          onLockBroken={() => {
+      {/* Lock Error Dialog — always mounted so Radix receives open→false before unmount */}
+      <LockErrorDialog
+        open={!!lockError}
+        onClose={() => setLockError(null)}
+        repositoryId={lockError?.repositoryId ?? 0}
+        repositoryName={lockError?.repositoryName ?? ''}
+        borgVersion={lockError?.borgVersion}
+        canBreakLock={canManageRepositoriesGlobally}
+        onLockBroken={() => {
+          if (lockError) {
             queryClient.invalidateQueries({ queryKey: ['repository-info', lockError.repositoryId] })
-          }}
-        />
-      )}
+          }
+        }}
+      />
 
       {/* Repository Wizard */}
       <RepositoryWizard
