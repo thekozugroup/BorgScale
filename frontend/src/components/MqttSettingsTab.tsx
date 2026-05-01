@@ -148,7 +148,7 @@ const MqttSettingsTab: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
         <div>
-          <p className="text-lg font-bold mb-1">{t('mqttSettings.title')}</p>
+          <h2 className="text-lg font-bold mb-1">{t('mqttSettings.title')}</h2>
           <p className="text-sm text-muted-foreground">{t('mqtt.subtitle')}</p>
         </div>
         <Button

@@ -162,7 +162,7 @@ const CacheManagementTab: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
         <div>
-          <p className="text-lg font-semibold">{t('cacheManagement.title')}</p>
+          <h2 className="text-lg font-semibold">{t('cacheManagement.title')}</h2>
           <p className="text-sm text-muted-foreground">{t('cache.subtitle')}</p>
         </div>
         <Button

@@ -17,7 +17,7 @@ export default function AppearanceTab() {
   return (
     <div>
       <div>
-        <p className="text-lg font-semibold mb-1">{t('settings.appearance.title')}</p>
+        <h2 className="text-lg font-semibold mb-1">{t('settings.appearance.title')}</h2>
         <p className="text-sm text-muted-foreground mb-6">{t('settings.appearance.subtitle')}</p>
       </div>
       <SettingsCard className="max-w-2xl">

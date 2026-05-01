@@ -364,7 +364,7 @@ export default function PackagesTab() {
   return (
     <div>
       <div className="mb-6">
-        <p className="text-lg font-semibold mb-1">{t('packages.title')}</p>
+        <h2 className="text-lg font-semibold mb-1">{t('packages.title')}</h2>
         <p className="text-sm text-muted-foreground">{t('packages.subtitle')}</p>
       </div>
 

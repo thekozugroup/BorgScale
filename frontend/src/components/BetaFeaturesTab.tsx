@@ -126,7 +126,7 @@ const BetaFeaturesTab: React.FC = () => {
   return (
     <div>
       <div className="mb-6">
-        <p className="text-lg font-semibold mb-1">{t('betaFeatures.title')}</p>
+        <h2 className="text-lg font-semibold mb-1">{t('betaFeatures.title')}</h2>
         <p className="text-sm text-muted-foreground">{t('betaFeatures.description')}</p>
       </div>
 

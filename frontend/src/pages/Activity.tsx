@@ -75,26 +75,30 @@ const Activity: React.FC = () => {
         <div className="flex items-center gap-3">
           <History size={28} className="flex-shrink-0" />
           <div>
-            <p className="text-2xl font-bold">{t('activity.title')}</p>
+            <h1 className="text-2xl font-bold">{t('activity.title')}</h1>
             <p className="text-sm text-muted-foreground">{t('activity.subtitle')}</p>
           </div>
         </div>
         <button
           type="button"
           onClick={() => refetch()}
-          title="Refresh"
+          title={t('common.buttons.refresh')}
+          aria-label={t('common.buttons.refresh')}
           className="self-end sm:self-auto flex items-center justify-center w-9 h-9 rounded-xl border border-border hover:bg-muted/40 transition-colors"
         >
-          <RefreshCw size={18} />
+          <RefreshCw size={18} aria-hidden="true" />
         </button>
       </div>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3 items-center mb-6">
+        <label htmlFor="activity-type-filter" className="sr-only">{t('activity.filters.type')}</label>
         <select
+          id="activity-type-filter"
           value={typeFilter}
           onChange={(e) => handleTypeFilterChange(e.target.value)}
           className={selectClass}
+          aria-label={t('activity.filters.type')}
         >
           <option value="all">{t('activity.filters.allTypes')}</option>
           <option value="backup">{t('activity.filters.types.backup')}</option>
@@ -105,10 +109,13 @@ const Activity: React.FC = () => {
           <option value="package">{t('activity.filters.types.package')}</option>
         </select>
 
+        <label htmlFor="activity-status-filter" className="sr-only">{t('activity.filters.status')}</label>
         <select
+          id="activity-status-filter"
           value={statusFilter}
           onChange={(e) => handleStatusFilterChange(e.target.value)}
           className={selectClass}
+          aria-label={t('activity.filters.status')}
         >
           <option value="all">{t('activity.filters.allStatus')}</option>
           <option value="completed">{t('activity.filters.statuses.completed')}</option>

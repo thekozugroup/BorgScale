@@ -419,7 +419,7 @@ export default function Scripts() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
         <div>
-          <p className="text-2xl font-bold">{t('scripts.title')}</p>
+          <h1 className="text-2xl font-bold">{t('scripts.title')}</h1>
           <p className="text-sm text-muted-foreground mt-0.5">{t('scripts.subtitle')}</p>
         </div>
         <Button size="lg" onClick={handleCreate} className="w-full sm:w-auto gap-1.5">

@@ -429,7 +429,7 @@ const Schedule: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
         <div>
-          <p className="text-2xl font-bold">{t('schedule.title')}</p>
+          <h1 className="text-2xl font-bold">{t('schedule.title')}</h1>
           <p className="text-sm text-muted-foreground">{t('schedule.subtitle')}</p>
         </div>
 
@@ -458,9 +458,13 @@ const Schedule: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-border mb-6">
+      <div role="tablist" aria-label={t('schedule.title')} className="flex border-b border-border mb-6">
         <button
           type="button"
+          role="tab"
+          aria-selected={currentTab === 0}
+          aria-controls="schedule-panel-backups"
+          id="schedule-tab-backups"
           onClick={() => setCurrentTab(0)}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${currentTab === 0 ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
         >
@@ -468,6 +472,10 @@ const Schedule: React.FC = () => {
         </button>
         <button
           type="button"
+          role="tab"
+          aria-selected={currentTab === 1}
+          aria-controls="schedule-panel-checks"
+          id="schedule-tab-checks"
           onClick={() => setCurrentTab(1)}
           className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${currentTab === 1 ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
         >
@@ -477,7 +485,7 @@ const Schedule: React.FC = () => {
 
       {/* Tab Content: Backup Jobs */}
       {currentTab === 0 && (
-        <div>
+        <div id="schedule-panel-backups" role="tabpanel" aria-labelledby="schedule-tab-backups">
           {/* No repositories warning */}
           {!loadingRepositories && (!repositories || repositories.length === 0) && (
             <div className="flex flex-col items-start gap-3 p-3 rounded-xl text-sm mb-6 border border-border bg-muted/40 text-muted-foreground">
@@ -539,7 +547,7 @@ const Schedule: React.FC = () => {
 
       {/* Tab Content: Repository Checks */}
       {currentTab === 1 && (
-        <div>
+        <div id="schedule-panel-checks" role="tabpanel" aria-labelledby="schedule-tab-checks">
           <ScheduledChecksSection ref={scheduledChecksSectionRef} />
         </div>
       )}

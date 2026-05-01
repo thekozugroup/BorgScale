@@ -187,7 +187,7 @@ const LogManagementTab: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6">
         <div>
-          <p className="text-lg font-semibold mb-1">{t('logManagement.title')}</p>
+          <h2 className="text-lg font-semibold mb-1">{t('logManagement.title')}</h2>
           <p className="text-sm text-muted-foreground">
             Configure log storage, retention, and cleanup policies for job logs
           </p>

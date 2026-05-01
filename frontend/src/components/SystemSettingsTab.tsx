@@ -429,7 +429,7 @@ const SystemSettingsTab: React.FC = () => {
     <div>
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6">
         <div>
-          <p className="text-lg font-bold mb-1">{t('systemSettings.title')}</p>
+          <h2 className="text-lg font-bold mb-1">{t('systemSettings.title')}</h2>
           <p className="text-sm text-muted-foreground">{t('systemSettings.subtitle')}</p>
         </div>
         <Button

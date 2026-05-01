@@ -255,10 +255,15 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
           ))}
         </div>
       ) : !scheduledChecks || scheduledChecks.length === 0 ? (
-        <div className="py-12 flex flex-col items-center text-muted-foreground">
-          <Shield size={40} style={{ opacity: 0.25, marginBottom: 12 }} />
-          <p className="text-base mb-1">{t('scheduledChecks.noScheduledChecks')}</p>
+        <div className="py-12 flex flex-col items-center gap-3 text-muted-foreground">
+          <Shield size={40} style={{ opacity: 0.25 }} />
+          <p className="text-base">{t('scheduledChecks.noScheduledChecks')}</p>
           <p className="text-sm text-muted-foreground">{t('scheduledChecks.noScheduledChecksDesc')}</p>
+          {manageableRepositories.length > 0 && (
+            <Button size="sm" variant="outline" className="mt-1" onClick={() => setShowDialog(true)}>
+              {t('schedule.addCheck')}
+            </Button>
+          )}
         </div>
       ) : (
         <div className="flex flex-col gap-4">

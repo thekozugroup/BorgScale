@@ -153,7 +153,7 @@ const ExportImportTab: React.FC = () => {
       <div className="mb-5">
         <div className="flex items-center gap-2 mb-1">
           <Download size={22} />
-          <p className="text-lg font-semibold">{t('exportImport.export.title')}</p>
+          <h2 className="text-lg font-semibold">{t('exportImport.export.title')}</h2>
         </div>
         <p className="text-sm text-muted-foreground">{t('exportImport.export.description')}</p>
       </div>
@@ -234,7 +234,7 @@ const ExportImportTab: React.FC = () => {
       <div className="mb-5">
         <div className="flex items-center gap-2 mb-1">
           <Upload size={22} />
-          <p className="text-lg font-semibold">{t('exportImport.import.title')}</p>
+          <h2 className="text-lg font-semibold">{t('exportImport.import.title')}</h2>
         </div>
         <p className="text-sm text-muted-foreground">{t('exportImport.import.description')}</p>
       </div>

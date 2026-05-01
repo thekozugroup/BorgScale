@@ -174,7 +174,7 @@ const Backup: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4 mb-8">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <p className="text-2xl font-bold">{t('backup.title')}</p>
+            <h1 className="text-2xl font-bold">{t('backup.title')}</h1>
             {repositoriesData?.data?.repositories?.some(
               (repo: Repository) => !getRepoCapabilities(repo).canBackup
             ) && !loadingRepositories && (
