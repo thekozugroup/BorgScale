@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 
@@ -323,25 +323,27 @@ export default function DataTable<T>({
         const actionClass = action.color && action.color !== 'default' ? ACTION_CLASSES[action.color] : undefined
 
         return (
-          <Tooltip key={idx}>
-            <TooltipTrigger asChild>
-              <span>
-                <button
-                  aria-label={tooltipText}
-                  disabled={isDisabled}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    action.onClick(row)
-                  }}
-                  className={`w-7 h-7 rounded flex items-center justify-center transition-all duration-150 disabled:opacity-20 disabled:cursor-not-allowed hover:opacity-100 ${actionClass ? `${actionClass.text} ${actionClass.hover}` : 'text-muted-foreground hover:bg-foreground/[0.06]'}`}
-                  style={{ opacity: isDisabled ? 0.2 : iconOpacity }}
-                >
-                  {action.icon}
-                </button>
-              </span>
-            </TooltipTrigger>
-            <TooltipContent>{tooltipText}</TooltipContent>
-          </Tooltip>
+          <TooltipProvider key={idx}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <button
+                    aria-label={tooltipText}
+                    disabled={isDisabled}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      action.onClick(row)
+                    }}
+                    className={`w-7 h-7 rounded flex items-center justify-center transition-all duration-150 disabled:opacity-20 disabled:cursor-not-allowed hover:opacity-100 ${actionClass ? `${actionClass.text} ${actionClass.hover}` : 'text-muted-foreground hover:bg-foreground/[0.06]'}`}
+                    style={{ opacity: isDisabled ? 0.2 : iconOpacity }}
+                  >
+                    {action.icon}
+                  </button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>{tooltipText}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )
       })}
     </div>

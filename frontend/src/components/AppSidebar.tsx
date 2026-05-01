@@ -186,7 +186,6 @@ function SidebarNavInner({
 function useNavigationSections({
   showMqttNav,
   canManageUsers,
-  canManageLicensing,
   canManageSystemSettings,
   canManageMqtt,
   canManagePackages,
@@ -198,7 +197,6 @@ function useNavigationSections({
 }: {
   showMqttNav: boolean
   canManageUsers: boolean
-  canManageLicensing: boolean
   canManageSystemSettings: boolean
   canManageMqtt: boolean
   canManagePackages: boolean
@@ -266,10 +264,7 @@ function useNavigationSections({
                   icon: SettingsIcon,
                   key: 'dashboard' as const,
                   subItems: [
-                    ...(canManageLicensing
-                      ? [{ name: 'Licensing', href: '/settings/licensing', icon: SettingsIcon }]
-                      : []),
-                    { name: 'System', href: '/settings/system', icon: SettingsIcon },
+                      { name: 'System', href: '/settings/system', icon: SettingsIcon },
                     ...(showMqttNav && canManageMqtt
                       ? [{ name: 'MQTT', href: '/settings/mqtt', icon: Wifi }]
                       : []),
@@ -318,7 +313,6 @@ function useNavigationSections({
   }, [
     showMqttNav,
     canManageUsers,
-    canManageLicensing,
     canManageSystemSettings,
     canManageMqtt,
     canManagePackages,
@@ -335,7 +329,6 @@ export default function AppSidebar({ mobileOpen, onClose }: AppSidebarProps) {
   const location = useLocation()
   const { hasGlobalPermission } = useAuth()
   const canManageUsers = hasGlobalPermission('settings.users.manage')
-  const canManageLicensing = hasGlobalPermission('settings.system.manage')
   const canManageSystemSettings = hasGlobalPermission('settings.system.manage')
   const canManageMqtt = hasGlobalPermission('settings.mqtt.manage')
   const canManagePackages = hasGlobalPermission('settings.packages.manage')
@@ -399,7 +392,6 @@ export default function AppSidebar({ mobileOpen, onClose }: AppSidebarProps) {
   const navigationSections = useNavigationSections({
     showMqttNav,
     canManageUsers,
-    canManageLicensing,
     canManageSystemSettings,
     canManageMqtt,
     canManagePackages,

@@ -9,7 +9,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useAuthorization } from '../hooks/useAuthorization'
 import { formatRoleLabel } from '../utils/rolePresentation'
 import { Button } from '@/components/ui/button'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
   Select,
@@ -364,19 +364,21 @@ export default function UserPermissionsPanel({
                   </span>
                 )}
                 {canManageAssignments && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        onClick={() => removeMutation.mutate(perm.repository_id)}
-                        disabled={removeMutation.isPending}
-                        className="flex items-center justify-center w-7 h-7 rounded flex-shrink-0 opacity-45 hover:opacity-100 hover:bg-destructive/12 text-destructive transition-opacity duration-150 disabled:opacity-20"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>{t('settings.permissions.actions.removeAccess')}</TooltipContent>
-                  </Tooltip>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={() => removeMutation.mutate(perm.repository_id)}
+                          disabled={removeMutation.isPending}
+                          className="flex items-center justify-center w-7 h-7 rounded flex-shrink-0 opacity-45 hover:opacity-100 hover:bg-destructive/12 text-destructive transition-opacity duration-150 disabled:opacity-20"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>{t('settings.permissions.actions.removeAccess')}</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 )}
               </div>
             ))}

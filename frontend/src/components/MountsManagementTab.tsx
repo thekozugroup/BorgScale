@@ -8,7 +8,7 @@ import { translateBackendKey } from '../utils/translateBackendKey'
 import { formatDate } from '../utils/dateUtils'
 import { useAnalytics } from '../hooks/useAnalytics'
 import { useAuth } from '../hooks/useAuth'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Skeleton } from '@/components/ui/skeleton'
 
 interface Mount {
@@ -114,49 +114,51 @@ function MountCard({
       </span>
 
       {/* Actions */}
-      <div className="flex items-center gap-0.5 justify-end">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              onClick={() => onCopy(mount)}
-              aria-label={t('mounts.actions.copyAccessCommand')}
-              className={iconBtn('info')}
-            >
-              <Copy size={15} />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>{t('mounts.actions.copyAccessCommand')}</TooltipContent>
-        </Tooltip>
+      <TooltipProvider>
+        <div className="flex items-center gap-0.5 justify-end">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => onCopy(mount)}
+                aria-label={t('mounts.actions.copyAccessCommand')}
+                className={iconBtn('info')}
+              >
+                <Copy size={15} />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>{t('mounts.actions.copyAccessCommand')}</TooltipContent>
+          </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              onClick={() => onUnmount(mount)}
-              aria-label={t('mounts.actions.unmountArchive')}
-              className={iconBtn('warning')}
-            >
-              <Trash2 size={15} />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>{t('mounts.actions.unmountArchive')}</TooltipContent>
-        </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => onUnmount(mount)}
+                aria-label={t('mounts.actions.unmountArchive')}
+                className={iconBtn('warning')}
+              >
+                <Trash2 size={15} />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>{t('mounts.actions.unmountArchive')}</TooltipContent>
+          </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              onClick={() => onForceUnmount(mount)}
-              aria-label={t('mounts.actions.forceUnmountTooltip')}
-              className={iconBtn('destructive')}
-            >
-              <XCircle size={15} />
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>{t('mounts.actions.forceUnmountTooltip')}</TooltipContent>
-        </Tooltip>
-      </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => onForceUnmount(mount)}
+                aria-label={t('mounts.actions.forceUnmountTooltip')}
+                className={iconBtn('destructive')}
+              >
+                <XCircle size={15} />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>{t('mounts.actions.forceUnmountTooltip')}</TooltipContent>
+          </Tooltip>
+        </div>
+      </TooltipProvider>
     </div>
   )
 }
@@ -232,16 +234,18 @@ export default function MountsManagementTab() {
         <p className="text-sm font-bold">{t('mountsManagement.title')}</p>
         {countBadge}
       </div>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div
-            className="flex items-center text-muted-foreground opacity-60 hover:opacity-100 transition-opacity duration-150 cursor-help"
-          >
-            <Info size={15} />
-          </div>
-        </TooltipTrigger>
-        <TooltipContent side="bottom">{t('mounts.infoAlert')}</TooltipContent>
-      </Tooltip>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div
+              className="flex items-center text-muted-foreground opacity-60 hover:opacity-100 transition-opacity duration-150 cursor-help"
+            >
+              <Info size={15} />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">{t('mounts.infoAlert')}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </div>
   )
 
