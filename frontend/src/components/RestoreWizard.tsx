@@ -1,14 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Box,
-  Button,
-  Typography,
-} from '@mui/material'
 import { Files, HardDrive, CheckCircle } from 'lucide-react'
 import {
   WizardStepIndicator,
@@ -19,6 +10,14 @@ import {
 import FileExplorerDialog from './FileExplorerDialog'
 import { sshKeysAPI } from '../services/api'
 import type { Archive, Repository } from '../types'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 
 interface SSHConnection {
   id: number
@@ -59,14 +58,9 @@ export interface RestoreData {
 }
 
 interface WizardState {
-  // Step 0: Files
   selectedPaths: string[]
-
-  // Step 1: Destination
   destinationType: 'local' | 'ssh'
   destinationConnectionId: number | ''
-
-  // Step 2: Path
   restoreStrategy: 'original' | 'custom'
   customPath: string
 }
@@ -93,10 +87,8 @@ const RestoreWizard = ({
   const [sshConnections, setSshConnections] = useState<SSHConnection[]>([])
   const wasOpenRef = useRef(false)
 
-  // File explorer state
   const [showPathExplorer, setShowPathExplorer] = useState(false)
 
-  // Step definitions
   const steps = useMemo(
     () => [
       { key: 'files', label: t('restoreWizard.steps.files'), icon: <Files size={14} /> },
@@ -110,7 +102,6 @@ const RestoreWizard = ({
     [t]
   )
 
-  // Load SSH connections
   const loadSshConnections = async () => {
     try {
       const connectionsRes = await sshKeysAPI.getSSHConnections()
@@ -122,21 +113,17 @@ const RestoreWizard = ({
     }
   }
 
-  // Initialize and reset on dialog open
   useEffect(() => {
     if (open && !wasOpenRef.current) {
-      // Dialog just opened (was closed before)
       setActiveStep(0)
       setWizardState(initialState)
       loadSshConnections()
       wasOpenRef.current = true
     } else if (!open && wasOpenRef.current) {
-      // Dialog just closed
       wasOpenRef.current = false
     }
   }, [open])
 
-  // Force destinationType to 'local' for SSH repositories (SSH-to-SSH not supported)
   useEffect(() => {
     if (open && repositoryType === 'ssh' && wizardState.destinationType === 'ssh') {
       setWizardState((prev) => ({
@@ -147,16 +134,13 @@ const RestoreWizard = ({
     }
   }, [open, repositoryType, wizardState.destinationType])
 
-  // Handle state changes
   const handleStateChange = (updates: Partial<WizardState>) => {
-    // Prevent SSH destination for SSH repositories
     if (repositoryType === 'ssh' && updates.destinationType === 'ssh') {
-      return // Silently ignore
+      return
     }
     setWizardState((prev) => ({ ...prev, ...updates }))
   }
 
-  // Handle SSH connection selection
   const handleSshConnectionSelect = (connectionId: number) => {
     const connection = sshConnections.find((c) => c.id === connectionId)
     if (connection) {
@@ -167,21 +151,17 @@ const RestoreWizard = ({
     }
   }
 
-  // Validation
   const canProceed = () => {
     const currentStepKey = steps[activeStep]?.key
 
     switch (currentStepKey) {
       case 'files':
-        // Must have at least one file selected
         return wizardState.selectedPaths.length > 0
 
       case 'destination':
-        // Validate SSH connection selection
         if (wizardState.destinationType === 'ssh' && !wizardState.destinationConnectionId) {
           return false
         }
-        // Validate custom path when custom strategy is selected (applies to both local and SSH)
         if (wizardState.restoreStrategy === 'custom' && !wizardState.customPath.trim()) {
           return false
         }
@@ -218,11 +198,9 @@ const RestoreWizard = ({
     onRestore(data)
   }
 
-  // Render current step content
   const renderStepContent = () => {
     const currentStepKey = steps[activeStep]?.key
 
-    // Convert selectedPaths to ArchiveFile format for compatibility
     const selectedFiles: ArchiveFile[] = wizardState.selectedPaths.map((path) => ({
       path,
       mode: '',
@@ -258,7 +236,6 @@ const RestoreWizard = ({
             sshConnections={sshConnections}
             repositoryType={repositoryType}
             onChange={(updates) => {
-              // Handle SSH connection selection
               if (
                 updates.destinationConnectionId &&
                 updates.destinationConnectionId !== wizardState.destinationConnectionId
@@ -294,35 +271,21 @@ const RestoreWizard = ({
 
   return (
     <>
-      <Dialog
-        open={open}
-        onClose={onClose}
-        maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: 3,
-            overflow: 'hidden',
-            backdropFilter: 'blur(10px)',
-            backgroundImage:
-              'linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))',
-            boxShadow: (theme) =>
-              theme.palette.mode === 'dark'
-                ? '0 24px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1)'
-                : '0 24px 48px rgba(0,0,0,0.1)',
-          },
-        }}
-      >
-        <DialogTitle sx={{ pt: 3, pb: 1 }}>
-          <Typography variant="h5" component="div" fontWeight={700}>
-            {t('restoreWizard.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            {t('restoreWizard.fromArchive', { archiveName: archive.name })}
-          </Typography>
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ mt: 2 }}>
+      <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose() }}>
+        <DialogContent
+          showCloseButton={false}
+          className="max-w-2xl w-full p-0 gap-0 overflow-hidden rounded-2xl"
+        >
+          <DialogHeader className="px-6 pt-5 pb-3">
+            <DialogTitle className="text-xl font-bold">
+              {t('restoreWizard.title')}
+            </DialogTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              {t('restoreWizard.fromArchive', { archiveName: archive.name })}
+            </p>
+          </DialogHeader>
+
+          <div className="px-6 pb-4">
             {/* Step Indicator */}
             <WizardStepIndicator
               steps={steps}
@@ -330,44 +293,35 @@ const RestoreWizard = ({
               onStepClick={setActiveStep}
             />
 
-            {/* Step Content - Fixed height to prevent layout shift */}
-            <Box sx={{ height: 450, overflow: 'auto' }}>
+            {/* Step Content */}
+            <div className="h-[450px] overflow-auto">
               {activeStep === 0 ? (
-                // Files step fills entire height with its own layout
-                <Box sx={{ height: '100%', px: 3, py: 2 }}>{renderStepContent()}</Box>
+                <div className="h-full px-3 py-2">{renderStepContent()}</div>
               ) : (
-                // Other steps just need padding and scroll naturally
-                <Box sx={{ px: 3, py: 2 }}>{renderStepContent()}</Box>
+                <div className="px-3 py-2">{renderStepContent()}</div>
               )}
-            </Box>
-          </Box>
+            </div>
+          </div>
+
+          <DialogFooter className="px-6 pb-5 flex-row gap-2">
+            <Button variant="ghost" onClick={onClose}>
+              {t('common.buttons.cancel')}
+            </Button>
+            <div className="flex-1" />
+            <Button variant="outline" disabled={activeStep === 0} onClick={handleBack}>
+              {t('common.buttons.back')}
+            </Button>
+            {activeStep < steps.length - 1 ? (
+              <Button onClick={handleNext} disabled={!canProceed()}>
+                {t('common.buttons.next')}
+              </Button>
+            ) : (
+              <Button onClick={handleSubmit} disabled={!canProceed()}>
+                {t('restoreWizard.buttons.restore')}
+              </Button>
+            )}
+          </DialogFooter>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={onClose}>{t('common.buttons.cancel')}</Button>
-          <Box sx={{ flex: 1 }} />
-          <Button disabled={activeStep === 0} onClick={handleBack}>
-            {t('common.buttons.back')}
-          </Button>
-          {activeStep < steps.length - 1 ? (
-            <Button
-              variant="contained"
-              onClick={handleNext}
-              disabled={!canProceed()}
-              sx={{ boxShadow: '0 2px 8px rgba(37,99,235,0.3)' }}
-            >
-              {t('common.buttons.next')}
-            </Button>
-          ) : (
-            <Button
-              variant="contained"
-              onClick={handleSubmit}
-              disabled={!canProceed()}
-              sx={{ boxShadow: '0 2px 8px rgba(37,99,235,0.3)' }}
-            >
-              {t('restoreWizard.buttons.restore')}
-            </Button>
-          )}
-        </DialogActions>
       </Dialog>
 
       {/* File Explorer Dialog for custom path */}

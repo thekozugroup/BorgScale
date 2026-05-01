@@ -1,17 +1,13 @@
 import { useTranslation } from 'react-i18next'
+import { AlertCircle, Trash2, Loader2 } from 'lucide-react'
 import {
-  DialogTitle,
+  Dialog,
   DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-  Stack,
-  Box,
-  Alert,
-  CircularProgress,
-} from '@mui/material'
-import ResponsiveDialog from './ResponsiveDialog'
-import { AlertCircle, Trash2 } from 'lucide-react'
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 
 interface DeleteArchiveDialogProps {
   open: boolean
@@ -30,52 +26,57 @@ export default function DeleteArchiveDialog({
 }: DeleteArchiveDialogProps) {
   const { t } = useTranslation()
   return (
-    <ResponsiveDialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogTitle>
-        <Stack direction="row" spacing={2} alignItems="center">
-          <Box
-            sx={{
-              width: 48,
-              height: 48,
-              borderRadius: '50%',
-              backgroundColor: 'error.lighter',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose() }}>
+      <DialogContent showCloseButton={false} className="max-w-sm">
+        <DialogHeader>
+          <div className="flex items-center gap-3">
+            <div className="size-12 rounded-full bg-destructive/10 flex items-center justify-center shrink-0">
+              <AlertCircle size={24} className="text-destructive" />
+            </div>
+            <DialogTitle className="text-base font-semibold">
+              {t('dialogs.deleteArchive.title')}
+            </DialogTitle>
+          </div>
+        </DialogHeader>
+
+        <div className="space-y-3">
+          <div className="rounded-md border border-yellow-200 bg-yellow-50 dark:border-yellow-800/50 dark:bg-yellow-900/20 px-3 py-2">
+            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+              {t('dialogs.deleteArchive.warning')}
+            </p>
+          </div>
+          <p className="text-sm">
+            {t('dialogs.deleteArchive.subtitle')}{' '}
+            <strong>&quot;{archiveName}&quot;</strong>
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {t('dialogs.deleteArchive.archiveName', { name: archiveName })}
+          </p>
+        </div>
+
+        <DialogFooter className="-mx-4 -mb-4 border-t bg-muted/50 px-4 py-3 rounded-b-xl flex-row justify-end gap-2">
+          <Button variant="outline" onClick={onClose}>
+            {t('common.buttons.cancel')}
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => archiveName && onConfirm(archiveName)}
+            disabled={deleting}
           >
-            <AlertCircle size={24} color="#d32f2f" />
-          </Box>
-          <Typography variant="h6" fontWeight={600}>
-            {t('dialogs.deleteArchive.title')}
-          </Typography>
-        </Stack>
-      </DialogTitle>
-      <DialogContent>
-        <Alert severity="warning" sx={{ mb: 2 }}>
-          {t('dialogs.deleteArchive.warning')}
-        </Alert>
-        <Typography variant="body2" gutterBottom>
-          {t('dialogs.deleteArchive.subtitle')} <strong>"{archiveName}"</strong>
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          {t('dialogs.deleteArchive.archiveName', { name: archiveName })}
-        </Typography>
+            {deleting ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                {t('dialogs.deleteArchive.deleting')}
+              </>
+            ) : (
+              <>
+                <Trash2 size={16} />
+                {t('dialogs.deleteArchive.confirm')}
+              </>
+            )}
+          </Button>
+        </DialogFooter>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>{t('common.buttons.cancel')}</Button>
-        <Button
-          variant="contained"
-          color="error"
-          onClick={() => archiveName && onConfirm(archiveName)}
-          disabled={deleting}
-          startIcon={
-            deleting ? <CircularProgress size={16} color="inherit" /> : <Trash2 size={16} />
-          }
-        >
-          {deleting ? t('dialogs.deleteArchive.deleting') : t('dialogs.deleteArchive.confirm')}
-        </Button>
-      </DialogActions>
-    </ResponsiveDialog>
+    </Dialog>
   )
 }

@@ -1,55 +1,42 @@
-import { Box, Skeleton, alpha, useTheme } from '@mui/material'
+import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
 
 interface ArchiveCardSkeletonProps {
   index?: number
 }
 
-export default function ArchiveCardSkeleton({ index = 0 }: ArchiveCardSkeletonProps) {
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
-  const desktopGridTemplate = 'minmax(0, 1fr) 76px minmax(180px, 220px) 132px'
+const widths = [160, 200, 140, 180, 152, 190, 170, 210, 145, 185]
 
+export default function ArchiveCardSkeleton({ index = 0 }: ArchiveCardSkeletonProps) {
   return (
-    <Box
-      sx={{
-        display: 'grid',
-        gridTemplateColumns: desktopGridTemplate,
-        alignItems: 'center',
-        gap: 1,
-        px: 2,
-        py: 1.125,
-        borderBottom: '1px solid',
-        borderBottomColor: isDark ? alpha('#fff', 0.04) : alpha('#000', 0.04),
-        opacity: 0,
-        animation: 'archiveSkeletonFadeIn 0.35s ease forwards',
-        animationDelay: `${index * 40}ms`,
-        '@keyframes archiveSkeletonFadeIn': {
-          from: { opacity: 0 },
-          to: { opacity: 1 },
-        },
-        '@media (max-width: 767px)': {
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 0.75,
-          px: 1.75,
-          py: 1.25,
-        },
-      }}
+    <div
+      className={cn(
+        'border-b border-b-neutral-100 dark:border-b-neutral-800/70 opacity-0',
+        // Desktop: 4-col grid; mobile: flex-wrap
+        'md:grid md:grid-cols-[minmax(0,1fr)_76px_minmax(180px,220px)_132px] md:items-center md:gap-2 md:px-4 md:py-[9px]',
+        'flex flex-wrap gap-1.5 px-[14px] py-[10px]',
+        'animate-[archiveSkeletonFadeIn_0.35s_ease_forwards]',
+      )}
+      style={{ animationDelay: `${index * 40}ms` }}
     >
+      <style>{`
+        @keyframes archiveSkeletonFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
       <Skeleton
-        variant="text"
-        width={[160, 200, 140, 180, 152, 190, 170, 210, 145, 185][index % 10]}
-        height={16}
-        sx={{ borderRadius: 0.5, transform: 'none' }}
+        className="h-4 rounded-sm"
+        style={{ width: widths[index % 10] }}
       />
-      <Skeleton variant="rounded" width={36} height={18} sx={{ borderRadius: 3 }} />
-      <Skeleton variant="text" width={90} height={14} sx={{ transform: 'none' }} />
-      <Box sx={{ display: 'flex', gap: 0.25, justifyContent: 'flex-end' }}>
-        <Skeleton variant="rounded" width={28} height={28} sx={{ borderRadius: 1.5 }} />
-        <Skeleton variant="rounded" width={28} height={28} sx={{ borderRadius: 1.5 }} />
-        <Skeleton variant="rounded" width={28} height={28} sx={{ borderRadius: 1.5 }} />
-        <Skeleton variant="rounded" width={28} height={28} sx={{ borderRadius: 1.5 }} />
-      </Box>
-    </Box>
+      <Skeleton className="h-[18px] w-9 rounded-full" />
+      <Skeleton className="h-3.5 w-[90px]" />
+      <div className="flex gap-0.5 md:justify-end">
+        <Skeleton className="size-7 rounded-[6px]" />
+        <Skeleton className="size-7 rounded-[6px]" />
+        <Skeleton className="size-7 rounded-[6px]" />
+        <Skeleton className="size-7 rounded-[6px]" />
+      </div>
+    </div>
   )
 }

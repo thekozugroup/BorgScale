@@ -47,7 +47,7 @@ describe('ArchivesList', () => {
       <ArchivesList archives={[]} repositoryName="Test Repo" loading={true} {...mockHandlers} />
     )
 
-    expect(document.querySelectorAll('.MuiSkeleton-root').length).toBeGreaterThan(0)
+    expect(document.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(0)
   })
 
   it('renders empty state when no archives', () => {
@@ -143,7 +143,7 @@ describe('ArchivesList', () => {
       />
     )
 
-    expect(screen.getByText('100')).toBeInTheDocument()
+    expect(screen.getAllByText('100').length).toBeGreaterThan(0)
     // With pagination (default 10 per page), only first 10 should be visible
     expect(screen.getByTestId('archive-card-0')).toBeInTheDocument()
     expect(screen.getByTestId('archive-card-9')).toBeInTheDocument()
@@ -602,7 +602,7 @@ describe('ArchivesList', () => {
         />
       )
 
-      const todayAccordion = screen.getByText('Today').closest('div[class*="MuiAccordionSummary"]')
+      const todayAccordion = screen.getByText('Today').closest('button[data-testid="accordion-trigger"]')
       if (todayAccordion) {
         await user.click(todayAccordion)
       }
@@ -821,13 +821,9 @@ describe('ArchivesList', () => {
         />
       )
 
-      // Open rows per page dropdown
-      const rowsPerPageButton = screen.getByRole('combobox', { name: /archives per page/i })
-      await user.click(rowsPerPageButton)
-
-      // Select 25
-      const option25 = screen.getByRole('option', { name: '25' })
-      await user.click(option25)
+      // Select 25 via native select
+      const rowsPerPageSelect = screen.getByRole('combobox', { name: /archives per page/i })
+      await user.selectOptions(rowsPerPageSelect, '25')
 
       // LocalStorage should be updated
       expect(localStorage.getItem('archives-list-rows-per-page')).toBe('25')
