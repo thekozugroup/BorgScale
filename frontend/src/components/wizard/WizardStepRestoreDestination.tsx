@@ -79,7 +79,7 @@ export default function WizardStepRestoreDestination({
               : 'border border-border hover:-translate-y-0.5 hover:shadow-sm'
           )}
         >
-          <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all', isLocalSelected ? 'bg-primary text-white shadow-md' : 'bg-muted text-muted-foreground')}>
+          <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all', isLocalSelected ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground')}>
             <Server size={24} />
           </div>
           <div>
@@ -99,7 +99,7 @@ export default function WizardStepRestoreDestination({
                 : 'border border-border hover:-translate-y-0.5 hover:shadow-sm'
             )}
           >
-            <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all', isSSHSelected ? 'bg-primary text-white shadow-md' : 'bg-muted text-muted-foreground')}>
+            <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all', isSSHSelected ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground')}>
               <Cloud size={24} />
             </div>
             <div>

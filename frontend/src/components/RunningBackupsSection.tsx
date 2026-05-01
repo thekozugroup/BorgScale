@@ -65,7 +65,7 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
           </div>
           <p className="text-base font-semibold">{t('backup.runningJobs.title')}</p>
           <div
-            className="px-2 py-0.5 rounded-full text-[0.7rem] font-bold bg-primary/10 border border-primary/20 text-primary"
+            className="px-2 py-0.5 rounded-full text-xs font-bold bg-primary/10 border border-primary/20 text-primary"
             style={{ lineHeight: 1.5 }}
           >
             {runningBackupJobs.length}
@@ -111,16 +111,16 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                       <div className="flex items-center gap-1.5 mb-1 flex-wrap">
                         <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-primary" style={{ animation: 'liveDot 2s ease-in-out infinite' }} />
                         <p className="font-bold text-base leading-tight">{t('backup.runningJobs.jobTitle', { id: job.id })}</p>
-                        <div className="px-1.5 py-0.5 rounded text-[0.62rem] font-bold uppercase tracking-[0.05em] leading-none bg-primary/10 border border-primary/20 text-primary">
+                        <div className="px-1.5 py-0.5 rounded text-2xs font-bold uppercase tracking-[0.05em] leading-none bg-primary/10 border border-primary/20 text-primary">
                           {stageLabel}
                         </div>
                         {job.maintenance_status && (
-                          <div className="px-1.5 py-0.5 rounded text-[0.62rem] font-bold uppercase tracking-[0.05em] leading-none bg-muted text-muted-foreground border border-border">
+                          <div className="px-1.5 py-0.5 rounded text-2xs font-bold uppercase tracking-[0.05em] leading-none bg-muted text-muted-foreground border border-border">
                             {job.maintenance_status}
                           </div>
                         )}
                       </div>
-                      <p className="text-[0.69rem] truncate text-foreground/30" style={{ fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace' }}>
+                      <p className="text-xs truncate text-foreground/30 font-mono">
                         {job.repository}
                       </p>
                     </div>
@@ -158,8 +158,8 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                   {showProgress && (
                     <div className="mb-3">
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-[0.68rem] font-semibold text-primary">{pct.toFixed(1)}%</span>
-                        <span className="text-[0.65rem] text-muted-foreground">{t('backup.runningJobs.progress.totalSourceSize')}</span>
+                        <span className="text-2xs font-semibold text-primary">{pct.toFixed(1)}%</span>
+                        <span className="text-2xs text-muted-foreground">{t('backup.runningJobs.progress.totalSourceSize')}</span>
                       </div>
                       <div className="h-1 rounded-full overflow-hidden bg-muted">
                         <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
@@ -182,9 +182,9 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                         >
                           <div className="flex items-center gap-1 mb-0.5">
                             <span className="text-muted-foreground/70 flex items-center">{STAT_ICONS[i]}</span>
-                            <span className="text-[0.58rem] font-bold uppercase tracking-[0.07em] leading-none text-muted-foreground/70">{stat.label}</span>
+                            <span className="text-3xs font-bold uppercase tracking-[0.07em] leading-none text-muted-foreground/70">{stat.label}</span>
                           </div>
-                          <p className="text-[0.85rem] font-semibold truncate tabular-nums">{stat.value}</p>
+                          <p className="text-sm font-semibold truncate tabular-nums">{stat.value}</p>
                         </div>
                       ))}
                     </div>
@@ -196,7 +196,7 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                       className="flex items-center gap-2 px-3 py-2 rounded overflow-hidden bg-muted/50 border border-border"
                     >
                       <span className="text-primary/60 flex shrink-0"><FileText size={13} /></span>
-                      <p className="text-[0.72rem] text-muted-foreground truncate flex-1 min-w-0" style={{ fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace' }}>
+                      <p className="text-xs text-muted-foreground truncate flex-1 min-w-0 font-mono">
                         {job.progress_details.current_file}
                       </p>
                     </div>

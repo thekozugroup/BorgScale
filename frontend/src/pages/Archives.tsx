@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useLocation, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -53,6 +54,7 @@ function normalizeRepositoryId(value: number | string | null | undefined): numbe
 
 const Archives: React.FC = () => {
   const { t } = useTranslation()
+  usePageTitle(t('archives.title'))
   const [searchParams, setSearchParams] = useSearchParams()
   const [selectedRepositoryId, setSelectedRepositoryId] = useState<number | null>(() => {
     return normalizeRepositoryId(searchParams.get('repo'))

@@ -133,7 +133,7 @@ export default function PasskeyEnrollmentPrompt({
               <Icon size={16} className="text-foreground" strokeWidth={2} />
             </div>
             <div className="min-w-0">
-              <p className="text-[0.8125rem] font-semibold leading-tight mb-0.5">{t(titleKey)}</p>
+              <p className="text-sm font-semibold leading-tight mb-0.5">{t(titleKey)}</p>
               <p className="text-xs text-muted-foreground leading-snug">{t(descKey)}</p>
             </div>
           </div>
@@ -165,7 +165,7 @@ export default function PasskeyEnrollmentPrompt({
             variant="outline"
             onClick={handleClose}
             disabled={isPending}
-            className="flex-1 h-10 text-[0.8125rem]"
+            className="flex-1 h-10 text-sm"
           >
             {t('settings.account.security.passkeyPromptSnooze')}
           </Button>
@@ -173,7 +173,7 @@ export default function PasskeyEnrollmentPrompt({
             variant="ghost"
             onClick={handleIgnore}
             disabled={isPending}
-            className="flex-1 h-10 text-[0.8125rem] text-muted-foreground"
+            className="flex-1 h-10 text-sm text-muted-foreground"
           >
             {t('settings.account.security.passkeyPromptIgnore')}
           </Button>

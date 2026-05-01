@@ -113,6 +113,7 @@ export interface DataTableProps<T> {
     icon: React.ReactNode
     title: string
     description?: string
+    action?: React.ReactNode
   }
 
   // Table wrapper
@@ -252,14 +253,14 @@ export default function DataTable<T>({
               {columns.map((col) => (
                 <th
                   key={col.id}
-                  className="px-3 py-2 text-left text-[0.7rem] font-bold uppercase tracking-[0.05em] text-muted-foreground whitespace-nowrap border-b border-border"
+                  className="px-3 py-2 text-left text-xs font-bold uppercase tracking-[0.05em] text-muted-foreground whitespace-nowrap border-b border-border"
                   style={{ width: col.width, minWidth: col.minWidth }}
                 >
                   {col.label}
                 </th>
               ))}
               {actions && actions.length > 0 && (
-                <th className="px-3 py-2 text-right text-[0.7rem] font-bold uppercase tracking-[0.05em] text-muted-foreground border-b border-border" style={{ width: 152 }}>
+                <th className="px-3 py-2 text-right text-xs font-bold uppercase tracking-[0.05em] text-muted-foreground border-b border-border" style={{ width: 152 }}>
                   {t('dataTable.actions')}
                 </th>
               )}
@@ -300,6 +301,7 @@ export default function DataTable<T>({
           {emptyState.description && (
             <p className="text-sm text-muted-foreground">{emptyState.description}</p>
           )}
+          {emptyState.action && <div className="mt-4">{emptyState.action}</div>}
         </div>
       </div>
     )
@@ -365,7 +367,7 @@ export default function DataTable<T>({
                   key={column.id}
                   className={cn('min-w-0 overflow-hidden', column.mobileFullWidth && 'col-span-2')}
                 >
-                  <p className="text-[0.6rem] font-bold uppercase tracking-[0.03em] text-muted-foreground mb-0.5">
+                  <p className="text-2xs font-bold uppercase tracking-[0.03em] text-muted-foreground mb-0.5">
                     {column.label}
                   </p>
                   <div className="min-w-0 overflow-hidden">
@@ -377,7 +379,7 @@ export default function DataTable<T>({
               ))}
               {actions && actions.length > 0 && (
                 <div className="min-w-0">
-                  <p className="text-[0.6rem] font-bold uppercase tracking-[0.03em] text-muted-foreground mb-0.5">
+                  <p className="text-2xs font-bold uppercase tracking-[0.03em] text-muted-foreground mb-0.5">
                     {t('dataTable.actions')}
                   </p>
                   {renderActions(row, 0.7, 'start')}
@@ -412,7 +414,7 @@ export default function DataTable<T>({
                 <th
                   key={col.id}
                   className={cn(
-                    'px-3 py-2 text-[0.7rem] font-bold uppercase tracking-[0.05em] text-muted-foreground whitespace-nowrap border-b border-border',
+                    'px-3 py-2 text-xs font-bold uppercase tracking-[0.05em] text-muted-foreground whitespace-nowrap border-b border-border',
                     col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'
                   )}
                   style={{ width: col.width, minWidth: col.minWidth, maxWidth: col.width }}
@@ -422,7 +424,7 @@ export default function DataTable<T>({
               ))}
               {actions && actions.length > 0 && (
                 <th
-                  className="px-3 py-2 text-right text-[0.7rem] font-bold uppercase tracking-[0.05em] text-muted-foreground whitespace-nowrap border-b border-border"
+                  className="px-3 py-2 text-right text-xs font-bold uppercase tracking-[0.05em] text-muted-foreground whitespace-nowrap border-b border-border"
                   style={{ width: 152, minWidth: 152, maxWidth: 152 }}
                 >
                   {t('dataTable.actions')}

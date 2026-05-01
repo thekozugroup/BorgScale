@@ -30,7 +30,7 @@ export const RepositoryCell: React.FC<RepositoryCellProps> = ({
           <div className="min-w-0 flex-1 overflow-hidden">
             <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
             {repositoryPath && (
-              <p className="text-[0.7rem] text-muted-foreground font-mono truncate">{displayPath}</p>
+              <p className="text-xs text-muted-foreground font-mono truncate">{displayPath}</p>
             )}
           </div>
         </div>

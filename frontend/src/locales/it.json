@@ -196,7 +196,7 @@
     "moreScheduled": "+{{count}} altri pianificati",
     "resources": "Risorse",
     "memAbbr": "MEM",
-    "diskAbbr": "DISCO",
+    "diskAbbr": "Disco",
     "recentActivity": {
       "title": "Attività Recenti",
       "empty": "Nessuna attività recente",
@@ -591,6 +591,7 @@
     }
   },
   "settings": {
+    "title": "Impostazioni",
     "password": {
       "title": "Cambia Password",
       "subtitle": "Aggiorna la tua password per mantenere il tuo account sicuro",
@@ -1180,7 +1181,7 @@
       "message": "Il repository è attualmente bloccato. Questo potrebbe essere dovuto a un'operazione interrotta.",
       "breakLock": "Rompi Blocco",
       "cancel": "Annulla",
-      "breakLockWarning": "Sei ASSOLUTAMENTE certo che nessun backup o operazione sia in esecuzione su questo repository? Rompere il blocco mentre un'operazione è in esecuzione può corrompere il repository!",
+      "breakLockWarning": "Sei assolutamente certo che nessun backup o operazione sia in esecuzione su questo repository? Rompere il blocco mentre un'operazione è in esecuzione può corrompere il repository!",
       "lockRemovedSuccess": "Blocco rimosso con successo! Ora puoi riprovare la tua operazione.",
       "lockedDescription": "{{repositoryName}} è bloccato da un altro processo o ha un blocco obsoleto.",
       "staleLockInfo": "Se nessun backup è in esecuzione, questo è probabilmente un blocco obsoleto di un backup che si è bloccato.",
@@ -1288,9 +1289,9 @@
       "warningCompact": "Dopo la pulizia, esegui \"Compatta\" per liberare effettivamente spazio su disco.",
       "dryRunButton": "Prova Simulata (Anteprima)",
       "resultsTitle": "Risultati",
-      "dryRunPreviewBadge": "ANTEPRIMA",
-      "pruneCompleteBadge": "COMPLETATO",
-      "pruneFailedBadge": "FALLITO",
+      "dryRunPreviewBadge": "Anteprima",
+      "pruneCompleteBadge": "Completato",
+      "pruneFailedBadge": "Fallito",
       "runPruneNow": "Esegui potatura ora",
       "done": "Fine",
       "close": "Chiudi",
@@ -2426,7 +2427,7 @@
   },
   "packages": {
     "title": "Pacchetti di Sistema",
-    "subtitle": "Installa pacchetti di sistema che possono essere usati nei tuoi script di backup. I pacchetti vengono reinstallati automaticamente quando il container viene ricreato.",
+    "subtitle": "Installa pacchetti di sistema che possono essere usati nei tuoi script di backup. I pacchetti vengono reinstallati automaticamente quando l'app viene aggiornata.",
     "hint": "Inserisci semplicemente un nome di pacchetto (es., wakeonlan, curl) e verrà installato usando sudo apt-get install -y. Per casi avanzati, puoi abilitare comandi di installazione personalizzati.",
     "installedPackages": "Pacchetti Installati",
     "addPackage": "Aggiungi Pacchetto",
@@ -2725,7 +2726,7 @@
     "clientKeyPathLabel": "Percorso Chiave Client",
     "clientKeyPathHelper": "Percorso del file della chiave client (opzionale)",
     "noteLabel": "Nota:",
-    "dockerVolumesWarning": "I percorsi dei certificati sono relativi al filesystem del container. Per distribuzioni Docker, monta i tuoi certificati su un volume e fai riferimento al percorso del container (es., /certs/ca.crt).",
+    "dockerVolumesWarning": "I percorsi dei certificati sono relativi alla cartella dati di BorgScale. Monta i certificati nella cartella dati e fai riferimento al percorso montato (ad esempio, /certs/ca.crt).",
     "failedToSaveMqttSettings": "Impossibile salvare le impostazioni MQTT"
   },
   "remoteMachine": {
@@ -2817,6 +2818,10 @@
     "infoAlert": "Nota: Gli archivi montati appaiono come filesystem di sola lettura nel tuo file manager. Accedili al percorso del punto di mount. I mount vengono puliti automaticamente al riavvio dell'app.",
     "emptyDescription": "Monta archivi dalla pagina Archivi per sfogliare il loro contenuto direttamente nel tuo file manager.",
     "activeMounts": "Mount Attivi"
+  },
+  "mountToast": {
+    "archiveMounted": "Archivio montato",
+    "openInTerminal": "Apri in un terminale:"
   },
   "terminalLog": {
     "inProgress": "{{type}} in corso..."

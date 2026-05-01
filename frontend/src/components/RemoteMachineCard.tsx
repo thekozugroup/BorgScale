@@ -111,12 +111,12 @@ export default function RemoteMachineCard({
                 {getStatusIcon(machine.status)}
               </span>
               <span
-                className={`text-[0.6rem] font-bold uppercase tracking-[0.08em] leading-none ${statusClass}`}
+                className={`text-2xs font-bold uppercase tracking-[0.08em] leading-none ${statusClass}`}
               >
                 {machine.status}
               </span>
             </div>
-            <span className="text-[0.58rem] font-medium text-muted-foreground flex-shrink-0">
+            <span className="text-3xs font-medium text-muted-foreground flex-shrink-0">
               {machine.ssh_key_name}
             </span>
           </div>
@@ -129,8 +129,7 @@ export default function RemoteMachineCard({
           </p>
 
           <p
-            className="text-[0.7rem] text-muted-foreground truncate"
-            style={{ fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace' }}
+            className="text-xs text-muted-foreground truncate font-mono"
             title={`${machine.username}@${machine.host}:${machine.port}`}
           >
             {machine.username}@{machine.host}:{machine.port}
@@ -153,11 +152,11 @@ export default function RemoteMachineCard({
                   className={`px-4 sm:px-5 py-3 sm:py-2.5 min-w-0${i === 0 ? ' border-r border-border' : ''}`}
                 >
                   <p
-                    className={`text-[0.6rem] font-bold uppercase tracking-[0.06em] leading-none mb-1 truncate ${col.colorClass}`}
+                    className={`text-2xs font-bold uppercase tracking-[0.06em] leading-none mb-1 truncate ${col.colorClass}`}
                   >
                     {col.label}
                   </p>
-                  <p className="text-sm sm:text-[0.85rem] font-semibold tabular-nums leading-tight truncate">
+                  <p className="text-sm sm:text-sm font-semibold tabular-nums leading-tight truncate">
                     {col.value}
                   </p>
                 </div>
@@ -169,10 +168,10 @@ export default function RemoteMachineCard({
               className="px-4 sm:px-5 pb-2.5 pt-1.5 border-t border-border"
             >
               <div className="flex justify-between items-center mb-1">
-                <span className="text-[0.58rem] text-muted-foreground leading-none">
+                <span className="text-3xs text-muted-foreground leading-none">
                   {machine.storage.percent_used.toFixed(1)}% used
                 </span>
-                <span className="text-[0.58rem] text-muted-foreground leading-none tabular-nums">
+                <span className="text-3xs text-muted-foreground leading-none tabular-nums">
                   {machine.storage.total_formatted} total
                 </span>
               </div>
@@ -215,12 +214,11 @@ export default function RemoteMachineCard({
           <div className="flex flex-col gap-1 mb-3 px-0.5">
             {machine.default_path && (
               <div className="flex items-baseline gap-1 min-w-0">
-                <span className="text-[0.68rem] text-muted-foreground leading-none flex-shrink-0">
+                <span className="text-2xs text-muted-foreground leading-none flex-shrink-0">
                   {t('remoteMachine.defaultPath')}:
                 </span>
                 <span
-                  className="text-[0.68rem] font-semibold text-foreground truncate min-w-0"
-                  style={{ fontFamily: 'monospace' }}
+                  className="text-2xs font-semibold text-foreground truncate min-w-0 font-mono"
                 >
                   {machine.default_path}
                 </span>
@@ -228,12 +226,11 @@ export default function RemoteMachineCard({
             )}
             {machine.mount_point && machine.mount_point !== machine.host && (
               <div className="flex items-baseline gap-1 min-w-0">
-                <span className="text-[0.68rem] text-muted-foreground leading-none flex-shrink-0">
+                <span className="text-2xs text-muted-foreground leading-none flex-shrink-0">
                   {t('remoteMachineCard.mountPoint')}:
                 </span>
                 <span
-                  className="text-[0.68rem] font-semibold text-primary truncate min-w-0"
-                  style={{ fontFamily: 'monospace' }}
+                  className="text-2xs font-semibold text-primary truncate min-w-0 font-mono"
                 >
                   {machine.mount_point}
                 </span>
@@ -247,7 +244,7 @@ export default function RemoteMachineCard({
           <div
             className="mb-3 px-3 py-2.5 rounded-xl bg-destructive/10 border border-destructive/25 text-destructive"
           >
-            <p className="text-[0.7rem] text-destructive break-words leading-snug">
+            <p className="text-xs text-destructive break-words leading-snug">
               {machine.error_message}
             </p>
           </div>

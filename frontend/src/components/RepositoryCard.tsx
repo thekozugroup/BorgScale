@@ -224,9 +224,9 @@ export default function RepositoryCard({
           <div className="mb-1 flex items-center justify-between gap-2">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-[0.9rem] font-bold leading-snug">{repository.name}</span>
+                <span className="text-sm font-bold leading-snug">{repository.name}</span>
                 {repository.mode === 'observe' && (
-                  <Badge variant="secondary" className="h-4.5 px-1.5 text-[0.65rem]">
+                  <Badge variant="secondary" className="h-4.5 px-1.5 text-2xs">
                     {t('repositoryCard.observeOnly')}
                   </Badge>
                 )}
@@ -241,7 +241,7 @@ export default function RepositoryCard({
                     <Badge
                       variant={scheduleBadge.variant === 'warning' ? 'outline' : 'outline'}
                       className={cn(
-                        'h-5 max-w-[140px] shrink truncate px-2 text-[0.64rem] font-bold sm:max-w-[170px]',
+                        'h-5 max-w-[140px] shrink truncate px-2 text-2xs font-bold sm:max-w-[170px]',
                         scheduleBadge.variant === 'warning'
                           ? 'border-border bg-muted text-muted-foreground'
                           : 'border-border bg-muted text-muted-foreground'
@@ -274,7 +274,7 @@ export default function RepositoryCard({
 
           <p
             title={repository.path}
-            className="truncate font-mono text-[0.7rem] text-muted-foreground/60"
+            className="truncate font-mono text-xs text-muted-foreground/60"
           >
             {repository.path}
           </p>
@@ -305,14 +305,14 @@ export default function RepositoryCard({
                       </span>
                       <span
                         className={cn(
-                          'text-[0.58rem] font-bold uppercase tracking-[0.07em] leading-none',
+                          'text-3xs font-bold tracking-wide leading-none',
                           STAT_COLOR_CLASSES[i]
                         )}
                       >
                         {stat.label}
                       </span>
                     </div>
-                    <span className="text-[0.85rem] font-semibold tabular-nums leading-none">
+                    <span className="text-sm font-semibold tabular-nums leading-none">
                       {stat.value}
                     </span>
                   </div>
@@ -334,10 +334,10 @@ export default function RepositoryCard({
                     m.tooltip ? 'cursor-help' : 'cursor-default'
                   )}
                 >
-                  <span className="text-[0.68rem] leading-none text-muted-foreground/70">
+                  <span className="text-2xs leading-none text-muted-foreground/70">
                     {m.label}:
                   </span>
-                  <span className="text-[0.68rem] font-semibold leading-none text-muted-foreground">
+                  <span className="text-2xs font-semibold leading-none text-muted-foreground">
                     {m.value}
                   </span>
                 </div>
@@ -521,7 +521,7 @@ export default function RepositoryCard({
                       onBackupNow()
                     }}
                     disabled={isMaintenanceRunning}
-                    className="h-11 shrink-0 px-2 text-[0.78rem] disabled:bg-muted disabled:text-muted-foreground sm:px-3"
+                    className="h-11 shrink-0 px-2 text-xs disabled:bg-muted disabled:text-muted-foreground sm:px-3"
                   >
                     <Play size={13} />
                     <span className="hidden sm:inline">{t('repositoryCard.buttons.backupNow')}</span>
@@ -539,7 +539,7 @@ export default function RepositoryCard({
         {(checkJob?.progress_message || compactJob?.progress_message || elapsedTime) && (
           <div className="mt-3 rounded-md border border-border bg-muted/50 px-3 py-2">
             {(checkJob?.progress_message || compactJob?.progress_message) && (
-              <p className="block font-mono text-[0.72rem] text-foreground">
+              <p className="block font-mono text-xs text-foreground">
                 {checkJob?.progress_message || compactJob?.progress_message}
               </p>
             )}

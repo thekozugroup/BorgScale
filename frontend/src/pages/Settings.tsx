@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 import { settingsAPI } from '../services/api'
@@ -22,6 +24,8 @@ import Scripts from './Scripts'
 import Activity from './Activity'
 
 const Settings: React.FC = () => {
+  const { t } = useTranslation()
+  usePageTitle(t('settings.title'))
   const { hasGlobalPermission } = useAuth()
   const canManageSystem = hasGlobalPermission('settings.system.manage')
   const canManageMqtt = hasGlobalPermission('settings.mqtt.manage')

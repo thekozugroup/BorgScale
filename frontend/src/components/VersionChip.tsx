@@ -24,8 +24,7 @@ export default function VersionChip({ label, version, accent = false }: VersionC
         {label}
       </span>
       <span
-        className="text-muted-foreground"
-        style={{ fontSize: '0.6rem', fontWeight: 500, fontFamily: 'monospace', lineHeight: 1 }}
+        className="font-mono leading-none font-medium text-2xs text-muted-foreground"
       >
         {version}
       </span>

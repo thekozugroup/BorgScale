@@ -1,4 +1,5 @@
 import { useState, useImperativeHandle, forwardRef } from 'react'
+import { cn } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Shield, Info } from 'lucide-react'
@@ -238,7 +239,7 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
                 </div>
                 <div className="grid grid-cols-4 rounded-md overflow-hidden mb-3 border border-border">
                   {[0, 1, 2, 3].map((j) => (
-                    <div key={j} className="px-3 py-2.5" style={{ borderRight: j < 3 ? '1px solid var(--border)' : 'none' }}>
+                    <div key={j} className={cn('px-3 py-2.5', j < 3 ? 'border-r border-border' : '')}>
                       <Skeleton className="h-2.5 mb-1.5 rounded" style={{ width: 38 }} />
                       <Skeleton className="h-4 rounded" style={{ width: [58, 48, 54, 44][j] }} />
                     </div>

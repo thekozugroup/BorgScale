@@ -167,14 +167,13 @@ function ColorizedOutput({ text, isFailed = false }: ColorizedOutputProps) {
 
   return (
     <div
+      className="font-mono overflow-auto"
       style={{
         margin: 0,
         padding: '0.5rem',
         fontSize: '0.745rem',
         lineHeight: 1.7,
-        overflow: 'auto',
         maxHeight: 380,
-        fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
       }}
     >
       {lines.map((line, i) => {
@@ -332,15 +331,14 @@ function PruneResultsDialog({
             <div className="flex items-center gap-2 flex-wrap">
               <p className="text-base font-semibold leading-tight">{title}</p>
               <span
-                className={`px-2 py-0.5 rounded text-[0.6rem] font-bold uppercase tracking-[0.06em] border ${badgeColor}`}
+                className={`px-2 py-0.5 rounded text-2xs font-bold uppercase tracking-[0.06em] border ${badgeColor}`}
               >
                 {badge}
               </span>
             </div>
             {repository?.name && (
               <p
-                className="text-[0.72rem] text-muted-foreground truncate mt-0.5"
-                style={{ fontFamily: 'ui-monospace, monospace' }}
+                className="text-xs text-muted-foreground truncate mt-0.5 font-mono"
               >
                 {repository.name}
               </p>
@@ -358,7 +356,7 @@ function PruneResultsDialog({
               <span className="text-muted-foreground flex">
                 <Terminal size={13} />
               </span>
-              <span className="text-[0.6rem] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+              <span className="text-2xs font-bold uppercase tracking-[0.08em] text-muted-foreground">
                 {t('dialogs.prune.outputLabel')}
               </span>
             </div>
@@ -370,7 +368,7 @@ function PruneResultsDialog({
                 {stdout && (
                   <div className={`flex items-center gap-2 px-3 py-1.5 border-b ${stderrSectionBorderClass}`}>
                     <span
-                      className={`text-[0.6rem] font-bold uppercase tracking-[0.08em] ${isFailed ? 'text-destructive' : 'text-muted-foreground'}`}
+                      className={`text-2xs font-bold uppercase tracking-[0.08em] ${isFailed ? 'text-destructive' : 'text-muted-foreground'}`}
                     >
                       {t('dialogs.prune.messagesLabel')}
                     </span>
@@ -504,8 +502,7 @@ export default function PruneRepositoryDialog({
               </p>
               {repository?.name && (
                 <p
-                  className="text-[0.72rem] text-muted-foreground truncate"
-                  style={{ fontFamily: 'ui-monospace, monospace' }}
+                  className="text-xs text-muted-foreground truncate font-mono"
                 >
                   {repository.name}
                 </p>
@@ -531,7 +528,7 @@ export default function PruneRepositoryDialog({
 
         <div className="px-5 pb-4">
           {/* ── Retention policy ── */}
-          <p className="text-[0.6rem] font-bold uppercase tracking-[0.08em] text-muted-foreground mb-2">
+          <p className="text-2xs font-bold uppercase tracking-[0.08em] text-muted-foreground mb-2">
             {t('dialogs.prune.retentionPolicy')}
           </p>
 
@@ -581,7 +578,7 @@ export default function PruneRepositoryDialog({
               <p className="text-sm font-semibold text-foreground">
                 {t('dialogs.prune.warningTitle')}
               </p>
-              <p className="text-[0.78rem] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 {t('dialogs.prune.warningCompact')}
               </p>
             </div>

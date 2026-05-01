@@ -415,16 +415,16 @@ const AccountTab: React.FC = () => {
           <p className="text-sm text-muted-foreground mb-4">{t('settings.account.profile.description')}</p>
           <div className="flex flex-col gap-3">
             <div>
-              <Label className="text-xs font-semibold mb-1.5 block">{t('settings.users.fields.username')} *</Label>
-              <Input value={profileForm.username} onChange={(e) => setProfileForm((c) => ({ ...c, username: e.target.value }))} className="h-9 text-sm" required />
+              <Label htmlFor="account-username" className="text-xs font-semibold mb-1.5 block">{t('settings.users.fields.username')} *</Label>
+              <Input id="account-username" value={profileForm.username} onChange={(e) => setProfileForm((c) => ({ ...c, username: e.target.value }))} className="h-9 text-sm" required />
             </div>
             <div>
-              <Label className="text-xs font-semibold mb-1.5 block">{t('settings.users.fields.email')} *</Label>
-              <Input type="email" value={profileForm.email} onChange={(e) => setProfileForm((c) => ({ ...c, email: e.target.value }))} className="h-9 text-sm" required />
+              <Label htmlFor="account-email" className="text-xs font-semibold mb-1.5 block">{t('settings.users.fields.email')} *</Label>
+              <Input id="account-email" type="email" value={profileForm.email} onChange={(e) => setProfileForm((c) => ({ ...c, email: e.target.value }))} className="h-9 text-sm" required />
             </div>
             <div>
-              <Label className="text-xs font-semibold mb-1.5 block">{t('settings.users.fields.fullName')}</Label>
-              <Input value={profileForm.full_name} onChange={(e) => setProfileForm((c) => ({ ...c, full_name: e.target.value }))} className="h-9 text-sm" />
+              <Label htmlFor="account-fullname" className="text-xs font-semibold mb-1.5 block">{t('settings.users.fields.fullName')}</Label>
+              <Input id="account-fullname" value={profileForm.full_name} onChange={(e) => setProfileForm((c) => ({ ...c, full_name: e.target.value }))} className="h-9 text-sm" />
             </div>
           </div>
         </div>
@@ -474,8 +474,8 @@ const AccountTab: React.FC = () => {
             <div className="flex flex-col gap-3">
               <p className="text-sm text-muted-foreground">{t('settings.account.security.totpSetupIntro')}</p>
               <div>
-                <Label className="text-xs font-semibold mb-1.5 block">{t('settings.account.security.currentPasswordLabel')}</Label>
-                <Input type="password" value={totpSetupPassword} onChange={(e) => setTotpSetupPassword(e.target.value)} className="h-9 text-sm" />
+                <Label htmlFor="account-totp-current-password" className="text-xs font-semibold mb-1.5 block">{t('settings.account.security.currentPasswordLabel')}</Label>
+                <Input id="account-totp-current-password" type="password" value={totpSetupPassword} onChange={(e) => setTotpSetupPassword(e.target.value)} className="h-9 text-sm" />
               </div>
             </div>
           ) : (
@@ -483,13 +483,14 @@ const AccountTab: React.FC = () => {
               <p className="text-sm text-muted-foreground">{t('settings.account.security.totpSetupInstructions')}</p>
               {totpQrCodeDataUrl && (
                 <div className="p-4 rounded-xl bg-muted flex flex-col items-center gap-3">
+                  {/* QR scanners require white background regardless of theme */}
                   <img src={totpQrCodeDataUrl} alt={t('settings.account.security.totpQrCodeAlt')} className="w-56 max-w-full rounded-xl bg-white p-2" />
                   <p className="text-xs text-muted-foreground text-center">{t('settings.account.security.totpQrCodeHint')}</p>
                 </div>
               )}
               <div className="p-3 rounded-xl bg-muted">
                 <p className="text-xs text-muted-foreground mb-1">{t('settings.account.security.manualSecret')}</p>
-                <p className="text-sm font-bold break-all" style={{ fontFamily: 'monospace' }}>{totpSecret}</p>
+                <p className="text-sm font-bold break-all font-mono">{totpSecret}</p>
               </div>
               <div className="p-3 rounded-xl bg-muted">
                 <p className="text-xs text-muted-foreground mb-2">{t('settings.account.security.recoveryCodesTitle')}</p>
@@ -500,8 +501,8 @@ const AccountTab: React.FC = () => {
                 </div>
               </div>
               <div>
-                <Label className="text-xs font-semibold mb-1.5 block">{t('settings.account.security.totpVerificationLabel')}</Label>
-                <Input value={totpVerificationCode} onChange={(e) => setTotpVerificationCode(e.target.value)} className="h-9 text-sm" />
+                <Label htmlFor="account-totp-verification" className="text-xs font-semibold mb-1.5 block">{t('settings.account.security.totpVerificationLabel')}</Label>
+                <Input id="account-totp-verification" value={totpVerificationCode} onChange={(e) => setTotpVerificationCode(e.target.value)} className="h-9 text-sm" />
               </div>
             </div>
           )}
@@ -529,12 +530,12 @@ const AccountTab: React.FC = () => {
           <div className="flex flex-col gap-3">
             <p className="text-sm text-muted-foreground">{t('settings.account.security.totpDisableIntro')}</p>
             <div>
-              <Label className="text-xs font-semibold mb-1.5 block">{t('settings.account.security.currentPasswordLabel')}</Label>
-              <Input type="password" value={totpDisablePassword} onChange={(e) => setTotpDisablePassword(e.target.value)} className="h-9 text-sm" />
+              <Label htmlFor="account-totp-disable-password" className="text-xs font-semibold mb-1.5 block">{t('settings.account.security.currentPasswordLabel')}</Label>
+              <Input id="account-totp-disable-password" type="password" value={totpDisablePassword} onChange={(e) => setTotpDisablePassword(e.target.value)} className="h-9 text-sm" />
             </div>
             <div>
-              <Label className="text-xs font-semibold mb-1.5 block">{t('settings.account.security.totpVerificationLabel')}</Label>
-              <Input value={totpDisableCode} onChange={(e) => setTotpDisableCode(e.target.value)} className="h-9 text-sm" />
+              <Label htmlFor="account-totp-disable-code" className="text-xs font-semibold mb-1.5 block">{t('settings.account.security.totpVerificationLabel')}</Label>
+              <Input id="account-totp-disable-code" value={totpDisableCode} onChange={(e) => setTotpDisableCode(e.target.value)} className="h-9 text-sm" />
               <p className="text-xs text-muted-foreground mt-1">{t('settings.account.security.totpDisableHint')}</p>
             </div>
           </div>
@@ -562,8 +563,8 @@ const AccountTab: React.FC = () => {
           <div className="flex flex-col gap-3">
             <p className="text-sm text-muted-foreground">{t('settings.account.security.passkeySetupIntro')}</p>
             <div>
-              <Label className="text-xs font-semibold mb-1.5 block">{t('settings.account.security.currentPasswordLabel')}</Label>
-              <Input type="password" value={passkeyPassword} onChange={(e) => setPasskeyPassword(e.target.value)} className="h-9 text-sm" />
+              <Label htmlFor="account-passkey-password" className="text-xs font-semibold mb-1.5 block">{t('settings.account.security.currentPasswordLabel')}</Label>
+              <Input id="account-passkey-password" type="password" value={passkeyPassword} onChange={(e) => setPasskeyPassword(e.target.value)} className="h-9 text-sm" />
             </div>
           </div>
         </div>

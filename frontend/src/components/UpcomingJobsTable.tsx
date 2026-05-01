@@ -47,7 +47,7 @@ const UpcomingJobsTable: React.FC<UpcomingJobsTableProps> = ({
       {/* Section label */}
       <div className="flex items-center gap-2 mb-3">
         <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-primary" />
-        <span className="text-[0.68rem] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+        <span className="text-2xs font-bold uppercase tracking-[0.08em] text-muted-foreground">
           {t('upcomingJobs.title')}
         </span>
       </div>
@@ -63,13 +63,13 @@ const UpcomingJobsTable: React.FC<UpcomingJobsTableProps> = ({
                 {/* Name + repo */}
                 <div className="flex-1 min-w-0 flex items-center gap-3 overflow-hidden">
                   <p className="text-sm font-semibold truncate flex-shrink-0">{job.name}</p>
-                  <p className="text-[0.8rem] text-muted-foreground truncate min-w-0">{getRepoLabel(job)}</p>
+                  <p className="text-sm text-muted-foreground truncate min-w-0">{getRepoLabel(job)}</p>
                 </div>
 
                 {/* Countdown */}
                 <div className="flex items-center gap-1 px-2.5 py-1 rounded-md flex-shrink-0 bg-muted">
                   <Clock size={11} className="text-muted-foreground" />
-                  <span className="text-[0.75rem] font-bold leading-none text-foreground">
+                  <span className="text-xs font-bold leading-none text-foreground">
                     {formatRelativeTime(job.next_run)}
                   </span>
                 </div>

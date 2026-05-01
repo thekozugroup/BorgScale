@@ -78,7 +78,7 @@ export default function EntityCard({
           <div className="min-w-0 flex-1">
             <p className="text-sm font-bold truncate leading-tight">{title}</p>
             {subtitle && (
-              <p className="text-[0.7rem] truncate leading-snug text-muted-foreground/60">
+              <p className="text-xs truncate leading-snug text-muted-foreground/60">
                 {subtitle}
               </p>
             )}
@@ -112,13 +112,13 @@ export default function EntityCard({
                         {stat.icon}
                       </span>
                       <span
-                        className="text-[0.58rem] font-bold uppercase tracking-widest leading-none text-muted-foreground/60"
+                        className="text-3xs font-bold uppercase tracking-widest leading-none text-muted-foreground/60"
                         style={statColor ? { color: statColor } : undefined}
                       >
                         {stat.label}
                       </span>
                     </div>
-                    <p className="text-[0.85rem] font-semibold truncate tabular-nums">{stat.value}</p>
+                    <p className="text-sm font-semibold truncate tabular-nums">{stat.value}</p>
                   </div>
                 </TooltipTrigger>
                 {stat.tooltip && <TooltipContent>{stat.tooltip}</TooltipContent>}
@@ -136,10 +136,10 @@ export default function EntityCard({
                   <div
                     className={cn('flex items-center gap-1', m.tooltip ? 'cursor-help' : '')}
                   >
-                    <span className="text-[0.68rem] leading-none text-muted-foreground/60">
+                    <span className="text-2xs leading-none text-muted-foreground/60">
                       {m.label}:
                     </span>
-                    <span className="text-[0.68rem] font-semibold text-muted-foreground leading-none">{m.value}</span>
+                    <span className="text-2xs font-semibold text-muted-foreground leading-none">{m.value}</span>
                   </div>
                 </TooltipTrigger>
                 {m.tooltip && <TooltipContent>{m.tooltip}</TooltipContent>}
@@ -189,7 +189,7 @@ export default function EntityCard({
                     size="sm"
                     onClick={primaryAction.onClick}
                     disabled={primaryAction.disabled}
-                    className="h-7 px-2 sm:px-3 text-[0.78rem] gap-1 min-w-0"
+                    className="h-7 px-2 sm:px-3 text-xs gap-1 min-w-0"
                   >
                     <span className="flex-shrink-0">{primaryAction.icon}</span>
                     <span className="hidden sm:inline">{primaryAction.label}</span>

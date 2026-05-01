@@ -360,7 +360,7 @@ describe('MqttSettingsTab', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/Certificate paths are relative to the container's filesystem/)
+          screen.getByText(/Certificate paths are relative to the BorgScale data folder/)
         ).toBeInTheDocument()
       })
     })

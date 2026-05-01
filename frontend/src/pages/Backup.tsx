@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -38,6 +39,7 @@ const Backup: React.FC = () => {
   const canManageRepositoryOperations = hasGlobalPermission('repositories.manage_all')
   const permissions = usePermissions()
   const { t } = useTranslation()
+  usePageTitle(t('backup.title'))
 
   // Handle incoming navigation state (from "Backup Now" button)
   useEffect(() => {
@@ -299,6 +301,7 @@ const Backup: React.FC = () => {
           emptyState={{
             icon: <Clock size={48} />,
             title: t('backup.recentJobs.empty'),
+            action: <Button size="sm" variant="outline" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>{t('backup.manualBackup.startBackup')}</Button>,
           }}
         />
       </div>

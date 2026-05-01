@@ -112,7 +112,7 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
             )}
           >
             <Avatar className="size-8 rounded-lg border border-primary/30 bg-primary/15">
-              <AvatarFallback className="rounded-lg bg-transparent text-[0.8rem] font-bold text-primary">
+              <AvatarFallback className="rounded-lg bg-transparent text-sm font-bold text-primary">
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -139,15 +139,15 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <p className="truncate text-[0.875rem] font-bold text-foreground">{displayName}</p>
-              <p className="mt-0.5 truncate text-[0.75rem] text-muted-foreground">
+              <p className="truncate text-sm font-bold text-foreground">{displayName}</p>
+              <p className="mt-0.5 truncate text-xs text-muted-foreground">
                 {companyLabel ||
                   t('settings.account.profile.deployment.individual', 'Individual')}
               </p>
               {roleLabel && (
                 <span
                   className={cn(
-                    'mt-1.5 inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[0.57rem] font-bold uppercase tracking-wide',
+                    'mt-1.5 inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-3xs font-bold uppercase tracking-wide',
                     getRoleBadgeClass(roleLabel)
                   )}
                 >
@@ -166,21 +166,21 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
               </div>
               <div className="flex-1 text-left">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[0.78rem] font-bold text-foreground">
+                  <span className="text-xs font-bold text-foreground">
                     {planLabel} {t('plan.planSuffix', 'Plan')}
                   </span>
-                  <span className="inline-flex items-center gap-1 rounded border border-border/30 bg-muted px-1.5 py-0.5 text-[0.55rem] font-bold uppercase tracking-wide text-muted-foreground">
+                  <span className="inline-flex items-center gap-1 rounded border border-border/30 bg-muted px-1.5 py-0.5 text-3xs font-bold uppercase tracking-wide text-muted-foreground">
                     {t('plan.activeStatus', 'Active')}
                   </span>
                 </div>
-                <p className="mt-0.5 text-[0.61rem] text-muted-foreground">{planDescription}</p>
+                <p className="mt-0.5 text-2xs text-muted-foreground">{planDescription}</p>
               </div>
             </div>
           </div>
 
           {/* ── 3. Settings nav links ── */}
           <div className="border-t border-border/5 pb-1 pt-0.5">
-            <span className="block px-3.5 pb-1 pt-1.5 text-[0.57rem] font-bold uppercase tracking-widest text-muted-foreground/70">
+            <span className="block px-3.5 pb-1 pt-1.5 text-3xs font-medium tracking-wide text-muted-foreground/70">
               {t('navigation.sections.settings', 'Settings')}
             </span>
 
@@ -198,10 +198,10 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
                   <Icon size={14} className="text-muted-foreground" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-[0.77rem] font-semibold leading-tight text-foreground">
+                  <p className="text-xs font-semibold leading-tight text-foreground">
                     {label}
                   </p>
-                  <p className="mt-0.5 text-[0.59rem] text-muted-foreground">{desc}</p>
+                  <p className="mt-0.5 text-3xs text-muted-foreground">{desc}</p>
                 </div>
                 <ChevronRight size={13} className="shrink-0 text-border" />
               </button>
@@ -224,7 +224,7 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
               <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-destructive/20 bg-destructive/5">
                 <LogOut size={14} className="text-destructive" />
               </div>
-              <span className="text-[0.77rem] font-semibold text-destructive">
+              <span className="text-xs font-semibold text-destructive">
                 {t('navigation.logout')}
               </span>
             </button>

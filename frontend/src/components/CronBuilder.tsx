@@ -260,7 +260,7 @@ export default function CronBuilder({ value, onChange, label, helperText }: Cron
                             handleStateChange({ selectedDays: newSelected })
                           }}
                           className={cn(
-                            'w-6 h-6 rounded-full text-[0.7rem] font-semibold transition-colors border',
+                            'w-6 h-6 rounded-full text-xs font-semibold transition-colors border',
                             state.selectedDays[i]
                               ? 'bg-primary text-primary-foreground border-primary'
                               : 'bg-transparent text-muted-foreground border-border hover:border-primary/50'
@@ -317,8 +317,8 @@ export default function CronBuilder({ value, onChange, label, helperText }: Cron
 
         {/* Preview footer */}
         <div className="border-t border-border px-4 py-2 bg-primary/5 flex items-center justify-between gap-2">
-          <span className="text-[0.8125rem] font-medium text-primary">{generatePreview(state, t)}</span>
-          <span className="font-mono text-[0.7rem] bg-background px-2 py-1 rounded border border-border">
+          <span className="text-sm font-medium text-primary">{generatePreview(state, t)}</span>
+          <span className="font-mono text-xs bg-background px-2 py-1 rounded border border-border">
             {buildCron(state)}
           </span>
         </div>

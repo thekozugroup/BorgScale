@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { useQuery } from '@tanstack/react-query'
 import { History, Info, RefreshCw } from 'lucide-react'
 import { activityAPI } from '../services/api'
@@ -27,6 +28,7 @@ interface ActivityItem {
 
 const Activity: React.FC = () => {
   const { t } = useTranslation()
+  usePageTitle(t('activity.title'))
   const { track, EventCategory, EventAction } = useAnalytics()
   const { hasGlobalPermission } = useAuth()
   const canManageActivityJobs = hasGlobalPermission('repositories.manage_all')

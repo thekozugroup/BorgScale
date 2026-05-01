@@ -101,7 +101,7 @@ export default function AppearanceTab() {
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs font-bold">{t(themeOption.labelKey)}</p>
-                      <p className="text-[0.68rem] text-muted-foreground">
+                      <p className="text-2xs text-muted-foreground">
                         {t(`settings.appearance.themeDescriptions.${themeOption.id}`)}
                       </p>
                     </div>

@@ -79,7 +79,7 @@ function CodePill({ children }: { children: React.ReactNode }) {
   return (
     <span
       title={typeof children === 'string' ? children : undefined}
-      className="font-mono text-[0.72rem] px-1.5 py-0.5 rounded bg-muted text-foreground max-w-full overflow-hidden text-ellipsis whitespace-nowrap inline-block align-middle cursor-default leading-relaxed"
+      className="font-mono text-xs px-1.5 py-0.5 rounded bg-muted text-foreground max-w-full overflow-hidden text-ellipsis whitespace-nowrap inline-block align-middle cursor-default leading-relaxed"
     >
       {children}
     </span>
@@ -90,7 +90,7 @@ function CodePill({ children }: { children: React.ReactNode }) {
 function AttrRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-2 min-w-0">
-      <span className="text-[0.7rem] text-muted-foreground shrink-0">{label}</span>
+      <span className="text-xs text-muted-foreground shrink-0">{label}</span>
       <div className="min-w-0 flex items-center gap-1 flex-wrap justify-end">{children}</div>
     </div>
   )
@@ -114,7 +114,7 @@ function SectionCard({
     <div className={cn('rounded-lg p-3 flex flex-col gap-2 min-w-0 overflow-hidden', cardClass)}>
       <div className="flex items-center gap-2">
         <IconBadge icon={icon} className={iconClass} />
-        <span className="text-[0.68rem] text-muted-foreground font-bold uppercase tracking-wide">
+        <span className="text-2xs text-muted-foreground font-bold uppercase tracking-wide">
           {label}
         </span>
       </div>
@@ -194,14 +194,14 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
 
       {/* Manifest header + status chip */}
       <div className="flex items-center justify-between">
-        <span className="text-[0.6rem] text-muted-foreground font-bold uppercase tracking-widest">
+        <span className="text-2xs text-muted-foreground font-bold uppercase tracking-widest">
           {t('wizard.review.configurationSummary')}
         </span>
 
         {mode === 'create' && data.repositoryMode === 'full' && (
           <span
             title={t('wizard.review.repositoryInitialized')}
-            className="flex items-center gap-1 text-[0.65rem] font-semibold px-2 py-0.5 rounded-full border bg-muted text-foreground border-border cursor-help"
+            className="flex items-center gap-1 text-2xs font-semibold px-2 py-0.5 rounded-full border bg-muted text-foreground border-border cursor-help"
           >
             <Rocket size={10} />
             {t('wizard.review.readyToInitialize')}
@@ -234,7 +234,7 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
           <AttrRow label={t('wizard.review.mode')}>
             <span
               className={cn(
-                'text-[0.62rem] font-semibold px-1.5 py-0.5 rounded-full',
+                'text-2xs font-semibold px-1.5 py-0.5 rounded-full',
                 data.repositoryMode === 'full'
                   ? 'bg-primary/10 text-primary'
                   : 'bg-muted text-muted-foreground'
@@ -291,7 +291,7 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
                 )}
                 <span
                   className={cn(
-                    'text-[0.62rem] font-semibold px-1.5 py-0.5 rounded-full',
+                    'text-2xs font-semibold px-1.5 py-0.5 rounded-full',
                     isEncrypted
                       ? 'bg-primary/10 text-primary'
                       : 'bg-destructive/10 text-destructive'

@@ -43,8 +43,8 @@ const CronExpressionInput: React.FC<CronExpressionInputProps> = ({
           required={required}
           disabled={disabled}
           placeholder="0 2 * * *"
-          className="pr-10"
-          style={{ fontFamily: 'monospace', fontSize, letterSpacing: '0.1em' }}
+          className="pr-10 font-mono tracking-[0.1em]"
+          style={{ fontSize }}
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2">
           <CronBuilderDialog

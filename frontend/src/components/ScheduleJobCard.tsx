@@ -188,7 +188,7 @@ export default function ScheduleJobCard({
             className="pointer-events-none scale-75"
           />
           <span
-            className={`text-[0.7rem] font-semibold mr-1 ${job.enabled ? 'text-primary' : ''}`}
+            className={`text-xs font-semibold mr-1 ${job.enabled ? 'text-primary' : ''}`}
           >
             {job.enabled ? t('schedule.card.badge.enabled') : t('schedule.card.badge.disabled')}
           </span>

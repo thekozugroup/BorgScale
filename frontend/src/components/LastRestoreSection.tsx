@@ -35,7 +35,7 @@ export default function LastRestoreSection({ restoreJob }: LastRestoreSectionPro
     return (
       <div className="flex items-center gap-2">
         <RotateCcw size={14} className="text-foreground/25" />
-        <span className="text-[0.78rem] text-muted-foreground">{t('lastRestoreSection.noRestores')}</span>
+        <span className="text-xs text-muted-foreground">{t('lastRestoreSection.noRestores')}</span>
       </div>
     )
   }
@@ -45,7 +45,7 @@ export default function LastRestoreSection({ restoreJob }: LastRestoreSectionPro
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <RotateCcw size={15} className="text-secondary" />
-          <p className="text-[0.82rem] font-semibold">{t('lastRestoreSection.title')}</p>
+          <p className="text-sm font-semibold">{t('lastRestoreSection.title')}</p>
         </div>
         <Button
           variant="outline"

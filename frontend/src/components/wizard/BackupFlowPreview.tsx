@@ -132,7 +132,7 @@ export default function BackupFlowPreview({
     <div className="rounded-lg bg-muted/30 border border-border p-3 flex flex-col gap-3 overflow-hidden">
       {/* Summary header */}
       <div className="flex items-baseline gap-2 flex-wrap">
-        <span className="text-[0.6rem] text-muted-foreground font-bold uppercase tracking-widest shrink-0">
+        <span className="text-2xs text-muted-foreground font-bold uppercase tracking-widest shrink-0">
           Backup Flow
         </span>
         <span className="text-xs font-medium text-foreground">

@@ -231,7 +231,7 @@ export default function ArchiveContentsDialog({
                             </span>
                           </div>
                           <div className="flex items-center gap-4 shrink-0">
-                            <span className="text-sm text-muted-foreground min-w-[165px] text-right font-mono text-[0.8rem] whitespace-nowrap">
+                            <span className="text-sm text-muted-foreground min-w-[165px] text-right font-mono text-sm whitespace-nowrap">
                               {file.mtime ? formatDateCompact(file.mtime) : '-'}
                             </span>
                             <span className="text-sm text-muted-foreground w-20 text-right">

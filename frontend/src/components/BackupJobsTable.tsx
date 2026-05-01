@@ -36,6 +36,7 @@ interface EmptyState {
   icon?: React.ReactNode
   title?: string
   description?: string
+  action?: React.ReactNode
 }
 
 interface BackupJobsTableProps<T extends Job = Job> {
@@ -581,11 +582,12 @@ export const BackupJobsTable = <T extends Job = Job>({
     description: t('backupJobsTable.empty'),
   }
 
-  const finalEmptyState: { icon: React.ReactNode; title: string; description?: string } = emptyState
+  const finalEmptyState: { icon: React.ReactNode; title: string; description?: string; action?: React.ReactNode } = emptyState
     ? {
         icon: emptyState.icon || defaultEmptyState.icon!,
         title: emptyState.title || defaultEmptyState.title!,
         description: emptyState.description || defaultEmptyState.description,
+        action: emptyState.action,
       }
     : {
         icon: defaultEmptyState.icon!,

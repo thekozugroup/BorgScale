@@ -57,9 +57,9 @@ export default function CompressionSettings({
 
       <div className="flex flex-col gap-4">
         <div>
-          <Label className="mb-1 block">{t('compressionSettings.algorithmLabel')}</Label>
+          <Label htmlFor="compression-algorithm" className="mb-1 block">{t('compressionSettings.algorithmLabel')}</Label>
           <Select value={algorithm} onValueChange={setAlgorithm} disabled={disabled}>
-            <SelectTrigger>
+            <SelectTrigger id="compression-algorithm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -76,8 +76,9 @@ export default function CompressionSettings({
         {algorithm !== 'none' && (
           <>
             <div>
-              <Label className="mb-1 block">{t('compressionSettings.levelLabel')}</Label>
+              <Label htmlFor="compression-level" className="mb-1 block">{t('compressionSettings.levelLabel')}</Label>
               <Input
+                id="compression-level"
                 type="number"
                 value={level}
                 onChange={(e) => setLevel(e.target.value)}
@@ -115,8 +116,9 @@ export default function CompressionSettings({
             )}
 
             <div>
-              <Label className="mb-1 block">{t('compressionSettings.obfuscateLabel')}</Label>
+              <Label htmlFor="compression-obfuscate" className="mb-1 block">{t('compressionSettings.obfuscateLabel')}</Label>
               <Input
+                id="compression-obfuscate"
                 type="number"
                 value={obfuscate}
                 onChange={(e) => setObfuscate(e.target.value)}

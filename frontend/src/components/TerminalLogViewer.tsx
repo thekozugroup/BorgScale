@@ -73,7 +73,7 @@ function colorizeJsonLine(content: string): React.ReactNode {
 const MemoizedLogLine = React.memo(({ log }: { log: LogLine }) => (
   <div className="mb-1">
     <span
-      className="text-neutral-500 text-[0.8rem] mr-4 select-none"
+      className="text-neutral-500 text-sm mr-4 select-none"
     >
       {log.line_number}
     </span>

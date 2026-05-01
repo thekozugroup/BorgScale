@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
@@ -91,6 +92,7 @@ interface PruneForm {
 
 export default function Repositories() {
   const { t } = useTranslation()
+  usePageTitle(t('repositories.title'))
   const { hasGlobalPermission } = useAuth()
   const canManageRepositoriesGlobally = hasGlobalPermission('repositories.manage_all')
   const permissions = usePermissions()

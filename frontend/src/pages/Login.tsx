@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { toast } from 'react-hot-toast'
@@ -36,6 +37,7 @@ export default function Login() {
   const { login, verifyTotpLogin, loginWithPasskey, mustChangePassword } = useAuth()
   const navigate = useNavigate()
   const { t } = useTranslation()
+  usePageTitle(t('login.submit'))
   const { trackAuth, EventAction } = useAnalytics()
 
   const {

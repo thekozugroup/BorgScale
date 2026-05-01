@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Boxes } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 // ─── Animated background nodes ──────────────────────────────────────────────
 
@@ -13,23 +14,26 @@ interface NodeProps {
   opacity: number
 }
 
-const ArchiveNode = ({ x, y, delay, duration, size, opacity }: NodeProps) => (
-  <div
-    aria-hidden="true"
-    style={{
-      position: 'absolute',
-      left: x,
-      top: y,
-      width: size,
-      height: size,
-      borderRadius: '50%',
-      border: `1px solid hsl(var(--foreground) / ${opacity * 0.25})`,
-      backgroundColor: `hsl(var(--foreground) / ${opacity * 0.04})`,
-      animation: `borgPulse ${duration} ease-in-out ${delay} infinite`,
-      pointerEvents: 'none',
-    }}
-  />
-)
+const ArchiveNode = ({ x, y, delay, duration, size, opacity }: NodeProps) => {
+  const opacityCls =
+    opacity >= 0.65 ? 'bg-foreground/[0.03] border-foreground/[0.18]' :
+    opacity >= 0.55 ? 'bg-foreground/[0.02] border-foreground/[0.14]' :
+    opacity >= 0.45 ? 'bg-foreground/[0.02] border-foreground/[0.12]' :
+    'bg-foreground/[0.01] border-foreground/[0.10]'
+  return (
+    <div
+      aria-hidden="true"
+      className={cn('absolute rounded-full border pointer-events-none', opacityCls)}
+      style={{
+        left: x,
+        top: y,
+        width: size,
+        height: size,
+        animation: `borgPulse ${duration} ease-in-out ${delay} infinite`,
+      }}
+    />
+  )
+}
 
 const FloatingDot = ({
   x,
@@ -44,16 +48,11 @@ const FloatingDot = ({
 }) => (
   <div
     aria-hidden="true"
+    className="absolute rounded-full bg-foreground/20 pointer-events-none size-[3px]"
     style={{
-      position: 'absolute',
       left: x,
       top: y,
-      width: 3,
-      height: 3,
-      borderRadius: '50%',
-      backgroundColor: 'hsl(var(--foreground) / 0.2)',
       animation: `borgFloat ${duration} ease-in-out ${delay} infinite`,
-      pointerEvents: 'none',
     }}
   />
 )
@@ -101,13 +100,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <div
-        className="flex-col lg:flex-row lg:h-screen bg-background"
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
-          overflow: 'hidden',
-        }}
+        className="flex flex-col lg:flex-row lg:h-screen bg-background min-h-screen overflow-hidden"
       >
         {/* ── LEFT: Brand panel ──────────────────────────────────────────────── */}
         <div
@@ -181,17 +174,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           {/* Bottom decoration — desktop only */}
           <div
             aria-hidden="true"
-            className="hidden lg:block text-muted-foreground/35"
-            style={{
-              position: 'absolute',
-              bottom: 24,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              fontSize: 11,
-              fontFamily: "'JetBrains Mono', monospace",
-              letterSpacing: '0.08em',
-              whiteSpace: 'nowrap',
-            }}
+            className="hidden lg:block absolute bottom-6 left-1/2 -translate-x-1/2 text-[11px] font-mono tracking-[0.08em] whitespace-nowrap text-muted-foreground/35"
           >
             Encrypted · Deduplicated · Open source
           </div>

@@ -196,7 +196,7 @@
     "moreScheduled": "+{{count}} más programados",
     "resources": "Recursos",
     "memAbbr": "MEM",
-    "diskAbbr": "DISCO",
+    "diskAbbr": "Disco",
     "recentActivity": {
       "title": "Actividad reciente",
       "empty": "Sin actividad reciente",
@@ -591,6 +591,7 @@
     }
   },
   "settings": {
+    "title": "Configuración",
     "password": {
       "title": "Cambiar contraseña",
       "subtitle": "Actualiza tu contraseña para mantener tu cuenta segura",
@@ -1180,7 +1181,7 @@
       "message": "El repositorio está actualmente bloqueado. Esto puede deberse a una operación interrumpida.",
       "breakLock": "Forzar desbloqueo",
       "cancel": "Cancelar",
-      "breakLockWarning": "¿Estás SEGURO de que no hay ninguna copia de seguridad u operación en curso en este repositorio? ¡Forzar el desbloqueo mientras una operación está en curso puede corromper tu repositorio!",
+      "breakLockWarning": "¿Estás seguro de que no hay ninguna copia de seguridad u operación en curso en este repositorio? ¡Forzar el desbloqueo mientras una operación está en curso puede corromper tu repositorio!",
       "lockRemovedSuccess": "¡Bloqueo eliminado correctamente! Ahora puedes reintentar tu operación.",
       "lockedDescription": "{{repositoryName}} está bloqueado por otro proceso o tiene un bloqueo obsoleto.",
       "staleLockInfo": "Si no hay ninguna copia de seguridad en curso, probablemente sea un bloqueo obsoleto de una copia interrumpida.",
@@ -1288,9 +1289,9 @@
       "warningCompact": "Después de podar, ejecuta \"Compactar\" para liberar espacio en disco.",
       "dryRunButton": "Simulacro (Vista previa)",
       "resultsTitle": "Resultados",
-      "dryRunPreviewBadge": "VISTA PREVIA",
-      "pruneCompleteBadge": "COMPLETADO",
-      "pruneFailedBadge": "FALLIDO",
+      "dryRunPreviewBadge": "Vista previa",
+      "pruneCompleteBadge": "Completado",
+      "pruneFailedBadge": "Fallido",
       "runPruneNow": "Ejecutar poda ahora",
       "done": "Hecho",
       "close": "Cerrar",
@@ -2426,7 +2427,7 @@
   },
   "packages": {
     "title": "Paquetes del sistema",
-    "subtitle": "Instala paquetes del sistema que pueden usarse en tus scripts de copia de seguridad. Los paquetes se reinstalan automáticamente cuando se recrea el contenedor.",
+    "subtitle": "Instala paquetes del sistema que pueden usarse en tus scripts de copia de seguridad. Los paquetes se reinstalan automáticamente cuando se actualiza la aplicación.",
     "hint": "Simplemente introduce el nombre de un paquete (ej., wakeonlan, curl) y se instalará usando sudo apt-get install -y. Para casos avanzados, puedes habilitar comandos de instalación personalizados.",
     "installedPackages": "Paquetes instalados",
     "addPackage": "Agregar paquete",
@@ -2725,7 +2726,7 @@
     "clientKeyPathLabel": "Ruta de la clave de cliente",
     "clientKeyPathHelper": "Ruta al archivo de clave de cliente (opcional)",
     "noteLabel": "Nota:",
-    "dockerVolumesWarning": "Las rutas de certificados son relativas al sistema de archivos del contenedor. Para despliegues Docker, monta tus certificados en un volumen y referencia la ruta del contenedor (ej., /certs/ca.crt).",
+    "dockerVolumesWarning": "Las rutas de certificados son relativas a la carpeta de datos de BorgScale. Monta los certificados dentro de la carpeta de datos y referencia la ruta montada (por ejemplo, /certs/ca.crt).",
     "failedToSaveMqttSettings": "Error al guardar la configuración MQTT"
   },
   "remoteMachine": {
@@ -2817,6 +2818,10 @@
     "infoAlert": "Nota: Los archivos montados aparecen como sistemas de archivos de solo lectura en tu gestor de archivos. Accede a ellos en la ruta del punto de montaje. Los montajes se limpian automáticamente al reiniciar la aplicación.",
     "emptyDescription": "Monta archivos desde la página de Archivos para explorar su contenido directamente en tu gestor de archivos.",
     "activeMounts": "Montajes activos"
+  },
+  "mountToast": {
+    "archiveMounted": "Archivo montado",
+    "openInTerminal": "Abrir en una terminal:"
   },
   "terminalLog": {
     "inProgress": "{{type}} en progreso..."
