@@ -1,33 +1,31 @@
 import React, { useState, useEffect, useRef } from 'react'
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Breadcrumbs,
-  Link,
-  Typography,
-  Box,
-  CircularProgress,
-  Alert,
-  Chip,
-  TextField,
-  InputAdornment,
-  Checkbox,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material'
-import { File, ChevronRight, Home, Search, Archive, HardDrive, FolderPlus } from 'lucide-react'
-import FolderOpenIcon from '@mui/icons-material/FolderOpen'
+  File,
+  ChevronRight,
+  Home,
+  Search,
+  Archive,
+  HardDrive,
+  FolderPlus,
+  FolderOpen,
+  Loader2,
+} from 'lucide-react'
 import api from '../services/api'
 import { sshKeysAPI } from '../services/api'
 import { useTranslation } from 'react-i18next'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
+import { Checkbox } from '@/components/ui/checkbox'
+import { cn } from '@/lib/utils'
 
 interface FileSystemItem {
   name: string
@@ -36,8 +34,8 @@ interface FileSystemItem {
   size?: number
   modified?: string
   is_borg_repo: boolean
-  is_local_mount?: boolean // Local host filesystem mount
-  is_mount_point?: boolean // SSH mount point
+  is_local_mount?: boolean
+  is_mount_point?: boolean
   ssh_connection?: SSHConnection
   permissions?: string
 }
@@ -70,8 +68,8 @@ interface FileExplorerDialogProps {
   connectionType?: 'local' | 'ssh'
   sshConfig?: SSHNetworkConfig
   selectMode?: 'directories' | 'files' | 'both'
-  showSshMountPoints?: boolean // Set to false to hide SSH mount points (e.g., when repo is SSH to prevent remote-to-remote)
-  allowedSshConnectionId?: number | null // Only show this SSH connection's mount point (used when source_connection_id is already set)
+  showSshMountPoints?: boolean
+  allowedSshConnectionId?: number | null
 }
 
 export default function FileExplorerDialog({
@@ -97,7 +95,6 @@ export default function FileExplorerDialog({
   const [sshConnections, setSshConnections] = useState<SSHConnection[]>([])
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  // Track current browsing mode (can switch from local to ssh when clicking mount points)
   const [activeConnectionType, setActiveConnectionType] = useState(connectionType)
   const [activeSshConfig, setActiveSshConfig] = useState(sshConfig)
   const [isInsideLocalMount, setIsInsideLocalMount] = useState(false)
@@ -107,21 +104,14 @@ export default function FileExplorerDialog({
   const [newFolderName, setNewFolderName] = useState('')
   const [creatingFolder, setCreatingFolder] = useState(false)
 
-  // Track if initial load has been done to prevent re-triggering
   const initialLoadDone = useRef(false)
-
-  // Responsive dialog
-  const theme = useTheme()
-  const fullScreen = useMediaQuery(theme.breakpoints.down('md'))
 
   const loadSSHConnections = async () => {
     try {
       const response = await sshKeysAPI.getSSHConnections()
       const connections = response.data?.connections || []
-      // Show all connected SSH connections (mount point is optional)
       setSshConnections(connections.filter((conn: SSHConnection) => conn.status === 'connected'))
     } catch (err) {
-      // Silently fail - mount points are optional
       console.error('Failed to load SSH connections:', err)
       setSshConnections([])
     }
@@ -132,7 +122,6 @@ export default function FileExplorerDialog({
       setLoading(true)
       setError(null)
 
-      // Update state if new connection params provided
       if (conn !== undefined) {
         setActiveConnectionType(conn)
       }
@@ -177,28 +166,22 @@ export default function FileExplorerDialog({
     [activeConnectionType, activeSshConfig, t]
   )
 
-  // Initial load - only runs once when dialog opens
   useEffect(() => {
     if (open && !initialLoadDone.current) {
       initialLoadDone.current = true
-      // Reset selection state when dialog opens
       setSelectedPaths([])
       setSearchTerm('')
 
       if (initialPath) {
-        // Use provided configuration for initial load
         loadDirectory(initialPath, connectionType, sshConfig)
       } else {
-        // Load default/root path
         loadDirectory('', connectionType, sshConfig)
       }
 
-      // Load SSH connections to show mount points
       if (connectionType === 'local') {
         loadSSHConnections()
       }
     }
-    // Reset when dialog closes
     if (!open) {
       initialLoadDone.current = false
     }
@@ -207,7 +190,6 @@ export default function FileExplorerDialog({
 
   const handleItemClick = (item: FileSystemItem) => {
     if (item.is_mount_point && item.ssh_connection) {
-      // Switch to SSH browsing mode for this mount point
       const sshCfg = {
         ssh_key_id: item.ssh_connection.ssh_key_id,
         host: item.ssh_connection.host,
@@ -216,19 +198,16 @@ export default function FileExplorerDialog({
       }
       const startPath = item.ssh_connection.default_path || '/'
       loadDirectory(startPath, 'ssh', sshCfg)
-      // Clear search and focus input
       setSearchTerm('')
       setTimeout(() => searchInputRef.current?.focus(), 100)
     } else if (item.is_directory) {
       loadDirectory(item.path)
-      // Clear search and focus input
       setSearchTerm('')
       setTimeout(() => searchInputRef.current?.focus(), 100)
     }
   }
 
   const handleItemSelect = (item: FileSystemItem) => {
-    // Check if item type matches selectMode
     if (selectMode === 'directories' && !item.is_directory) return
     if (selectMode === 'files' && item.is_directory) return
 
@@ -242,7 +221,6 @@ export default function FileExplorerDialog({
   }
 
   const handleBreadcrumbClick = (path: string) => {
-    // If clicking root while in SSH mode from mount point, go back to local
     if (path === '/' && activeConnectionType === 'ssh' && connectionType === 'local') {
       setActiveConnectionType('local')
       setActiveSshConfig(undefined)
@@ -253,10 +231,8 @@ export default function FileExplorerDialog({
   }
 
   const handleConfirm = () => {
-    // Convert paths to SSH URL format if browsing via mount point
     const paths = selectedPaths.map((path) => {
       if (activeConnectionType === 'ssh' && activeSshConfig && connectionType === 'local') {
-        // We're browsing a mount point - convert to SSH URL
         return `ssh://${activeSshConfig.username}@${activeSshConfig.host}:${activeSshConfig.port}${path}`
       }
       return path
@@ -266,10 +242,8 @@ export default function FileExplorerDialog({
   }
 
   const handleSelectCurrent = () => {
-    // Convert path to SSH URL format if browsing via mount point
     let path = currentPath
     if (activeConnectionType === 'ssh' && activeSshConfig && connectionType === 'local') {
-      // We're browsing a mount point - convert to SSH URL
       path = `ssh://${activeSshConfig.username}@${activeSshConfig.host}:${activeSshConfig.port}${currentPath}`
     }
     onSelect([path])
@@ -296,11 +270,7 @@ export default function FileExplorerDialog({
       }
 
       await api.post('/filesystem/create-folder', params)
-
-      // Refresh directory
       await loadDirectory(currentPath)
-
-      // Close dialog and reset
       setShowCreateFolder(false)
       setNewFolderName('')
       setError(null)
@@ -310,7 +280,6 @@ export default function FileExplorerDialog({
     } catch (err: any) {
       console.error('Failed to create folder:', err)
       const errorMessage = err.response?.data?.detail || err.message || 'Failed to create folder'
-      // Handle validation errors from FastAPI
       if (typeof errorMessage === 'object') {
         setError(JSON.stringify(errorMessage))
       } else {
@@ -348,17 +317,14 @@ export default function FileExplorerDialog({
     return `${size.toFixed(1)} ${units[unitIndex]}`
   }
 
-  // Add mount points as virtual items at root level
   const getMountPointItems = (): FileSystemItem[] => {
     if (currentPath !== '/' || activeConnectionType !== 'local' || !showSshMountPoints) return []
 
-    // Filter connections based on allowedSshConnectionId
     const filteredConnections = allowedSshConnectionId
       ? sshConnections.filter((conn) => conn.id === allowedSshConnectionId)
       : sshConnections
 
     return filteredConnections.map((conn) => {
-      // Use mount_point name if available, otherwise show full SSH URL
       const displayName =
         conn.mount_point && conn.mount_point.trim()
           ? conn.mount_point
@@ -375,8 +341,6 @@ export default function FileExplorerDialog({
     })
   }
 
-  // When allowedSshConnectionId is set and we're at root in local mode,
-  // hide local filesystem items - only show the SSH mount point
   const shouldHideLocalItems =
     allowedSshConnectionId && currentPath === '/' && activeConnectionType === 'local'
 
@@ -385,377 +349,284 @@ export default function FileExplorerDialog({
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  const breadcrumbs = getBreadcrumbs()
+
   return (
     <>
-      <Dialog
-        open={open}
-        onClose={onClose}
-        maxWidth="md"
-        fullWidth
-        fullScreen={fullScreen}
-        PaperProps={{ sx: { height: fullScreen ? '100%' : '75vh' } }}
-      >
-        <DialogTitle sx={{ pb: 1, pt: 2 }}>
-          <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography variant="h6" fontWeight={600}>
-              {title ?? t('dialogs.fileExplorer.selectDirectory')}
-            </Typography>
-            {activeConnectionType === 'ssh' && activeSshConfig ? (
-              <Chip
-                label={`${activeSshConfig.username}@${activeSshConfig.host}`}
-                size="small"
-                color="primary"
-                variant="outlined"
-              />
-            ) : isInsideLocalMount && activeConnectionType === 'local' ? (
-              <Chip
-                icon={<HardDrive size={14} />}
-                label={t('fileExplorer.chips.host')}
-                size="small"
-                color="primary"
-                variant="outlined"
-              />
-            ) : null}
-          </Box>
-        </DialogTitle>
+      <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose() }}>
+        <DialogContent
+          showCloseButton={false}
+          className="max-w-2xl w-full p-0 gap-0 overflow-hidden h-[75vh] flex flex-col"
+        >
+          <DialogHeader className="px-4 py-3 border-b shrink-0">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-base font-semibold">
+                {title ?? t('dialogs.fileExplorer.selectDirectory')}
+              </DialogTitle>
+              {activeConnectionType === 'ssh' && activeSshConfig ? (
+                <Badge variant="outline" className="text-xs font-medium">
+                  {activeSshConfig.username}@{activeSshConfig.host}
+                </Badge>
+              ) : isInsideLocalMount && activeConnectionType === 'local' ? (
+                <Badge variant="outline" className="text-xs font-medium gap-1">
+                  <HardDrive size={12} />
+                  {t('fileExplorer.chips.host')}
+                </Badge>
+              ) : null}
+            </div>
+          </DialogHeader>
 
-        <DialogContent sx={{ p: 0 }}>
           {/* Breadcrumb Navigation */}
-          <Box
-            sx={{
-              px: 2,
-              py: 1,
-              bgcolor: 'background.default',
-              borderBottom: 1,
-              borderColor: 'divider',
-            }}
-          >
-            <Breadcrumbs
-              separator={<ChevronRight size={12} />}
-              maxItems={6}
-              sx={{ '& .MuiBreadcrumbs-separator': { mx: 0.25 } }}
-            >
-              {getBreadcrumbs().map((crumb, index) => (
-                <Link
-                  key={index}
-                  component="button"
-                  variant="caption"
-                  onClick={() => handleBreadcrumbClick(crumb.path)}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.25,
-                    textDecoration: 'none',
-                    color: 'text.primary',
-                    fontWeight: index === getBreadcrumbs().length - 1 ? 600 : 400,
-                    '&:hover': {
-                      textDecoration: 'underline',
-                      color: 'primary.main',
-                    },
-                  }}
-                >
-                  {index === 0 && <Home size={12} />}
-                  {crumb.label}
-                </Link>
+          <div className="px-3 py-1.5 bg-muted/30 border-b shrink-0">
+            <nav className="flex items-center flex-wrap gap-0.5 text-xs">
+              {breadcrumbs.map((crumb, index) => (
+                <React.Fragment key={index}>
+                  {index > 0 && (
+                    <ChevronRight size={12} className="text-muted-foreground mx-0.5 shrink-0" />
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleBreadcrumbClick(crumb.path)}
+                    className={cn(
+                      'flex items-center gap-0.5 hover:underline hover:text-primary transition-colors',
+                      index === breadcrumbs.length - 1
+                        ? 'font-semibold text-foreground'
+                        : 'text-foreground'
+                    )}
+                  >
+                    {index === 0 && <Home size={12} />}
+                    {crumb.label}
+                  </button>
+                </React.Fragment>
               ))}
-            </Breadcrumbs>
-          </Box>
+            </nav>
+          </div>
 
           {/* Search and Create Folder */}
-          <Box sx={{ px: 2, py: 1, display: 'flex', gap: 1 }}>
-            <TextField
-              fullWidth
-              size="small"
-              placeholder={t('fileExplorer.searchPlaceholder')}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              inputRef={searchInputRef}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Search size={16} />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  bgcolor: 'background.paper',
-                },
-                '& .MuiOutlinedInput-input': {
-                  py: 0.75,
-                },
-              }}
-            />
+          <div className="px-3 py-1.5 flex gap-2 shrink-0">
+            <div className="relative flex-1">
+              <Search size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <Input
+                ref={searchInputRef}
+                placeholder={t('fileExplorer.searchPlaceholder')}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-8 h-[35px]"
+              />
+            </div>
             <Button
-              variant="outlined"
-              size="small"
-              startIcon={<FolderPlus size={16} />}
+              variant="outline"
+              size="sm"
+              className="shrink-0 whitespace-nowrap h-[35px]"
               onClick={() => setShowCreateFolder(true)}
-              sx={{
-                flexShrink: 0,
-                whiteSpace: 'nowrap',
-                height: '35px',
-                minHeight: '35px',
-              }}
             >
+              <FolderPlus size={16} />
               {t('fileExplorer.newFolder')}
             </Button>
-          </Box>
+          </div>
 
           {/* Error Display */}
           {error && (
-            <Box sx={{ px: 2, pb: 1 }}>
-              <Alert severity="error" sx={{ borderRadius: 1, py: 0.5 }}>
-                {error}
-              </Alert>
-            </Box>
+            <div className="px-3 pb-1.5 shrink-0">
+              <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2">
+                <p className="text-sm text-destructive">{error}</p>
+              </div>
+            </div>
           )}
 
           {/* Mount Point Info */}
           {currentPath === '/' && activeConnectionType === 'local' && sshConnections.length > 0 && (
-            <Box sx={{ px: 2, pb: 1 }}>
-              <Alert severity="info" sx={{ borderRadius: 1, py: 0.5 }}>
-                <Typography variant="caption">{t('fileExplorer.sshInfoAlert')}</Typography>
-              </Alert>
-            </Box>
+            <div className="px-3 pb-1.5 shrink-0">
+              <div className="rounded-md border border-blue-200 bg-blue-50 dark:border-blue-800/50 dark:bg-blue-900/20 px-3 py-2">
+                <p className="text-xs text-blue-700 dark:text-blue-300">
+                  {t('fileExplorer.sshInfoAlert')}
+                </p>
+              </div>
+            </div>
           )}
 
-          {/* Loading State */}
-          {loading ? (
-            <Box
-              display="flex"
-              flexDirection="column"
-              alignItems="center"
-              justifyContent="center"
-              py={4}
-            >
-              <CircularProgress size={32} />
-              <Typography variant="caption" color="text.secondary" mt={1.5}>
-                {t('fileExplorer.loading')}
-              </Typography>
-            </Box>
-          ) : (
-            <>
-              {/* File List */}
-              <List
-                sx={{
-                  flex: 1,
-                  overflow: 'auto',
-                  px: 0.5,
-                  py: 0,
-                }}
-              >
-                {filteredItems.length === 0 ? (
-                  <Box
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="center"
-                    justifyContent="center"
-                    py={4}
-                    sx={{ color: 'text.secondary' }}
-                  >
-                    <FolderOpenIcon sx={{ fontSize: 36 }} />
-                    <Typography variant="body2" color="text.secondary" mt={1.5}>
-                      {t('fileExplorer.noItemsFound')}
-                    </Typography>
-                    <Typography variant="caption" color="text.disabled">
-                      {searchTerm
-                        ? t('fileExplorer.tryDifferentSearch')
-                        : t('fileExplorer.emptyDirectory')}
-                    </Typography>
-                  </Box>
-                ) : (
-                  filteredItems.map((item) => {
-                    const isSelectable =
-                      (selectMode === 'directories' && item.is_directory) ||
-                      (selectMode === 'files' && !item.is_directory) ||
-                      selectMode === 'both'
+          {/* File List or Loading */}
+          <div className="flex-1 overflow-auto">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-10 gap-3">
+                <Loader2 size={32} className="animate-spin text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">{t('fileExplorer.loading')}</p>
+              </div>
+            ) : filteredItems.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-10 gap-2 text-muted-foreground">
+                <FolderOpen size={36} />
+                <p className="text-sm">{t('fileExplorer.noItemsFound')}</p>
+                <p className="text-xs text-muted-foreground">
+                  {searchTerm
+                    ? t('fileExplorer.tryDifferentSearch')
+                    : t('fileExplorer.emptyDirectory')}
+                </p>
+              </div>
+            ) : (
+              <ul className="px-1 py-0">
+                {filteredItems.map((item) => {
+                  const isSelectable =
+                    (selectMode === 'directories' && item.is_directory) ||
+                    (selectMode === 'files' && !item.is_directory) ||
+                    selectMode === 'both'
 
-                    const isSelected = selectedPaths.includes(item.path)
+                  const isSelected = selectedPaths.includes(item.path)
 
-                    return (
-                      <ListItem
-                        key={item.path}
-                        disablePadding
-                        secondaryAction={
-                          isSelectable && multiSelect ? (
-                            <Checkbox
-                              edge="end"
-                              checked={isSelected}
-                              onChange={() => handleItemSelect(item)}
-                              size="small"
-                            />
-                          ) : null
+                  return (
+                    <li key={item.path} className="list-none">
+                      <div
+                        className={cn(
+                          'flex items-center gap-2 px-3 py-1.5 rounded-md cursor-pointer transition-colors',
+                          'hover:bg-muted',
+                          isSelected && !multiSelect && 'bg-primary/10 hover:bg-primary/15'
+                        )}
+                        onClick={() =>
+                          item.is_directory
+                            ? handleItemClick(item)
+                            : isSelectable && handleItemSelect(item)
                         }
                       >
-                        <ListItemButton
-                          onClick={() =>
-                            item.is_directory
-                              ? handleItemClick(item)
-                              : isSelectable && handleItemSelect(item)
-                          }
-                          selected={isSelected && !multiSelect}
-                          sx={{
-                            py: 0.5,
-                            px: 1.5,
-                            '&:hover': {
-                              bgcolor: 'action.hover',
-                            },
-                            '&.Mui-selected': {
-                              bgcolor: 'primary.50',
-                              '&:hover': {
-                                bgcolor: 'primary.100',
-                              },
-                            },
-                          }}
-                        >
-                          <ListItemIcon sx={{ minWidth: 32 }}>
-                            {item.is_mount_point ? (
-                              <HardDrive size={18} color="#10b981" />
-                            ) : item.is_local_mount ? (
-                              <HardDrive size={18} color="#6366f1" />
-                            ) : item.is_borg_repo ? (
-                              <Archive size={18} color="#ff6b6b" />
-                            ) : item.is_directory ? (
-                              <FolderOpenIcon sx={{ fontSize: 18, color: '#2563eb' }} />
-                            ) : (
-                              <File size={18} color="#999" />
-                            )}
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={
-                              <Box display="flex" alignItems="center" gap={0.75}>
-                                <Typography variant="body2">{item.name}</Typography>
-                                {item.is_mount_point && (
-                                  <Chip
-                                    label={t('fileExplorer.chips.remote')}
-                                    size="small"
-                                    color="success"
-                                    sx={{ height: 16, fontSize: '0.6rem', fontWeight: 600 }}
-                                  />
-                                )}
-                                {item.is_local_mount && (
-                                  <Chip
-                                    label={t('fileExplorer.chips.host')}
-                                    size="small"
-                                    color="primary"
-                                    sx={{ height: 16, fontSize: '0.6rem', fontWeight: 600 }}
-                                  />
-                                )}
-                                {item.is_borg_repo && (
-                                  <Chip
-                                    label={t('fileExplorer.chips.borg')}
-                                    size="small"
-                                    color="warning"
-                                    sx={{ height: 16, fontSize: '0.6rem', fontWeight: 600 }}
-                                  />
-                                )}
-                                {!item.is_directory && item.size && (
-                                  <Typography
-                                    variant="caption"
-                                    color="text.disabled"
-                                    sx={{ ml: 'auto' }}
-                                  >
-                                    {formatFileSize(item.size)}
-                                  </Typography>
-                                )}
-                              </Box>
-                            }
+                        <span className="shrink-0 flex items-center">
+                          {item.is_mount_point ? (
+                            <HardDrive size={18} className="text-emerald-500" />
+                          ) : item.is_local_mount ? (
+                            <HardDrive size={18} className="text-indigo-400" />
+                          ) : item.is_borg_repo ? (
+                            <Archive size={18} className="text-red-400" />
+                          ) : item.is_directory ? (
+                            <FolderOpen size={18} className="text-blue-500" />
+                          ) : (
+                            <File size={18} className="text-muted-foreground" />
+                          )}
+                        </span>
+
+                        <span className="flex items-center gap-1.5 flex-1 min-w-0">
+                          <span className="text-sm truncate">{item.name}</span>
+                          {item.is_mount_point && (
+                            <Badge className="h-4 text-[0.6rem] font-semibold px-1 bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-700/50">
+                              {t('fileExplorer.chips.remote')}
+                            </Badge>
+                          )}
+                          {item.is_local_mount && (
+                            <Badge variant="outline" className="h-4 text-[0.6rem] font-semibold px-1">
+                              {t('fileExplorer.chips.host')}
+                            </Badge>
+                          )}
+                          {item.is_borg_repo && (
+                            <Badge className="h-4 text-[0.6rem] font-semibold px-1 bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-700/50">
+                              {t('fileExplorer.chips.borg')}
+                            </Badge>
+                          )}
+                          {!item.is_directory && item.size && (
+                            <span className="text-xs text-muted-foreground ml-auto shrink-0">
+                              {formatFileSize(item.size)}
+                            </span>
+                          )}
+                        </span>
+
+                        {isSelectable && multiSelect && (
+                          <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={() => handleItemSelect(item)}
+                            onClick={(e) => e.stopPropagation()}
+                            className="shrink-0"
                           />
-                        </ListItemButton>
-                      </ListItem>
-                    )
-                  })
-                )}
-              </List>
+                        )}
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
+            )}
 
-              {/* Info Box */}
-              {multiSelect && selectedPaths.length > 0 && (
-                <Box
-                  sx={{ px: 2, py: 1, bgcolor: 'primary.50', borderTop: 1, borderColor: 'divider' }}
-                >
-                  <Typography variant="caption" color="primary.main" fontWeight={600}>
-                    {t('fileExplorer.selectedCount', { count: selectedPaths.length })}
-                  </Typography>
-                </Box>
-              )}
-            </>
-          )}
-        </DialogContent>
+            {/* Multi-select info */}
+            {multiSelect && selectedPaths.length > 0 && (
+              <div className="px-3 py-2 bg-primary/5 border-t">
+                <p className="text-xs font-semibold text-primary">
+                  {t('fileExplorer.selectedCount', { count: selectedPaths.length })}
+                </p>
+              </div>
+            )}
+          </div>
 
-        <DialogActions sx={{ px: 2, py: 1.5, borderTop: 1, borderColor: 'divider' }}>
-          <Button onClick={onClose} size="small" sx={{ color: 'text.secondary' }}>
-            {t('fileExplorer.cancel')}
-          </Button>
-          <Box sx={{ flex: 1 }} />
-          {selectMode === 'directories' && (
-            <Button onClick={handleSelectCurrent} variant="outlined" size="small" sx={{ mr: 1 }}>
-              {t('fileExplorer.useCurrent')}
+          <DialogFooter className="px-3 py-2 border-t flex-row gap-2">
+            <Button variant="ghost" size="sm" onClick={onClose} className="text-muted-foreground">
+              {t('fileExplorer.cancel')}
             </Button>
-          )}
-          <Button
-            onClick={handleConfirm}
-            variant="contained"
-            size="small"
-            disabled={selectedPaths.length === 0}
-          >
-            {multiSelect && selectedPaths.length > 0
-              ? t('fileExplorer.selectWithCount', { count: selectedPaths.length })
-              : t('fileExplorer.select')}
-          </Button>
-        </DialogActions>
+            <div className="flex-1" />
+            {selectMode === 'directories' && (
+              <Button variant="outline" size="sm" onClick={handleSelectCurrent}>
+                {t('fileExplorer.useCurrent')}
+              </Button>
+            )}
+            <Button
+              size="sm"
+              onClick={handleConfirm}
+              disabled={selectedPaths.length === 0}
+            >
+              {multiSelect && selectedPaths.length > 0
+                ? t('fileExplorer.selectWithCount', { count: selectedPaths.length })
+                : t('fileExplorer.select')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
 
       {/* Create Folder Dialog */}
       <Dialog
         open={showCreateFolder}
-        onClose={() => !creatingFolder && setShowCreateFolder(false)}
-        maxWidth="xs"
-        fullWidth
+        onOpenChange={(isOpen) => { if (!isOpen && !creatingFolder) setShowCreateFolder(false) }}
       >
-        <DialogTitle>{t('fileExplorer.createFolderTitle')}</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            fullWidth
-            label={t('fileExplorer.folderNameLabel')}
-            value={newFolderName}
-            onChange={(e) => setNewFolderName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && newFolderName.trim()) {
-                handleCreateFolder()
-              }
-            }}
-            placeholder={t('fileExplorer.folderNamePlaceholder')}
-            margin="dense"
-            disabled={creatingFolder}
-          />
-          {error && (
-            <Alert severity="error" sx={{ mt: 2 }}>
-              {error}
-            </Alert>
-          )}
-        </DialogContent>
+        <DialogContent showCloseButton={false} className="max-w-xs">
+          <DialogHeader>
+            <DialogTitle>{t('fileExplorer.createFolderTitle')}</DialogTitle>
+          </DialogHeader>
 
-        <DialogActions>
-          <Button
-            onClick={() => {
-              setShowCreateFolder(false)
-              setNewFolderName('')
-              setError(null)
-            }}
-            disabled={creatingFolder}
-          >
-            {t('fileExplorer.cancel')}
-          </Button>
-          <Button
-            onClick={handleCreateFolder}
-            variant="contained"
-            disabled={!newFolderName.trim() || creatingFolder}
-          >
-            {creatingFolder ? t('fileExplorer.creating') : t('fileExplorer.create')}
-          </Button>
-        </DialogActions>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="new-folder-input">{t('fileExplorer.folderNameLabel')}</Label>
+              <Input
+                id="new-folder-input"
+                autoFocus
+                value={newFolderName}
+                onChange={(e) => setNewFolderName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && newFolderName.trim()) {
+                    handleCreateFolder()
+                  }
+                }}
+                placeholder={t('fileExplorer.folderNamePlaceholder')}
+                disabled={creatingFolder}
+              />
+            </div>
+
+            {error && (
+              <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2">
+                <p className="text-sm text-destructive">{error}</p>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="-mx-4 -mb-4 border-t bg-muted/50 px-4 py-3 rounded-b-xl flex-row justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowCreateFolder(false)
+                setNewFolderName('')
+                setError(null)
+              }}
+              disabled={creatingFolder}
+            >
+              {t('fileExplorer.cancel')}
+            </Button>
+            <Button
+              onClick={handleCreateFolder}
+              disabled={!newFolderName.trim() || creatingFolder}
+            >
+              {creatingFolder ? t('fileExplorer.creating') : t('fileExplorer.create')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
     </>
   )

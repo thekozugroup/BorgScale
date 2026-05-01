@@ -1,8 +1,9 @@
-import { Box, Typography, Alert, Chip, useTheme, alpha, type Theme } from '@mui/material'
 import { RefreshCw, CheckCircle, AlertCircle, Clock, AlertTriangle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatTimeRange, formatDurationSeconds, formatRelativeTime } from '../utils/dateUtils'
 import { translateBackendKey } from '../utils/translateBackendKey'
+import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
 
 interface RestoreJob {
   id: number
@@ -45,19 +46,17 @@ const getStatusIcon = (status: string) => {
   }
 }
 
-const getStatusColor = (status: string, theme: Theme): string => {
-  switch (status) {
-    case 'running':
-      return theme.palette.info.main
-    case 'completed':
-      return theme.palette.success.main
-    case 'completed_with_warnings':
-      return theme.palette.warning.main
-    case 'failed':
-      return theme.palette.error.main
-    default:
-      return theme.palette.text.secondary
-  }
+type StatusKey = 'running' | 'completed' | 'completed_with_warnings' | 'failed'
+
+const STATUS_COLORS: Record<StatusKey, string> = {
+  running: 'bg-sky-500/10 text-sky-600 border-sky-500/18 dark:bg-sky-500/12 dark:text-sky-400 dark:border-sky-500/25',
+  completed: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/18 dark:bg-emerald-500/12 dark:text-emerald-400 dark:border-emerald-500/25',
+  completed_with_warnings: 'bg-amber-500/10 text-amber-600 border-amber-500/18 dark:bg-amber-500/12 dark:text-amber-400 dark:border-amber-500/25',
+  failed: 'bg-destructive/10 text-destructive border-destructive/18 dark:bg-destructive/12 dark:border-destructive/25',
+}
+
+const getStatusColorCls = (status: string): string => {
+  return STATUS_COLORS[status as StatusKey] ?? 'bg-muted text-muted-foreground border-border'
 }
 
 const getStatusLabel = (status: string, t: (key: string) => string): string => {
@@ -77,8 +76,6 @@ const getStatusLabel = (status: string, t: (key: string) => string): string => {
 
 export default function RestoreJobCard({ job, showJobId = true }: RestoreJobCardProps) {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
 
   const getArchiveName = (archiveName: string) => {
     const timestampPattern = /-\d{4}-\d{2}-\d{2}T[\d:.]+$/
@@ -92,213 +89,119 @@ export default function RestoreJobCard({ job, showJobId = true }: RestoreJobCard
     return duration
   }
 
-  const statusColor = getStatusColor(job.status, theme)
-
   return (
-    <Box>
+    <div>
       {showJobId && (
-        <Typography variant="body2" fontWeight={500} sx={{ mb: 1 }}>
+        <p className="text-sm font-medium mb-2">
           {t('restoreJobCard.title')} #{job.id}
-        </Typography>
+        </p>
       )}
 
-      {/* Single-line layout: archive → destination + status chip + time */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1.5,
-          flexWrap: 'wrap',
-          rowGap: 0.75,
-        }}
-      >
+      {/* Single-line layout */}
+      <div className="flex items-center gap-3 flex-wrap" style={{ rowGap: '6px' }}>
         {/* Archive → Destination */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.75,
-            minWidth: 0,
-            flex: '1 1 auto',
-          }}
-        >
-          <Typography
-            variant="body2"
-            fontWeight={600}
-            noWrap
-            sx={{
-              fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace',
-              fontSize: '0.78rem',
-            }}
-          >
+        <div className="flex items-center gap-1.5 min-w-0 flex-1">
+          <span className="text-sm font-semibold truncate font-mono text-[0.78rem]">
             {getArchiveName(job.archive)}
-          </Typography>
-          <Box component="span" sx={{ color: 'text.disabled', fontSize: '0.72rem', flexShrink: 0 }}>
-            →
-          </Box>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            noWrap
-            sx={{
-              fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace',
-              fontSize: '0.72rem',
-              minWidth: 0,
-            }}
-          >
+          </span>
+          <span className="text-muted-foreground text-[0.72rem] shrink-0">→</span>
+          <span className="text-sm text-muted-foreground truncate font-mono text-[0.72rem] min-w-0">
             {job.destination}
-          </Typography>
-        </Box>
+          </span>
+        </div>
 
-        {/* Status chip */}
-        <Chip
-          icon={
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              {getStatusIcon(job.status)}
-            </Box>
-          }
-          label={getStatusLabel(job.status, t)}
-          size="small"
-          sx={{
-            height: 22,
-            fontSize: '0.68rem',
-            fontWeight: 600,
-            letterSpacing: '0.02em',
-            bgcolor: alpha(statusColor, isDark ? 0.12 : 0.08),
-            color: statusColor,
-            border: '1px solid',
-            borderColor: alpha(statusColor, isDark ? 0.25 : 0.18),
-            '& .MuiChip-icon': { ml: 0.5, mr: -0.25, color: 'inherit' },
-            '& .MuiChip-label': { px: 0.75 },
-          }}
-        />
+        {/* Status badge */}
+        <Badge
+          variant="outline"
+          className={cn(
+            'h-[22px] text-[0.68rem] font-semibold tracking-[0.02em] gap-1 px-1.5 border',
+            getStatusColorCls(job.status)
+          )}
+        >
+          <span className="flex items-center">{getStatusIcon(job.status)}</span>
+          {getStatusLabel(job.status, t)}
+        </Badge>
 
         {/* Time + duration */}
         {job.completed_at && (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.75,
-              flexShrink: 0,
-            }}
-          >
-            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.72rem' }}>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="text-sm text-muted-foreground text-[0.72rem]">
               {formatRelativeTime(job.completed_at)}
-            </Typography>
+            </span>
             {getDurationText() && (
               <>
-                <Box
-                  component="span"
-                  sx={{
-                    width: 3,
-                    height: 3,
-                    borderRadius: '50%',
-                    bgcolor: isDark ? alpha('#fff', 0.2) : alpha('#000', 0.18),
-                    flexShrink: 0,
-                  }}
-                />
-                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.72rem' }}>
+                <span className="inline-block size-[3px] rounded-full bg-neutral-300 dark:bg-neutral-600 shrink-0" />
+                <span className="text-sm text-muted-foreground text-[0.72rem]">
                   {getDurationText()}
-                </Typography>
+                </span>
               </>
             )}
-          </Box>
+          </div>
         )}
-      </Box>
+      </div>
 
       {/* Running: elapsed time */}
       {job.status === 'running' && job.started_at && !job.completed_at && (
-        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.72rem', mt: 0.5 }}>
+        <p className="text-sm text-muted-foreground text-[0.72rem] mt-1">
           {formatTimeRange(job.started_at, job.completed_at, job.status)}
-        </Typography>
+        </p>
       )}
 
       {/* Error alert */}
       {job.status === 'failed' && job.error_message && (
-        <Alert severity="error" sx={{ mt: 1.5 }}>
-          <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+        <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2">
+          <p className="text-sm text-destructive whitespace-pre-wrap">
             {job.error_message
               .split('\n')
               .map((line) => translateBackendKey(line))
               .join('\n')}
-          </Typography>
-        </Alert>
+          </p>
+        </div>
       )}
 
       {/* Running: current file */}
       {job.status === 'running' && job.progress_details?.current_file && (
-        <Alert severity="info" sx={{ mt: 1.5, py: 0.5 }}>
-          <Typography variant="caption" fontWeight={500}>
+        <div className="mt-3 rounded-md border border-sky-200 bg-sky-50 dark:border-sky-800/50 dark:bg-sky-900/20 px-3 py-2">
+          <p className="text-xs font-medium text-sky-700 dark:text-sky-300">
             {t('restoreJobCard.currentFile')}
-          </Typography>
-          <Typography
-            variant="caption"
-            sx={{
-              fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace',
-              display: 'block',
-              mt: 0.5,
-              wordBreak: 'break-all',
-            }}
-          >
+          </p>
+          <p className="text-xs mt-1 font-mono break-all text-sky-700 dark:text-sky-300">
             {job.progress_details.current_file}
-          </Typography>
-        </Alert>
+          </p>
+        </div>
       )}
 
       {/* Running: progress stats */}
       {job.status === 'running' && job.progress_details && (
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-            gap: 2,
-            mt: 1.5,
-          }}
-        >
-          <Box>
-            <Typography variant="body2" color="text.secondary">
-              {t('restoreJobCard.filesRestored')}
-            </Typography>
-            <Typography variant="body2" fontWeight={500}>
-              {job.progress_details.nfiles?.toLocaleString() || '0'}
-            </Typography>
-          </Box>
-          <Box>
-            <Typography variant="body2" color="text.secondary">
-              {t('restoreJobCard.progress')}
-            </Typography>
-            <Typography variant="body2" fontWeight={500} color="primary.main">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-4 mt-3">
+          <div>
+            <p className="text-sm text-muted-foreground">{t('restoreJobCard.filesRestored')}</p>
+            <p className="text-sm font-medium">{job.progress_details.nfiles?.toLocaleString() || '0'}</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">{t('restoreJobCard.progress')}</p>
+            <p className="text-sm font-medium text-primary">
               {job.progress_details.progress_percent?.toFixed(1) || '0'}%
-            </Typography>
-          </Box>
-          <Box>
-            <Typography variant="body2" color="text.secondary">
-              {t('restoreJobCard.speed')}
-            </Typography>
-            <Typography variant="body2" fontWeight={500} color="primary.main">
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">{t('restoreJobCard.speed')}</p>
+            <p className="text-sm font-medium text-primary">
               {job.progress_details.restore_speed
                 ? `${job.progress_details.restore_speed.toFixed(2)} MB/s`
                 : 'N/A'}
-            </Typography>
-          </Box>
+            </p>
+          </div>
           {(job.progress_details.estimated_time_remaining || 0) > 0 && (
-            <Box>
-              <Typography variant="body2" color="text.secondary">
-                {t('restoreJobCard.eta')}
-              </Typography>
-              <Typography variant="body2" fontWeight={500} color="success.main">
+            <div>
+              <p className="text-sm text-muted-foreground">{t('restoreJobCard.eta')}</p>
+              <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
                 {formatDurationSeconds(job.progress_details.estimated_time_remaining || 0)}
-              </Typography>
-            </Box>
+              </p>
+            </div>
           )}
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   )
 }

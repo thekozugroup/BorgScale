@@ -1,9 +1,17 @@
-import { Box, IconButton, Tooltip, Chip, useTheme, alpha } from '@mui/material'
 import { FolderOpen, RotateCcw, HardDrive, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatDate } from '../utils/dateUtils'
 import { Archive } from '../types'
 import { getArchiveType } from '../utils/archiveGrouping'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
 
 interface ArchiveCardProps {
   archive: Archive
@@ -25,186 +33,129 @@ export default function ArchiveCard({
   canDelete = true,
 }: ArchiveCardProps) {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
   const isManual = getArchiveType(archive) === 'manual'
   const archiveTime = archive.start || archive.time
-  const desktopGridTemplate = 'minmax(0, 1fr) 76px minmax(180px, 220px) 132px'
-
-  const iconBtnSx = (color: string) => ({
-    width: 28,
-    height: 28,
-    borderRadius: 1.5,
-    color: alpha(color, isDark ? 0.6 : 0.5),
-    '&:hover': {
-      bgcolor: alpha(color, isDark ? 0.12 : 0.09),
-      color: color,
-    },
-    '&.Mui-disabled': { opacity: 0.28 },
-  })
 
   return (
-    <Box
-      sx={{
-        display: 'grid',
-        gridTemplateColumns: desktopGridTemplate,
-        alignItems: 'center',
-        gap: 1,
-        px: 2,
-        py: 1.125,
-        borderBottom: '1px solid',
-        borderBottomColor: isDark ? alpha('#fff', 0.04) : alpha('#000', 0.04),
-        transition: 'all 150ms ease',
-        '&:hover': {
-          bgcolor: alpha(theme.palette.primary.main, isDark ? 0.04 : 0.03),
-        },
-        '@media (max-width: 767px)': {
-          display: 'grid',
-          gridTemplateColumns: '1fr auto',
-          gridTemplateRows: 'auto auto',
-          gap: 0.5,
-          px: 1.75,
-          py: 1.25,
-        },
-      }}
-    >
-      {/* Archive name */}
-      <Box
-        title={archive.name}
-        sx={{
-          fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace',
-          fontSize: '0.78rem',
-          fontWeight: 600,
-          color: 'text.primary',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          minWidth: 0,
-          '@media (max-width: 767px)': {
-            gridColumn: 1,
-            gridRow: 1,
-          },
-        }}
-      >
-        {archive.name}
-      </Box>
-
-      {/* Type chip + Date (share row 2 on mobile) */}
-      <Box
-        sx={{
-          display: 'contents',
-          '@media (max-width: 767px)': {
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.75,
-            gridColumn: 1,
-            gridRow: 2,
-            minWidth: 0,
-          },
-        }}
-      >
-        <Chip
-          label={
-            isManual ? t('archivesList.manualAbbr', 'MAN') : t('archivesList.scheduledAbbr', 'SCH')
-          }
-          size="small"
-          sx={{
-            height: 18,
-            justifySelf: 'start',
-            fontSize: '0.6rem',
-            fontWeight: 700,
-            letterSpacing: '0.05em',
-            textTransform: 'uppercase',
-            bgcolor: isManual
-              ? alpha(theme.palette.primary.main, isDark ? 0.18 : 0.1)
-              : alpha(theme.palette.success.main, isDark ? 0.18 : 0.1),
-            color: isManual ? 'primary.main' : 'success.main',
-            border: '1px solid',
-            borderColor: isManual
-              ? alpha(theme.palette.primary.main, isDark ? 0.3 : 0.2)
-              : alpha(theme.palette.success.main, isDark ? 0.3 : 0.2),
-            '& .MuiChip-label': { px: 0.75 },
-          }}
-        />
-        <Box
-          component="span"
-          sx={{
-            fontSize: '0.72rem',
-            color: 'text.secondary',
-            whiteSpace: 'nowrap',
-            minWidth: 0,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {formatDate(archiveTime)}
-        </Box>
-      </Box>
-
-      {/* Actions — always visible */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 0.25,
-          minWidth: 0,
-          justifyContent: 'flex-end',
-          '@media (max-width: 767px)': {
-            gridColumn: 2,
-            gridRow: '1 / 3',
-            alignSelf: 'center',
-          },
-        }}
-      >
-        <Tooltip title={t('archiveCard.viewContents')} arrow>
-          <IconButton
-            size="small"
-            onClick={() => onView(archive)}
-            aria-label={t('archiveCard.viewContents')}
-            sx={iconBtnSx(theme.palette.success.main)}
-          >
-            <FolderOpen size={15} />
-          </IconButton>
-        </Tooltip>
-
-        <Tooltip title={t('archiveCard.restore')} arrow>
-          <IconButton
-            size="small"
-            onClick={() => onRestore(archive)}
-            aria-label={t('archiveCard.restore')}
-            sx={iconBtnSx(theme.palette.warning.main)}
-          >
-            <RotateCcw size={15} />
-          </IconButton>
-        </Tooltip>
-
-        <Tooltip title={t('archiveCard.mount')} arrow>
-          <span>
-            <IconButton
-              size="small"
-              onClick={() => onMount(archive)}
-              disabled={mountDisabled}
-              aria-label={t('archiveCard.mount')}
-              sx={iconBtnSx(theme.palette.info.main)}
-            >
-              <HardDrive size={15} />
-            </IconButton>
-          </span>
-        </Tooltip>
-
-        {canDelete && (
-          <Tooltip title={t('archiveCard.delete')} arrow>
-            <IconButton
-              size="small"
-              onClick={() => onDelete(archive.name)}
-              aria-label={t('archiveCard.delete')}
-              sx={iconBtnSx(theme.palette.error.main)}
-            >
-              <Trash2 size={15} />
-            </IconButton>
-          </Tooltip>
+    <TooltipProvider>
+      <div
+        className={cn(
+          'grid items-center gap-2 px-4 py-[9px]',
+          'border-b border-b-neutral-100 dark:border-b-neutral-800/70',
+          'transition-all duration-150 hover:bg-neutral-50 dark:hover:bg-neutral-800/30',
+          // Desktop: 4-col grid; Mobile: 2-col 2-row
+          'md:grid-cols-[minmax(0,1fr)_76px_minmax(180px,220px)_132px]',
+          'grid-cols-[1fr_auto] grid-rows-[auto_auto]'
         )}
-      </Box>
-    </Box>
+      >
+        {/* Archive name */}
+        <div
+          title={archive.name}
+          className={cn(
+            'font-mono text-[0.78rem] font-semibold text-foreground overflow-hidden text-ellipsis whitespace-nowrap min-w-0',
+            'col-start-1 row-start-1'
+          )}
+        >
+          {archive.name}
+        </div>
+
+        {/* Type badge */}
+        <div className="row-start-2 col-start-1 md:row-auto md:col-auto flex items-center gap-1.5 min-w-0">
+          <Badge
+            variant="outline"
+            className={cn(
+              'h-[18px] text-[0.6rem] font-bold tracking-wider uppercase px-1.5 shrink-0',
+              isManual
+                ? 'bg-primary/10 text-primary border-primary/20 dark:bg-primary/18 dark:border-primary/30'
+                : 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/18 dark:text-emerald-400 dark:border-emerald-500/30'
+            )}
+          >
+            {isManual
+              ? t('archivesList.manualAbbr', 'MAN')
+              : t('archivesList.scheduledAbbr', 'SCH')}
+          </Badge>
+          {/* Date shown inline with badge on mobile */}
+          <span className="text-[0.72rem] text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis md:hidden">
+            {formatDate(archiveTime)}
+          </span>
+        </div>
+
+        {/* Date shown in its own column on desktop */}
+        <span className="hidden md:block text-[0.72rem] text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis">
+          {formatDate(archiveTime)}
+        </span>
+
+        {/* Actions */}
+        <div
+          className={cn(
+            'flex items-center gap-0.5 min-w-0 justify-end',
+            'col-start-2 row-start-1 row-span-2 md:row-span-1 self-center'
+          )}
+        >
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                onClick={() => onView(archive)}
+                aria-label={t('archiveCard.viewContents')}
+                className="text-emerald-500/60 hover:text-emerald-600 hover:bg-emerald-500/10 dark:text-emerald-500/50 dark:hover:text-emerald-400 dark:hover:bg-emerald-500/12 size-7 rounded-[6px]"
+              >
+                <FolderOpen size={15} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('archiveCard.viewContents')}</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                onClick={() => onRestore(archive)}
+                aria-label={t('archiveCard.restore')}
+                className="text-amber-500/60 hover:text-amber-600 hover:bg-amber-500/10 dark:text-amber-500/50 dark:hover:text-amber-400 dark:hover:bg-amber-500/12 size-7 rounded-[6px]"
+              >
+                <RotateCcw size={15} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('archiveCard.restore')}</TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                onClick={() => onMount(archive)}
+                disabled={mountDisabled}
+                aria-label={t('archiveCard.mount')}
+                className="text-sky-500/60 hover:text-sky-600 hover:bg-sky-500/10 dark:text-sky-500/50 dark:hover:text-sky-400 dark:hover:bg-sky-500/12 size-7 rounded-[6px] disabled:opacity-30"
+              >
+                <HardDrive size={15} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('archiveCard.mount')}</TooltipContent>
+          </Tooltip>
+
+          {canDelete && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon-sm"
+                  variant="ghost"
+                  onClick={() => onDelete(archive.name)}
+                  aria-label={t('archiveCard.delete')}
+                  className="text-destructive/50 hover:text-destructive hover:bg-destructive/10 dark:text-destructive/40 dark:hover:text-destructive dark:hover:bg-destructive/12 size-7 rounded-[6px]"
+                >
+                  <Trash2 size={15} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t('archiveCard.delete')}</TooltipContent>
+            </Tooltip>
+          )}
+        </div>
+      </div>
+    </TooltipProvider>
   )
 }

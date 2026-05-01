@@ -1,23 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-  Stack,
-  Box,
-  Skeleton,
-  IconButton,
-  alpha,
-} from '@mui/material'
-import ResponsiveDialog from './ResponsiveDialog'
-import { FolderOpen, Folder, FileText, Inbox } from 'lucide-react'
+import { FolderOpen, Folder, FileText, Inbox, Download } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { BorgApiClient, type Repository } from '../services/borgApi/client'
 import { Archive } from '../types'
 import { formatDateCompact, formatBytes as formatBytesUtil } from '../utils/dateUtils'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface ArchiveContentsDialogProps {
   open: boolean
@@ -133,318 +129,166 @@ export default function ArchiveContentsDialog({
   const { folders, files } = getFilesInCurrentPath()
 
   return (
-    <ResponsiveDialog
-      open={open}
-      onClose={onClose}
-      maxWidth="md"
-      fullWidth
-      PaperProps={{
-        sx: {
-          maxHeight: '80vh',
-        },
-      }}
-    >
-      <DialogTitle>
-        <Stack direction="row" alignItems="center" spacing={2}>
-          <FolderOpen size={24} />
-          <Box>
-            <Typography variant="h6" fontWeight={600}>
-              {t('archiveContents.title')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {archive?.name}
-            </Typography>
-          </Box>
-        </Stack>
-      </DialogTitle>
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose() }}>
       <DialogContent
-        dividers
-        sx={{
-          height: 600,
-          display: 'flex',
-          flexDirection: 'column',
-        }}
+        showCloseButton={false}
+        className="max-w-2xl w-full p-0 gap-0 overflow-hidden max-h-[85vh] flex flex-col"
       >
-        <Stack spacing={2} sx={{ height: '100%', overflow: 'hidden' }}>
-          {/* Breadcrumb Navigation — always visible, updates immediately on navigation */}
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: 0.5,
-              flexShrink: 0,
-            }}
-          >
+        <DialogHeader className="px-4 pt-4 pb-3 border-b shrink-0">
+          <div className="flex items-center gap-3">
+            <FolderOpen size={24} className="text-muted-foreground shrink-0" />
+            <div>
+              <DialogTitle className="text-base font-semibold">
+                {t('archiveContents.title')}
+              </DialogTitle>
+              <p className="text-sm text-muted-foreground mt-0.5">{archive?.name}</p>
+            </div>
+          </div>
+        </DialogHeader>
+
+        <div className="flex flex-col flex-1 overflow-hidden">
+          {/* Breadcrumb Navigation */}
+          <div className="flex items-center flex-wrap gap-1 px-4 py-2 border-b shrink-0">
             {getBreadcrumbs().map((crumb, index) => (
               <React.Fragment key={crumb.path}>
                 {index > 0 && (
-                  <Typography variant="body2" color="text.secondary">
-                    /
-                  </Typography>
+                  <span className="text-sm text-muted-foreground">/</span>
                 )}
-                <Typography
-                  variant="body2"
+                <button
+                  type="button"
                   onClick={() => navigateToPath(crumb.path)}
-                  sx={{
-                    cursor: 'pointer',
-                    color: 'primary.main',
-                    textDecoration: 'underline',
-                    '&:hover': { color: 'primary.dark' },
-                  }}
+                  className="text-sm text-primary underline hover:text-primary/80 cursor-pointer"
                 >
                   {crumb.label}
-                </Typography>
+                </button>
               </React.Fragment>
             ))}
-          </Box>
+          </div>
 
-          {/* Content area — skeleton while loading, list or empty state when ready */}
-          <Box sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          {/* Content area */}
+          <div className="flex-1 overflow-hidden flex flex-col">
             {isFetching ? (
-              <Stack spacing={0.5}>
+              <div className="space-y-1 p-3">
                 {[
-                  { width: '55%', isFolder: true },
-                  { width: '40%', isFolder: true },
-                  { width: '70%', isFolder: true },
-                  { width: '62%', isFolder: false },
-                  { width: '48%', isFolder: false },
-                  { width: '75%', isFolder: false },
-                  { width: '33%', isFolder: false },
+                  { width: 'w-[55%]', isFolder: true },
+                  { width: 'w-[40%]', isFolder: true },
+                  { width: 'w-[70%]', isFolder: true },
+                  { width: 'w-[62%]', isFolder: false },
+                  { width: 'w-[48%]', isFolder: false },
+                  { width: 'w-[75%]', isFolder: false },
+                  { width: 'w-[33%]', isFolder: false },
                 ].map((row, i) => (
-                  <Box
+                  <div
                     key={i}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1.5,
-                      p: 1.5,
-                      borderRadius: 1,
-                      bgcolor: (theme) =>
-                        row.isFolder ? alpha(theme.palette.primary.main, 0.05) : 'action.hover',
-                    }}
+                    className={`flex items-center gap-3 p-3 rounded-md ${row.isFolder ? 'bg-primary/5' : 'bg-muted/50'}`}
                   >
-                    <Skeleton variant="rounded" width={20} height={20} sx={{ flexShrink: 0 }} />
-                    <Skeleton variant="text" sx={{ flex: 1, maxWidth: row.width }} />
-                    <Skeleton variant="text" width={52} />
-                  </Box>
+                    <Skeleton className="size-5 shrink-0 rounded" />
+                    <Skeleton className={`h-4 flex-1 ${row.width}`} />
+                    <Skeleton className="h-4 w-12" />
+                  </div>
                 ))}
-              </Stack>
+              </div>
             ) : archiveContents?.data?.items ? (
               archiveContents.data.items.length > 0 ? (
-                <Box sx={{ flex: 1, overflow: 'hidden' }}>
-                  <Box sx={{ height: '100%', overflowY: 'auto' }}>
-                    {folders.length === 0 && files.length === 0 ? (
-                      <Box sx={{ textAlign: 'center', py: 4 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          {t('archiveContents.emptyDirectory')}
-                        </Typography>
-                      </Box>
-                    ) : (
-                      <Stack spacing={0.5}>
-                        {/* Folders */}
-                        {folders.map((folder, index) => (
-                          <Box
-                            key={`folder-${index}`}
-                            onClick={() => navigateToPath(folder.path)}
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              p: 1.5,
-                              borderRadius: 1,
-                              cursor: 'pointer',
-                              userSelect: 'none',
-                              backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.1),
-                              '&:hover': {
-                                backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.2),
-                              },
-                            }}
-                          >
-                            <Stack
-                              direction="row"
-                              spacing={1.5}
-                              alignItems="center"
-                              sx={{ color: 'text.primary', flex: 1 }}
-                            >
-                              <Folder size={20} />
-                              <Typography variant="body2" fontWeight={500}>
-                                {folder.name}
-                              </Typography>
-                            </Stack>
-                            {folder.size !== null && folder.size !== undefined ? (
-                              <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
-                                {formatBytesUtil(folder.size)}
-                              </Typography>
-                            ) : null}
-                          </Box>
-                        ))}
+                <div className="flex-1 overflow-y-auto">
+                  {folders.length === 0 && files.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-sm text-muted-foreground">
+                        {t('archiveContents.emptyDirectory')}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="space-y-1 p-3">
+                      {/* Folders */}
+                      {folders.map((folder, index) => (
+                        <div
+                          key={`folder-${index}`}
+                          onClick={() => navigateToPath(folder.path)}
+                          className="flex items-center justify-between p-3 rounded-md cursor-pointer select-none bg-primary/10 hover:bg-primary/20 transition-colors"
+                        >
+                          <div className="flex items-center gap-3 text-foreground flex-1">
+                            <Folder size={20} />
+                            <span className="text-sm font-medium">{folder.name}</span>
+                          </div>
+                          {folder.size !== null && folder.size !== undefined ? (
+                            <span className="text-sm text-muted-foreground ml-2">
+                              {formatBytesUtil(folder.size)}
+                            </span>
+                          ) : null}
+                        </div>
+                      ))}
 
-                        {/* Files */}
-                        {files.map((file, index) => (
-                          <Box
-                            key={`file-${index}`}
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              p: 1.5,
-                              borderRadius: 1,
-                              userSelect: 'none',
-                              backgroundColor: 'action.hover',
-                              '&:hover': {
-                                backgroundColor: 'action.selected',
-                              },
-                            }}
-                          >
-                            <Stack
-                              direction="row"
-                              spacing={1.5}
-                              alignItems="center"
-                              sx={{ flex: 1, minWidth: 0, color: 'text.primary' }}
-                            >
-                              <FileText size={20} />
-                              <Typography
-                                variant="body2"
-                                sx={{
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                  whiteSpace: 'nowrap',
+                      {/* Files */}
+                      {files.map((file, index) => (
+                        <div
+                          key={`file-${index}`}
+                          className="flex items-center justify-between p-3 rounded-md select-none bg-muted/50 hover:bg-muted transition-colors"
+                        >
+                          <div className="flex items-center gap-3 flex-1 min-w-0 text-foreground">
+                            <FileText size={20} />
+                            <span className="text-sm overflow-hidden text-ellipsis whitespace-nowrap">
+                              {file.name}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-4 shrink-0">
+                            <span className="text-sm text-muted-foreground min-w-[165px] text-right font-mono text-[0.8rem] whitespace-nowrap">
+                              {file.mtime ? formatDateCompact(file.mtime) : '-'}
+                            </span>
+                            <span className="text-sm text-muted-foreground w-20 text-right">
+                              {file.size ? formatBytesUtil(file.size) : '0 B'}
+                            </span>
+                            {onDownloadFile && (
+                              <button
+                                type="button"
+                                title={t('archiveContents.downloadFile')}
+                                className="text-muted-foreground hover:text-foreground transition-colors"
+                                onClick={() => {
+                                  if (archive) {
+                                    onDownloadFile(archive.name, file.path)
+                                  }
                                 }}
                               >
-                                {file.name}
-                              </Typography>
-                            </Stack>
-                            <Stack direction="row" spacing={2} alignItems="center">
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                                sx={{
-                                  minWidth: 165,
-                                  textAlign: 'right',
-                                  fontFamily: 'monospace',
-                                  fontSize: '0.8rem',
-                                  whiteSpace: 'nowrap',
-                                }}
-                              >
-                                {file.mtime ? formatDateCompact(file.mtime) : '-'}
-                              </Typography>
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                                sx={{ width: 80, textAlign: 'right' }}
-                              >
-                                {file.size ? formatBytesUtil(file.size) : '0 B'}
-                              </Typography>
-                              {onDownloadFile && (
-                                <IconButton
-                                  size="small"
-                                  sx={{ color: 'text.secondary' }}
-                                  onClick={() => {
-                                    if (archive) {
-                                      onDownloadFile(archive.name, file.path)
-                                    }
-                                  }}
-                                  title={t('archiveContents.downloadFile')}
-                                >
-                                  <svg
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                  >
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                    <polyline points="7 10 12 15 17 10" />
-                                    <line x1="12" y1="15" x2="12" y2="3" />
-                                  </svg>
-                                </IconButton>
-                              )}
-                            </Stack>
-                          </Box>
-                        ))}
-                      </Stack>
-                    )}
-                  </Box>
-                </Box>
+                                <Download size={16} />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ) : (
-                <Box
-                  sx={{
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    textAlign: 'center',
-                    py: 4,
-                    px: 3,
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: 72,
-                      height: 72,
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      bgcolor: (theme) => alpha(theme.palette.text.secondary, 0.08),
-                      mb: 2.5,
-                    }}
-                  >
-                    <Inbox size={32} style={{ opacity: 0.5 }} />
-                  </Box>
-                  <Typography variant="h6" fontWeight={600} gutterBottom>
+                <div className="flex-1 flex flex-col items-center justify-center text-center py-8 px-6">
+                  <div className="size-[72px] rounded-full flex items-center justify-center bg-muted mb-5">
+                    <Inbox size={32} className="opacity-50" />
+                  </div>
+                  <h3 className="text-base font-semibold mb-1">
                     {t('archiveContents.emptyArchive')}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ maxWidth: 380, lineHeight: 1.7 }}
-                  >
+                  </h3>
+                  <p className="text-sm text-muted-foreground max-w-[380px] leading-relaxed">
                     {t('archiveContents.emptyArchiveDesc')}
-                  </Typography>
-                </Box>
+                  </p>
+                </div>
               )
             ) : (
-              <Box
-                sx={{
-                  flex: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  textAlign: 'center',
-                  py: 4,
-                  px: 3,
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 72,
-                    height: 72,
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    bgcolor: (theme) => alpha(theme.palette.text.secondary, 0.08),
-                    mb: 2.5,
-                  }}
-                >
-                  <Inbox size={32} style={{ opacity: 0.5 }} />
-                </Box>
-                <Typography variant="body1" color="text.secondary">
+              <div className="flex-1 flex flex-col items-center justify-center text-center py-8 px-6">
+                <div className="size-[72px] rounded-full flex items-center justify-center bg-muted mb-5">
+                  <Inbox size={32} className="opacity-50" />
+                </div>
+                <p className="text-sm text-muted-foreground">
                   {t('archiveContents.noInfo')}
-                </Typography>
-              </Box>
+                </p>
+              </div>
             )}
-          </Box>
-        </Stack>
+          </div>
+        </div>
+
+        <DialogFooter className="hidden md:flex px-4 py-3 border-t">
+          <Button variant="outline" onClick={onClose}>
+            {t('common.buttons.close')}
+          </Button>
+        </DialogFooter>
       </DialogContent>
-      <DialogActions sx={{ display: { xs: 'none', md: 'flex' } }}>
-        <Button onClick={onClose}>{t('common.buttons.close')}</Button>
-      </DialogActions>
-    </ResponsiveDialog>
+    </Dialog>
   )
 }

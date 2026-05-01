@@ -98,7 +98,7 @@ describe('ArchiveContentsDialog', () => {
     )
 
     await waitFor(() => {
-      expect(document.querySelectorAll('.MuiSkeleton-root').length).toBeGreaterThan(0)
+      expect(document.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(0)
     })
   })
 

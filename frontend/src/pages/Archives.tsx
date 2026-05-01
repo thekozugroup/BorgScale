@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useLocation, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Box, Typography, useTheme, alpha } from '@mui/material'
 import { Folder } from 'lucide-react'
 import { repositoriesAPI, mountsAPI, restoreAPI } from '../services/api'
 import { useRepositoryStats } from '../hooks/useRepositoryStats'
@@ -52,8 +51,6 @@ function normalizeRepositoryId(value: number | string | null | undefined): numbe
 
 const Archives: React.FC = () => {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
   const [searchParams, setSearchParams] = useSearchParams()
   const [selectedRepositoryId, setSelectedRepositoryId] = useState<number | null>(() => {
     return normalizeRepositoryId(searchParams.get('repo'))
@@ -137,7 +134,7 @@ const Archives: React.FC = () => {
   const { data: restoreJobsData } = useQuery({
     queryKey: ['restore-jobs'],
     queryFn: restoreAPI.getRestoreJobs,
-    refetchInterval: 3000, // Refresh every 3 seconds for live progress
+    refetchInterval: 3000,
   })
 
   // Handle repo info error
@@ -157,9 +154,7 @@ const Archives: React.FC = () => {
     mutationFn: ({ archive }: { repository: string; archive: string }) =>
       new BorgApiClient(selectedRepository!).deleteArchive(archive),
     onSuccess: (data) => {
-      // Backend now returns job_id for background deletion
       toast.success(t('archives.deletionStarted', { id: data.data.job_id }))
-      // Refresh archives list and repository stats after a delay to allow deletion to complete
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['repository-archives', selectedRepositoryId] })
         queryClient.invalidateQueries({ queryKey: ['repository-info', selectedRepositoryId] })
@@ -210,9 +205,7 @@ const Archives: React.FC = () => {
       if (isMountTimeout) {
         toast.error(t('archives.mountTimeout'), {
           duration: 10000,
-          style: {
-            maxWidth: '500px',
-          },
+          style: { maxWidth: '500px' },
         })
       } else {
         toast.error(t('archives.mountFailed', { error: errorDetail }))
@@ -249,9 +242,7 @@ const Archives: React.FC = () => {
         destination_connection_id
       ),
     onSuccess: (_response, variables) => {
-      toast.success(t('archives.restoreStarted'), {
-        duration: 6000, // Show longer so user can read it
-      })
+      toast.success(t('archives.restoreStarted'), { duration: 6000 })
       trackArchive(EventAction.START, selectedRepository || undefined, {
         operation: 'restore',
         destination_type: variables.destination_type,
@@ -284,7 +275,6 @@ const Archives: React.FC = () => {
     } else {
       setSearchParams({}, { replace: true })
     }
-    // Track archive listing (selecting a repo to filter/list its archives)
     if (repo) {
       trackArchive(EventAction.FILTER, repo, { surface: 'archives_page' })
     }
@@ -316,7 +306,6 @@ const Archives: React.FC = () => {
   // Open mount dialog
   const openMountDialog = (archive: Archive) => {
     setMountDialogArchive(archive)
-    // Pre-fill with archive name (sanitized for filesystem)
     setCustomMountPoint(getDefaultMountPoint(archive.name))
   }
 
@@ -341,12 +330,10 @@ const Archives: React.FC = () => {
       return
     }
 
-    // Determine destination based on restore strategy
     let destinationPath: string
     if (data.restore_strategy === 'custom' && data.custom_path) {
       destinationPath = data.custom_path
     } else {
-      // For "original location", extract to root (/)
       destinationPath = '/'
     }
 
@@ -364,7 +351,6 @@ const Archives: React.FC = () => {
   }
 
   useEffect(() => {
-    // Handle incoming navigation state (from "View Archives" button)
     const stateRepoId = normalizeRepositoryId(
       (location.state as { repositoryId?: number | string | null } | null)?.repositoryId
     )
@@ -376,7 +362,6 @@ const Archives: React.FC = () => {
   }, [location.state, setSearchParams])
 
   const archivesList = (archives?.data?.archives || []).sort((a: Archive, b: Archive) => {
-    // Sort by start date (borg1) or time (borg2), latest first
     return new Date(b.start || b.time).getTime() - new Date(a.start || a.time).getTime()
   })
 
@@ -386,7 +371,6 @@ const Archives: React.FC = () => {
   const lastRestoreJob = React.useMemo(() => {
     if (!selectedRepository || !restoreJobsData?.data?.jobs) return null
 
-    // Filter restore jobs for this repository and get the most recent one
     const repoJobs = restoreJobsData.data.jobs.filter(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (job: any) => job.repository === selectedRepository.path
@@ -406,7 +390,6 @@ const Archives: React.FC = () => {
   }
 
   const handleRestoreArchive = (archive: Archive) => {
-    // Open restore wizard flow instead of navigating to separate page
     handleRestoreArchiveClick(archive)
   }
 
@@ -432,34 +415,15 @@ const Archives: React.FC = () => {
     },
   })
 
-  const panelSx = {
-    borderRadius: 3,
-    border: '1px solid',
-    borderColor: isDark ? alpha('#fff', 0.07) : alpha('#000', 0.07),
-    overflow: 'hidden',
-  }
-
   return (
-    <Box>
-      {/* ── Compact header: title + repo selector inline ── */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: { xs: 'flex-start', sm: 'center' },
-          flexDirection: { xs: 'column', sm: 'row' },
-          gap: 2,
-          mb: 3,
-        }}
-      >
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography variant="h5" fontWeight={700} sx={{ lineHeight: 1.3 }}>
-            {t('archives.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('archives.subtitle')}
-          </Typography>
-        </Box>
-        <Box sx={{ width: { xs: '100%', sm: '340px' }, flexShrink: 0 }}>
+    <div>
+      {/* Header: title + repo selector inline */}
+      <div className="flex items-start sm:items-center flex-col sm:flex-row gap-4 mb-6">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl font-bold leading-snug">{t('archives.title')}</h1>
+          <p className="text-sm text-muted-foreground">{t('archives.subtitle')}</p>
+        </div>
+        <div className="w-full sm:w-[340px] shrink-0">
           <RepositorySelectorCard
             repositories={repositories}
             value={selectedRepositoryId}
@@ -467,35 +431,27 @@ const Archives: React.FC = () => {
             loading={loadingRepositories}
             sx={{ mb: 0 }}
           />
-        </Box>
-      </Box>
+        </div>
+      </div>
 
-      {/* ── No repository selected ── */}
+      {/* No repository selected */}
       {!selectedRepositoryId && !loadingRepositories && (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            py: 8,
-            color: 'text.secondary',
-          }}
-        >
-          <Folder size={48} style={{ marginBottom: 16 }} />
-          <Typography variant="body1" color="text.secondary">
+        <div className="flex flex-col items-center py-16 text-muted-foreground">
+          <Folder size={48} className="mb-4" />
+          <p className="text-sm">
             {repositories.length === 0
               ? t('archives.noRepositories')
               : t('archives.selectRepository')}
-          </Typography>
-        </Box>
+          </p>
+        </div>
       )}
 
-      {/* ── Context panel: stats + last restore ── */}
+      {/* Context panel: stats + last restore */}
       {selectedRepositoryId &&
         (loadingRepoInfo || repositoryStats || restoreJobsData?.data?.jobs) && (
-          <Box sx={{ ...panelSx, mb: 3 }}>
+          <div className="rounded-2xl border border-neutral-200/70 dark:border-neutral-700/40 overflow-hidden mb-6">
             {/* Stats */}
-            <Box sx={{ p: 2.5 }}>
+            <div className="p-5">
               {loadingRepoInfo ? (
                 <RepositoryStatsGridSkeleton />
               ) : repositoryStats ? (
@@ -506,25 +462,17 @@ const Archives: React.FC = () => {
                   archivesLoading={loadingArchives || repoInfoPending}
                 />
               ) : null}
-            </Box>
+            </div>
             {/* Last Restore */}
             {restoreJobsData?.data?.jobs && (
-              <Box
-                sx={{
-                  px: 2.5,
-                  py: 2,
-                  borderTop: '1px solid',
-                  borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.06),
-                  bgcolor: isDark ? alpha('#fff', 0.012) : alpha('#000', 0.01),
-                }}
-              >
+              <div className="px-5 py-4 border-t border-neutral-100 dark:border-neutral-800/50 bg-neutral-50/50 dark:bg-neutral-900/20">
                 <LastRestoreSection restoreJob={lastRestoreJob} />
-              </Box>
+              </div>
             )}
-          </Box>
+          </div>
         )}
 
-      {/* ── Archives list ── */}
+      {/* Archives list */}
       {selectedRepositoryId && (
         <ArchivesList
           archives={archivesList}
@@ -594,7 +542,6 @@ const Archives: React.FC = () => {
           repositoryName={lockError.repositoryName}
           borgVersion={lockError.borgVersion}
           onLockBroken={() => {
-            // Invalidate queries to retry
             queryClient.invalidateQueries({
               queryKey: ['repository-archives', lockError.repositoryId],
             })
@@ -614,7 +561,7 @@ const Archives: React.FC = () => {
           onRestore={handleRestoreFromWizard}
         />
       )}
-    </Box>
+    </div>
   )
 }
 

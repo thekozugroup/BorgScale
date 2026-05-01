@@ -1,27 +1,22 @@
-import React, { useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Box,
-  Typography,
-  TablePagination,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Chip,
-  alpha,
-  useTheme,
-  Skeleton,
-} from '@mui/material'
 import {
   FolderOpen,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Calendar,
   Archive as ArchiveIcon,
   List,
   Layers,
+  ChevronUp,
 } from 'lucide-react'
 import ArchiveCard from './ArchiveCard'
 import ArchiveCardSkeleton from './ArchiveCardSkeleton'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import { Archive } from '../types'
 import {
   groupArchivesByTime,
@@ -59,7 +54,6 @@ export default function ArchivesList({
   defaultRowsPerPage = 10,
   rowsPerPageOptions = [5, 10, 25, 50, 100],
 }: ArchivesListProps) {
-  // Load saved preferences from localStorage
   const getInitialRowsPerPage = () => {
     const saved = localStorage.getItem('archives-list-rows-per-page')
     if (saved) {
@@ -83,7 +77,7 @@ export default function ArchivesList({
     const saved = localStorage.getItem('archives-list-grouping-enabled')
     if (saved === 'true') return true
     if (saved === 'false') return false
-    return false // Default to false (flat list)
+    return false
   }
 
   const getInitialExpandedGroups = (): Set<TimeGroup> => {
@@ -93,10 +87,9 @@ export default function ArchivesList({
         const parsed = JSON.parse(saved) as TimeGroup[]
         return new Set(parsed)
       } catch {
-        // Fall through to defaults
+        // fall through
       }
     }
-    // Default: today and yesterday expanded
     return new Set(['today', 'yesterday'])
   }
 
@@ -109,11 +102,7 @@ export default function ArchivesList({
   }
 
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
-  const desktopGridTemplate = 'minmax(0, 1fr) 76px minmax(180px, 220px) 132px'
 
-  // State
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(getInitialRowsPerPage)
   const [sortBy, setSortBy] = useState<SortOption>(getInitialSortBy)
@@ -121,36 +110,31 @@ export default function ArchivesList({
   const [expandedGroups, setExpandedGroups] = useState<Set<TimeGroup>>(getInitialExpandedGroups)
   const [filter, setFilter] = useState<FilterType>(getInitialFilter)
 
-  // Filter and sort archives
   const sortedArchives = useMemo(() => {
-    // Apply filter first
     const filtered = filterArchivesByType(archives, filter)
-    // When grouping is enabled, always sort by date-desc for proper grouping
     const effectiveSortBy = groupingEnabled ? 'date-desc' : sortBy
     return sortArchives(filtered, effectiveSortBy)
   }, [archives, filter, sortBy, groupingEnabled])
 
-  // Group archives
   const groupedArchives = useMemo(() => {
     if (!groupingEnabled) return null
     const grouped = groupArchivesByTime(sortedArchives)
     return getGroupsArray(grouped)
   }, [sortedArchives, groupingEnabled])
 
-  // Handlers
   const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage)
   }
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newRowsPerPage = parseInt(event.target.value, 10)
+  const handleChangeRowsPerPage = (value: string) => {
+    const newRowsPerPage = parseInt(value, 10)
     setRowsPerPage(newRowsPerPage)
     setPage(0)
     localStorage.setItem('archives-list-rows-per-page', String(newRowsPerPage))
   }
 
-  const handleSortChange = (event: { target: { value: string } }) => {
-    const newSort = event.target.value as SortOption
+  const handleSortChange = (value: string) => {
+    const newSort = value as SortOption
     setSortBy(newSort)
     setPage(0)
     localStorage.setItem('archives-list-sort-by', newSort)
@@ -167,473 +151,259 @@ export default function ArchivesList({
     localStorage.setItem('archives-list-expanded-groups', JSON.stringify(Array.from(newExpanded)))
   }
 
-  const handleViewModeChange = (_event: React.MouseEvent<HTMLElement>, newMode: string | null) => {
-    if (newMode !== null) {
-      const enabled = newMode === 'grouped'
-      setGroupingEnabled(enabled)
-      setPage(0)
-      localStorage.setItem('archives-list-grouping-enabled', String(enabled))
-    }
+  const handleViewModeChange = (mode: 'grouped' | 'flat') => {
+    const enabled = mode === 'grouped'
+    setGroupingEnabled(enabled)
+    setPage(0)
+    localStorage.setItem('archives-list-grouping-enabled', String(enabled))
   }
 
-  const handleFilterChange = (event: { target: { value: string } }) => {
-    const filterValue = event.target.value as FilterType
+  const handleFilterChange = (value: string) => {
+    const filterValue = value as FilterType
     setFilter(filterValue)
     setPage(0)
     localStorage.setItem('archives-list-filter', filterValue)
   }
 
+  // Table header for flat view
   const tableHeader = (
-    <Box
-      sx={{
-        display: { xs: 'none', md: 'grid' },
-        gridTemplateColumns: desktopGridTemplate,
-        alignItems: 'center',
-        gap: 1,
-        px: 2,
-        py: 1,
-        bgcolor: isDark ? alpha('#fff', 0.03) : alpha('#000', 0.02),
-        borderBottom: '1px solid',
-        borderBottomColor: isDark ? alpha('#fff', 0.08) : alpha('#000', 0.08),
-        fontSize: '0.65rem',
-        fontWeight: 600,
-        textTransform: 'uppercase',
-        letterSpacing: '0.06em',
-        color: 'text.disabled',
-      }}
+    <div
+      className={cn(
+        'hidden md:grid grid-cols-[minmax(0,1fr)_76px_minmax(180px,220px)_132px] items-center gap-2',
+        'px-4 py-2 bg-neutral-50/80 dark:bg-neutral-900/30',
+        'border-b border-b-neutral-200 dark:border-b-neutral-700/60',
+        'text-[0.65rem] font-semibold uppercase tracking-widest text-muted-foreground'
+      )}
     >
       <span>{t('archivesList.columnArchive', 'Archive')}</span>
       <span>{t('archivesList.columnType', 'Type')}</span>
       <span>{t('archivesList.columnDate', 'Date')}</span>
-      <Box sx={{ textAlign: 'right' }}>{t('archivesList.columnActions', 'Actions')}</Box>
-    </Box>
+      <span className="text-right">{t('archivesList.columnActions', 'Actions')}</span>
+    </div>
   )
 
   // Loading State
   if (loading) {
     return (
-      <Box>
-        {/* Header bar skeleton — mirrors the real header exactly */}
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            justifyContent: 'space-between',
-            alignItems: { xs: 'flex-start', sm: 'center' },
-            gap: { xs: 1.5, sm: 1 },
-            px: 2,
-            py: 1.25,
-            mb: 2.5,
-            borderRadius: 2,
-            bgcolor: isDark
-              ? alpha(theme.palette.primary.main, 0.1)
-              : alpha(theme.palette.primary.main, 0.06),
-            border: '1px solid',
-            borderColor: isDark
-              ? alpha(theme.palette.primary.main, 0.2)
-              : alpha(theme.palette.primary.main, 0.15),
-          }}
+      <div>
+        {/* Header skeleton */}
+        <div
+          className={cn(
+            'flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-2',
+            'px-4 py-[10px] mb-5 rounded-lg',
+            'bg-primary/6 dark:bg-primary/10',
+            'border border-primary/15 dark:border-primary/20'
+          )}
         >
-          <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.25 }}>
-            <Skeleton variant="rounded" width={64} height={19} sx={{ borderRadius: 1 }} />
-            <Skeleton variant="rounded" width={22} height={20} sx={{ borderRadius: 1 }} />
-          </Box>
-          <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-            <Skeleton variant="rounded" width={72} height={20} sx={{ borderRadius: 1.5 }} />
-            <Skeleton variant="rounded" width={60} height={20} sx={{ borderRadius: 1.5 }} />
-            <Skeleton variant="rounded" width={72} height={20} sx={{ borderRadius: 1.5 }} />
-            <Skeleton variant="rounded" width={44} height={20} sx={{ borderRadius: 1.5 }} />
-            <Skeleton variant="rounded" width={44} height={20} sx={{ borderRadius: 1.5 }} />
-          </Box>
-        </Box>
-        <Box
-          sx={{
-            borderRadius: 3,
-            border: '1px solid',
-            borderColor: isDark ? alpha('#fff', 0.07) : alpha('#000', 0.07),
-            overflow: 'hidden',
-          }}
-        >
+          <div className="flex items-baseline gap-3">
+            <Skeleton className="h-[19px] w-16 rounded" />
+            <Skeleton className="h-5 w-5.5 rounded" />
+          </div>
+          <div className="flex gap-1.5 items-center flex-wrap">
+            <Skeleton className="h-5 w-16 rounded-full" />
+            <Skeleton className="h-5 w-14 rounded-full" />
+            <Skeleton className="h-5 w-16 rounded-full" />
+            <Skeleton className="h-5 w-11 rounded-full" />
+            <Skeleton className="h-5 w-11 rounded-full" />
+          </div>
+        </div>
+        <div className="rounded-2xl border border-neutral-200/70 dark:border-neutral-700/40 overflow-hidden">
           {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
             <ArchiveCardSkeleton key={i} index={i} />
           ))}
-        </Box>
-      </Box>
+        </div>
+      </div>
     )
   }
 
   // Empty State
   if (archives.length === 0) {
     return (
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          textAlign: 'center',
-          py: 8,
-          color: 'text.secondary',
-        }}
-      >
-        <FolderOpen size={48} style={{ marginBottom: 16 }} />
-        <Typography variant="body1" color="text.secondary">
-          {t('archivesList.empty')}
-        </Typography>
-      </Box>
+      <div className="flex flex-col items-center text-center py-16 text-muted-foreground">
+        <FolderOpen size={48} className="mb-4" />
+        <p className="text-sm">{t('archivesList.empty')}</p>
+      </div>
     )
   }
 
-  // Archives List
+  // Pill button helper
+  const pillCls = (active: boolean, colorActive?: string) =>
+    cn(
+      'flex items-center gap-1 px-3 py-1 rounded-xl border cursor-pointer select-none text-[0.72rem] font-semibold transition-all duration-150',
+      active
+        ? colorActive
+          ? colorActive
+          : 'border-neutral-400/40 dark:border-neutral-500/40 bg-neutral-100/80 dark:bg-neutral-700/50 text-foreground'
+        : 'border-neutral-200 dark:border-neutral-700/60 bg-transparent text-muted-foreground hover:border-neutral-300 dark:hover:border-neutral-600 hover:text-foreground'
+    )
+
   return (
-    <Box>
-      {/* Sticky panel header: title + count + controls */}
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          justifyContent: 'space-between',
-          alignItems: { xs: 'flex-start', sm: 'center' },
-          gap: { xs: 1.5, sm: 1 },
-          px: 2,
-          py: 1.25,
-          mb: 2.5,
-          borderRadius: 2,
-          bgcolor: isDark
-            ? alpha(theme.palette.primary.main, 0.1)
-            : alpha(theme.palette.primary.main, 0.06),
-          border: '1px solid',
-          borderColor: isDark
-            ? alpha(theme.palette.primary.main, 0.2)
-            : alpha(theme.palette.primary.main, 0.15),
-        }}
+    <div>
+      {/* Panel header */}
+      <div
+        className={cn(
+          'flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-2',
+          'px-4 py-[10px] mb-5 rounded-lg',
+          'bg-primary/6 dark:bg-primary/10',
+          'border border-primary/15 dark:border-primary/20'
+        )}
       >
-        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.25, flexShrink: 0 }}>
-          <Typography variant="h6" fontWeight={700} sx={{ fontSize: '0.95rem' }}>
-            Archives
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{
-              fontSize: '0.72rem',
-              fontWeight: 600,
-              px: 0.75,
-              py: 0.2,
-              borderRadius: 1,
-              bgcolor: isDark ? alpha('#fff', 0.08) : alpha('#000', 0.06),
-              color: 'text.secondary',
-              lineHeight: 1.6,
-            }}
+        <div className="flex items-baseline gap-3 shrink-0">
+          <span className="text-[0.95rem] font-bold">Archives</span>
+          <span
+            className={cn(
+              'text-[0.72rem] font-semibold px-1.5 py-0.5 rounded',
+              'bg-neutral-100 dark:bg-neutral-700/60 text-muted-foreground leading-[1.6]'
+            )}
           >
             {filter === 'all' || sortedArchives.length === archives.length
               ? archives.length
               : `${sortedArchives.length}/${archives.length}`}
-          </Typography>
-        </Box>
+          </span>
+        </div>
 
-        {/* View controls */}
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            gap: 1,
-            alignItems: 'center',
-            width: { xs: '100%', sm: 'auto' },
-          }}
-        >
+        <div className="flex flex-row flex-wrap gap-2 items-center w-full sm:w-auto">
           {/* Sort group — flat view only */}
           {!groupingEnabled && (
             <>
-              <Box
-                sx={{
-                  display: 'flex',
-                  gap: 0.5,
-                  alignItems: 'center',
-                }}
-              >
-                {(['date-desc', 'date-asc'] as SortOption[]).map((opt) => {
-                  const active = sortBy === opt
-                  return (
-                    <Box
-                      key={opt}
-                      onClick={() => handleSortChange({ target: { value: opt } })}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.5,
-                        px: 1.25,
-                        py: 0.5,
-                        borderRadius: 1.5,
-                        border: '1px solid',
-                        cursor: 'pointer',
-                        userSelect: 'none',
-                        fontSize: '0.72rem',
-                        fontWeight: 600,
-                        transition: 'all 150ms',
-                        borderColor: active
-                          ? alpha(theme.palette.primary.main, isDark ? 0.45 : 0.35)
-                          : isDark
-                            ? alpha('#fff', 0.1)
-                            : alpha('#000', 0.1),
-                        bgcolor: active
-                          ? alpha(theme.palette.primary.main, isDark ? 0.14 : 0.08)
-                          : 'transparent',
-                        color: active ? 'primary.main' : 'text.secondary',
-                        '&:hover': {
-                          borderColor: alpha(theme.palette.primary.main, 0.35),
-                          color: 'primary.main',
-                        },
-                      }}
-                    >
-                      {opt === 'date-desc'
-                        ? t('archivesList.newestFirst')
-                        : t('archivesList.oldestFirst')}
-                    </Box>
-                  )
-                })}
-              </Box>
-              {/* Group divider */}
-              <Box
-                sx={{
-                  width: '1px',
-                  alignSelf: 'stretch',
-                  bgcolor: isDark ? alpha('#fff', 0.08) : alpha('#000', 0.08),
-                  flexShrink: 0,
-                  display: { xs: 'none', sm: 'block' },
-                }}
-              />
+              <div className="flex gap-1 items-center">
+                {(['date-desc', 'date-asc'] as SortOption[]).map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => handleSortChange(opt)}
+                    className={pillCls(
+                      sortBy === opt,
+                      'border-primary/35 dark:border-primary/45 bg-primary/8 dark:bg-primary/14 text-primary'
+                    )}
+                  >
+                    {opt === 'date-desc'
+                      ? t('archivesList.newestFirst')
+                      : t('archivesList.oldestFirst')}
+                  </button>
+                ))}
+              </div>
+              <div className="hidden sm:block w-px self-stretch bg-neutral-200 dark:bg-neutral-700/60 shrink-0" />
             </>
           )}
 
           {/* Filter group */}
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 0.5,
-              alignItems: 'center',
-            }}
-          >
+          <div className="flex gap-1 items-center">
             {(['all', 'scheduled', 'manual'] as FilterType[]).map((opt) => {
-              const active = filter === opt
               const label =
                 opt === 'all'
                   ? t('archivesList.allArchives')
                   : opt === 'scheduled'
                     ? t('archivesList.scheduled')
                     : t('archivesList.manual')
-              const color =
+              const activeColor =
                 opt === 'scheduled'
-                  ? theme.palette.success.main
+                  ? 'border-emerald-500/35 dark:border-emerald-500/45 bg-emerald-500/8 dark:bg-emerald-500/14 text-emerald-600 dark:text-emerald-400'
                   : opt === 'manual'
-                    ? theme.palette.primary.main
+                    ? 'border-primary/35 dark:border-primary/45 bg-primary/8 dark:bg-primary/14 text-primary'
                     : undefined
               return (
-                <Box
+                <button
                   key={opt}
-                  onClick={() =>
-                    handleFilterChange({
-                      target: { value: opt },
-                    } as React.ChangeEvent<HTMLSelectElement>)
-                  }
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    px: 1.25,
-                    py: 0.5,
-                    borderRadius: 1.5,
-                    border: '1px solid',
-                    cursor: 'pointer',
-                    userSelect: 'none',
-                    fontSize: '0.72rem',
-                    fontWeight: 600,
-                    transition: 'all 150ms',
-                    borderColor:
-                      active && color
-                        ? alpha(color, isDark ? 0.45 : 0.35)
-                        : active
-                          ? isDark
-                            ? alpha('#fff', 0.2)
-                            : alpha('#000', 0.15)
-                          : isDark
-                            ? alpha('#fff', 0.1)
-                            : alpha('#000', 0.1),
-                    bgcolor:
-                      active && color
-                        ? alpha(color, isDark ? 0.14 : 0.08)
-                        : active
-                          ? isDark
-                            ? alpha('#fff', 0.06)
-                            : alpha('#000', 0.05)
-                          : 'transparent',
-                    color: active && color ? color : active ? 'text.primary' : 'text.secondary',
-                    '&:hover': {
-                      borderColor: color
-                        ? alpha(color, 0.35)
-                        : isDark
-                          ? alpha('#fff', 0.2)
-                          : alpha('#000', 0.15),
-                      color: color ?? 'text.primary',
-                    },
-                  }}
+                  type="button"
+                  onClick={() => handleFilterChange(opt)}
+                  className={pillCls(filter === opt, activeColor)}
                 >
                   {label}
-                </Box>
+                </button>
               )
             })}
-          </Box>
+          </div>
 
-          {/* Group divider */}
-          <Box
-            sx={{
-              width: '1px',
-              alignSelf: 'stretch',
-              bgcolor: isDark ? alpha('#fff', 0.08) : alpha('#000', 0.08),
-              flexShrink: 0,
-              display: { xs: 'none', sm: 'block' },
-            }}
-          />
+          <div className="hidden sm:block w-px self-stretch bg-neutral-200 dark:bg-neutral-700/60 shrink-0" />
 
           {/* View mode group */}
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 0.5,
-              alignItems: 'center',
-            }}
-          >
-            {(['grouped', 'flat'] as const).map((mode) => {
-              const active = (groupingEnabled ? 'grouped' : 'flat') === mode
-              return (
-                <Box
-                  key={mode}
-                  onClick={(e) =>
-                    handleViewModeChange(e as unknown as React.MouseEvent<HTMLElement>, mode)
-                  }
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.5,
-                    px: 1.25,
-                    py: 0.5,
-                    borderRadius: 1.5,
-                    border: '1px solid',
-                    cursor: 'pointer',
-                    userSelect: 'none',
-                    fontSize: '0.72rem',
-                    fontWeight: 600,
-                    transition: 'all 150ms',
-                    borderColor: active
-                      ? isDark
-                        ? alpha('#fff', 0.2)
-                        : alpha('#000', 0.15)
-                      : isDark
-                        ? alpha('#fff', 0.1)
-                        : alpha('#000', 0.1),
-                    bgcolor: active
-                      ? isDark
-                        ? alpha('#fff', 0.06)
-                        : alpha('#000', 0.05)
-                      : 'transparent',
-                    color: active ? 'text.primary' : 'text.secondary',
-                    '&:hover': {
-                      borderColor: isDark ? alpha('#fff', 0.2) : alpha('#000', 0.15),
-                      color: 'text.primary',
-                    },
-                  }}
-                >
-                  {mode === 'grouped' ? <Layers size={13} /> : <List size={13} />}
-                  {mode === 'grouped' ? t('archivesList.grouped') : t('archivesList.list')}
-                </Box>
-              )
-            })}
-          </Box>
-        </Box>
-      </Box>
+          <div className="flex gap-1 items-center">
+            {(['grouped', 'flat'] as const).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => handleViewModeChange(mode)}
+                className={pillCls((groupingEnabled ? 'grouped' : 'flat') === mode)}
+              >
+                {mode === 'grouped' ? <Layers size={13} /> : <List size={13} />}
+                {mode === 'grouped' ? t('archivesList.grouped') : t('archivesList.list')}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
-      {/* Empty state for filtered results */}
+      {/* Empty filtered state */}
       {sortedArchives.length === 0 && archives.length > 0 ? (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            py: 8,
-            color: 'text.secondary',
-          }}
-        >
-          <FolderOpen size={48} style={{ marginBottom: 16 }} />
-          <Typography variant="body1" color="text.secondary">
+        <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+          <FolderOpen size={48} className="mb-4" />
+          <p className="text-sm">
             {filter === 'scheduled'
               ? t('archivesList.noScheduledArchives')
               : t('archivesList.noManualArchives')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            {t('archivesList.tryDifferentFilter')}
-          </Typography>
-        </Box>
+          </p>
+          <p className="text-sm mt-2">{t('archivesList.tryDifferentFilter')}</p>
+        </div>
       ) : groupingEnabled && groupedArchives ? (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {groupedArchives.map((group) => (
-            <Accordion
-              key={group.key}
-              expanded={expandedGroups.has(group.key)}
-              onChange={() => handleToggleGroup(group.key)}
-              sx={{
-                borderRadius: 2,
-                '&:before': { display: 'none' },
-                boxShadow: 'none',
-                border: '1px solid',
-                borderColor: 'divider',
-              }}
-            >
-              <AccordionSummary
-                expandIcon={<ChevronDown size={20} />}
-                sx={{
-                  '&:hover': { bgcolor: 'action.hover' },
-                  borderRadius: 2,
-                }}
+        /* Grouped view */
+        <div className="flex flex-col gap-3">
+          {groupedArchives.map((group) => {
+            const isExpanded = expandedGroups.has(group.key)
+            return (
+              <div
+                key={group.key}
+                className="rounded-lg border border-neutral-200 dark:border-neutral-700/60 overflow-hidden"
               >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
-                  {group.iconName === 'Calendar' ? (
-                    <Calendar size={20} />
-                  ) : (
-                    <ArchiveIcon size={20} />
+                <button
+                  type="button"
+                  data-testid="accordion-trigger"
+                  onClick={() => handleToggleGroup(group.key)}
+                  className={cn(
+                    'w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/50 transition-colors',
+                    'border-b border-transparent',
+                    isExpanded && 'border-b-neutral-200 dark:border-b-neutral-700/60'
                   )}
-                  <Typography variant="h6" fontSize="1rem" fontWeight={600}>
-                    {group.label}
-                  </Typography>
-                  <Chip label={group.archives.length} size="small" sx={{ ml: 'auto', mr: 2 }} />
-                </Box>
-              </AccordionSummary>
-              <AccordionDetails sx={{ pt: 0, pb: 0, px: 0 }}>
-                {group.archives.map((archive) => (
-                  <ArchiveCard
-                    key={archive.id}
-                    archive={archive}
-                    onView={onViewArchive}
-                    onRestore={onRestoreArchive}
-                    onMount={onMountArchive}
-                    onDelete={onDeleteArchive}
-                    mountDisabled={mountDisabled}
-                    canDelete={canDelete}
-                  />
-                ))}
-              </AccordionDetails>
-            </Accordion>
-          ))}
-        </Box>
+                >
+                  {group.iconName === 'Calendar' ? (
+                    <Calendar size={20} className="text-muted-foreground shrink-0" />
+                  ) : (
+                    <ArchiveIcon size={20} className="text-muted-foreground shrink-0" />
+                  )}
+                  <span className="text-base font-semibold flex-1">{group.label}</span>
+                  <Badge variant="secondary" className="ml-auto mr-4 text-xs">
+                    {group.archives.length}
+                  </Badge>
+                  {isExpanded ? (
+                    <ChevronUp size={20} className="text-muted-foreground shrink-0" />
+                  ) : (
+                    <ChevronDown size={20} className="text-muted-foreground shrink-0" />
+                  )}
+                </button>
+                {isExpanded && (
+                  <div>
+                    {group.archives.map((archive) => (
+                      <ArchiveCard
+                        key={archive.id}
+                        archive={archive}
+                        onView={onViewArchive}
+                        onRestore={onRestoreArchive}
+                        onMount={onMountArchive}
+                        onDelete={onDeleteArchive}
+                        mountDisabled={mountDisabled}
+                        canDelete={canDelete}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
       ) : (
+        /* Flat view */
         <>
-          <Box
-            sx={{
-              borderRadius: 3,
-              border: '1px solid',
-              borderColor: isDark ? alpha('#fff', 0.07) : alpha('#000', 0.07),
-              overflow: 'hidden',
-              mb: 2,
-            }}
-          >
+          <div className="rounded-2xl border border-neutral-200/70 dark:border-neutral-700/40 overflow-hidden mb-4">
             {tableHeader}
             {sortedArchives
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -649,59 +419,63 @@ export default function ArchivesList({
                   canDelete={canDelete}
                 />
               ))}
-          </Box>
+          </div>
 
           {/* Pagination */}
           {sortedArchives.length > 0 && (
-            <Box>
-              <TablePagination
-                component="div"
-                count={sortedArchives.length}
-                page={page}
-                onPageChange={handleChangePage}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                rowsPerPageOptions={rowsPerPageOptions}
-                labelRowsPerPage={t('archivesList.archivesPerPage')}
-                labelDisplayedRows={({ from, to, count }) =>
-                  `${from}–${to} of ${count !== -1 ? count : `more than ${to}`}`
-                }
-                sx={{
-                  '.MuiTablePagination-toolbar': {
-                    minHeight: '52px',
-                    paddingLeft: 2,
-                    paddingRight: 1,
-                  },
-                  '.MuiTablePagination-spacer': {
-                    display: 'none',
-                  },
-                  '.MuiTablePagination-selectLabel': {
-                    marginTop: 0,
-                    marginBottom: 0,
-                  },
-                  '.MuiTablePagination-displayedRows': {
-                    marginTop: 0,
-                    marginBottom: 0,
-                    marginLeft: 'auto',
-                  },
-                  '.MuiTablePagination-select': {
-                    paddingTop: 1,
-                    paddingBottom: 1,
-                  },
-                  '.MuiTablePagination-actions': {
-                    marginLeft: 1,
-                  },
-                  '@media (max-width: 600px)': {
-                    '.MuiTablePagination-selectLabel': {
-                      display: 'none',
-                    },
-                  },
-                }}
-              />
-            </Box>
+            <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground px-1">
+              {/* Rows per page */}
+              <label htmlFor="rows-per-page-select" className="shrink-0">
+                {t('archivesList.archivesPerPage')}
+              </label>
+              <select
+                id="rows-per-page-select"
+                aria-label={t('archivesList.archivesPerPage')}
+                value={rowsPerPage}
+                onChange={(e) => handleChangeRowsPerPage(e.target.value)}
+                className={cn(
+                  'h-7 rounded-md border border-input bg-background px-2 text-sm',
+                  'focus:outline-none focus:ring-2 focus:ring-ring/50'
+                )}
+              >
+                {rowsPerPageOptions.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+
+              {/* Display rows */}
+              <span className="ml-auto text-sm">
+                {page * rowsPerPage + 1}–{Math.min((page + 1) * rowsPerPage, sortedArchives.length)}{' '}
+                of {sortedArchives.length !== -1 ? sortedArchives.length : `more than ${(page + 1) * rowsPerPage}`}
+              </span>
+
+              {/* Prev/Next */}
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label="Go to previous page"
+                  disabled={page === 0}
+                  onClick={(e) => handleChangePage(e, page - 1)}
+                >
+                  <ChevronLeft size={16} />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label="Go to next page"
+                  disabled={(page + 1) * rowsPerPage >= sortedArchives.length}
+                  onClick={(e) => handleChangePage(e, page + 1)}
+                >
+                  <ChevronRight size={16} />
+                </Button>
+              </div>
+            </div>
           )}
         </>
       )}
-    </Box>
+    </div>
   )
 }
