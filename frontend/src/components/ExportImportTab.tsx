@@ -1,26 +1,7 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import {
-  Box,
-  Typography,
-  Button,
-  Stack,
-  Alert,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Checkbox,
-  FormControlLabel,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  LinearProgress,
-} from '@mui/material'
-import { Download, Upload, FileText, CheckCircle, AlertCircle } from 'lucide-react'
+import { Download, Upload, FileText, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
 import SettingsCard from './SettingsCard'
 import { toast } from 'react-hot-toast'
 import { configExportImportAPI } from '../services/api'
@@ -28,6 +9,15 @@ import { translateBackendKey } from '../utils/translateBackendKey'
 import { Repository } from '../types'
 import { useAnalytics } from '../hooks/useAnalytics'
 import { useAuth } from '../hooks/useAuth'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface ImportResult {
   success: boolean
@@ -45,17 +35,14 @@ const ExportImportTab: React.FC = () => {
   const { hasGlobalPermission } = useAuth()
   const canManageExportImport = hasGlobalPermission('settings.export_import.manage')
   const { trackSystem, EventAction } = useAnalytics()
-  // Export state
+
   const [selectedRepos, setSelectedRepos] = useState<number[]>([])
   const [includeSchedules, setIncludeSchedules] = useState(true)
   const [exportingAll, setExportingAll] = useState(true)
-
-  // Import state
   const [importFile, setImportFile] = useState<File | null>(null)
   const [mergeStrategy, setMergeStrategy] = useState('skip_duplicates')
   const [importResult, setImportResult] = useState<ImportResult | null>(null)
 
-  // Fetch repositories for export
   const { data: reposData, isLoading: loadingRepos } = useQuery({
     queryKey: ['exportable-repositories'],
     queryFn: async () => {
@@ -66,7 +53,6 @@ const ExportImportTab: React.FC = () => {
 
   const repositories: Repository[] = reposData?.repositories || []
 
-  // Export mutation
   const exportMutation = useMutation({
     mutationFn: async () => {
       const repoIds = exportingAll ? undefined : selectedRepos
@@ -74,18 +60,11 @@ const ExportImportTab: React.FC = () => {
       return response
     },
     onSuccess: (response) => {
-      // Get content type and filename from headers
       const contentType = response.headers['content-type'] || 'application/octet-stream'
       const contentDisposition = response.headers['content-disposition'] || ''
-
-      // Extract filename from Content-Disposition header
       let filename = 'borgscale-export.yaml'
       const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)
-      if (filenameMatch && filenameMatch[1]) {
-        filename = filenameMatch[1].replace(/['"]/g, '')
-      }
-
-      // Create blob with correct content type and download file
+      if (filenameMatch && filenameMatch[1]) filename = filenameMatch[1].replace(/['"]/g, '')
       const blob = new Blob([response.data], { type: contentType })
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
@@ -95,7 +74,6 @@ const ExportImportTab: React.FC = () => {
       link.click()
       document.body.removeChild(link)
       window.URL.revokeObjectURL(url)
-
       toast.success(t('exportImport.export.success'))
       trackSystem(EventAction.EXPORT, {
         section: 'export_import',
@@ -106,13 +84,10 @@ const ExportImportTab: React.FC = () => {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast.error(
-        translateBackendKey(error.response?.data?.detail) || t('exportImport.failedToExport')
-      )
+      toast.error(translateBackendKey(error.response?.data?.detail) || t('exportImport.failedToExport'))
     },
   })
 
-  // Import mutation
   const importMutation = useMutation({
     mutationFn: async ({ file, dryRun }: { file: File; dryRun: boolean }) => {
       const response = await configExportImportAPI.importBorgmatic(file, mergeStrategy, dryRun)
@@ -120,13 +95,9 @@ const ExportImportTab: React.FC = () => {
     },
     onSuccess: (result) => {
       setImportResult(result)
-      if (!result.success) {
-        toast.error(result.error || t('exportImport.importFailed'))
-      } else if (result.errors?.length > 0) {
-        toast.error(t('exportImport.importCompletedWithErrors'))
-      } else {
-        toast.success(t('exportImport.importSuccess'))
-      }
+      if (!result.success) toast.error(result.error || t('exportImport.importFailed'))
+      else if (result.errors?.length > 0) toast.error(t('exportImport.importCompletedWithErrors'))
+      else toast.success(t('exportImport.importSuccess'))
       trackSystem(EventAction.UPLOAD, {
         section: 'export_import',
         merge_strategy: mergeStrategy,
@@ -144,27 +115,9 @@ const ExportImportTab: React.FC = () => {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast.error(
-        translateBackendKey(error.response?.data?.detail) || t('exportImport.failedToImport')
-      )
+      toast.error(translateBackendKey(error.response?.data?.detail) || t('exportImport.failedToImport'))
     },
   })
-
-  const handleExport = () => {
-    if (!exportingAll && selectedRepos.length === 0) {
-      toast.error(t('exportImport.selectAtLeastOneRepo'))
-      return
-    }
-    exportMutation.mutate()
-  }
-
-  const handleImport = () => {
-    if (!importFile) {
-      toast.error(t('exportImport.selectFileToImport'))
-      return
-    }
-    importMutation.mutate({ file: importFile, dryRun: false })
-  }
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -192,154 +145,104 @@ const ExportImportTab: React.FC = () => {
     }
   }
 
-  const selectAllRepos = () => {
-    setSelectedRepos(repositories.map((r) => r.id))
-  }
-
-  const clearSelection = () => {
-    setSelectedRepos([])
-  }
-
-  if (!canManageExportImport) {
-    return null
-  }
+  if (!canManageExportImport) return null
 
   return (
-    <Box>
+    <div>
       {/* Export Section */}
-      <Box sx={{ mb: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          <Download size={24} style={{ marginRight: 8 }} />
-          <Typography variant="h6" fontWeight={600}>
-            {t('exportImport.export.title')}
-          </Typography>
-        </Box>
+      <div className="mb-5">
+        <div className="flex items-center gap-2 mb-1">
+          <Download size={22} />
+          <p className="text-lg font-semibold">{t('exportImport.export.title')}</p>
+        </div>
+        <p className="text-sm text-muted-foreground">{t('exportImport.export.description')}</p>
+      </div>
 
-        <Typography variant="body2" color="text.secondary">
-          {t('exportImport.export.description')}
-        </Typography>
-      </Box>
-
-      <SettingsCard sx={{ mb: 3 }}>
-        <Stack spacing={3}>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={exportingAll}
-                onChange={(e) => setExportingAll(e.target.checked)}
-              />
-            }
-            label={t('exportImport.exportAllRepositories')}
-          />
+      <SettingsCard className="mb-6">
+        <div className="flex flex-col gap-4">
+          {/* Export all checkbox */}
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={exportingAll}
+              onChange={(e) => setExportingAll(e.target.checked)}
+              className="w-4 h-4 rounded"
+            />
+            <span className="text-sm">{t('exportImport.exportAllRepositories')}</span>
+          </label>
 
           {!exportingAll && (
-            <Box>
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  mb: 1,
-                }}
-              >
-                <Typography variant="subtitle2">{t('exportImport.selectRepositories')}</Typography>
-                <Box>
-                  <Button size="small" onClick={selectAllRepos} disabled={loadingRepos}>
-                    {t('exportImport.selectAll')}
-                  </Button>
-                  <Button size="small" onClick={clearSelection} disabled={loadingRepos}>
-                    {t('exportImport.clear')}
-                  </Button>
-                </Box>
-              </Box>
-              <Box
-                sx={{
-                  maxHeight: 200,
-                  overflow: 'auto',
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  borderRadius: 1,
-                }}
-              >
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <p className="text-sm font-semibold">{t('exportImport.selectRepositories')}</p>
+                <div className="flex gap-1">
+                  <Button variant="ghost" size="sm" onClick={() => setSelectedRepos(repositories.map((r) => r.id))} disabled={loadingRepos}>{t('exportImport.selectAll')}</Button>
+                  <Button variant="ghost" size="sm" onClick={() => setSelectedRepos([])} disabled={loadingRepos}>{t('exportImport.clear')}</Button>
+                </div>
+              </div>
+              <div className="border border-border rounded-xl overflow-auto" style={{ maxHeight: 200 }}>
                 {loadingRepos ? (
-                  <Typography variant="body2" sx={{ p: 2 }}>
-                    {t('exportImport.loadingRepositories')}
-                  </Typography>
+                  <p className="text-sm text-muted-foreground p-3">{t('exportImport.loadingRepositories')}</p>
                 ) : repositories.length === 0 ? (
-                  <Typography variant="body2" sx={{ p: 2 }}>
-                    {t('exportImport.noRepositoriesAvailable')}
-                  </Typography>
+                  <p className="text-sm text-muted-foreground p-3">{t('exportImport.noRepositoriesAvailable')}</p>
                 ) : (
-                  <List dense>
+                  <div>
                     {repositories.map((repo) => (
-                      <ListItem
-                        key={repo.id}
-                        component="div"
-                        onClick={() => toggleRepository(repo.id)}
-                        sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
-                      >
-                        <ListItemIcon>
-                          <Checkbox
-                            edge="start"
-                            checked={selectedRepos.includes(repo.id)}
-                            tabIndex={-1}
-                            disableRipple
-                          />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={repo.name}
-                          secondary={`${repo.path} • ${repo.repository_type}`}
+                      <label key={repo.id} className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-muted/40 border-b border-border last:border-b-0">
+                        <input
+                          type="checkbox"
+                          checked={selectedRepos.includes(repo.id)}
+                          onChange={() => toggleRepository(repo.id)}
+                          className="w-4 h-4 rounded flex-shrink-0"
                         />
-                      </ListItem>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium truncate">{repo.name}</p>
+                          <p className="text-xs text-muted-foreground truncate">{repo.path} · {repo.repository_type}</p>
+                        </div>
+                      </label>
                     ))}
-                  </List>
+                  </div>
                 )}
-              </Box>
-            </Box>
+              </div>
+            </div>
           )}
 
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={includeSchedules}
-                onChange={(e) => setIncludeSchedules(e.target.checked)}
-              />
-            }
-            label={t('exportImport.includeSchedules')}
-          />
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={includeSchedules}
+              onChange={(e) => setIncludeSchedules(e.target.checked)}
+              className="w-4 h-4 rounded"
+            />
+            <span className="text-sm">{t('exportImport.includeSchedules')}</span>
+          </label>
 
           <Button
-            variant="contained"
-            startIcon={<Download size={18} />}
-            onClick={handleExport}
+            className="gap-1.5 self-start"
+            onClick={() => exportMutation.mutate()}
             disabled={exportMutation.isPending || (!exportingAll && selectedRepos.length === 0)}
           >
-            {exportMutation.isPending
-              ? t('exportImport.export.exporting')
-              : t('exportImport.export.button')}
+            {exportMutation.isPending ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
+            {exportMutation.isPending ? t('exportImport.export.exporting') : t('exportImport.export.button')}
           </Button>
-        </Stack>
+        </div>
       </SettingsCard>
 
-      <Divider sx={{ my: 4 }} />
+      <div className="border-t border-border my-8" />
 
       {/* Import Section */}
-      <Box sx={{ mb: 3 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          <Upload size={24} style={{ marginRight: 8 }} />
-          <Typography variant="h6" fontWeight={600}>
-            {t('exportImport.import.title')}
-          </Typography>
-        </Box>
-
-        <Typography variant="body2" color="text.secondary">
-          {t('exportImport.import.description')}
-        </Typography>
-      </Box>
+      <div className="mb-5">
+        <div className="flex items-center gap-2 mb-1">
+          <Upload size={22} />
+          <p className="text-lg font-semibold">{t('exportImport.import.title')}</p>
+        </div>
+        <p className="text-sm text-muted-foreground">{t('exportImport.import.description')}</p>
+      </div>
 
       <SettingsCard>
-        <Stack spacing={3}>
-          <Box>
+        <div className="flex flex-col gap-4">
+          {/* File selector */}
+          <div>
             <input
               accept=".yaml,.yml"
               style={{ display: 'none' }}
@@ -348,129 +251,115 @@ const ExportImportTab: React.FC = () => {
               onChange={handleFileSelect}
             />
             <label htmlFor="import-file-input">
-              <Button variant="outlined" component="span" startIcon={<FileText size={18} />}>
-                {t('exportImport.selectYamlFile')}
+              <Button variant="outline" className="gap-1.5 cursor-pointer" asChild>
+                <span><FileText size={15} />{t('exportImport.selectYamlFile')}</span>
               </Button>
             </label>
             {importFile && (
-              <Typography variant="body2" sx={{ mt: 1 }}>
+              <p className="text-sm text-muted-foreground mt-2">
                 {t('exportImport.selectedFile', { name: importFile.name })}
-              </Typography>
+              </p>
             )}
-          </Box>
+          </div>
 
-          <FormControl fullWidth>
-            <InputLabel>{t('exportImport.conflictResolutionStrategy')}</InputLabel>
-            <Select
-              value={mergeStrategy}
-              onChange={(e) => {
-                const nextStrategy = e.target.value
-                setMergeStrategy(nextStrategy)
-                trackSystem(EventAction.EDIT, {
-                  section: 'export_import',
-                  setting: 'merge_strategy',
-                  value: nextStrategy,
-                })
-              }}
-              label={t('exportImport.conflictResolutionStrategy')}
-            >
-              <MenuItem value="skip_duplicates">
-                {t('exportImport.strategySkipDuplicates')}
-              </MenuItem>
-              <MenuItem value="replace">{t('exportImport.strategyReplace')}</MenuItem>
-              <MenuItem value="rename">{t('exportImport.strategyRename')}</MenuItem>
+          {/* Merge strategy */}
+          <div>
+            <p className="text-xs font-semibold mb-1.5">{t('exportImport.conflictResolutionStrategy')}</p>
+            <Select value={mergeStrategy} onValueChange={(v) => {
+              setMergeStrategy(v)
+              trackSystem(EventAction.EDIT, { section: 'export_import', setting: 'merge_strategy', value: v })
+            }}>
+              <SelectTrigger className="h-9 text-sm font-semibold">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="skip_duplicates">{t('exportImport.strategySkipDuplicates')}</SelectItem>
+                <SelectItem value="replace">{t('exportImport.strategyReplace')}</SelectItem>
+                <SelectItem value="rename">{t('exportImport.strategyRename')}</SelectItem>
+              </SelectContent>
             </Select>
-          </FormControl>
+          </div>
 
-          <Alert severity="warning" icon={<AlertCircle size={20} />}>
-            <strong>{t('exportImport.importantLabel')}</strong>{' '}
-            {t('exportImport.importSecurityWarning')}
+          <Alert>
+            <AlertCircle size={16} />
+            <AlertDescription>
+              <strong>{t('exportImport.importantLabel')}</strong>{' '}
+              {t('exportImport.importSecurityWarning')}
+            </AlertDescription>
           </Alert>
 
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button
-              variant="contained"
-              startIcon={<Upload size={18} />}
-              onClick={handleImport}
-              disabled={!importFile || importMutation.isPending}
-            >
-              {importMutation.isPending
-                ? t('exportImport.import.importing')
-                : t('exportImport.import.button')}
-            </Button>
-          </Box>
+          <Button
+            className="gap-1.5 self-start"
+            onClick={() => importFile && importMutation.mutate({ file: importFile, dryRun: false })}
+            disabled={!importFile || importMutation.isPending}
+          >
+            {importMutation.isPending ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} />}
+            {importMutation.isPending ? t('exportImport.import.importing') : t('exportImport.import.button')}
+          </Button>
 
-          {importMutation.isPending && <LinearProgress />}
+          {importMutation.isPending && (
+            <div className="h-1.5 rounded-full overflow-hidden bg-muted">
+              <div className="h-full bg-primary animate-pulse w-full" />
+            </div>
+          )}
 
           {/* Import Result */}
           {importResult && (
             <SettingsCard>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                {importResult.success ? (
-                  <CheckCircle size={24} color="green" style={{ marginRight: 8 }} />
-                ) : (
-                  <AlertCircle size={24} color="red" style={{ marginRight: 8 }} />
-                )}
-                <Typography variant="h6">
-                  {importResult.success
-                    ? t('exportImport.importSummary')
-                    : t('exportImport.importFailed')}
-                </Typography>
-              </Box>
-
-              {importResult.success && (
-                <Stack spacing={1}>
-                  <Typography variant="body2">
-                    <strong>{t('exportImport.repositoriesCreated')}:</strong>{' '}
-                    {importResult.repositories_created || 0}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>{t('exportImport.repositoriesUpdated')}:</strong>{' '}
-                    {importResult.repositories_updated || 0}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>{t('exportImport.schedulesCreated')}:</strong>{' '}
-                    {importResult.schedules_created || 0}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>{t('exportImport.schedulesUpdated')}:</strong>{' '}
-                    {importResult.schedules_updated || 0}
-                  </Typography>
-
-                  {importResult.warnings && importResult.warnings.length > 0 && (
-                    <Box sx={{ mt: 2 }}>
-                      <Typography variant="subtitle2" gutterBottom>
-                        {t('exportImport.warnings')}:
-                      </Typography>
-                      {importResult.warnings.map((warning: string, index: number) => (
-                        <Alert severity="warning" key={index} sx={{ mt: 1 }}>
-                          {warning}
-                        </Alert>
-                      ))}
-                    </Box>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  {importResult.success ? (
+                    <CheckCircle size={22} className="text-green-500" />
+                  ) : (
+                    <AlertCircle size={22} className="text-destructive" />
                   )}
-                </Stack>
-              )}
+                  <p className="text-base font-semibold">
+                    {importResult.success ? t('exportImport.importSummary') : t('exportImport.importFailed')}
+                  </p>
+                </div>
 
-              {!importResult.success && <Alert severity="error">{importResult.error}</Alert>}
+                {importResult.success && (
+                  <div className="flex flex-col gap-1.5">
+                    {[
+                      { key: 'repositoriesCreated', val: importResult.repositories_created || 0 },
+                      { key: 'repositoriesUpdated', val: importResult.repositories_updated || 0 },
+                      { key: 'schedulesCreated', val: importResult.schedules_created || 0 },
+                      { key: 'schedulesUpdated', val: importResult.schedules_updated || 0 },
+                    ].map((item) => (
+                      <p key={item.key} className="text-sm">
+                        <strong>{t(`exportImport.${item.key}`)}:</strong> {item.val}
+                      </p>
+                    ))}
 
-              {importResult.errors && importResult.errors.length > 0 && (
-                <Box sx={{ mt: 2 }}>
-                  <Typography variant="subtitle2" gutterBottom>
-                    {t('exportImport.errors')}:
-                  </Typography>
-                  {importResult.errors.map((error: string, index: number) => (
-                    <Alert severity="error" key={index} sx={{ mt: 1 }}>
-                      {error}
-                    </Alert>
-                  ))}
-                </Box>
-              )}
+                    {(importResult.warnings?.length ?? 0) > 0 && (
+                      <div className="mt-2 flex flex-col gap-1">
+                        <p className="text-sm font-semibold">{t('exportImport.warnings')}:</p>
+                        {importResult.warnings?.map((w, i) => (
+                          <Alert key={i}><AlertDescription>{w}</AlertDescription></Alert>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {!importResult.success && (
+                  <Alert variant="destructive"><AlertDescription>{importResult.error}</AlertDescription></Alert>
+                )}
+
+                {(importResult.errors?.length ?? 0) > 0 && (
+                  <div className="mt-2 flex flex-col gap-1">
+                    <p className="text-sm font-semibold">{t('exportImport.errors')}:</p>
+                    {importResult.errors?.map((e, i) => (
+                      <Alert key={i} variant="destructive"><AlertDescription>{e}</AlertDescription></Alert>
+                    ))}
+                  </div>
+                )}
+              </div>
             </SettingsCard>
           )}
-        </Stack>
+        </div>
       </SettingsCard>
-    </Box>
+    </div>
   )
 }
 

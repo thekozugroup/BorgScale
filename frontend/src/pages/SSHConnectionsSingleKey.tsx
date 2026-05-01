@@ -1,33 +1,13 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { sshKeysAPI } from '../services/api'
-import {
-  Box,
-  Typography,
-  Button,
-  Stack,
-  Chip,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Skeleton,
-  Alert,
-  Tooltip,
-  InputAdornment,
-  Checkbox,
-  FormControlLabel,
-  useTheme,
-  alpha,
-} from '@mui/material'
+import { Button } from '../components/ui/button'
+import { Input } from '../components/ui/input'
+import { Label } from '../components/ui/label'
+import { Skeleton } from '../components/ui/skeleton'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog'
 import {
   Key,
   Copy,
@@ -120,8 +100,6 @@ export default function SSHConnectionsSingleKey() {
   const { track, EventCategory, EventAction } = useAnalytics()
   const { hasGlobalPermission } = useAuth()
   const canManageSsh = hasGlobalPermission('settings.ssh.manage')
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
 
   // State
   const [keyVisible, setKeyVisible] = useState(false)
@@ -537,784 +515,276 @@ export default function SSHConnectionsSingleKey() {
 
   if (keyLoading || connectionsLoading) {
     return (
-      <Box>
+      <div>
         {/* Header skeleton */}
-        <Box sx={{ mb: 4 }}>
-          <Skeleton
-            variant="text"
-            width={200}
-            height={36}
-            sx={{ transform: 'none', borderRadius: 0.5, mb: 0.75 }}
-          />
-          <Skeleton
-            variant="text"
-            width={320}
-            height={16}
-            sx={{ transform: 'none', borderRadius: 0.5 }}
-          />
-        </Box>
+        <div className="mb-8">
+          <Skeleton className="h-8 w-48 mb-2" />
+          <Skeleton className="h-4 w-80" />
+        </div>
 
         {/* Stats band skeleton */}
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            borderRadius: 2,
-            border: '1px solid',
-            borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-            overflow: 'hidden',
-            mb: 3,
-            bgcolor: isDark ? alpha('#fff', 0.025) : alpha('#000', 0.018),
-          }}
-        >
+        <div className="grid grid-cols-3 rounded-xl border border-border overflow-hidden mb-6">
           {[0, 1, 2].map((i) => (
-            <Box
-              key={i}
-              sx={{
-                px: { xs: 1.25, sm: 2 },
-                py: { xs: 1.5, sm: 1.75 },
-                borderRight: i < 2 ? '1px solid' : 0,
-                borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-              }}
-            >
-              <Box
-                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: { xs: 0.75, sm: 0.5 } }}
-              >
-                <Skeleton variant="rounded" width={13} height={13} sx={{ borderRadius: 0.5 }} />
-                <Skeleton
-                  variant="text"
-                  width={80}
-                  height={12}
-                  sx={{ transform: 'none', borderRadius: 0.5 }}
-                />
-              </Box>
-              <Skeleton
-                variant="text"
-                width={32}
-                sx={{ transform: 'none', borderRadius: 0.5, height: { xs: 28, sm: 24 } }}
-              />
-            </Box>
+            <div key={i} className={`px-4 py-4 ${i < 2 ? 'border-r border-border' : ''}`}>
+              <div className="flex items-center gap-1 mb-2">
+                <Skeleton className="h-3 w-3 rounded" />
+                <Skeleton className="h-3 w-20" />
+              </div>
+              <Skeleton className="h-7 w-8" />
+            </div>
           ))}
-        </Box>
+        </div>
 
         {/* System SSH Key card skeleton */}
-        <Box
-          sx={{
-            borderRadius: 2,
-            bgcolor: 'background.paper',
-            overflow: 'hidden',
-            mb: 3,
-            boxShadow: isDark
-              ? `0 0 0 1px ${alpha('#fff', 0.08)}, 0 4px 16px ${alpha('#000', 0.25)}`
-              : `0 0 0 1px ${alpha('#000', 0.08)}, 0 2px 8px ${alpha('#000', 0.07)}`,
-          }}
-        >
-          <Box sx={{ px: { xs: 2, sm: 2.5 }, pt: { xs: 2, sm: 2.5 }, pb: { xs: 2, sm: 2.5 } }}>
-            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 2 }}>
-              <Skeleton
-                variant="rounded"
-                width={34}
-                height={34}
-                sx={{ borderRadius: 1.5, flexShrink: 0 }}
-              />
-              <Skeleton
-                variant="text"
-                width={140}
-                height={24}
-                sx={{ transform: 'none', borderRadius: 0.5, flex: 1 }}
-              />
-              <Skeleton variant="rounded" width={64} height={22} sx={{ borderRadius: 3 }} />
-            </Stack>
-            <Stack spacing={2}>
-              <Box>
-                <Skeleton
-                  variant="text"
-                  width={48}
-                  height={20}
-                  sx={{ transform: 'none', borderRadius: 0.5 }}
-                />
-                <Skeleton
-                  variant="text"
-                  width={80}
-                  height={20}
-                  sx={{ transform: 'none', borderRadius: 0.5 }}
-                />
-              </Box>
-              <Box>
-                <Skeleton
-                  variant="text"
-                  width={80}
-                  height={20}
-                  sx={{ transform: 'none', borderRadius: 0.5 }}
-                />
-                <Skeleton
-                  variant="text"
-                  width="60%"
-                  height={20}
-                  sx={{ transform: 'none', borderRadius: 0.5 }}
-                />
-              </Box>
-              <Box>
-                <Skeleton
-                  variant="text"
-                  width={70}
-                  height={20}
-                  sx={{ transform: 'none', borderRadius: 0.5, mb: 0.5 }}
-                />
-                <Skeleton variant="rounded" width="100%" height={55} sx={{ borderRadius: 1 }} />
-              </Box>
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <Skeleton variant="rounded" width={160} height={36} sx={{ borderRadius: 1 }} />
-                <Skeleton variant="rounded" width={140} height={36} sx={{ borderRadius: 1 }} />
-                <Skeleton variant="rounded" width={120} height={36} sx={{ borderRadius: 1 }} />
-              </Stack>
-            </Stack>
-          </Box>
-        </Box>
+        <div className="rounded-xl border border-border p-5 mb-6">
+          <div className="flex items-center gap-3 mb-5">
+            <Skeleton className="h-9 w-9 rounded-xl flex-shrink-0" />
+            <Skeleton className="h-6 w-36 flex-1" />
+            <Skeleton className="h-6 w-16 rounded-full" />
+          </div>
+          <div className="flex flex-col gap-4">
+            <div><Skeleton className="h-3 w-12 mb-1" /><Skeleton className="h-4 w-20" /></div>
+            <div><Skeleton className="h-3 w-20 mb-1" /><Skeleton className="h-4 w-3/5" /></div>
+            <div><Skeleton className="h-3 w-18 mb-2" /><Skeleton className="h-14 w-full rounded-lg" /></div>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Skeleton className="h-9 w-40 rounded-lg" />
+              <Skeleton className="h-9 w-36 rounded-lg" />
+              <Skeleton className="h-9 w-28 rounded-lg" />
+            </div>
+          </div>
+        </div>
 
         {/* Remote Connections section skeleton */}
-        <Box>
-          {/* Section header */}
-          <Box
-            sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}
-          >
-            <Box>
-              <Skeleton
-                variant="text"
-                width={160}
-                height={24}
-                sx={{ transform: 'none', borderRadius: 0.5, mb: 0.4 }}
-              />
-              <Skeleton
-                variant="text"
-                width={120}
-                height={14}
-                sx={{ transform: 'none', borderRadius: 0.5 }}
-              />
-            </Box>
-            <Skeleton variant="rounded" width={32} height={32} sx={{ borderRadius: 1.5 }} />
-          </Box>
-
-          {/* Connection cards — flex wrap matching real RemoteMachineCard layout */}
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 2, sm: 2.5 } }}>
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <Skeleton className="h-5 w-40 mb-1" />
+              <Skeleton className="h-3 w-28" />
+            </div>
+            <Skeleton className="h-8 w-8 rounded-xl" />
+          </div>
+          <div className="flex flex-wrap gap-4 sm:gap-5">
             {[0, 1, 2].map((i) => (
-              <Box
+              <div
                 key={i}
-                sx={{
-                  flex: {
-                    xs: '0 0 100%',
-                    sm: '0 0 calc(50% - 10px)',
-                    md: '0 0 calc(33.333% - 14px)',
-                  },
-                  minWidth: 0,
-                  display: 'flex',
-                }}
+                className="w-full sm:w-[calc(50%-10px)] md:w-[calc(33.333%-14px)] rounded-xl border border-border p-4 flex flex-col gap-3"
+                style={{ opacity: Math.max(0.4, 1 - i * 0.2) }}
               >
-                <Box
-                  sx={{
-                    width: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    borderRadius: 2,
-                    bgcolor: 'background.paper',
-                    boxShadow: isDark
-                      ? `0 0 0 1px ${alpha('#fff', 0.08)}, 0 4px 16px ${alpha('#000', 0.25)}`
-                      : `0 0 0 1px ${alpha('#000', 0.08)}, 0 2px 8px ${alpha('#000', 0.07)}`,
-                    opacity: Math.max(0.4, 1 - i * 0.2),
-                  }}
-                >
-                  <Box
-                    sx={{
-                      flex: 1,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      px: { xs: 1.75, sm: 2 },
-                      pt: { xs: 1.75, sm: 2 },
-                      pb: { xs: 1.5, sm: 1.75 },
-                    }}
-                  >
-                    {/* Header: status + name + connection string */}
-                    <Box sx={{ mb: 1.5 }}>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          mb: 0.5,
-                        }}
-                      >
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          <Skeleton variant="circular" width={13} height={13} />
-                          <Skeleton
-                            variant="text"
-                            width={60}
-                            height={12}
-                            sx={{ transform: 'none', borderRadius: 0.5 }}
-                          />
-                        </Box>
-                        <Skeleton
-                          variant="text"
-                          width={70}
-                          height={10}
-                          sx={{ transform: 'none', borderRadius: 0.5 }}
-                        />
-                      </Box>
-                      <Skeleton
-                        variant="text"
-                        width={[160, 130, 150][i]}
-                        height={22}
-                        sx={{ transform: 'none', borderRadius: 0.5, mb: 0.25 }}
-                      />
-                      <Skeleton
-                        variant="text"
-                        width={[180, 200, 170][i]}
-                        height={14}
-                        sx={{ transform: 'none', borderRadius: 0.5 }}
-                      />
-                    </Box>
-
-                    {/* Storage stats band: 2-col + progress bar */}
-                    <Box
-                      sx={{
-                        borderRadius: 1.5,
-                        border: '1px solid',
-                        borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-                        overflow: 'hidden',
-                        mb: 1.5,
-                      }}
-                    >
-                      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)' }}>
-                        {[0, 1].map((j) => (
-                          <Box
-                            key={j}
-                            sx={{
-                              px: { xs: 1.25, sm: 1.5 },
-                              py: { xs: 1.25, sm: 1 },
-                              borderRight: j === 0 ? '1px solid' : 0,
-                              borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-                            }}
-                          >
-                            <Skeleton
-                              variant="text"
-                              width={30}
-                              height={10}
-                              sx={{ transform: 'none', borderRadius: 0.5, mb: 0.5 }}
-                            />
-                            <Skeleton
-                              variant="text"
-                              width={50}
-                              height={18}
-                              sx={{ transform: 'none', borderRadius: 0.5 }}
-                            />
-                          </Box>
-                        ))}
-                      </Box>
-                      <Box
-                        sx={{
-                          px: { xs: 1.25, sm: 1.5 },
-                          pb: 1,
-                          pt: 0.75,
-                          borderTop: '1px solid',
-                          borderColor: isDark ? alpha('#fff', 0.05) : alpha('#000', 0.06),
-                        }}
-                      >
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                          <Skeleton
-                            variant="text"
-                            width={50}
-                            height={10}
-                            sx={{ transform: 'none', borderRadius: 0.5 }}
-                          />
-                          <Skeleton
-                            variant="text"
-                            width={60}
-                            height={10}
-                            sx={{ transform: 'none', borderRadius: 0.5 }}
-                          />
-                        </Box>
-                        <Skeleton
-                          variant="rounded"
-                          width="100%"
-                          height={5}
-                          sx={{ borderRadius: 1 }}
-                        />
-                      </Box>
-                    </Box>
-
-                    {/* Action bar */}
-                    <Box
-                      sx={{
-                        mt: 'auto',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: { xs: 0.75, sm: 0.5 },
-                        pt: { xs: 1.5, sm: 1.25 },
-                        borderTop: '1px solid',
-                        borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-                      }}
-                    >
-                      {[0, 1, 2, 3, 4].map((j) => (
-                        <Skeleton
-                          key={j}
-                          variant="rounded"
-                          width={34}
-                          height={34}
-                          sx={{ borderRadius: 1.5 }}
-                        />
-                      ))}
-                    </Box>
-                  </Box>
-                </Box>
-              </Box>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <Skeleton className="h-3 w-3 rounded-full" />
+                    <Skeleton className="h-3 w-16" />
+                  </div>
+                  <Skeleton className="h-3 w-18" />
+                </div>
+                <Skeleton className="h-5 w-40" />
+                <Skeleton className="h-3 w-44" />
+                <div className="rounded-lg border border-border overflow-hidden">
+                  <div className="grid grid-cols-2">
+                    {[0, 1].map((j) => (
+                      <div key={j} className={`px-3 py-2 ${j === 0 ? 'border-r border-border' : ''}`}>
+                        <Skeleton className="h-2 w-8 mb-1" />
+                        <Skeleton className="h-4 w-12" />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="px-3 py-2 border-t border-border">
+                    <div className="flex justify-between mb-1">
+                      <Skeleton className="h-2 w-12" />
+                      <Skeleton className="h-2 w-16" />
+                    </div>
+                    <Skeleton className="h-1.5 w-full rounded-full" />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 pt-2 border-t border-border">
+                  {[0, 1, 2, 3, 4].map((j) => (
+                    <Skeleton key={j} className="h-8 w-8 rounded-lg" />
+                  ))}
+                </div>
+              </div>
             ))}
-          </Box>
-        </Box>
-      </Box>
+          </div>
+        </div>
+      </div>
     )
   }
 
+  const infoAlertStyle = { background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }
+  const warningAlertStyle = { background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', color: '#b45309' }
+  const successAlertStyle = { background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#15803d' }
+
+  const FormField = ({ label, children, helper }: { label: string; children: React.ReactNode; helper?: string }) => (
+    <div>
+      <Label className="text-xs font-semibold mb-1.5 block">{label}</Label>
+      {children}
+      {helper && <p className="text-xs text-muted-foreground mt-1">{helper}</p>}
+    </div>
+  )
+
   return (
-    <Box>
+    <div>
       {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-          <Typography variant="h4" fontWeight={600}>
-            {t('sshConnections.title')}
-          </Typography>
-          <Tooltip
-            title={
-              <Box>
-                <Typography variant="body2" fontWeight={600} sx={{ mb: 0.5 }}>
-                  {t('sshConnections.singleKeySystem.title')}
-                </Typography>
-                <Typography variant="body2">
-                  {t('sshConnections.singleKeySystem.description')}
-                </Typography>
-              </Box>
-            }
-            arrow
-          >
-            <Info
-              size={16}
-              style={{ color: 'inherit', opacity: 0.45, cursor: 'help', flexShrink: 0 }}
-            />
-          </Tooltip>
-        </Box>
-        <Typography variant="body2" color="text.secondary">
-          {t('sshConnections.subtitle')}
-        </Typography>
-      </Box>
+      <div className="mb-8">
+        <div className="flex items-center gap-2 mb-1">
+          <p className="text-2xl font-bold">{t('sshConnections.title')}</p>
+          <span title={`${t('sshConnections.singleKeySystem.title')}: ${t('sshConnections.singleKeySystem.description')}`} className="cursor-help opacity-50">
+            <Info size={16} />
+          </span>
+        </div>
+        <p className="text-sm text-muted-foreground">{t('sshConnections.subtitle')}</p>
+      </div>
 
       {/* Statistics Band */}
       {keyExists && (
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            borderRadius: 2,
-            border: '1px solid',
-            borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-            overflow: 'hidden',
-            mb: 3,
-            bgcolor: isDark ? alpha('#fff', 0.025) : alpha('#000', 0.018),
-            boxShadow: isDark
-              ? `0 0 0 1px ${alpha('#fff', 0.04)}, 0 2px 8px ${alpha('#000', 0.2)}`
-              : `0 0 0 1px ${alpha('#000', 0.06)}, 0 2px 6px ${alpha('#000', 0.05)}`,
-          }}
-        >
+        <div className="grid grid-cols-3 rounded-xl border border-border overflow-hidden mb-6">
           {[
-            {
-              label: t('sshConnections.stats.totalConnections'),
-              value: stats.totalConnections,
-              icon: <Wifi size={13} />,
-              color: theme.palette.primary.main,
-            },
-            {
-              label: t('sshConnections.stats.active'),
-              value: stats.activeConnections,
-              icon: <CheckCircle size={13} />,
-              color: theme.palette.success.main,
-            },
-            {
-              label: t('sshConnections.stats.failed'),
-              value: stats.failedConnections,
-              icon: <XCircle size={13} />,
-              color: theme.palette.error.main,
-            },
+            { label: t('sshConnections.stats.totalConnections'), value: stats.totalConnections, icon: <Wifi size={13} />, color: '#2563eb' },
+            { label: t('sshConnections.stats.active'), value: stats.activeConnections, icon: <CheckCircle size={13} />, color: '#16a34a' },
+            { label: t('sshConnections.stats.failed'), value: stats.failedConnections, icon: <XCircle size={13} />, color: '#dc2626' },
           ].map((stat, i) => (
-            <Box
-              key={stat.label}
-              sx={{
-                px: { xs: 1.25, sm: 2 },
-                py: { xs: 1.5, sm: 1.75 },
-                borderRight: i < 2 ? '1px solid' : 0,
-                borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-              }}
-            >
-              <Box
-                sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: { xs: 0.75, sm: 0.5 } }}
-              >
-                <Box
-                  sx={{
-                    color: alpha(stat.color, 0.75),
-                    display: 'flex',
-                    alignItems: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  {stat.icon}
-                </Box>
-                <Typography
-                  sx={{
-                    fontSize: { xs: '0.58rem', sm: '0.6rem' },
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.04em',
-                    color: alpha(stat.color, 0.75),
-                    lineHeight: 1.2,
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {stat.label}
-                </Typography>
-              </Box>
-              <Typography
-                sx={{
-                  fontSize: { xs: '1.75rem', sm: '1.5rem' },
-                  fontWeight: 700,
-                  lineHeight: 1,
-                  fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {stat.value}
-              </Typography>
-            </Box>
+            <div key={stat.label} className={`px-3 sm:px-4 py-3 sm:py-4 ${i < 2 ? 'border-r border-border' : ''}`}>
+              <div className="flex items-center gap-1 mb-1 sm:mb-1.5">
+                <span style={{ color: stat.color, opacity: 0.75 }}>{stat.icon}</span>
+                <span className="text-[0.6rem] font-bold uppercase tracking-wider whitespace-nowrap" style={{ color: stat.color, opacity: 0.75 }}>{stat.label}</span>
+              </div>
+              <p className="text-2xl sm:text-3xl font-bold tabular-nums leading-none">{stat.value}</p>
+            </div>
           ))}
-        </Box>
+        </div>
       )}
 
       {/* System SSH Key Card */}
-      <Box
-        sx={{
-          borderRadius: 2,
-          bgcolor: 'background.paper',
-          overflow: 'hidden',
-          mb: 3,
-          boxShadow: isDark
-            ? `0 0 0 1px ${alpha('#fff', 0.08)}, 0 4px 16px ${alpha('#000', 0.25)}`
-            : `0 0 0 1px ${alpha('#000', 0.08)}, 0 2px 8px ${alpha('#000', 0.07)}`,
-        }}
-      >
-        <Box sx={{ px: { xs: 2, sm: 2.5 }, pt: { xs: 2, sm: 2.5 }, pb: { xs: 2, sm: 2.5 } }}>
-          <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 2 }}>
-            <Box
-              sx={{
-                width: 34,
-                height: 34,
-                borderRadius: 1.5,
-                bgcolor: isDark
-                  ? alpha(theme.palette.primary.main, 0.15)
-                  : alpha(theme.palette.primary.main, 0.1),
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: theme.palette.primary.main,
-                flexShrink: 0,
-              }}
-            >
-              <Key size={18} />
-            </Box>
-            <Typography variant="h6" fontWeight={600} sx={{ flex: 1 }}>
-              {t('sshConnections.systemKey.title')}
-            </Typography>
-            {keyExists && (
-              <Chip label="Active" color="success" size="small" icon={<CheckCircle size={14} />} />
-            )}
-          </Stack>
-
-          {!keyExists ? (
-            // No key exists - show generation UI
-            <Box>
-              <Alert severity="warning" sx={{ mb: 2 }}>
-                {t('sshConnections.systemKey.noKey')}
-              </Alert>
-              <Stack direction="row" spacing={2}>
-                <Button
-                  variant="contained"
-                  startIcon={<Plus size={18} />}
-                  onClick={() => setGenerateDialogOpen(true)}
-                >
-                  {t('sshConnections.systemKey.generate')}
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<Key size={18} />}
-                  onClick={() => setImportDialogOpen(true)}
-                >
-                  {t('sshConnections.systemKey.import')}
-                </Button>
-              </Stack>
-            </Box>
-          ) : (
-            // Key exists - show key details
-            <Box>
-              <Stack spacing={2}>
-                {/* Key Type */}
-                <Box>
-                  <Typography variant="caption" color="text.secondary">
-                    {t('sshConnections.systemKey.type')}
-                  </Typography>
-                  <Typography variant="body2" fontWeight={500}>
-                    {systemKey?.key_type?.toUpperCase() || 'Unknown'}
-                  </Typography>
-                </Box>
-
-                {/* Fingerprint */}
-                {systemKey?.fingerprint && (
-                  <Box>
-                    <Stack direction="row" spacing={0.5} alignItems="center" sx={{ mb: 0.25 }}>
-                      <Typography variant="caption" color="text.secondary">
-                        {t('sshConnections.systemKey.fingerprint')}
-                      </Typography>
-                      <Tooltip
-                        title={fingerprintVisible ? 'Hide fingerprint' : 'Reveal fingerprint'}
-                      >
-                        <IconButton
-                          size="small"
-                          onClick={() => setFingerprintVisible((v) => !v)}
-                          sx={{ p: 0.25 }}
-                        >
-                          {fingerprintVisible ? <EyeOff size={13} /> : <Eye size={13} />}
-                        </IconButton>
-                      </Tooltip>
-                    </Stack>
-                    <Typography
-                      variant="body2"
-                      fontWeight={500}
-                      sx={{
-                        fontFamily: 'monospace',
-                        fontSize: '0.85rem',
-                        wordBreak: 'break-all',
-                        filter: fingerprintVisible ? 'none' : 'blur(4px)',
-                        userSelect: fingerprintVisible ? 'auto' : 'none',
-                        transition: 'filter 0.2s ease',
-                      }}
-                    >
-                      {systemKey.fingerprint}
-                    </Typography>
-                  </Box>
-                )}
-
-                {/* Public Key */}
-                <Box>
-                  <Stack direction="row" spacing={0.5} alignItems="center" sx={{ mb: 0.5 }}>
-                    <Typography variant="caption" color="text.secondary">
-                      {t('sshConnections.systemKey.publicKey')}
-                    </Typography>
-                    <Tooltip title={keyVisible ? 'Hide key' : 'Reveal key'}>
-                      <IconButton
-                        size="small"
-                        onClick={() => setKeyVisible((v) => !v)}
-                        sx={{ p: 0.25 }}
-                      >
-                        {keyVisible ? <EyeOff size={13} /> : <Eye size={13} />}
-                      </IconButton>
-                    </Tooltip>
-                  </Stack>
-                  <Box
-                    sx={{
-                      position: 'relative',
-                      bgcolor: 'background.default',
-                      p: 1.5,
-                      pr: 5,
-                      borderRadius: 1,
-                      border: '1px solid',
-                      borderColor: 'divider',
-                    }}
-                  >
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontFamily: 'monospace',
-                        fontSize: '0.75rem',
-                        wordBreak: 'break-all',
-                        maxHeight: '100px',
-                        overflow: 'auto',
-                        filter: keyVisible ? 'none' : 'blur(4px)',
-                        userSelect: keyVisible ? 'auto' : 'none',
-                        transition: 'filter 0.2s ease',
-                      }}
-                    >
-                      {systemKey?.public_key || 'N/A'}
-                    </Typography>
-                    <Box sx={{ position: 'absolute', top: 6, right: 6 }}>
-                      <Tooltip title="Copy to clipboard">
-                        <IconButton size="small" onClick={handleCopyPublicKey}>
-                          <Copy size={15} />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </Box>
-                </Box>
-
-                {/* Action Buttons */}
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} flexWrap="wrap">
-                  <Tooltip title="Automatically deploy SSH key using password authentication">
-                    <Button
-                      variant="contained"
-                      startIcon={<Plus size={18} />}
-                      onClick={() => setDeployDialogOpen(true)}
-                      fullWidth={false}
-                      sx={{ width: { xs: '100%', sm: 'auto' } }}
-                    >
-                      {t('sshConnections.systemKey.actions.deploy')}
-                    </Button>
-                  </Tooltip>
-                  <Tooltip title="Add a connection for a manually deployed SSH key">
-                    <Button
-                      variant="outlined"
-                      startIcon={<Wifi size={18} />}
-                      onClick={() => setTestConnectionDialogOpen(true)}
-                      sx={{ width: { xs: '100%', sm: 'auto' } }}
-                    >
-                      {t('sshConnections.systemKey.actions.addManual')}
-                    </Button>
-                  </Tooltip>
-                  <Tooltip title="Delete system SSH key (connections will be preserved)">
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      startIcon={<Trash2 size={18} />}
-                      onClick={() => setDeleteKeyDialogOpen(true)}
-                      sx={{ width: { xs: '100%', sm: 'auto' } }}
-                    >
-                      {t('sshConnections.systemKey.actions.delete')}
-                    </Button>
-                  </Tooltip>
-                </Stack>
-              </Stack>
-            </Box>
+      <div className="rounded-xl border border-border p-4 sm:p-5 mb-6">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-primary/10 text-primary">
+            <Key size={18} />
+          </div>
+          <p className="text-base font-semibold flex-1">{t('sshConnections.systemKey.title')}</p>
+          {keyExists && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400">
+              <CheckCircle size={12} /> Active
+            </span>
           )}
-        </Box>
-      </Box>
+        </div>
+
+        {!keyExists ? (
+          <div>
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm mb-4" style={warningAlertStyle}>
+              {t('sshConnections.systemKey.noKey')}
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Button onClick={() => setGenerateDialogOpen(true)} className="gap-1.5">
+                <Plus size={18} />
+                {t('sshConnections.systemKey.generate')}
+              </Button>
+              <Button variant="outline" onClick={() => setImportDialogOpen(true)} className="gap-1.5">
+                <Key size={18} />
+                {t('sshConnections.systemKey.import')}
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {/* Key Type */}
+            <div>
+              <p className="text-xs text-muted-foreground">{t('sshConnections.systemKey.type')}</p>
+              <p className="text-sm font-medium">{systemKey?.key_type?.toUpperCase() || 'Unknown'}</p>
+            </div>
+
+            {/* Fingerprint */}
+            {systemKey?.fingerprint && (
+              <div>
+                <div className="flex items-center gap-1 mb-0.5">
+                  <p className="text-xs text-muted-foreground">{t('sshConnections.systemKey.fingerprint')}</p>
+                  <button type="button" onClick={() => setFingerprintVisible((v) => !v)} className="p-0.5 text-muted-foreground hover:text-foreground transition-colors" title={fingerprintVisible ? 'Hide fingerprint' : 'Reveal fingerprint'}>
+                    {fingerprintVisible ? <EyeOff size={13} /> : <Eye size={13} />}
+                  </button>
+                </div>
+                <p className="text-sm font-medium font-mono break-all transition-all" style={{ filter: fingerprintVisible ? 'none' : 'blur(4px)', userSelect: fingerprintVisible ? 'auto' : 'none' }}>
+                  {systemKey.fingerprint}
+                </p>
+              </div>
+            )}
+
+            {/* Public Key */}
+            <div>
+              <div className="flex items-center gap-1 mb-1">
+                <p className="text-xs text-muted-foreground">{t('sshConnections.systemKey.publicKey')}</p>
+                <button type="button" onClick={() => setKeyVisible((v) => !v)} className="p-0.5 text-muted-foreground hover:text-foreground transition-colors" title={keyVisible ? 'Hide key' : 'Reveal key'}>
+                  {keyVisible ? <EyeOff size={13} /> : <Eye size={13} />}
+                </button>
+              </div>
+              <div className="relative bg-muted/30 p-3 pr-10 rounded-lg border border-border">
+                <p className="text-xs font-mono break-all max-h-24 overflow-auto transition-all" style={{ filter: keyVisible ? 'none' : 'blur(4px)', userSelect: keyVisible ? 'auto' : 'none' }}>
+                  {systemKey?.public_key || 'N/A'}
+                </p>
+                <button type="button" onClick={handleCopyPublicKey} title="Copy to clipboard" className="absolute top-2 right-2 p-1 text-muted-foreground hover:text-foreground transition-colors">
+                  <Copy size={15} />
+                </button>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-3">
+              <Button onClick={() => setDeployDialogOpen(true)} className="w-full sm:w-auto gap-1.5" title="Automatically deploy SSH key using password authentication">
+                <Plus size={18} />
+                {t('sshConnections.systemKey.actions.deploy')}
+              </Button>
+              <Button variant="outline" onClick={() => setTestConnectionDialogOpen(true)} className="w-full sm:w-auto gap-1.5" title="Add a connection for a manually deployed SSH key">
+                <Wifi size={18} />
+                {t('sshConnections.systemKey.actions.addManual')}
+              </Button>
+              <Button variant="outline" onClick={() => setDeleteKeyDialogOpen(true)} className="w-full sm:w-auto gap-1.5 text-destructive border-destructive/40 hover:bg-destructive/10" title="Delete system SSH key (connections will be preserved)">
+                <Trash2 size={18} />
+                {t('sshConnections.systemKey.actions.delete')}
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Remote Connections */}
-      <Box>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            mb: 2,
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box>
-              <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1.3 }}>
-                Remote Connections
-              </Typography>
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div>
+              <p className="text-base font-bold leading-tight">Remote Connections</p>
               {connections.length > 0 && (
-                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-                  {connections.length} machine{connections.length !== 1 ? 's' : ''} configured
-                </Typography>
+                <p className="text-xs text-muted-foreground">{connections.length} machine{connections.length !== 1 ? 's' : ''} configured</p>
               )}
-            </Box>
+            </div>
             {!keyExists && connections.length > 0 && (
-              <Tooltip title={t('sshConnections.systemKey.noKey')} arrow placement="right">
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: theme.palette.warning.main,
-                    cursor: 'help',
-                  }}
-                >
-                  <Info size={18} />
-                </Box>
-              </Tooltip>
+              <span title={t('sshConnections.systemKey.noKey')} className="text-amber-500 cursor-help">
+                <Info size={18} />
+              </span>
             )}
-          </Box>
-          <Tooltip title="Refresh connections" arrow>
-            <IconButton
-              size="small"
-              onClick={() => queryClient.invalidateQueries({ queryKey: ['ssh-connections'] })}
-              sx={{
-                width: 32,
-                height: 32,
-                borderRadius: 1.5,
-                color: 'text.secondary',
-                '&:hover': {
-                  bgcolor: isDark ? alpha('#fff', 0.07) : alpha('#000', 0.06),
-                  color: 'text.primary',
-                },
-              }}
-            >
-              <RefreshCw size={16} />
-            </IconButton>
-          </Tooltip>
-        </Box>
+          </div>
+          <button
+            type="button"
+            title="Refresh connections"
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['ssh-connections'] })}
+            className="w-8 h-8 flex items-center justify-center rounded-xl border border-border text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+          >
+            <RefreshCw size={16} />
+          </button>
+        </div>
 
         {connections.length === 0 ? (
-          <Box
-            sx={{
-              borderRadius: 2,
-              border: '1px solid',
-              borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-              bgcolor: isDark ? alpha('#fff', 0.025) : alpha('#000', 0.018),
-              px: 3,
-              py: 4,
-              textAlign: 'center',
-            }}
-          >
-            <Box
-              sx={{
-                width: 44,
-                height: 44,
-                borderRadius: 2,
-                bgcolor: isDark
-                  ? alpha(theme.palette.primary.main, 0.12)
-                  : alpha(theme.palette.primary.main, 0.08),
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: theme.palette.primary.main,
-                mx: 'auto',
-                mb: 1.5,
-              }}
-            >
+          <div className="rounded-xl border border-border bg-muted/10 px-6 py-10 text-center">
+            <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
               <Wifi size={22} />
-            </Box>
-            <Typography variant="body1" fontWeight={600} sx={{ mb: 0.5 }}>
-              No remote machines yet
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.82rem' }}>
+            </div>
+            <p className="text-base font-semibold mb-1">No remote machines yet</p>
+            <p className="text-sm text-muted-foreground">
               {keyExists
                 ? 'Deploy your SSH key to a remote server to get started.'
                 : 'Generate or import an SSH key first, then deploy it to remote servers.'}
-            </Typography>
-          </Box>
+            </p>
+          </div>
         ) : (
-          <Box
-            sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: { xs: 2, sm: 2.5 },
-            }}
-          >
+          <div className="flex flex-wrap gap-4 sm:gap-5">
             {connections.map((connection) => (
-              <Box
-                key={connection.id}
-                sx={{
-                  flex: {
-                    xs: '0 0 100%',
-                    sm: '0 0 calc(50% - 10px)',
-                    md: '0 0 calc(33.333% - 14px)',
-                  },
-                  minWidth: 0,
-                  display: 'flex',
-                }}
-              >
+              <div key={connection.id} className="w-full sm:w-[calc(50%-10px)] md:w-[calc(33.333%-14px)] min-w-0 flex">
                 <RemoteMachineCard
                   machine={connection}
                   onEdit={handleEditConnection}
@@ -1324,725 +794,281 @@ export default function SSHConnectionsSingleKey() {
                   onDeployKey={handleDeployKeyToConnection}
                   canManageConnections={canManageSsh}
                 />
-              </Box>
+              </div>
             ))}
-          </Box>
+          </div>
         )}
-      </Box>
+      </div>
 
       {/* Generate Key Dialog */}
-      <Dialog
-        open={generateDialogOpen}
-        onClose={() => setGenerateDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>{t('sshConnections.generateDialog.title')}</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            <Alert severity="info">
-              This will generate a new SSH key pair for your system. You can only have one system
-              key at a time.
-            </Alert>
-
-            <FormControl fullWidth>
-              <InputLabel>{t('sshConnections.generateDialog.keyType')}</InputLabel>
-              <Select
-                value={keyType}
-                label={t('sshConnections.generateDialog.keyType')}
-                onChange={(e) => setKeyType(e.target.value)}
-              >
-                <MenuItem value="ed25519">{t('sshConnections.generateDialog.ed25519')}</MenuItem>
-                <MenuItem value="rsa">{t('sshConnections.generateDialog.rsa')}</MenuItem>
-                <MenuItem value="ecdsa">{t('sshConnections.generateDialog.ecdsa')}</MenuItem>
-              </Select>
-            </FormControl>
-          </Stack>
+      <Dialog open={generateDialogOpen} onOpenChange={(open) => !open && setGenerateDialogOpen(false)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>{t('sshConnections.generateDialog.title')}</DialogTitle></DialogHeader>
+          <div className="flex flex-col gap-4 pt-1">
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={infoAlertStyle}>
+              This will generate a new SSH key pair for your system. You can only have one system key at a time.
+            </div>
+            <FormField label={t('sshConnections.generateDialog.keyType')}>
+              <select value={keyType} onChange={(e) => setKeyType(e.target.value)} className="w-full rounded-md border border-input bg-background h-9 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring">
+                <option value="ed25519">{t('sshConnections.generateDialog.ed25519')}</option>
+                <option value="rsa">{t('sshConnections.generateDialog.rsa')}</option>
+                <option value="ecdsa">{t('sshConnections.generateDialog.ecdsa')}</option>
+              </select>
+            </FormField>
+            <div className="flex justify-end gap-2 pt-1">
+              <Button variant="outline" onClick={() => setGenerateDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleGenerateKey} disabled={generateKeyMutation.isPending}>
+                {generateKeyMutation.isPending ? t('sshConnections.generateDialog.generating') : t('sshConnections.generateDialog.generate')}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setGenerateDialogOpen(false)}>Cancel</Button>
-          <Button
-            variant="contained"
-            onClick={handleGenerateKey}
-            disabled={generateKeyMutation.isPending}
-          >
-            {generateKeyMutation.isPending
-              ? t('sshConnections.generateDialog.generating')
-              : t('sshConnections.generateDialog.generate')}
-          </Button>
-        </DialogActions>
       </Dialog>
 
       {/* Import Key Dialog */}
-      <Dialog
-        open={importDialogOpen}
-        onClose={() => setImportDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>{t('sshConnections.importDialog.title')}</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            <Alert severity="info">
-              Import an existing SSH key from your filesystem (e.g., mounted volume). The key will
-              be read from the specified paths and stored in the database.
-            </Alert>
-
-            <TextField
-              label={t('sshConnections.importDialog.keyName')}
-              fullWidth
-              value={importForm.name}
-              onChange={(e) => setImportForm({ ...importForm, name: e.target.value })}
-              placeholder="System SSH Key"
-              InputLabelProps={{ shrink: true }}
-            />
-
-            <TextField
-              label={t('sshConnections.importDialog.privateKeyPath')}
-              fullWidth
-              required
-              value={importForm.private_key_path}
-              onChange={(e) => setImportForm({ ...importForm, private_key_path: e.target.value })}
-              placeholder="/home/borg/.ssh/id_ed25519 or /root/.ssh/id_rsa"
-              helperText="Absolute path to the private key file"
-              InputLabelProps={{ shrink: true }}
-            />
-
-            <TextField
-              label={t('sshConnections.importDialog.publicKeyPath')}
-              fullWidth
-              value={importForm.public_key_path}
-              onChange={(e) => setImportForm({ ...importForm, public_key_path: e.target.value })}
-              placeholder="Leave empty to auto-detect (adds .pub to private key path)"
-              helperText="If not provided, will try {private_key_path}.pub"
-              InputLabelProps={{ shrink: true }}
-            />
-
-            <TextField
-              label={t('sshConnections.importDialog.description')}
-              fullWidth
-              value={importForm.description}
-              onChange={(e) => setImportForm({ ...importForm, description: e.target.value })}
-              placeholder="Imported system SSH key"
-              InputLabelProps={{ shrink: true }}
-              multiline
-              rows={2}
-            />
-          </Stack>
+      <Dialog open={importDialogOpen} onOpenChange={(open) => !open && setImportDialogOpen(false)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>{t('sshConnections.importDialog.title')}</DialogTitle></DialogHeader>
+          <div className="flex flex-col gap-4 pt-1">
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={infoAlertStyle}>
+              Import an existing SSH key from your filesystem (e.g., mounted volume). The key will be read from the specified paths and stored in the database.
+            </div>
+            <FormField label={t('sshConnections.importDialog.keyName')}>
+              <Input value={importForm.name} onChange={(e) => setImportForm({ ...importForm, name: e.target.value })} placeholder="System SSH Key" className="h-9 text-sm" />
+            </FormField>
+            <FormField label={`${t('sshConnections.importDialog.privateKeyPath')} *`} helper="Absolute path to the private key file">
+              <Input value={importForm.private_key_path} onChange={(e) => setImportForm({ ...importForm, private_key_path: e.target.value })} placeholder="/home/borg/.ssh/id_ed25519 or /root/.ssh/id_rsa" className="h-9 text-sm" required />
+            </FormField>
+            <FormField label={t('sshConnections.importDialog.publicKeyPath')} helper="If not provided, will try {private_key_path}.pub">
+              <Input value={importForm.public_key_path} onChange={(e) => setImportForm({ ...importForm, public_key_path: e.target.value })} placeholder="Leave empty to auto-detect (adds .pub to private key path)" className="h-9 text-sm" />
+            </FormField>
+            <FormField label={t('sshConnections.importDialog.description')}>
+              <textarea value={importForm.description} onChange={(e) => setImportForm({ ...importForm, description: e.target.value })} placeholder="Imported system SSH key" rows={2} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
+            </FormField>
+            <div className="flex justify-end gap-2 pt-1">
+              <Button variant="outline" onClick={() => setImportDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleImportKey} disabled={importKeyMutation.isPending || !importForm.private_key_path}>
+                {importKeyMutation.isPending ? t('sshConnections.importDialog.importing') : t('sshConnections.importDialog.import')}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setImportDialogOpen(false)}>Cancel</Button>
-          <Button
-            variant="contained"
-            onClick={handleImportKey}
-            disabled={importKeyMutation.isPending || !importForm.private_key_path}
-          >
-            {importKeyMutation.isPending
-              ? t('sshConnections.importDialog.importing')
-              : t('sshConnections.importDialog.import')}
-          </Button>
-        </DialogActions>
       </Dialog>
 
       {/* Deploy Key Dialog */}
-      <Dialog
-        open={deployDialogOpen}
-        onClose={() => setDeployDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>{t('sshConnections.deployDialog.title')}</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField
-              label={t('sshConnections.deployDialog.host')}
-              fullWidth
-              value={connectionForm.host}
-              onChange={(e) => setConnectionForm({ ...connectionForm, host: e.target.value })}
-              placeholder="192.168.1.100 or example.com"
-              InputLabelProps={{ shrink: true }}
-            />
-            <TextField
-              label={t('sshConnections.deployDialog.username')}
-              fullWidth
-              value={connectionForm.username}
-              onChange={(e) => setConnectionForm({ ...connectionForm, username: e.target.value })}
-              placeholder="root"
-              InputLabelProps={{ shrink: true }}
-            />
-            <TextField
-              label={t('sshConnections.deployDialog.port')}
-              type="number"
-              fullWidth
-              value={connectionForm.port}
-              onChange={(e) =>
-                setConnectionForm({
-                  ...connectionForm,
-                  port: parseInt(e.target.value),
-                })
-              }
-              InputLabelProps={{ shrink: true }}
-            />
-            <TextField
-              label={t('sshConnections.deployDialog.password')}
-              type="password"
-              fullWidth
-              value={connectionForm.password}
-              onChange={(e) => setConnectionForm({ ...connectionForm, password: e.target.value })}
-              placeholder="Server password (for initial deployment)"
-              InputLabelProps={{ shrink: true }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Tooltip
-                      title="The password is used to deploy your public key to the server's authorized_keys file. After deployment, you'll connect using the SSH key."
-                      arrow
-                    >
-                      <Box
-                        component="span"
-                        sx={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          color: 'text.secondary',
-                          cursor: 'help',
-                        }}
-                      >
-                        <Info size={18} />
-                      </Box>
-                    </Tooltip>
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={connectionForm.use_sftp_mode}
-                  onChange={(e) =>
-                    setConnectionForm({ ...connectionForm, use_sftp_mode: e.target.checked })
-                  }
-                />
-              }
-              label={
-                <Box>
-                  <Typography variant="body2">
-                    {t('sshConnections.deployDialog.sftpMode')}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Required by Hetzner Storage Box. Disable for Synology NAS or older SSH servers.
-                  </Typography>
-                </Box>
-              }
-            />
-            <TextField
-              label={t('sshConnections.deployDialog.defaultPath')}
-              fullWidth
-              value={connectionForm.default_path}
-              onChange={(e) =>
-                setConnectionForm({ ...connectionForm, default_path: e.target.value })
-              }
-              placeholder="/home"
-              helperText="Starting directory for SSH file browsing (e.g., /home for Hetzner Storage Box)"
-              InputLabelProps={{ shrink: true }}
-            />
-            {/* Temporarily disabled - feature not fully working yet
-            <TextField
-              label="SSH Path Prefix (Optional)"
-              fullWidth
-              value={connectionForm.ssh_path_prefix}
-              onChange={(e) =>
-                setConnectionForm({ ...connectionForm, ssh_path_prefix: e.target.value })
-              }
-              placeholder="/volume1"
-              helperText="Path prefix for SSH commands (e.g., /volume1 for Synology). SFTP browsing uses paths as-is, SSH prepends this prefix."
-              InputLabelProps={{ shrink: true }}
-            />
-            */}
-            <TextField
-              label={t('sshConnections.deployDialog.mountPoint')}
-              fullWidth
-              value={connectionForm.mount_point}
-              onChange={(e) =>
-                setConnectionForm({ ...connectionForm, mount_point: e.target.value })
-              }
-              placeholder="hetzner or homeserver"
-              helperText="Friendly name for this remote machine (e.g., hetzner, backup-server)"
-              InputLabelProps={{ shrink: true }}
-            />
-          </Stack>
+      <Dialog open={deployDialogOpen} onOpenChange={(open) => !open && setDeployDialogOpen(false)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>{t('sshConnections.deployDialog.title')}</DialogTitle></DialogHeader>
+          <div className="flex flex-col gap-4 pt-1">
+            <FormField label={t('sshConnections.deployDialog.host')}>
+              <Input value={connectionForm.host} onChange={(e) => setConnectionForm({ ...connectionForm, host: e.target.value })} placeholder="192.168.1.100 or example.com" className="h-9 text-sm" />
+            </FormField>
+            <FormField label={t('sshConnections.deployDialog.username')}>
+              <Input value={connectionForm.username} onChange={(e) => setConnectionForm({ ...connectionForm, username: e.target.value })} placeholder="root" className="h-9 text-sm" />
+            </FormField>
+            <FormField label={t('sshConnections.deployDialog.port')}>
+              <Input type="number" value={connectionForm.port} onChange={(e) => setConnectionForm({ ...connectionForm, port: parseInt(e.target.value) })} className="h-9 text-sm" />
+            </FormField>
+            <FormField label={t('sshConnections.deployDialog.password')}>
+              <div className="relative">
+                <Input type="password" value={connectionForm.password} onChange={(e) => setConnectionForm({ ...connectionForm, password: e.target.value })} placeholder="Server password (for initial deployment)" className="h-9 text-sm pr-9" />
+                <span title="The password is used to deploy your public key to the server's authorized_keys file. After deployment, you'll connect using the SSH key." className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground cursor-help">
+                  <Info size={18} />
+                </span>
+              </div>
+            </FormField>
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input type="checkbox" checked={connectionForm.use_sftp_mode} onChange={(e) => setConnectionForm({ ...connectionForm, use_sftp_mode: e.target.checked })} className="mt-0.5" />
+              <div>
+                <p className="text-sm font-medium">{t('sshConnections.deployDialog.sftpMode')}</p>
+                <p className="text-xs text-muted-foreground">Required by Hetzner Storage Box. Disable for Synology NAS or older SSH servers.</p>
+              </div>
+            </label>
+            <FormField label={t('sshConnections.deployDialog.defaultPath')} helper="Starting directory for SSH file browsing (e.g., /home for Hetzner Storage Box)">
+              <Input value={connectionForm.default_path} onChange={(e) => setConnectionForm({ ...connectionForm, default_path: e.target.value })} placeholder="/home" className="h-9 text-sm" />
+            </FormField>
+            <FormField label={t('sshConnections.deployDialog.mountPoint')} helper="Friendly name for this remote machine (e.g., hetzner, backup-server)">
+              <Input value={connectionForm.mount_point} onChange={(e) => setConnectionForm({ ...connectionForm, mount_point: e.target.value })} placeholder="hetzner or homeserver" className="h-9 text-sm" />
+            </FormField>
+            <div className="flex justify-end gap-2 pt-1">
+              <Button variant="outline" onClick={() => setDeployDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleDeployKey} disabled={deployKeyMutation.isPending || !connectionForm.host || !connectionForm.username || !connectionForm.password}>
+                {deployKeyMutation.isPending ? t('sshConnections.deployDialog.deploying') : t('sshConnections.deployDialog.deploy')}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeployDialogOpen(false)}>Cancel</Button>
-          <Button
-            variant="contained"
-            onClick={handleDeployKey}
-            disabled={
-              deployKeyMutation.isPending ||
-              !connectionForm.host ||
-              !connectionForm.username ||
-              !connectionForm.password
-            }
-          >
-            {deployKeyMutation.isPending
-              ? t('sshConnections.deployDialog.deploying')
-              : t('sshConnections.deployDialog.deploy')}
-          </Button>
-        </DialogActions>
       </Dialog>
 
       {/* Test Manual Connection Dialog */}
-      <Dialog
-        open={testConnectionDialogOpen}
-        onClose={() => setTestConnectionDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>{t('sshConnections.manualConnectionDialog.title')}</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            <Alert severity="info" sx={{ fontSize: '0.85rem' }}>
-              <Typography variant="body2" fontWeight={600} gutterBottom>
-                {t('sshConnections.manualConnectionDialog.instructions.title')}
-              </Typography>
-              <Typography variant="caption" component="div" sx={{ mb: 0.5 }}>
-                1. {t('sshConnections.manualConnectionDialog.instructions.step1')}
-              </Typography>
-              <Typography variant="caption" component="div" sx={{ mb: 0.5 }}>
-                2. {t('sshConnections.manualConnectionDialog.instructions.step2')}
-              </Typography>
-              <Typography variant="caption" component="div">
-                3. {t('sshConnections.manualConnectionDialog.instructions.step3')}
-              </Typography>
-            </Alert>
-
-            <TextField
-              label={t('sshConnections.deployDialog.host')}
-              fullWidth
-              value={testConnectionForm.host}
-              onChange={(e) =>
-                setTestConnectionForm({ ...testConnectionForm, host: e.target.value })
-              }
-              placeholder="192.168.1.100 or example.com"
-              InputLabelProps={{ shrink: true }}
-            />
-            <TextField
-              label={t('sshConnections.deployDialog.username')}
-              fullWidth
-              value={testConnectionForm.username}
-              onChange={(e) =>
-                setTestConnectionForm({
-                  ...testConnectionForm,
-                  username: e.target.value,
-                })
-              }
-              placeholder="root"
-              InputLabelProps={{ shrink: true }}
-            />
-            <TextField
-              label={t('sshConnections.deployDialog.port')}
-              type="number"
-              fullWidth
-              value={testConnectionForm.port}
-              onChange={(e) =>
-                setTestConnectionForm({
-                  ...testConnectionForm,
-                  port: parseInt(e.target.value),
-                })
-              }
-              InputLabelProps={{ shrink: true }}
-            />
-
-            <Alert severity="success" sx={{ fontSize: '0.85rem' }}>
+      <Dialog open={testConnectionDialogOpen} onOpenChange={(open) => !open && setTestConnectionDialogOpen(false)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>{t('sshConnections.manualConnectionDialog.title')}</DialogTitle></DialogHeader>
+          <div className="flex flex-col gap-4 pt-1">
+            <div className="p-3 rounded-xl text-sm" style={infoAlertStyle}>
+              <p className="font-semibold mb-1">{t('sshConnections.manualConnectionDialog.instructions.title')}</p>
+              <p className="text-xs mb-0.5">1. {t('sshConnections.manualConnectionDialog.instructions.step1')}</p>
+              <p className="text-xs mb-0.5">2. {t('sshConnections.manualConnectionDialog.instructions.step2')}</p>
+              <p className="text-xs">3. {t('sshConnections.manualConnectionDialog.instructions.step3')}</p>
+            </div>
+            <FormField label={t('sshConnections.deployDialog.host')}>
+              <Input value={testConnectionForm.host} onChange={(e) => setTestConnectionForm({ ...testConnectionForm, host: e.target.value })} placeholder="192.168.1.100 or example.com" className="h-9 text-sm" />
+            </FormField>
+            <FormField label={t('sshConnections.deployDialog.username')}>
+              <Input value={testConnectionForm.username} onChange={(e) => setTestConnectionForm({ ...testConnectionForm, username: e.target.value })} placeholder="root" className="h-9 text-sm" />
+            </FormField>
+            <FormField label={t('sshConnections.deployDialog.port')}>
+              <Input type="number" value={testConnectionForm.port} onChange={(e) => setTestConnectionForm({ ...testConnectionForm, port: parseInt(e.target.value) })} className="h-9 text-sm" />
+            </FormField>
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={successAlertStyle}>
               This will test the connection and add it to your connections list if successful.
-            </Alert>
-          </Stack>
+            </div>
+            <div className="flex justify-end gap-2 pt-1">
+              <Button variant="outline" onClick={() => setTestConnectionDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleTestManualConnection} disabled={testConnectionMutation.isPending || !testConnectionForm.host || !testConnectionForm.username}>
+                {testConnectionMutation.isPending ? 'Testing...' : t('sshConnections.manualConnectionDialog.submit')}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setTestConnectionDialogOpen(false)}>Cancel</Button>
-          <Button
-            variant="contained"
-            onClick={handleTestManualConnection}
-            disabled={
-              testConnectionMutation.isPending ||
-              !testConnectionForm.host ||
-              !testConnectionForm.username
-            }
-          >
-            {testConnectionMutation.isPending
-              ? 'Testing...'
-              : t('sshConnections.manualConnectionDialog.submit')}
-          </Button>
-        </DialogActions>
       </Dialog>
 
       {/* Edit Connection Dialog */}
-      <Dialog
-        open={editConnectionDialogOpen}
-        onClose={() => {
-          setEditConnectionDialogOpen(false)
-          setSelectedConnection(null)
-        }}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>{t('sshConnections.editConnectionDialog.title')}</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField
-              label={t('sshConnections.deployDialog.host')}
-              fullWidth
-              value={editConnectionForm.host}
-              onChange={(e) =>
-                setEditConnectionForm({
-                  ...editConnectionForm,
-                  host: e.target.value,
-                })
-              }
-              placeholder="192.168.1.100 or example.com"
-              InputLabelProps={{ shrink: true }}
-            />
-            <TextField
-              label={t('sshConnections.deployDialog.username')}
-              fullWidth
-              value={editConnectionForm.username}
-              onChange={(e) =>
-                setEditConnectionForm({
-                  ...editConnectionForm,
-                  username: e.target.value,
-                })
-              }
-              placeholder="root"
-              InputLabelProps={{ shrink: true }}
-            />
-            <TextField
-              label={t('sshConnections.deployDialog.port')}
-              type="number"
-              fullWidth
-              value={editConnectionForm.port}
-              onChange={(e) =>
-                setEditConnectionForm({
-                  ...editConnectionForm,
-                  port: parseInt(e.target.value),
-                })
-              }
-              InputLabelProps={{ shrink: true }}
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={editConnectionForm.use_sftp_mode}
-                  onChange={(e) =>
-                    setEditConnectionForm({
-                      ...editConnectionForm,
-                      use_sftp_mode: e.target.checked,
-                    })
-                  }
-                />
-              }
-              label={
-                <Box>
-                  <Typography variant="body2">
-                    {t('sshConnections.deployDialog.sftpMode')}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Required by Hetzner Storage Box. Disable for Synology NAS or older SSH servers.
-                  </Typography>
-                </Box>
-              }
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={editConnectionForm.use_sudo}
-                  onChange={(e) =>
-                    setEditConnectionForm({
-                      ...editConnectionForm,
-                      use_sudo: e.target.checked,
-                    })
-                  }
-                />
-              }
-              label={
-                <Box>
-                  <Typography variant="body2">
-                    {t('sshConnections.deployDialog.useSudo')}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {t('sshConnections.deployDialog.useSudoHint')}
-                  </Typography>
-                </Box>
-              }
-            />
-            <TextField
-              label={t('sshConnections.deployDialog.defaultPath')}
-              fullWidth
-              value={editConnectionForm.default_path}
-              onChange={(e) =>
-                setEditConnectionForm({
-                  ...editConnectionForm,
-                  default_path: e.target.value,
-                })
-              }
-              placeholder="/home"
-              helperText="Starting directory for SSH file browsing (e.g., /home for Hetzner Storage Box)"
-              InputLabelProps={{ shrink: true }}
-            />
-            {/* Temporarily disabled - feature not fully working yet
-            <TextField
-              label="SSH Path Prefix (Optional)"
-              fullWidth
-              value={editConnectionForm.ssh_path_prefix}
-              onChange={(e) =>
-                setEditConnectionForm({
-                  ...editConnectionForm,
-                  ssh_path_prefix: e.target.value,
-                })
-              }
-              placeholder="/volume1"
-              helperText="Path prefix for SSH commands (e.g., /volume1 for Synology). SFTP browsing uses paths as-is, SSH prepends this prefix."
-              InputLabelProps={{ shrink: true }}
-            />
-            */}
-            <TextField
-              label={t('sshConnections.deployDialog.mountPoint')}
-              fullWidth
-              value={editConnectionForm.mount_point}
-              onChange={(e) =>
-                setEditConnectionForm({
-                  ...editConnectionForm,
-                  mount_point: e.target.value,
-                })
-              }
-              placeholder="hetzner or homeserver"
-              helperText="Friendly name for this remote machine (e.g., hetzner, backup-server)"
-              InputLabelProps={{ shrink: true }}
-            />
-            <Alert severity="info" sx={{ fontSize: '0.85rem' }}>
+      <Dialog open={editConnectionDialogOpen} onOpenChange={(open) => { if (!open) { setEditConnectionDialogOpen(false); setSelectedConnection(null) } }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>{t('sshConnections.editConnectionDialog.title')}</DialogTitle></DialogHeader>
+          <div className="flex flex-col gap-4 pt-1">
+            <FormField label={t('sshConnections.deployDialog.host')}>
+              <Input value={editConnectionForm.host} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, host: e.target.value })} placeholder="192.168.1.100 or example.com" className="h-9 text-sm" />
+            </FormField>
+            <FormField label={t('sshConnections.deployDialog.username')}>
+              <Input value={editConnectionForm.username} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, username: e.target.value })} placeholder="root" className="h-9 text-sm" />
+            </FormField>
+            <FormField label={t('sshConnections.deployDialog.port')}>
+              <Input type="number" value={editConnectionForm.port} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, port: parseInt(e.target.value) })} className="h-9 text-sm" />
+            </FormField>
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input type="checkbox" checked={editConnectionForm.use_sftp_mode} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, use_sftp_mode: e.target.checked })} className="mt-0.5" />
+              <div>
+                <p className="text-sm font-medium">{t('sshConnections.deployDialog.sftpMode')}</p>
+                <p className="text-xs text-muted-foreground">Required by Hetzner Storage Box. Disable for Synology NAS or older SSH servers.</p>
+              </div>
+            </label>
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input type="checkbox" checked={editConnectionForm.use_sudo} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, use_sudo: e.target.checked })} className="mt-0.5" />
+              <div>
+                <p className="text-sm font-medium">{t('sshConnections.deployDialog.useSudo')}</p>
+                <p className="text-xs text-muted-foreground">{t('sshConnections.deployDialog.useSudoHint')}</p>
+              </div>
+            </label>
+            <FormField label={t('sshConnections.deployDialog.defaultPath')} helper="Starting directory for SSH file browsing (e.g., /home for Hetzner Storage Box)">
+              <Input value={editConnectionForm.default_path} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, default_path: e.target.value })} placeholder="/home" className="h-9 text-sm" />
+            </FormField>
+            <FormField label={t('sshConnections.deployDialog.mountPoint')} helper="Friendly name for this remote machine (e.g., hetzner, backup-server)">
+              <Input value={editConnectionForm.mount_point} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, mount_point: e.target.value })} placeholder="hetzner or homeserver" className="h-9 text-sm" />
+            </FormField>
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={infoAlertStyle}>
               Update the connection details. You may want to test the connection after updating.
-            </Alert>
-          </Stack>
+            </div>
+            <div className="flex justify-end gap-2 pt-1">
+              <Button variant="outline" onClick={() => { setEditConnectionDialogOpen(false); setSelectedConnection(null) }}>Cancel</Button>
+              <Button onClick={handleUpdateConnection} disabled={updateConnectionMutation.isPending || !editConnectionForm.host || !editConnectionForm.username}>
+                {updateConnectionMutation.isPending ? 'Updating...' : t('sshConnections.editConnectionDialog.submit')}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              setEditConnectionDialogOpen(false)
-              setSelectedConnection(null)
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleUpdateConnection}
-            disabled={
-              updateConnectionMutation.isPending ||
-              !editConnectionForm.host ||
-              !editConnectionForm.username
-            }
-          >
-            {updateConnectionMutation.isPending
-              ? 'Updating...'
-              : t('sshConnections.editConnectionDialog.submit')}
-          </Button>
-        </DialogActions>
       </Dialog>
 
       {/* Delete Connection Dialog */}
-      <Dialog
-        open={deleteConnectionDialogOpen}
-        onClose={() => {
-          setDeleteConnectionDialogOpen(false)
-          setSelectedConnection(null)
-        }}
-        maxWidth="xs"
-        fullWidth
-      >
-        <DialogTitle>{t('sshConnections.deleteConnectionDialog.title')}</DialogTitle>
-        <DialogContent>
-          <Alert severity="warning" sx={{ mb: 2 }}>
-            Are you sure you want to delete this connection?
-          </Alert>
-          {selectedConnection && (
-            <Stack spacing={1}>
-              <Typography variant="body2">
-                <strong>Host:</strong> {selectedConnection.host}
-              </Typography>
-              <Typography variant="body2">
-                <strong>Username:</strong> {selectedConnection.username}
-              </Typography>
-              <Typography variant="body2">
-                <strong>Port:</strong> {selectedConnection.port}
-              </Typography>
-            </Stack>
-          )}
+      <Dialog open={deleteConnectionDialogOpen} onOpenChange={(open) => { if (!open) { setDeleteConnectionDialogOpen(false); setSelectedConnection(null) } }}>
+        <DialogContent className="max-w-xs">
+          <DialogHeader><DialogTitle>{t('sshConnections.deleteConnectionDialog.title')}</DialogTitle></DialogHeader>
+          <div className="flex flex-col gap-4 pt-1">
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={warningAlertStyle}>
+              Are you sure you want to delete this connection?
+            </div>
+            {selectedConnection && (
+              <div className="flex flex-col gap-1.5 text-sm">
+                <p><strong>Host:</strong> {selectedConnection.host}</p>
+                <p><strong>Username:</strong> {selectedConnection.username}</p>
+                <p><strong>Port:</strong> {selectedConnection.port}</p>
+              </div>
+            )}
+            <div className="flex justify-end gap-2 pt-1">
+              <Button variant="outline" onClick={() => { setDeleteConnectionDialogOpen(false); setSelectedConnection(null) }}>Cancel</Button>
+              <Button onClick={confirmDeleteConnection} disabled={deleteConnectionMutation.isPending} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                {deleteConnectionMutation.isPending ? t('sshConnections.deleteConnectionDialog.deleting') : t('sshConnections.deleteConnectionDialog.delete')}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              setDeleteConnectionDialogOpen(false)
-              setSelectedConnection(null)
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={confirmDeleteConnection}
-            disabled={deleteConnectionMutation.isPending}
-          >
-            {deleteConnectionMutation.isPending
-              ? t('sshConnections.deleteConnectionDialog.deleting')
-              : t('sshConnections.deleteConnectionDialog.delete')}
-          </Button>
-        </DialogActions>
       </Dialog>
 
       {/* Redeploy Key Dialog */}
-      <Dialog
-        open={redeployKeyDialogOpen}
-        onClose={() => {
-          setRedeployKeyDialogOpen(false)
-          setSelectedConnection(null)
-          setRedeployPassword('')
-        }}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Deploy SSH Key to Connection</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            <Alert severity="info">
-              This will deploy your current system SSH key to this connection. You'll need to
-              provide the password to authenticate.
-            </Alert>
+      <Dialog open={redeployKeyDialogOpen} onOpenChange={(open) => { if (!open) { setRedeployKeyDialogOpen(false); setSelectedConnection(null); setRedeployPassword('') } }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>Deploy SSH Key to Connection</DialogTitle></DialogHeader>
+          <div className="flex flex-col gap-4 pt-1">
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={infoAlertStyle}>
+              This will deploy your current system SSH key to this connection. You'll need to provide the password to authenticate.
+            </div>
             {selectedConnection && (
-              <Box sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
-                <Typography variant="body2">
-                  <strong>Host:</strong> {selectedConnection.host}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>Username:</strong> {selectedConnection.username}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>Port:</strong> {selectedConnection.port}
-                </Typography>
-              </Box>
+              <div className="p-3 rounded-xl bg-muted/30 text-sm flex flex-col gap-1">
+                <p><strong>Host:</strong> {selectedConnection.host}</p>
+                <p><strong>Username:</strong> {selectedConnection.username}</p>
+                <p><strong>Port:</strong> {selectedConnection.port}</p>
+              </div>
             )}
-            <TextField
-              label="Password"
-              type="password"
-              fullWidth
-              value={redeployPassword}
-              onChange={(e) => setRedeployPassword(e.target.value)}
-              placeholder="Enter SSH password"
-              helperText="Password is used to deploy the public key to authorized_keys"
-              InputLabelProps={{ shrink: true }}
-            />
-          </Stack>
+            <FormField label="Password" helper="Password is used to deploy the public key to authorized_keys">
+              <Input type="password" value={redeployPassword} onChange={(e) => setRedeployPassword(e.target.value)} placeholder="Enter SSH password" className="h-9 text-sm" />
+            </FormField>
+            <div className="flex justify-end gap-2 pt-1">
+              <Button variant="outline" onClick={() => { setRedeployKeyDialogOpen(false); setSelectedConnection(null); setRedeployPassword('') }}>Cancel</Button>
+              <Button onClick={handleConfirmRedeployKey} disabled={redeployKeyMutation.isPending || !redeployPassword}>
+                {redeployKeyMutation.isPending ? 'Deploying...' : 'Deploy Key'}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              setRedeployKeyDialogOpen(false)
-              setSelectedConnection(null)
-              setRedeployPassword('')
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleConfirmRedeployKey}
-            disabled={redeployKeyMutation.isPending || !redeployPassword}
-          >
-            {redeployKeyMutation.isPending ? 'Deploying...' : 'Deploy Key'}
-          </Button>
-        </DialogActions>
       </Dialog>
 
       {/* Delete SSH Key Dialog */}
-      <Dialog
-        open={deleteKeyDialogOpen}
-        onClose={() => setDeleteKeyDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>{t('sshConnections.deleteKeyDialog.title')}</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            <Alert severity="warning" sx={{ mb: 1 }}>
-              <Typography variant="body2" fontWeight={600} gutterBottom>
-                {t('sshConnections.deleteKeyDialog.confirm')}
-              </Typography>
-            </Alert>
-
+      <Dialog open={deleteKeyDialogOpen} onOpenChange={(open) => !open && setDeleteKeyDialogOpen(false)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>{t('sshConnections.deleteKeyDialog.title')}</DialogTitle></DialogHeader>
+          <div className="flex flex-col gap-4 pt-1">
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={warningAlertStyle}>
+              <p className="font-semibold">{t('sshConnections.deleteKeyDialog.confirm')}</p>
+            </div>
             {systemKey && (
-              <Box
-                sx={{
-                  p: 2,
-                  bgcolor: 'background.default',
-                  borderRadius: 1,
-                  border: '1px solid',
-                  borderColor: 'divider',
-                }}
-              >
-                <Stack spacing={1}>
-                  <Typography variant="body2">
-                    <strong>Key Name:</strong> {systemKey.name}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Key Type:</strong> {systemKey.key_type?.toUpperCase()}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Active Connections:</strong> {connections.length}
-                  </Typography>
-                  {systemKey.fingerprint && (
-                    <Typography
-                      variant="body2"
-                      sx={{ fontFamily: 'monospace', fontSize: '0.75rem', wordBreak: 'break-all' }}
-                    >
-                      <strong>Fingerprint:</strong> {systemKey.fingerprint}
-                    </Typography>
-                  )}
-                </Stack>
-              </Box>
+              <div className="p-3 rounded-xl border border-border bg-muted/10 flex flex-col gap-1.5 text-sm">
+                <p><strong>Key Name:</strong> {systemKey.name}</p>
+                <p><strong>Key Type:</strong> {systemKey.key_type?.toUpperCase()}</p>
+                <p><strong>Active Connections:</strong> {connections.length}</p>
+                {systemKey.fingerprint && (
+                  <p className="font-mono text-xs break-all"><strong>Fingerprint:</strong> {systemKey.fingerprint}</p>
+                )}
+              </div>
             )}
-
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              This action will:
-            </Typography>
-            <Box component="ul" sx={{ m: 0, pl: 3 }}>
-              <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                {t('sshConnections.deleteKeyDialog.warning1')}
-              </Typography>
-              <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                Mark {connections.length} connection(s) as failed
-              </Typography>
-              <Typography component="li" variant="body2" sx={{ mb: 0.5 }}>
-                Clear SSH key from any repositories using it
-              </Typography>
-            </Box>
-
-            <Alert severity="info" sx={{ mt: 2 }}>
-              <Typography variant="body2">
-                {t('sshConnections.deleteKeyDialog.warning2')}
-              </Typography>
-            </Alert>
-          </Stack>
+            <p className="text-sm text-muted-foreground">This action will:</p>
+            <ul className="list-disc pl-5 flex flex-col gap-1 text-sm">
+              <li>{t('sshConnections.deleteKeyDialog.warning1')}</li>
+              <li>Mark {connections.length} connection(s) as failed</li>
+              <li>Clear SSH key from any repositories using it</li>
+            </ul>
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={infoAlertStyle}>
+              {t('sshConnections.deleteKeyDialog.warning2')}
+            </div>
+            <div className="flex justify-end gap-2 pt-1">
+              <Button variant="outline" onClick={() => setDeleteKeyDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleDeleteKey} disabled={deleteKeyMutation.isPending} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
+                {deleteKeyMutation.isPending ? 'Deleting...' : 'Delete SSH Key'}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteKeyDialogOpen(false)}>Cancel</Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={handleDeleteKey}
-            disabled={deleteKeyMutation.isPending}
-          >
-            {deleteKeyMutation.isPending ? 'Deleting...' : 'Delete SSH Key'}
-          </Button>
-        </DialogActions>
       </Dialog>
-    </Box>
+    </div>
   )
 }

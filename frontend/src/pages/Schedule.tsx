@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Box, Typography, Button, Alert, Tabs, Tab } from '@mui/material'
+import { Button } from '../components/ui/button'
 import { Plus } from 'lucide-react'
 import { scheduleAPI, repositoriesAPI, backupAPI, scriptsAPI } from '../services/api'
 import { toast } from 'react-hot-toast'
@@ -425,76 +425,63 @@ const Schedule: React.FC = () => {
   const upcomingJobs = upcomingData?.data?.upcoming_jobs || []
 
   return (
-    <Box>
+    <div>
       {/* Header */}
-      <Box
-        sx={{
-          mb: 3,
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          justifyContent: 'space-between',
-          alignItems: { xs: 'stretch', sm: 'center' },
-          gap: 2,
-        }}
-      >
-        <Box>
-          <Typography variant="h4" fontWeight={600} gutterBottom>
-            {t('schedule.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('schedule.subtitle')}
-          </Typography>
-        </Box>
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+        <div>
+          <p className="text-2xl font-bold">{t('schedule.title')}</p>
+          <p className="text-sm text-muted-foreground">{t('schedule.subtitle')}</p>
+        </div>
 
         {/* Action Button — hidden for viewers */}
         {canCreateSchedule &&
           (currentTab === 0 ? (
             <Button
-              variant="contained"
-              startIcon={<Plus size={18} />}
               onClick={openCreateWizard}
               disabled={!canCreateSchedule}
-              fullWidth
-              sx={{
-                width: { xs: '100%', sm: 'auto' },
-                alignSelf: { xs: 'stretch', sm: 'auto' },
-              }}
+              className="w-full sm:w-auto gap-1.5"
             >
+              <Plus size={18} />
               {t('schedule.createBackup')}
             </Button>
           ) : (
             <Button
-              variant="contained"
-              startIcon={<Plus size={18} />}
               onClick={() => scheduledChecksSectionRef.current?.openAddDialog()}
               disabled={!canCreateSchedule}
-              fullWidth
-              sx={{
-                width: { xs: '100%', sm: 'auto' },
-                alignSelf: { xs: 'stretch', sm: 'auto' },
-              }}
+              className="w-full sm:w-auto gap-1.5"
             >
+              <Plus size={18} />
               {t('schedule.addCheck')}
             </Button>
           ))}
-      </Box>
+      </div>
 
       {/* Tabs */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-        <Tabs value={currentTab} onChange={(_, newValue) => setCurrentTab(newValue)}>
-          <Tab label={t('schedule.tabs.backupJobs')} />
-          <Tab label={t('schedule.tabs.repositoryChecks')} />
-        </Tabs>
-      </Box>
+      <div className="flex border-b border-border mb-6">
+        <button
+          type="button"
+          onClick={() => setCurrentTab(0)}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${currentTab === 0 ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+        >
+          {t('schedule.tabs.backupJobs')}
+        </button>
+        <button
+          type="button"
+          onClick={() => setCurrentTab(1)}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${currentTab === 1 ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+        >
+          {t('schedule.tabs.repositoryChecks')}
+        </button>
+      </div>
 
       {/* Tab Content: Backup Jobs */}
       {currentTab === 0 && (
-        <Box>
+        <div>
           {/* No repositories warning */}
           {!loadingRepositories && (!repositories || repositories.length === 0) && (
-            <Alert severity="info" sx={{ mb: 3 }}>
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm mb-6" style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}>
               {t('schedule.noRepositories')}
-            </Alert>
+            </div>
           )}
 
           {/* Running Scheduled Jobs */}
@@ -542,14 +529,14 @@ const Schedule: React.FC = () => {
             onFilterRepositoryChange={setFilterRepository}
             onFilterStatusChange={setFilterStatus}
           />
-        </Box>
+        </div>
       )}
 
       {/* Tab Content: Repository Checks */}
       {currentTab === 1 && (
-        <Box>
+        <div>
           <ScheduledChecksSection ref={scheduledChecksSectionRef} />
-        </Box>
+        </div>
       )}
 
       {/* Delete Confirmation Dialog */}
@@ -571,7 +558,7 @@ const Schedule: React.FC = () => {
         scripts={scriptsData?.data || []}
         onSubmit={handleWizardSubmit}
       />
-    </Box>
+    </div>
   )
 }
 

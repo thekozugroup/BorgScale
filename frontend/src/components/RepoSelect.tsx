@@ -1,20 +1,15 @@
 import React from 'react'
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Box,
-  Typography,
-  Stack,
-  useTheme,
-  alpha,
-} from '@mui/material'
-import type { SxProps, Theme } from '@mui/material'
 import { Database } from 'lucide-react'
 import { Repository } from '../types'
 import RepoMenuItem from './RepoMenuItem'
 import BorgVersionChip from './BorgVersionChip'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from '@/components/ui/select'
+import { Label } from '@/components/ui/label'
 
 interface RepoSelectProps {
   repositories: Repository[]
@@ -31,10 +26,12 @@ interface RepoSelectProps {
   size?: 'small' | 'medium'
   disabled?: boolean
   hidePath?: boolean
-  /** Extra MenuItems rendered before the repo list (e.g. an "All" option) */
+  /** Extra items rendered before the repo list (e.g. an "All" option) */
   prefixItems?: React.ReactNode
   fullWidth?: boolean
-  sx?: SxProps<Theme>
+  // Accept sx but ignore it (for compatibility)
+  sx?: object
+  className?: string
 }
 
 export default function RepoSelect({
@@ -52,153 +49,103 @@ export default function RepoSelect({
   disabled = false,
   hidePath = false,
   prefixItems,
-  fullWidth = true,
-  sx,
+  className,
 }: RepoSelectProps) {
-  const theme = useTheme()
-
-  // Find selected repo for rich renderValue
   const selectedRepo =
     value && value !== ''
-      ? repositories.find((r) => (valueKey === 'id' ? r.id === value : r.path === value))
+      ? repositories.find((r) => (valueKey === 'id' ? r.id === Number(value) : r.path === value))
       : null
 
-  const selectSx: SxProps<Theme> =
-    size === 'medium'
-      ? {
-          minHeight: { xs: 52, sm: 58 },
-          '& .MuiSelect-select': {
-            display: 'flex',
-            alignItems: 'center',
-          },
-          ...sx,
-        }
-      : {
-          '& .MuiSelect-select': {
-            display: 'flex',
-            alignItems: 'center',
-          },
-          ...sx,
-        }
+  const strValue = value !== null && value !== undefined && value !== '' ? String(value) : ''
+
+  const renderSelectedValue = () => {
+    if (loading) {
+      return <span className="text-muted-foreground text-sm">{loadingLabel}</span>
+    }
+    if (!strValue || !selectedRepo) {
+      if (strValue && fallbackDisplayValue) {
+        return <span className="text-sm font-semibold text-muted-foreground">{fallbackDisplayValue}</span>
+      }
+      return <span className="text-sm text-muted-foreground">{placeholderLabel}</span>
+    }
+
+    if (size === 'small') {
+      return (
+        <div className="flex items-center gap-1.5">
+          <Database size={13} />
+          <span className="text-sm font-medium truncate">{selectedRepo.name}</span>
+          <BorgVersionChip borgVersion={selectedRepo.borg_version} compact />
+        </div>
+      )
+    }
+
+    return (
+      <div className="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
+        <Database size={16} className="flex-shrink-0" />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1">
+            <span className="text-sm font-semibold truncate leading-tight">{selectedRepo.name}</span>
+            <BorgVersionChip borgVersion={selectedRepo.borg_version} compact />
+          </div>
+          <p
+            className="text-[0.62rem] truncate leading-snug text-muted-foreground"
+            style={{ fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,SFMono-Regular,monospace' }}
+          >
+            {selectedRepo.path}
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <FormControl
-      fullWidth={fullWidth}
-      size={size}
-      sx={{ minWidth: { xs: '100%', sm: 300 }, ...sx }}
-    >
-      {label && <InputLabel>{label}</InputLabel>}
+    <div className={className ?? 'w-full'}>
+      {label && <Label className="mb-1 block">{label}</Label>}
       <Select
-        value={value}
-        onChange={(e) => onChange(e.target.value as number | string)}
-        label={label || undefined}
-        disabled={disabled || loading}
-        sx={selectSx}
-        renderValue={(val) => {
-          if (loading) {
-            return (
-              <Typography variant="body2" color="text.secondary">
-                {loadingLabel}
-              </Typography>
-            )
+        value={strValue}
+        onValueChange={(val) => {
+          if (valueKey === 'id') {
+            onChange(Number(val))
+          } else {
+            onChange(val)
           }
-          if (!val || val === '' || !selectedRepo) {
-            if (val && val !== '' && fallbackDisplayValue) {
-              return (
-                <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-                  {fallbackDisplayValue}
-                </Typography>
-              )
-            }
-            return (
-              <Typography variant="body2" color="text.disabled">
-                {placeholderLabel}
-              </Typography>
-            )
-          }
-
-          if (size === 'small') {
-            // Compact: icon + name only
-            return (
-              <Stack direction="row" spacing={0.75} alignItems="center">
-                <Database size={13} />
-                <Typography variant="body2" fontWeight={500} noWrap>
-                  {selectedRepo.name}
-                </Typography>
-                <BorgVersionChip borgVersion={selectedRepo.borg_version} compact />
-              </Stack>
-            )
-          }
-
-          // Medium: icon + name + monospace path
-          return (
-            <Stack
-              direction="row"
-              spacing={1}
-              alignItems="center"
-              sx={{ minWidth: 0, flex: 1, overflow: 'hidden' }}
-            >
-              <Database size={16} style={{ flexShrink: 0 }} />
-              <Box sx={{ minWidth: 0, flex: 1 }}>
-                <Stack direction="row" spacing={0.5} alignItems="center">
-                  <Typography variant="body2" fontWeight={600} noWrap sx={{ lineHeight: 1.3 }}>
-                    {selectedRepo.name}
-                  </Typography>
-                  <BorgVersionChip borgVersion={selectedRepo.borg_version} compact />
-                </Stack>
-                <Typography
-                  sx={{
-                    fontFamily:
-                      '"JetBrains Mono","Fira Code",ui-monospace,SFMono-Regular,monospace',
-                    fontSize: '0.62rem',
-                    color: 'text.disabled',
-                    lineHeight: 1.4,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {selectedRepo.path}
-                </Typography>
-              </Box>
-            </Stack>
-          )
         }}
+        disabled={disabled || loading}
       >
-        {prefixItems}
-        {!prefixItems && (
-          <MenuItem value="" disabled>
-            {loading ? loadingLabel : placeholderLabel}
-          </MenuItem>
-        )}
-        {repositories.map((repo) => (
-          <MenuItem
-            key={repo.id}
-            value={valueKey === 'id' ? repo.id : repo.path}
-            disabled={repo.has_running_maintenance}
-            sx={{
-              minWidth: 0,
-              overflow: 'hidden',
-              '&.Mui-selected': {
-                bgcolor: alpha(
-                  theme.palette.primary.main,
-                  theme.palette.mode === 'dark' ? 0.14 : 0.08
-                ),
-              },
-            }}
-          >
-            <RepoMenuItem
-              name={repo.name}
-              path={repo.path}
-              borgVersion={repo.borg_version}
-              mode={repo.mode as 'full' | 'observe' | undefined}
-              hasRunningMaintenance={repo.has_running_maintenance}
-              maintenanceLabel={maintenanceLabel}
-              hidePath={hidePath}
-            />
-          </MenuItem>
-        ))}
+        <SelectTrigger
+          className={size === 'medium' ? 'h-auto min-h-[52px] sm:min-h-[58px]' : 'h-8'}
+        >
+          {renderSelectedValue()}
+        </SelectTrigger>
+        <SelectContent>
+          {prefixItems}
+          {!prefixItems && (
+            <SelectItem value="" disabled>
+              {loading ? loadingLabel : placeholderLabel}
+            </SelectItem>
+          )}
+          {repositories.map((repo) => {
+            const itemValue = String(valueKey === 'id' ? repo.id : repo.path)
+            return (
+              <SelectItem
+                key={repo.id}
+                value={itemValue}
+                disabled={repo.has_running_maintenance}
+              >
+                <RepoMenuItem
+                  name={repo.name}
+                  path={repo.path}
+                  borgVersion={repo.borg_version}
+                  mode={repo.mode as 'full' | 'observe' | undefined}
+                  hasRunningMaintenance={repo.has_running_maintenance}
+                  maintenanceLabel={maintenanceLabel}
+                  hidePath={hidePath}
+                />
+              </SelectItem>
+            )
+          })}
+        </SelectContent>
       </Select>
-    </FormControl>
+    </div>
   )
 }

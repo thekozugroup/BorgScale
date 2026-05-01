@@ -1,5 +1,4 @@
 import React from 'react'
-import { Box, Typography, Alert, Paper, Chip, Divider } from '@mui/material'
 import { HardDrive, Cloud, FolderOpen, FileCheck, CheckCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
@@ -38,26 +37,31 @@ interface WizardStepRestoreReviewProps {
   archiveName: string
 }
 
-// SummaryRow component
 function SummaryRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: { xs: 'column', sm: 'row' },
-        justifyContent: 'space-between',
-        alignItems: { xs: 'flex-start', sm: 'center' },
-        gap: 0.5,
-        py: 0.75,
-      }}
-    >
-      <Typography variant="body2" color="text.secondary">
-        {label}
-      </Typography>
-      <Box sx={{ textAlign: { xs: 'left', sm: 'right' }, width: { xs: '100%', sm: 'auto' } }}>
-        {children}
-      </Box>
-    </Box>
+    <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-1 py-2">
+      <p className="text-sm text-muted-foreground flex-shrink-0">{label}</p>
+      <div className="text-left sm:text-right">{children}</div>
+    </div>
+  )
+}
+
+const BADGE_PRIMARY = 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/30'
+const BADGE_WARNING = 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30'
+const BADGE_DEFAULT = 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border border-border text-muted-foreground'
+
+function Panel({ icon, title, headerBg, children }: { icon: React.ReactNode; title: string; headerBg?: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-xl border border-border overflow-hidden">
+      <div
+        className="px-4 py-3 border-b border-border flex items-center gap-2"
+        style={{ background: headerBg ?? 'rgba(37,99,235,0.08)' }}
+      >
+        {icon}
+        <p className="text-sm font-semibold">{title}</p>
+      </div>
+      <div className="p-4">{children}</div>
+    </div>
   )
 }
 
@@ -69,254 +73,145 @@ export default function WizardStepRestoreReview({
 }: WizardStepRestoreReviewProps) {
   const { t } = useTranslation()
 
-  // Get destination connection details
   const destinationConnection =
     data.destinationType === 'ssh' && data.destinationConnectionId
       ? sshConnections.find((c) => c.id === data.destinationConnectionId)
       : null
 
-  // Get SSH prefix for displaying paths
   const sshPrefix = destinationConnection
     ? `ssh://${destinationConnection.username}@${destinationConnection.host}:${destinationConnection.port}`
     : ''
 
-  // Get destination path with SSH prefix if applicable
   const getDestinationPath = (originalPath: string) => {
     let path: string
     if (data.restoreStrategy === 'custom' && data.customPath) {
-      // Borg recreates the full archive path structure under the custom destination.
-      // Archive paths have no leading slash (e.g. "home/user/file.txt"), so the result
-      // is customPath + "/" + archivePath (e.g. "/mnt/disk/home/user/file.txt").
       const archivePath = originalPath.startsWith('/') ? originalPath.slice(1) : originalPath
       path = `${data.customPath.replace(/\/$/, '')}/${archivePath}`
     } else {
-      // Original location: borg extracts to cwd=/, preserving the full archive path.
       path = originalPath
     }
-
-    // Ensure path starts with / for proper display
-    if (path && !path.startsWith('/')) {
-      path = '/' + path
-    }
-
-    // Add SSH prefix if restoring to SSH destination
+    if (path && !path.startsWith('/')) path = '/' + path
     return sshPrefix ? `${sshPrefix}${path}` : path
   }
 
-  // Get example paths to show
   const examplePaths = selectedFiles.length > 0 ? selectedFiles.slice(0, 3).map((f) => f.path) : []
   const hasMoreFiles = selectedFiles.length > 3
 
+
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <div className="flex flex-col gap-4">
       {/* Success Alert */}
-      <Alert severity="success" icon={<CheckCircle size={20} />} sx={{ py: 0.5 }}>
-        <Typography variant="body2" fontWeight={600}>
+      <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#15803d' }}>
+        <CheckCircle size={18} className="flex-shrink-0 mt-0.5" />
+        <p className="font-semibold">
           {selectedFiles.length === 0
             ? t('wizard.restoreReview.readyEntireArchive', { archiveName })
             : t('wizard.restoreReview.readyFiles', { count: selectedFiles.length, archiveName })}
-        </Typography>
-      </Alert>
+        </p>
+      </div>
 
       {/* Destination Summary */}
-      <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
-        {/* Header */}
-        <Box
-          sx={{
-            px: 2,
-            py: 1.5,
-            bgcolor: '#1976d220',
-            borderBottom: 1,
-            borderColor: 'divider',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {data.destinationType === 'local' ? <HardDrive size={18} /> : <Cloud size={18} />}
-            <Typography variant="subtitle2" fontWeight={600}>
-              {t('wizard.restoreReview.restoreDestination')}
-            </Typography>
-          </Box>
-        </Box>
+      <Panel
+        icon={data.destinationType === 'local' ? <HardDrive size={16} /> : <Cloud size={16} />}
+        title={t('wizard.restoreReview.restoreDestination')}
+      >
+        <SummaryRow label={t('wizard.restoreReview.destinationType')}>
+          <span className={BADGE_PRIMARY}>
+            {data.destinationType === 'local'
+              ? t('wizard.restoreReview.borgUiServer')
+              : t('wizard.restoreReview.remoteMachine')}
+          </span>
+        </SummaryRow>
 
-        {/* Content */}
-        <Box sx={{ p: 2 }}>
-          <SummaryRow label={t('wizard.restoreReview.destinationType')}>
-            <Chip
-              label={
-                data.destinationType === 'local'
-                  ? t('wizard.restoreReview.borgUiServer')
-                  : t('wizard.restoreReview.remoteMachine')
-              }
-              size="small"
-              color="primary"
-            />
-          </SummaryRow>
+        {data.destinationType === 'ssh' && destinationConnection && (
+          <>
+            <div className="border-t border-border my-1" />
+            <SummaryRow label={t('wizard.restoreReview.sshConnection')}>
+              <span className="text-sm font-mono">
+                {destinationConnection.username}@{destinationConnection.host}:{destinationConnection.port}
+              </span>
+            </SummaryRow>
+          </>
+        )}
 
-          {data.destinationType === 'ssh' && destinationConnection && (
-            <>
-              <Divider sx={{ my: 1 }} />
-              <SummaryRow label={t('wizard.restoreReview.sshConnection')}>
-                <Typography variant="body2" fontFamily="monospace">
-                  {destinationConnection.username}@{destinationConnection.host}:
-                  {destinationConnection.port}
-                </Typography>
-              </SummaryRow>
-            </>
-          )}
+        <div className="border-t border-border my-1" />
+        <SummaryRow label={t('wizard.restoreReview.restoreStrategy')}>
+          <span className={data.restoreStrategy === 'original' ? BADGE_WARNING : BADGE_DEFAULT}>
+            {data.restoreStrategy === 'original'
+              ? t('wizard.restoreReview.originalLocation')
+              : t('wizard.restoreReview.customLocation')}
+          </span>
+        </SummaryRow>
 
-          <Divider sx={{ my: 1 }} />
-          <SummaryRow label={t('wizard.restoreReview.restoreStrategy')}>
-            <Chip
-              label={
-                data.restoreStrategy === 'original'
-                  ? t('wizard.restoreReview.originalLocation')
-                  : t('wizard.restoreReview.customLocation')
-              }
-              size="small"
-              color={data.restoreStrategy === 'original' ? 'warning' : 'default'}
-            />
-          </SummaryRow>
-
-          {data.restoreStrategy === 'custom' && (
-            <>
-              <Divider sx={{ my: 1 }} />
-              <SummaryRow label={t('wizard.restoreReview.customPath')}>
-                <Typography variant="body2" fontFamily="monospace">
-                  {data.customPath || t('wizard.restoreReview.notSet')}
-                </Typography>
-              </SummaryRow>
-            </>
-          )}
-        </Box>
-      </Paper>
+        {data.restoreStrategy === 'custom' && (
+          <>
+            <div className="border-t border-border my-1" />
+            <SummaryRow label={t('wizard.restoreReview.customPath')}>
+              <span className="text-sm font-mono">
+                {data.customPath || t('wizard.restoreReview.notSet')}
+              </span>
+            </SummaryRow>
+          </>
+        )}
+      </Panel>
 
       {/* Restore Preview */}
       {examplePaths.length > 0 && (
-        <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
-          {/* Header */}
-          <Box
-            sx={{
-              px: 2,
-              py: 1.5,
-              bgcolor: '#ed6c0220',
-              borderBottom: 1,
-              borderColor: 'divider',
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <FileCheck size={18} />
-              <Typography variant="subtitle2" fontWeight={600}>
-                {t('wizard.restoreReview.restorePreview')}
-              </Typography>
-            </Box>
-          </Box>
-
-          {/* Content */}
-          <Box sx={{ p: 2 }}>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              gutterBottom
-              sx={{ display: 'block', mb: 1 }}
-            >
-              {t('wizard.restoreReview.previewNote')}
-            </Typography>
-            <Box
-              sx={{
-                p: 2,
-                bgcolor: 'background.default',
-                borderRadius: 1,
-                maxHeight: 200,
-                overflow: 'auto',
-              }}
-            >
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                {examplePaths.map((path, index) => (
-                  <Box key={index} sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ fontSize: '0.75rem', fontFamily: 'monospace' }}
-                    >
-                      Original: {path}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontSize: '0.8125rem',
-                        fontFamily: 'monospace',
-                        color: '#1976d2',
-                        fontWeight: 600,
-                      }}
-                    >
-                      → {getDestinationPath(path)}
-                    </Typography>
-                  </Box>
-                ))}
-                {hasMoreFiles && (
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-                    {t('wizard.restoreReview.andMoreFiles', { count: selectedFiles.length - 3 })}
-                  </Typography>
-                )}
-              </Box>
-            </Box>
-          </Box>
-        </Paper>
+        <Panel
+          icon={<FileCheck size={16} />}
+          title={t('wizard.restoreReview.restorePreview')}
+          headerBg="rgba(245,158,11,0.08)"
+        >
+          <p className="text-xs text-muted-foreground mb-3">{t('wizard.restoreReview.previewNote')}</p>
+          <div className="p-3 rounded-xl bg-muted/30 overflow-auto max-h-48">
+            <div className="flex flex-col gap-3">
+              {examplePaths.map((path, index) => (
+                <div key={index} className="flex flex-col gap-0.5">
+                  <p className="text-xs text-muted-foreground font-mono">Original: {path}</p>
+                  <p className="text-sm font-semibold font-mono" style={{ color: '#2563eb' }}>
+                    → {getDestinationPath(path)}
+                  </p>
+                </div>
+              ))}
+              {hasMoreFiles && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  {t('wizard.restoreReview.andMoreFiles', { count: selectedFiles.length - 3 })}
+                </p>
+              )}
+            </div>
+          </div>
+        </Panel>
       )}
 
       {/* Files Summary */}
-      <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
-        {/* Header */}
-        <Box
-          sx={{
-            px: 2,
-            py: 1.5,
-            bgcolor: '#ed6c0220',
-            borderBottom: 1,
-            borderColor: 'divider',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <FolderOpen size={18} />
-            <Typography variant="subtitle2" fontWeight={600}>
-              {t('wizard.restoreReview.filesToRestore')}
-            </Typography>
-          </Box>
-        </Box>
+      <Panel
+        icon={<FolderOpen size={16} />}
+        title={t('wizard.restoreReview.filesToRestore')}
+        headerBg="rgba(245,158,11,0.08)"
+      >
+        <SummaryRow label={t('wizard.restoreReview.numberOfItems')}>
+          <span className={BADGE_PRIMARY}>
+            {selectedFiles.length === 0
+              ? t('wizard.restoreReview.allFilesInArchive')
+              : t('wizard.restoreReview.files', { count: selectedFiles.length })}
+          </span>
+        </SummaryRow>
 
-        {/* Content */}
-        <Box sx={{ p: 2 }}>
-          <SummaryRow label={t('wizard.restoreReview.numberOfItems')}>
-            <Chip
-              label={
-                selectedFiles.length === 0
-                  ? t('wizard.restoreReview.allFilesInArchive')
-                  : t('wizard.restoreReview.files', { count: selectedFiles.length })
-              }
-              size="small"
-              color="primary"
-            />
-          </SummaryRow>
-
-          {selectedFiles.length === 0 && (
-            <>
-              <Divider sx={{ my: 1 }} />
-              <Alert severity="info" sx={{ mt: 1 }}>
-                <Typography variant="body2">
-                  {t('wizard.restoreReview.entireArchiveNote')}
-                </Typography>
-              </Alert>
-            </>
-          )}
-        </Box>
-      </Paper>
+        {selectedFiles.length === 0 && (
+          <>
+            <div className="border-t border-border my-2" />
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm mt-1" style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}>
+              {t('wizard.restoreReview.entireArchiveNote')}
+            </div>
+          </>
+        )}
+      </Panel>
 
       {/* Ready Alert */}
-      <Alert severity="success" icon={<FileCheck size={20} />}>
-        <Typography variant="body2" fontWeight={600}>
-          {t('wizard.restoreReview.everythingLooksGood')}
-        </Typography>
-      </Alert>
-    </Box>
+      <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#15803d' }}>
+        <FileCheck size={16} className="flex-shrink-0 mt-0.5" />
+        <p className="font-semibold">{t('wizard.restoreReview.everythingLooksGood')}</p>
+      </div>
+    </div>
   )
 }

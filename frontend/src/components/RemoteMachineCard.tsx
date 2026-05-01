@@ -1,14 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import {
-  Box,
-  Typography,
-  IconButton,
-  Tooltip,
-  LinearProgress,
-  useTheme,
-  alpha,
-} from '@mui/material'
-import {
   CheckCircle,
   XCircle,
   AlertTriangle,
@@ -19,6 +10,8 @@ import {
   Network,
   Key,
 } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { useTheme } from '../context/ThemeContext'
 
 interface StorageInfo {
   total: number
@@ -79,11 +72,10 @@ const getStatusIcon = (status: string) => {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getStorageBarColor = (pct: number, theme: any) => {
-  if (pct > 90) return theme.palette.error.main
-  if (pct > 75) return theme.palette.warning.main
-  return theme.palette.success.main
+const getStorageBarColor = (pct: number): string => {
+  if (pct > 90) return '#ef4444'
+  if (pct > 75) return '#f59e0b'
+  return '#22c55e'
 }
 
 export default function RemoteMachineCard({
@@ -96,456 +88,298 @@ export default function RemoteMachineCard({
   canManageConnections = true,
 }: RemoteMachineCardProps) {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
+  const { effectiveMode } = useTheme()
+  const isDark = effectiveMode === 'dark'
   const accent = getStatusAccent(machine.status)
 
-  const iconBtnSx = {
-    width: { xs: 40, sm: 34 },
-    height: { xs: 40, sm: 34 },
-    borderRadius: 1.5,
-    color: 'text.secondary',
-    '&:hover': {
-      bgcolor: isDark ? alpha('#fff', 0.07) : alpha('#000', 0.06),
-      color: 'text.primary',
-    },
-    '&.Mui-disabled': { opacity: 0.28 },
-  }
+  const borderColorSoft = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)'
 
-  const coloredIconBtnSx = (colorKey: 'primary' | 'success' | 'error' | 'warning' | 'info') => {
-    const color = theme.palette[colorKey].main
-    return {
-      ...iconBtnSx,
-      color: alpha(color, isDark ? 0.65 : 0.55),
-      '&:hover': {
-        bgcolor: alpha(color, isDark ? 0.12 : 0.09),
-        color,
-      },
-    }
-  }
+  const iconBtnBase =
+    'flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg transition-colors duration-150 text-muted-foreground hover:text-foreground'
 
   const hasMeta =
     machine.default_path || (machine.mount_point && machine.mount_point !== machine.host)
 
   return (
-    <Box
-      sx={{
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        borderRadius: 2,
-        bgcolor: 'background.paper',
+    <div
+      className="w-full flex flex-col rounded-2xl bg-background transition-all duration-200"
+      style={{
         boxShadow: isDark
-          ? `0 0 0 1px ${alpha('#fff', 0.08)}, 0 4px 16px ${alpha('#000', 0.25)}`
-          : `0 0 0 1px ${alpha('#000', 0.08)}, 0 2px 8px ${alpha('#000', 0.07)}`,
-        transition: 'all 200ms cubic-bezier(0.16,1,0.3,1)',
-        '&:hover': {
-          transform: 'translateY(-2px)',
-          boxShadow: isDark
-            ? `0 0 0 1px ${alpha(accent, 0.4)}, 0 8px 24px ${alpha('#000', 0.3)}, 0 2px 8px ${alpha(accent, 0.1)}`
-            : `0 0 0 1px ${alpha(accent, 0.3)}, 0 8px 24px ${alpha('#000', 0.12)}, 0 2px 8px ${alpha(accent, 0.08)}`,
-        },
+          ? `0 0 0 1px rgba(255,255,255,0.08), 0 4px 16px rgba(0,0,0,0.25)`
+          : `0 0 0 1px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.07)`,
+      }}
+      onMouseEnter={(e) => {
+        ;(e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'
+        ;(e.currentTarget as HTMLDivElement).style.boxShadow = isDark
+          ? `0 0 0 1px ${accent}66, 0 8px 24px rgba(0,0,0,0.3), 0 2px 8px ${accent}1a`
+          : `0 0 0 1px ${accent}4d, 0 8px 24px rgba(0,0,0,0.12), 0 2px 8px ${accent}14`
+      }}
+      onMouseLeave={(e) => {
+        ;(e.currentTarget as HTMLDivElement).style.transform = ''
+        ;(e.currentTarget as HTMLDivElement).style.boxShadow = isDark
+          ? `0 0 0 1px rgba(255,255,255,0.08), 0 4px 16px rgba(0,0,0,0.25)`
+          : `0 0 0 1px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.07)`
       }}
     >
-      <Box
-        sx={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          px: { xs: 1.75, sm: 2 },
-          pt: { xs: 1.75, sm: 2 },
-          pb: { xs: 1.5, sm: 1.75 },
-        }}
-      >
+      <div className="flex-1 flex flex-col px-4 sm:px-5 pt-4 sm:pt-5 pb-3.5 sm:pb-4">
+
         {/* ── Header ── */}
-        <Box sx={{ mb: 1.5 }}>
-          {/* Status label row */}
-          <Box
-            sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Box sx={{ color: accent, display: 'flex', alignItems: 'center' }}>
+        <div className="mb-3">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-1">
+              <span style={{ color: accent, display: 'flex', alignItems: 'center' }}>
                 {getStatusIcon(machine.status)}
-              </Box>
-              <Typography
-                sx={{
-                  fontSize: '0.6rem',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
-                  color: alpha(accent, 0.9),
-                  lineHeight: 1,
-                }}
+              </span>
+              <span
+                className="text-[0.6rem] font-bold uppercase tracking-[0.08em] leading-none"
+                style={{ color: `${accent}e6` }}
               >
                 {machine.status}
-              </Typography>
-            </Box>
-
-            {/* SSH key badge — right of status row, small */}
-            <Typography
-              sx={{
-                fontSize: '0.58rem',
-                fontWeight: 500,
-                color: 'text.disabled',
-                letterSpacing: '0.02em',
-                flexShrink: 0,
-              }}
-            >
+              </span>
+            </div>
+            <span className="text-[0.58rem] font-medium text-muted-foreground flex-shrink-0">
               {machine.ssh_key_name}
-            </Typography>
-          </Box>
+            </span>
+          </div>
 
-          {/* Machine name — full width, no competing badge */}
-          <Typography
-            variant="subtitle1"
-            fontWeight={700}
-            noWrap
+          <p
+            className="font-bold text-base leading-tight truncate mb-0.5"
             title={machine.mount_point || machine.host}
-            sx={{ lineHeight: 1.3, mb: 0.25 }}
           >
             {machine.mount_point || machine.host}
-          </Typography>
+          </p>
 
-          {/* Connection string */}
-          <Typography
-            noWrap
+          <p
+            className="text-[0.7rem] text-muted-foreground truncate"
+            style={{ fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace' }}
             title={`${machine.username}@${machine.host}:${machine.port}`}
-            sx={{
-              fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace',
-              fontSize: '0.7rem',
-              color: 'text.disabled',
-            }}
           >
             {machine.username}@{machine.host}:{machine.port}
-          </Typography>
-        </Box>
+          </p>
+        </div>
 
         {/* ── Storage Stats Band ── */}
         {machine.storage ? (
-          <Box
-            sx={{
-              borderRadius: 1.5,
-              border: '1px solid',
-              borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-              overflow: 'hidden',
-              mb: 1.5,
-              bgcolor: isDark ? alpha('#fff', 0.025) : alpha('#000', 0.018),
+          <div
+            className="rounded-xl overflow-hidden mb-3"
+            style={{
+              border: `1px solid ${borderColorSoft}`,
+              background: isDark ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.018)',
             }}
           >
-            {/* Two-column stats: Used + Free (Total shown inline with bar) */}
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)' }}>
+            {/* Two-column stats */}
+            <div className="grid grid-cols-2">
               {[
-                {
-                  label: t('remoteMachine.used'),
-                  value: machine.storage.used_formatted,
-                  color: theme.palette.warning.main,
-                },
-                {
-                  label: t('remoteMachine.free'),
-                  value: machine.storage.available_formatted,
-                  color: theme.palette.success.main,
-                },
+                { label: t('remoteMachine.used'), value: machine.storage.used_formatted, color: '#f59e0b' },
+                { label: t('remoteMachine.free'), value: machine.storage.available_formatted, color: '#22c55e' },
               ].map((col, i) => (
-                <Box
+                <div
                   key={col.label}
-                  sx={{
-                    px: { xs: 1.25, sm: 1.5 },
-                    py: { xs: 1.25, sm: 1 },
-                    borderRight: i === 0 ? '1px solid' : 0,
-                    borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-                    minWidth: 0,
-                  }}
+                  className="px-4 sm:px-5 py-3 sm:py-2.5 min-w-0"
+                  style={{ borderRight: i === 0 ? `1px solid ${borderColorSoft}` : 'none' }}
                 >
-                  <Typography
-                    noWrap
-                    sx={{
-                      fontSize: '0.6rem',
-                      fontWeight: 700,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.06em',
-                      color: alpha(col.color, 0.75),
-                      lineHeight: 1,
-                      mb: 0.5,
-                    }}
+                  <p
+                    className="text-[0.6rem] font-bold uppercase tracking-[0.06em] leading-none mb-1 truncate"
+                    style={{ color: `${col.color}bf` }}
                   >
                     {col.label}
-                  </Typography>
-                  <Typography
-                    noWrap
-                    sx={{
-                      fontSize: { xs: '0.9rem', sm: '0.85rem' },
-                      fontWeight: 600,
-                      fontVariantNumeric: 'tabular-nums',
-                      lineHeight: 1.2,
-                    }}
-                  >
+                  </p>
+                  <p className="text-sm sm:text-[0.85rem] font-semibold tabular-nums leading-tight truncate">
                     {col.value}
-                  </Typography>
-                </Box>
+                  </p>
+                </div>
               ))}
-            </Box>
+            </div>
 
-            {/* Usage bar with total inline */}
-            <Box
-              sx={{
-                px: { xs: 1.25, sm: 1.5 },
-                pb: 1,
-                borderTop: '1px solid',
-                borderColor: isDark ? alpha('#fff', 0.05) : alpha('#000', 0.06),
-                pt: 0.75,
-              }}
+            {/* Usage bar */}
+            <div
+              className="px-4 sm:px-5 pb-2.5 pt-1.5 border-t"
+              style={{ borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)' }}
             >
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  mb: 0.5,
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                  <Typography sx={{ fontSize: '0.58rem', color: 'text.disabled', lineHeight: 1 }}>
-                    {machine.storage.percent_used.toFixed(1)}% used
-                  </Typography>
-                </Box>
-                <Typography
-                  sx={{
-                    fontSize: '0.58rem',
-                    color: 'text.disabled',
-                    lineHeight: 1,
-                    fontVariantNumeric: 'tabular-nums',
-                  }}
-                >
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-[0.58rem] text-muted-foreground leading-none">
+                  {machine.storage.percent_used.toFixed(1)}% used
+                </span>
+                <span className="text-[0.58rem] text-muted-foreground leading-none tabular-nums">
                   {machine.storage.total_formatted} total
-                </Typography>
-              </Box>
-              <LinearProgress
-                variant="determinate"
-                value={machine.storage.percent_used}
-                sx={{
-                  height: 5,
-                  borderRadius: 1,
-                  bgcolor: isDark ? alpha('#fff', 0.08) : alpha('#000', 0.08),
-                  '& .MuiLinearProgress-bar': {
-                    bgcolor: getStorageBarColor(machine.storage.percent_used, theme),
-                    borderRadius: 1,
-                  },
-                }}
-              />
-            </Box>
-          </Box>
+                </span>
+              </div>
+              <div
+                className="h-1.5 rounded-full overflow-hidden"
+                style={{ background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }}
+              >
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${Math.min(100, machine.storage.percent_used)}%`,
+                    background: getStorageBarColor(machine.storage.percent_used),
+                  }}
+                />
+              </div>
+            </div>
+          </div>
         ) : (
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.75,
-              px: 1.25,
-              py: 0.875,
-              mb: 1.5,
-              borderRadius: 1.5,
-              border: '1px solid',
-              borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-              bgcolor: isDark ? alpha('#fff', 0.025) : alpha('#000', 0.018),
+          <div
+            className="flex items-center gap-2 px-3 py-2.5 mb-3 rounded-xl"
+            style={{
+              border: `1px solid ${borderColorSoft}`,
+              background: isDark ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.018)',
             }}
           >
-            <HardDrive size={14} style={{ opacity: 0.4, flexShrink: 0 }} />
-            <Typography noWrap sx={{ fontSize: '0.75rem', color: 'text.disabled', flex: 1 }}>
+            <HardDrive size={14} className="opacity-40 flex-shrink-0" />
+            <span className="text-sm text-muted-foreground flex-1 truncate">
               {t('remoteMachine.noStorageInfo')}
-            </Typography>
-            <Tooltip title={t('remoteMachine.refreshStorage')} arrow>
-              <IconButton
-                aria-label={t('remoteMachine.refreshStorage')}
-                onClick={() => onRefreshStorage(machine)}
-                sx={{
-                  width: { xs: 36, sm: 30 },
-                  height: { xs: 36, sm: 30 },
-                  flexShrink: 0,
-                  color: 'text.disabled',
-                  '&:hover': { color: 'text.secondary' },
-                }}
-              >
-                <RefreshCw size={14} />
-              </IconButton>
+            </span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={t('remoteMachine.refreshStorage')}
+                  onClick={() => onRefreshStorage(machine)}
+                  className="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <RefreshCw size={14} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{t('remoteMachine.refreshStorage')}</TooltipContent>
             </Tooltip>
-          </Box>
+          </div>
         )}
 
         {/* ── Secondary Metadata ── */}
         {hasMeta && (
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 0.4,
-              mb: 1.5,
-              px: 0.25,
-            }}
-          >
+          <div className="flex flex-col gap-1 mb-3 px-0.5">
             {machine.default_path && (
-              <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5, minWidth: 0 }}>
-                <Typography
-                  sx={{ fontSize: '0.68rem', color: 'text.disabled', lineHeight: 1, flexShrink: 0 }}
-                >
+              <div className="flex items-baseline gap-1 min-w-0">
+                <span className="text-[0.68rem] text-muted-foreground leading-none flex-shrink-0">
                   {t('remoteMachine.defaultPath')}:
-                </Typography>
-                <Typography
-                  noWrap
-                  sx={{
-                    fontSize: '0.68rem',
-                    fontWeight: 600,
-                    color: 'text.secondary',
-                    fontFamily: 'monospace',
-                    lineHeight: 1,
-                    minWidth: 0,
-                  }}
+                </span>
+                <span
+                  className="text-[0.68rem] font-semibold text-foreground truncate min-w-0"
+                  style={{ fontFamily: 'monospace' }}
                 >
                   {machine.default_path}
-                </Typography>
-              </Box>
+                </span>
+              </div>
             )}
             {machine.mount_point && machine.mount_point !== machine.host && (
-              <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.5, minWidth: 0 }}>
-                <Typography
-                  sx={{ fontSize: '0.68rem', color: 'text.disabled', lineHeight: 1, flexShrink: 0 }}
-                >
+              <div className="flex items-baseline gap-1 min-w-0">
+                <span className="text-[0.68rem] text-muted-foreground leading-none flex-shrink-0">
                   {t('remoteMachineCard.mountPoint')}:
-                </Typography>
-                <Typography
-                  noWrap
-                  sx={{
-                    fontSize: '0.68rem',
-                    fontWeight: 600,
-                    color: 'primary.main',
-                    fontFamily: 'monospace',
-                    lineHeight: 1,
-                    minWidth: 0,
-                  }}
+                </span>
+                <span
+                  className="text-[0.68rem] font-semibold text-primary truncate min-w-0"
+                  style={{ fontFamily: 'monospace' }}
                 >
                   {machine.mount_point}
-                </Typography>
-              </Box>
+                </span>
+              </div>
             )}
-          </Box>
+          </div>
         )}
 
         {/* ── Error Message ── */}
         {machine.error_message && (
-          <Box
-            sx={{
-              mb: 1.5,
-              px: 1.25,
-              py: 0.875,
-              bgcolor: alpha(theme.palette.error.main, isDark ? 0.1 : 0.06),
-              borderRadius: 1.5,
-              border: '1px solid',
-              borderColor: alpha(theme.palette.error.main, 0.25),
+          <div
+            className="mb-3 px-3 py-2.5 rounded-xl border"
+            style={{
+              background: isDark ? 'rgba(239,68,68,0.1)' : 'rgba(239,68,68,0.06)',
+              borderColor: 'rgba(239,68,68,0.25)',
             }}
           >
-            <Typography
-              sx={{
-                fontSize: '0.7rem',
-                color: 'error.main',
-                wordBreak: 'break-word',
-                lineHeight: 1.4,
-              }}
-            >
+            <p className="text-[0.7rem] text-destructive break-words leading-snug">
               {machine.error_message}
-            </Typography>
-          </Box>
+            </p>
+          </div>
         )}
 
         {/* ── Action Bar ── */}
-        <Box
-          sx={{
-            mt: 'auto',
-            display: 'flex',
-            alignItems: 'center',
-            gap: { xs: 0.75, sm: 0.5 },
-            pt: { xs: 1.5, sm: 1.25 },
-            borderTop: '1px solid',
-            borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-          }}
+        <div
+          className="mt-auto flex items-center gap-2 sm:gap-1.5 pt-3 sm:pt-2.5 border-t"
+          style={{ borderColor: borderColorSoft }}
         >
           {/* Left cluster */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 0.25 }, flex: 1 }}>
-            <Tooltip title={t('remoteMachine.actions.testConnection')} arrow>
-              <IconButton
-                size="small"
-                aria-label={t('remoteMachine.actions.testConnection')}
-                onClick={() => onTestConnection(machine)}
-                sx={coloredIconBtnSx('primary')}
-              >
-                <Network size={16} />
-              </IconButton>
+          <div className="flex items-center gap-1 sm:gap-0.5 flex-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={t('remoteMachine.actions.testConnection')}
+                  onClick={() => onTestConnection(machine)}
+                  className={`${iconBtnBase} text-blue-500/60 hover:text-blue-500 hover:bg-blue-500/10`}
+                >
+                  <Network size={16} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{t('remoteMachine.actions.testConnection')}</TooltipContent>
             </Tooltip>
-            <Tooltip title={t('remoteMachine.actions.refreshStorage')} arrow>
-              <IconButton
-                size="small"
-                aria-label={t('remoteMachine.actions.refreshStorage')}
-                onClick={() => onRefreshStorage(machine)}
-                sx={coloredIconBtnSx('info')}
-              >
-                <RefreshCw size={16} />
-              </IconButton>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  aria-label={t('remoteMachine.actions.refreshStorage')}
+                  onClick={() => onRefreshStorage(machine)}
+                  className={`${iconBtnBase} text-cyan-500/60 hover:text-cyan-500 hover:bg-cyan-500/10`}
+                >
+                  <RefreshCw size={16} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{t('remoteMachine.actions.refreshStorage')}</TooltipContent>
             </Tooltip>
             {canManageConnections && (
-              <Tooltip title={t('remoteMachineCard.actions.deploy')} arrow>
-                <IconButton
-                  size="small"
-                  aria-label={t('remoteMachineCard.actions.deploy')}
-                  onClick={() => onDeployKey(machine)}
-                  sx={coloredIconBtnSx('success')}
-                >
-                  <Key size={16} />
-                </IconButton>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label={t('remoteMachineCard.actions.deploy')}
+                    onClick={() => onDeployKey(machine)}
+                    className={`${iconBtnBase} text-green-500/60 hover:text-green-500 hover:bg-green-500/10`}
+                  >
+                    <Key size={16} />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>{t('remoteMachineCard.actions.deploy')}</TooltipContent>
               </Tooltip>
             )}
-          </Box>
+          </div>
 
           {/* Right cluster — edit / delete */}
           {canManageConnections && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 0.25 } }}>
-              <Box
-                sx={{
-                  width: '1px',
-                  height: 18,
-                  bgcolor: isDark ? alpha('#fff', 0.1) : alpha('#000', 0.1),
-                  mx: 0.25,
-                  flexShrink: 0,
-                }}
+            <div className="flex items-center gap-1 sm:gap-0.5">
+              <div
+                className="w-px h-4.5 flex-shrink-0 mx-0.5"
+                style={{ background: borderColorSoft, height: 18 }}
               />
-              <Tooltip title={t('remoteMachineCard.actions.edit')} arrow>
-                <IconButton
-                  size="small"
-                  aria-label={t('remoteMachineCard.actions.edit')}
-                  onClick={() => onEdit(machine)}
-                  sx={iconBtnSx}
-                >
-                  <Edit size={16} />
-                </IconButton>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label={t('remoteMachineCard.actions.edit')}
+                    onClick={() => onEdit(machine)}
+                    className={iconBtnBase}
+                  >
+                    <Edit size={16} />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>{t('remoteMachineCard.actions.edit')}</TooltipContent>
               </Tooltip>
-              <Tooltip title={t('remoteMachineCard.actions.delete')} arrow>
-                <IconButton
-                  size="small"
-                  aria-label={t('remoteMachineCard.actions.delete')}
-                  onClick={() => onDelete(machine)}
-                  sx={{
-                    ...iconBtnSx,
-                    color: alpha(theme.palette.error.main, 0.6),
-                    '&:hover': {
-                      color: theme.palette.error.main,
-                      bgcolor: alpha(theme.palette.error.main, isDark ? 0.15 : 0.1),
-                    },
-                  }}
-                >
-                  <Trash2 size={16} />
-                </IconButton>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label={t('remoteMachineCard.actions.delete')}
+                    onClick={() => onDelete(machine)}
+                    className={`${iconBtnBase} text-destructive/60 hover:text-destructive hover:bg-destructive/10`}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>{t('remoteMachineCard.actions.delete')}</TooltipContent>
               </Tooltip>
-            </Box>
+            </div>
           )}
-        </Box>
-      </Box>
-    </Box>
+        </div>
+      </div>
+    </div>
   )
 }

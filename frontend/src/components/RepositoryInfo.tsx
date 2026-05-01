@@ -1,7 +1,8 @@
-import { Card, CardContent, Typography, Box, Chip } from '@mui/material'
 import { Database, Archive, HardDrive, Calendar } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatBytes, formatDate } from '../utils/dateUtils'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
 
 interface RepositoryInfoProps {
   repoInfo?: {
@@ -37,10 +38,8 @@ export default function RepositoryInfo({
   if (loading) {
     return (
       <Card>
-        <CardContent>
-          <Typography variant="body2" color="text.secondary">
-            {t('dialogs.repositoryInfo.loadingInfo')}
-          </Typography>
+        <CardContent className="py-4">
+          <p className="text-sm text-muted-foreground">{t('dialogs.repositoryInfo.loadingInfo')}</p>
         </CardContent>
       </Card>
     )
@@ -52,68 +51,63 @@ export default function RepositoryInfo({
 
   return (
     <Card>
-      <CardContent sx={{ py: 2 }}>
-        <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-          <Box sx={{ flex: '1 1 200px' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-              <Archive size={16} color="#666" />
-              <Typography variant="caption" color="text.secondary" fontWeight={600}>
+      <CardContent className="py-4">
+        <div className="flex gap-6 flex-wrap">
+          <div className="flex-1 min-w-[200px]">
+            <div className="flex items-center gap-2 mb-1">
+              <Archive size={16} className="text-muted-foreground" />
+              <span className="text-xs text-muted-foreground font-semibold">
                 {t('repositoryInfo.archives')}
-              </Typography>
-            </Box>
-            <Typography variant="h6" fontWeight={600}>
-              {archivesCount}
-            </Typography>
-          </Box>
+              </span>
+            </div>
+            <p className="text-xl font-semibold">{archivesCount}</p>
+          </div>
 
-          <Box sx={{ flex: '1 1 200px' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-              <HardDrive size={16} color="#666" />
-              <Typography variant="caption" color="text.secondary" fontWeight={600}>
+          <div className="flex-1 min-w-[200px]">
+            <div className="flex items-center gap-2 mb-1">
+              <HardDrive size={16} className="text-muted-foreground" />
+              <span className="text-xs text-muted-foreground font-semibold">
                 {t('repositoryInfo.totalSize')}
-              </Typography>
-            </Box>
-            <Typography variant="h6" fontWeight={600}>
+              </span>
+            </div>
+            <p className="text-xl font-semibold">
               {stats?.total_size ? formatBytes(stats.total_size) : t('repositoryInfo.na')}
-            </Typography>
-          </Box>
+            </p>
+          </div>
 
-          <Box sx={{ flex: '1 1 200px' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-              <Database size={16} color="#666" />
-              <Typography variant="caption" color="text.secondary" fontWeight={600}>
+          <div className="flex-1 min-w-[200px]">
+            <div className="flex items-center gap-2 mb-1">
+              <Database size={16} className="text-muted-foreground" />
+              <span className="text-xs text-muted-foreground font-semibold">
                 {t('dialogs.repositoryInfo.uniqueData')}
-              </Typography>
-            </Box>
-            <Typography variant="h6" fontWeight={600}>
+              </span>
+            </div>
+            <p className="text-xl font-semibold">
               {stats?.unique_csize ? formatBytes(stats.unique_csize) : t('repositoryInfo.na')}
-            </Typography>
-          </Box>
+            </p>
+          </div>
 
-          <Box sx={{ flex: '1 1 200px' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-              <Calendar size={16} color="#666" />
-              <Typography variant="caption" color="text.secondary" fontWeight={600}>
+          <div className="flex-1 min-w-[200px]">
+            <div className="flex items-center gap-2 mb-1">
+              <Calendar size={16} className="text-muted-foreground" />
+              <span className="text-xs text-muted-foreground font-semibold">
                 {t('repositoryInfo.lastModified')}
-              </Typography>
-            </Box>
-            <Typography variant="body2" fontWeight={600}>
+              </span>
+            </div>
+            <p className="text-sm font-semibold">
               {repoInfo.repository?.last_modified
                 ? formatDate(repoInfo.repository.last_modified)
                 : t('repositoryInfo.na')}
-            </Typography>
-          </Box>
-        </Box>
+            </p>
+          </div>
+        </div>
 
         {repoInfo.encryption?.mode && (
-          <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: 'divider' }}>
-            <Chip
-              label={`${t('repositoryInfo.encryption')}: ${repoInfo.encryption.mode}`}
-              size="small"
-              color="primary"
-              variant="outlined"
-            />
-          </Box>
+          <div className="mt-4 pt-4 border-t border-border">
+            <Badge variant="outline">
+              {t('repositoryInfo.encryption')}: {repoInfo.encryption.mode}
+            </Badge>
+          </div>
         )}
       </CardContent>
     </Card>
