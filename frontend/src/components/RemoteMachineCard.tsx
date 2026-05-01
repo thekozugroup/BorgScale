@@ -53,13 +53,15 @@ interface RemoteMachineCardProps {
   canManageConnections?: boolean
 }
 
-const STATUS_ACCENT: Record<string, string> = {
-  connected: '#059669',
-  failed: '#ef4444',
-  testing: '#f59e0b',
+// Status uses semantic CSS vars so the accent still changes on hover.
+// We map status→a CSS variable name instead of a hex literal.
+const STATUS_CLASS: Record<string, string> = {
+  connected: 'text-primary',
+  failed: 'text-destructive',
+  testing: 'text-muted-foreground',
 }
 
-const getStatusAccent = (status: string) => STATUS_ACCENT[status] ?? '#6b7280'
+const getStatusClass = (status: string) => STATUS_CLASS[status] ?? 'text-muted-foreground'
 
 const getStatusIcon = (status: string) => {
   switch (status) {
@@ -72,10 +74,10 @@ const getStatusIcon = (status: string) => {
   }
 }
 
-const getStorageBarColor = (pct: number): string => {
-  if (pct > 90) return '#ef4444'
-  if (pct > 75) return '#f59e0b'
-  return '#22c55e'
+const getStorageBarClass = (pct: number): string => {
+  if (pct > 90) return 'bg-destructive'
+  if (pct > 75) return 'bg-secondary-foreground'
+  return 'bg-primary'
 }
 
 export default function RemoteMachineCard({
@@ -90,7 +92,7 @@ export default function RemoteMachineCard({
   const { t } = useTranslation()
   const { effectiveMode } = useTheme()
   const isDark = effectiveMode === 'dark'
-  const accent = getStatusAccent(machine.status)
+  const statusClass = getStatusClass(machine.status)
 
   const borderColorSoft = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)'
 
@@ -111,8 +113,8 @@ export default function RemoteMachineCard({
       onMouseEnter={(e) => {
         ;(e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'
         ;(e.currentTarget as HTMLDivElement).style.boxShadow = isDark
-          ? `0 0 0 1px ${accent}66, 0 8px 24px rgba(0,0,0,0.3), 0 2px 8px ${accent}1a`
-          : `0 0 0 1px ${accent}4d, 0 8px 24px rgba(0,0,0,0.12), 0 2px 8px ${accent}14`
+          ? `0 0 0 1px rgba(255,255,255,0.12), 0 8px 24px rgba(0,0,0,0.3)`
+          : `0 0 0 1px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.12)`
       }}
       onMouseLeave={(e) => {
         ;(e.currentTarget as HTMLDivElement).style.transform = ''
@@ -127,12 +129,11 @@ export default function RemoteMachineCard({
         <div className="mb-3">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-1">
-              <span style={{ color: accent, display: 'flex', alignItems: 'center' }}>
+              <span className={`${statusClass} flex items-center`}>
                 {getStatusIcon(machine.status)}
               </span>
               <span
-                className="text-[0.6rem] font-bold uppercase tracking-[0.08em] leading-none"
-                style={{ color: `${accent}e6` }}
+                className={`text-[0.6rem] font-bold uppercase tracking-[0.08em] leading-none ${statusClass}`}
               >
                 {machine.status}
               </span>
@@ -170,8 +171,8 @@ export default function RemoteMachineCard({
             {/* Two-column stats */}
             <div className="grid grid-cols-2">
               {[
-                { label: t('remoteMachine.used'), value: machine.storage.used_formatted, color: '#f59e0b' },
-                { label: t('remoteMachine.free'), value: machine.storage.available_formatted, color: '#22c55e' },
+                { label: t('remoteMachine.used'), value: machine.storage.used_formatted, colorClass: 'text-muted-foreground' },
+                { label: t('remoteMachine.free'), value: machine.storage.available_formatted, colorClass: 'text-foreground' },
               ].map((col, i) => (
                 <div
                   key={col.label}
@@ -179,8 +180,7 @@ export default function RemoteMachineCard({
                   style={{ borderRight: i === 0 ? `1px solid ${borderColorSoft}` : 'none' }}
                 >
                   <p
-                    className="text-[0.6rem] font-bold uppercase tracking-[0.06em] leading-none mb-1 truncate"
-                    style={{ color: `${col.color}bf` }}
+                    className={`text-[0.6rem] font-bold uppercase tracking-[0.06em] leading-none mb-1 truncate ${col.colorClass}`}
                   >
                     {col.label}
                   </p>
@@ -209,11 +209,8 @@ export default function RemoteMachineCard({
                 style={{ background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }}
               >
                 <div
-                  className="h-full rounded-full"
-                  style={{
-                    width: `${Math.min(100, machine.storage.percent_used)}%`,
-                    background: getStorageBarColor(machine.storage.percent_used),
-                  }}
+                  className={`h-full rounded-full ${getStorageBarClass(machine.storage.percent_used)}`}
+                  style={{ width: `${Math.min(100, machine.storage.percent_used)}%` }}
                 />
               </div>
             </div>
@@ -306,7 +303,7 @@ export default function RemoteMachineCard({
                   type="button"
                   aria-label={t('remoteMachine.actions.testConnection')}
                   onClick={() => onTestConnection(machine)}
-                  className={`${iconBtnBase} text-blue-500/60 hover:text-blue-500 hover:bg-blue-500/10`}
+                  className={`${iconBtnBase} text-muted-foreground/60 hover:text-foreground hover:bg-accent`}
                 >
                   <Network size={16} />
                 </button>
@@ -319,7 +316,7 @@ export default function RemoteMachineCard({
                   type="button"
                   aria-label={t('remoteMachine.actions.refreshStorage')}
                   onClick={() => onRefreshStorage(machine)}
-                  className={`${iconBtnBase} text-cyan-500/60 hover:text-cyan-500 hover:bg-cyan-500/10`}
+                  className={`${iconBtnBase} text-muted-foreground/60 hover:text-foreground hover:bg-accent`}
                 >
                   <RefreshCw size={16} />
                 </button>
@@ -333,7 +330,7 @@ export default function RemoteMachineCard({
                     type="button"
                     aria-label={t('remoteMachineCard.actions.deploy')}
                     onClick={() => onDeployKey(machine)}
-                    className={`${iconBtnBase} text-green-500/60 hover:text-green-500 hover:bg-green-500/10`}
+                    className={`${iconBtnBase} text-muted-foreground/60 hover:text-foreground hover:bg-accent`}
                   >
                     <Key size={16} />
                   </button>

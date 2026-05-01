@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
+import { screen, renderWithProviders } from '../../../../test/test-utils'
 import WizardStepScheduleReview from '../WizardStepScheduleReview'
 
 describe('WizardStepScheduleReview', () => {
@@ -41,26 +41,26 @@ describe('WizardStepScheduleReview', () => {
   }
 
   it('renders success alert with create message', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     expect(screen.getByText(/Ready to create schedule!/i)).toBeInTheDocument()
     expect(screen.getByText(/Review and confirm below/i)).toBeInTheDocument()
   })
 
   it('renders job summary card with title', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     expect(screen.getByText(/Job Summary/i)).toBeInTheDocument()
   })
 
   it('displays job name', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     expect(screen.getByText('Daily Backup Job')).toBeInTheDocument()
   })
 
   it('displays job description', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     expect(screen.getByText('Backup all servers daily')).toBeInTheDocument()
   })
@@ -71,7 +71,7 @@ describe('WizardStepScheduleReview', () => {
       description: '',
     }
 
-    render(<WizardStepScheduleReview {...defaultProps} data={dataNoDescription} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} data={dataNoDescription} />)
 
     // Name should be present
     expect(screen.getByText('Daily Backup Job')).toBeInTheDocument()
@@ -79,13 +79,13 @@ describe('WizardStepScheduleReview', () => {
   })
 
   it('displays repository count', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     expect(screen.getByText(/Repositories \(2\)/i)).toBeInTheDocument()
   })
 
   it('displays repository list with order numbers', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     expect(screen.getByText('Home Backup')).toBeInTheDocument()
     expect(screen.getByText('Work Backup')).toBeInTheDocument()
@@ -98,31 +98,31 @@ describe('WizardStepScheduleReview', () => {
   })
 
   it('displays cron expression', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     expect(screen.getByText('0 2 * * *')).toBeInTheDocument()
   })
 
   it('displays archive name template', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     expect(screen.getByText('{job_name}-{now}')).toBeInTheDocument()
   })
 
   it('renders scripts configuration card', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     expect(screen.getByText(/Scripts Configuration/i)).toBeInTheDocument()
   })
 
   it('displays pre-backup script name', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     expect(screen.getByText('Wake Server')).toBeInTheDocument()
   })
 
   it('displays post-backup script name', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     expect(screen.getByText('Shutdown Server')).toBeInTheDocument()
   })
@@ -133,7 +133,7 @@ describe('WizardStepScheduleReview', () => {
       preBackupScriptId: null,
     }
 
-    render(<WizardStepScheduleReview {...defaultProps} data={dataNoPreScript} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} data={dataNoPreScript} />)
 
     // Should find "None" in the pre-backup script section
     const noneElements = screen.getAllByText(/None/i)
@@ -146,7 +146,7 @@ describe('WizardStepScheduleReview', () => {
       postBackupScriptId: null,
     }
 
-    render(<WizardStepScheduleReview {...defaultProps} data={dataNoPostScript} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} data={dataNoPostScript} />)
 
     // Should find "None" in the post-backup script section
     const noneElements = screen.getAllByText(/None/i)
@@ -154,7 +154,7 @@ describe('WizardStepScheduleReview', () => {
   })
 
   it('displays repository scripts status as enabled', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     // Find all "Enabled" chips (there will be multiple: Status, Repository scripts, Prune, Compact)
     const enabledChips = screen.getAllByText('Enabled')
@@ -167,7 +167,7 @@ describe('WizardStepScheduleReview', () => {
       runRepositoryScripts: false,
     }
 
-    render(<WizardStepScheduleReview {...defaultProps} data={dataNoRepoScripts} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} data={dataNoRepoScripts} />)
 
     // Should have both Enabled (for status, prune, compact) and Disabled (for repo scripts)
     const enabledChips = screen.getAllByText('Enabled')
@@ -177,13 +177,13 @@ describe('WizardStepScheduleReview', () => {
   })
 
   it('renders maintenance settings card', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     expect(screen.getByText(/Maintenance Settings/i)).toBeInTheDocument()
   })
 
   it('displays prune enabled status', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     // Prune should show as enabled
     const enabledChips = screen.getAllByText('Enabled')
@@ -196,14 +196,14 @@ describe('WizardStepScheduleReview', () => {
       runPruneAfter: false,
     }
 
-    render(<WizardStepScheduleReview {...defaultProps} data={dataNoPrune} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} data={dataNoPrune} />)
 
     const disabledChips = screen.getAllByText('Disabled')
     expect(disabledChips.length).toBeGreaterThan(0)
   })
 
   it('displays prune keep format when prune is enabled', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     // Check for the formatted prune settings
     expect(screen.getByText(/Keep:/i)).toBeInTheDocument()
@@ -221,7 +221,7 @@ describe('WizardStepScheduleReview', () => {
       runPruneAfter: false,
     }
 
-    render(<WizardStepScheduleReview {...defaultProps} data={dataNoPrune} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} data={dataNoPrune} />)
 
     expect(screen.queryByText(/Keep:/i)).not.toBeInTheDocument()
   })
@@ -232,7 +232,7 @@ describe('WizardStepScheduleReview', () => {
       pruneKeepHourly: 0,
     }
 
-    render(<WizardStepScheduleReview {...defaultProps} data={dataNoHourly} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} data={dataNoHourly} />)
 
     expect(screen.queryByText(/0h/i)).not.toBeInTheDocument()
   })
@@ -243,13 +243,13 @@ describe('WizardStepScheduleReview', () => {
       pruneKeepQuarterly: 0,
     }
 
-    render(<WizardStepScheduleReview {...defaultProps} data={dataNoQuarterly} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} data={dataNoQuarterly} />)
 
     expect(screen.queryByText(/0q/i)).not.toBeInTheDocument()
   })
 
   it('displays compact enabled status', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     // Should have multiple "Enabled" chips
     const enabledChips = screen.getAllByText('Enabled')
@@ -262,7 +262,7 @@ describe('WizardStepScheduleReview', () => {
       runCompactAfter: false,
     }
 
-    render(<WizardStepScheduleReview {...defaultProps} data={dataNoCompact} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} data={dataNoCompact} />)
 
     const disabledChips = screen.getAllByText('Disabled')
     expect(disabledChips.length).toBeGreaterThan(0)
@@ -274,7 +274,7 @@ describe('WizardStepScheduleReview', () => {
       repositoryIds: [1, 2, 3],
     }
 
-    render(<WizardStepScheduleReview {...defaultProps} data={dataAllRepos} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} data={dataAllRepos} />)
 
     expect(screen.getByText('Home Backup')).toBeInTheDocument()
     expect(screen.getByText('Work Backup')).toBeInTheDocument()
@@ -283,7 +283,7 @@ describe('WizardStepScheduleReview', () => {
   })
 
   it('displays repositories in correct order', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     const repoChips = screen.getAllByText(/^[1-3]$/)
     expect(repoChips[0]).toHaveTextContent('1')
@@ -296,14 +296,14 @@ describe('WizardStepScheduleReview', () => {
       preBackupScriptId: 999, // Non-existent script
     }
 
-    render(<WizardStepScheduleReview {...defaultProps} data={dataInvalidScript} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} data={dataInvalidScript} />)
 
     // Should show None when script is not found
     expect(screen.getAllByText(/None/i).length).toBeGreaterThan(0)
   })
 
   it('displays section labels correctly', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     expect(screen.getByText(/^Name$/i)).toBeInTheDocument()
     expect(screen.getByText(/^Schedule$/i)).toBeInTheDocument()
@@ -316,7 +316,7 @@ describe('WizardStepScheduleReview', () => {
   })
 
   it('renders success alert with correct severity', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     const alert = screen.getByRole('alert')
     expect(alert).toBeInTheDocument()
@@ -324,7 +324,7 @@ describe('WizardStepScheduleReview', () => {
   })
 
   it('uses monospace font for paths and technical values', () => {
-    render(<WizardStepScheduleReview {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleReview {...defaultProps} />)
 
     const cronElement = screen.getByText('0 2 * * *')
     expect(cronElement.closest('*[style*="monospace"]') || cronElement).toBeTruthy()

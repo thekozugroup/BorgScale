@@ -1,7 +1,7 @@
-import { Box, Card, CardContent, Typography } from '@mui/material'
-import { DataUsage, Compress, Inventory } from '@mui/icons-material'
+import { HardDrive, Database, Archive } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatBytes } from '../utils/dateUtils'
+import { Card, CardContent } from '@/components/ui/card'
 
 export interface CacheStats {
   total_size?: number
@@ -20,84 +20,50 @@ export default function RepositoryStatsV1({ stats }: RepositoryStatsV1Props) {
 
   return (
     <>
-      <Typography variant="h6" fontWeight={600} sx={{ mt: 1 }}>
-        {t('dialogs.repositoryInfo.storageStatistics')}
-      </Typography>
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
-          gap: 2,
-        }}
-      >
-        <Card sx={{ backgroundColor: '#e8f5e9' }}>
-          <CardContent sx={{ py: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <DataUsage sx={{ color: '#2e7d32', fontSize: 24 }} />
-              <Typography variant="caption" color="text.secondary" fontWeight={500}>
-                {t('dialogs.repositoryInfo.totalSize')}
-              </Typography>
-            </Box>
-            <Typography variant="h6" fontWeight={700} sx={{ color: '#2e7d32' }}>
-              {formatBytes(stats.total_size || 0)}
-            </Typography>
+      <h3 className="text-base font-semibold mt-2 mb-3">{t('dialogs.repositoryInfo.storageStatistics')}</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+        <Card className="bg-muted/40">
+          <CardContent className="py-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Archive size={20} className="text-foreground" />
+              <span className="text-xs text-muted-foreground font-medium">{t('dialogs.repositoryInfo.totalSize')}</span>
+            </div>
+            <p className="text-xl font-bold text-foreground">{formatBytes(stats.total_size || 0)}</p>
           </CardContent>
         </Card>
-        <Card sx={{ backgroundColor: '#e3f2fd' }}>
-          <CardContent sx={{ py: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <Compress sx={{ color: '#1565c0', fontSize: 24 }} />
-              <Typography variant="caption" color="text.secondary" fontWeight={500}>
-                {t('dialogs.repositoryInfo.usedOnDisk')}
-              </Typography>
-            </Box>
-            <Typography variant="h6" fontWeight={700} sx={{ color: '#1565c0' }}>
-              {formatBytes(stats.unique_csize || 0)}
-            </Typography>
+        <Card className="bg-muted/40">
+          <CardContent className="py-4">
+            <div className="flex items-center gap-2 mb-2">
+              <HardDrive size={20} className="text-foreground" />
+              <span className="text-xs text-muted-foreground font-medium">{t('dialogs.repositoryInfo.usedOnDisk')}</span>
+            </div>
+            <p className="text-xl font-bold text-foreground">{formatBytes(stats.unique_csize || 0)}</p>
           </CardContent>
         </Card>
-        <Card sx={{ backgroundColor: '#fff3e0' }}>
-          <CardContent sx={{ py: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <Inventory sx={{ color: '#e65100', fontSize: 24 }} />
-              <Typography variant="caption" color="text.secondary" fontWeight={500}>
-                {t('dialogs.repositoryInfo.uniqueData')}
-              </Typography>
-            </Box>
-            <Typography variant="h6" fontWeight={700} sx={{ color: '#e65100' }}>
-              {formatBytes(stats.unique_size || 0)}
-            </Typography>
+        <Card className="bg-muted/40">
+          <CardContent className="py-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Database size={20} className="text-foreground" />
+              <span className="text-xs text-muted-foreground font-medium">{t('dialogs.repositoryInfo.uniqueData')}</span>
+            </div>
+            <p className="text-xl font-bold text-foreground">{formatBytes(stats.unique_size || 0)}</p>
           </CardContent>
         </Card>
-      </Box>
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
-          gap: 2,
-        }}
-      >
-        <Card variant="outlined">
-          <CardContent sx={{ py: 1.5 }}>
-            <Typography variant="caption" color="text.secondary" display="block">
-              {t('dialogs.repositoryInfo.totalChunks')}
-            </Typography>
-            <Typography variant="h6" fontWeight={600}>
-              {stats.total_chunks?.toLocaleString()}
-            </Typography>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Card className="border border-border">
+          <CardContent className="py-3">
+            <p className="text-xs text-muted-foreground">{t('dialogs.repositoryInfo.totalChunks')}</p>
+            <p className="text-xl font-semibold">{stats.total_chunks?.toLocaleString()}</p>
           </CardContent>
         </Card>
-        <Card variant="outlined">
-          <CardContent sx={{ py: 1.5 }}>
-            <Typography variant="caption" color="text.secondary" display="block">
-              {t('dialogs.repositoryInfo.uniqueChunks')}
-            </Typography>
-            <Typography variant="h6" fontWeight={600}>
-              {stats.total_unique_chunks?.toLocaleString()}
-            </Typography>
+        <Card className="border border-border">
+          <CardContent className="py-3">
+            <p className="text-xs text-muted-foreground">{t('dialogs.repositoryInfo.uniqueChunks')}</p>
+            <p className="text-xl font-semibold">{stats.total_unique_chunks?.toLocaleString()}</p>
           </CardContent>
         </Card>
-      </Box>
+      </div>
     </>
   )
 }

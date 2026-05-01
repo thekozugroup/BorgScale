@@ -61,10 +61,12 @@ interface UserType {
   organization_name?: string
 }
 
+// Role accent uses CSS variable hex equivalents for the avatar border/bg.
+// These are intentional design tokens (foreground-based), not palette colours.
 const getRoleAccentColor = (role: string): string => {
-  if (role === 'admin' || role === 'superadmin') return '#7c3aed'
-  if (role === 'operator') return '#0891b2'
-  return '#059669'
+  if (role === 'admin' || role === 'superadmin') return 'hsl(var(--primary))'
+  if (role === 'operator') return 'hsl(var(--secondary-foreground))'
+  return 'hsl(var(--muted-foreground))'
 }
 
 const getInitials = (user: UserType): string => {
@@ -366,13 +368,13 @@ const UsersTab: React.FC = () => {
             <div
               className={cn(
                 'h-[7px] w-[7px] shrink-0 rounded-full',
-                user.is_active ? 'bg-green-500' : 'bg-red-500'
+                user.is_active ? 'bg-primary' : 'bg-destructive'
               )}
             />
             <span
               className={cn(
                 'text-[0.8rem] font-medium',
-                user.is_active ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                user.is_active ? 'text-foreground' : 'text-destructive'
               )}
             >
               {user.is_active
@@ -439,11 +441,11 @@ const UsersTab: React.FC = () => {
     [t, canManageUsers]
   )
 
-  const roleFilterOptions: { value: RoleFilter; label: string; color?: string }[] = [
+  const roleFilterOptions: { value: RoleFilter; label: string }[] = [
     { value: 'all', label: t('settings.users.filter.allRoles') },
-    { value: 'admin', label: t('settings.users.roles.admin'), color: '#7c3aed' },
-    { value: 'operator', label: t('settings.users.roles.operator'), color: '#0891b2' },
-    { value: 'viewer', label: t('settings.users.roles.viewer'), color: '#059669' },
+    { value: 'admin', label: t('settings.users.roles.admin') },
+    { value: 'operator', label: t('settings.users.roles.operator') },
+    { value: 'viewer', label: t('settings.users.roles.viewer') },
   ]
 
   const statusFilterOptions: { value: StatusFilter; label: string }[] = [
@@ -456,8 +458,8 @@ const UsersTab: React.FC = () => {
     searchQuery.trim() !== '' || roleFilter !== 'all' || statusFilter !== 'all'
 
   const dotColor = (value: StatusFilter) => {
-    if (value === 'active') return 'bg-green-500'
-    if (value === 'inactive') return 'bg-red-500'
+    if (value === 'active') return 'bg-primary'
+    if (value === 'inactive') return 'bg-destructive'
     return null
   }
 
@@ -480,9 +482,9 @@ const UsersTab: React.FC = () => {
         <div className="flex flex-wrap gap-6 sm:gap-8">
           {[
             { label: t('settings.users.stats.total'), value: totalUsers, className: 'text-foreground' },
-            { label: t('settings.users.stats.active'), value: activeUsers, className: 'text-green-600 dark:text-green-400' },
-            { label: t('settings.users.stats.admins'), value: adminUsers, className: 'text-violet-600 dark:text-violet-400' },
-            { label: t('settings.users.stats.operators'), value: operatorUsers, className: 'text-cyan-600 dark:text-cyan-400' },
+            { label: t('settings.users.stats.active'), value: activeUsers, className: 'text-foreground' },
+            { label: t('settings.users.stats.admins'), value: adminUsers, className: 'text-foreground' },
+            { label: t('settings.users.stats.operators'), value: operatorUsers, className: 'text-foreground' },
             { label: t('settings.users.stats.viewers'), value: viewerUsers, className: 'text-muted-foreground' },
           ].map((stat) => (
             <div key={stat.label}>
@@ -516,7 +518,6 @@ const UsersTab: React.FC = () => {
               <div className="flex gap-2 shrink-0">
                 {roleFilterOptions.map((opt) => {
                   const isSelected = roleFilter === opt.value
-                  const color = opt.color
                   return (
                     <button
                       key={opt.value}
@@ -524,21 +525,10 @@ const UsersTab: React.FC = () => {
                       onClick={() => setRoleFilter(opt.value)}
                       className={cn(
                         'text-xs font-normal rounded-full border px-2.5 py-0.5 transition-all',
-                        isSelected && color
-                          ? 'font-semibold border-opacity-40'
-                          : isSelected
-                            ? 'font-semibold bg-foreground/10 border-foreground/20'
-                            : 'bg-transparent border-foreground/10 text-muted-foreground hover:bg-foreground/5 hover:border-foreground/20'
+                        isSelected
+                          ? 'font-semibold bg-foreground/10 border-foreground/20'
+                          : 'bg-transparent border-foreground/10 text-muted-foreground hover:bg-foreground/5 hover:border-foreground/20'
                       )}
-                      style={
-                        isSelected && color
-                          ? {
-                              backgroundColor: `${color}1f`,
-                              color,
-                              borderColor: `${color}66`,
-                            }
-                          : undefined
-                      }
                     >
                       {opt.label}
                     </button>
@@ -642,8 +632,8 @@ const UsersTab: React.FC = () => {
               </div>
               <Separator />
               {roleHasGlobalPermission(accessUser.role, 'repositories.manage_all') ? (
-                <div className="flex items-center gap-3 px-3 py-3.5 rounded-xl border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/20">
-                  <ShieldCheck size={15} className="text-violet-600 shrink-0" />
+                <div className="flex items-center gap-3 px-3 py-3.5 rounded-xl border border-border bg-muted/40">
+                  <ShieldCheck size={15} className="text-foreground shrink-0" />
                   <div>
                     <p className="text-sm font-semibold">
                       {t('settings.users.repositoryAccess.globalAccess')}
@@ -825,8 +815,8 @@ const UsersTab: React.FC = () => {
         <DialogContent className="sm:max-w-xs" aria-label={t('settings.users.deleteDialog.title')}>
           <DialogHeader>
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-950/40 shrink-0">
-                <AlertCircle size={24} className="text-red-600" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 shrink-0">
+                <AlertCircle size={24} className="text-destructive" />
               </div>
               <DialogTitle className="text-base font-semibold">
                 {t('settings.users.deleteDialog.title')}

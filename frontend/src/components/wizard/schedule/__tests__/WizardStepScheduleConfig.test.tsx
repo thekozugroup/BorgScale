@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { screen, fireEvent, renderWithProviders } from '../../../../test/test-utils'
 import WizardStepScheduleConfig from '../WizardStepScheduleConfig'
 
 // Mock cron-parser
@@ -35,26 +35,26 @@ describe('WizardStepScheduleConfig', () => {
   })
 
   it('renders CronExpressionInput', () => {
-    render(<WizardStepScheduleConfig {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
 
     expect(screen.getByLabelText(/Schedule \(Cron Expression\)/i)).toBeInTheDocument()
   })
 
   it('renders ArchiveNameTemplateInput', () => {
-    render(<WizardStepScheduleConfig {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
 
     expect(screen.getByLabelText(/Archive Name Template/i)).toBeInTheDocument()
   })
 
   it('displays cron expression value', () => {
-    render(<WizardStepScheduleConfig {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
 
     const cronInput = screen.getByLabelText(/Schedule \(Cron Expression\)/i) as HTMLInputElement
     expect(cronInput.value).toBe('0 2 * * *')
   })
 
   it('displays archive name template value', () => {
-    render(<WizardStepScheduleConfig {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
 
     const templateInput = screen.getByLabelText(/Archive Name Template/i) as HTMLInputElement
     expect(templateInput.value).toBe('{job_name}-{now}')
@@ -62,7 +62,7 @@ describe('WizardStepScheduleConfig', () => {
 
   it('calls onChange when cron expression changes', () => {
     const onChange = vi.fn()
-    render(<WizardStepScheduleConfig {...defaultProps} onChange={onChange} />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} onChange={onChange} />)
 
     const cronInput = screen.getByLabelText(/Schedule \(Cron Expression\)/i)
     fireEvent.change(cronInput, { target: { value: '0 0 * * 0' } })
@@ -72,7 +72,7 @@ describe('WizardStepScheduleConfig', () => {
 
   it('calls onChange when archive name template changes', () => {
     const onChange = vi.fn()
-    render(<WizardStepScheduleConfig {...defaultProps} onChange={onChange} />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} onChange={onChange} />)
 
     const templateInput = screen.getByLabelText(/Archive Name Template/i)
     fireEvent.change(templateInput, { target: { value: '{job_name}-{date}' } })
@@ -81,7 +81,7 @@ describe('WizardStepScheduleConfig', () => {
   })
 
   it('displays next run times preview for valid cron expression', () => {
-    render(<WizardStepScheduleConfig {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
 
     expect(screen.getByText(/Next 3 Run Times:/i)).toBeInTheDocument()
   })
@@ -92,19 +92,19 @@ describe('WizardStepScheduleConfig', () => {
       cronExpression: 'invalid',
     }
 
-    render(<WizardStepScheduleConfig {...defaultProps} data={invalidData} />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} data={invalidData} />)
 
     expect(screen.queryByText(/Next 3 Run Times:/i)).not.toBeInTheDocument()
   })
 
   it('displays helper text for cron expression', () => {
-    render(<WizardStepScheduleConfig {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
 
     expect(screen.getByText(/Click the clock icon to use the visual builder/i)).toBeInTheDocument()
   })
 
   it('passes jobName to ArchiveNameTemplateInput', () => {
-    render(<WizardStepScheduleConfig {...defaultProps} jobName="my-custom-job" />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} jobName="my-custom-job" />)
 
     // Check if the preview uses the custom job name
     const preview = screen.getByText(/my-custom-job/)
@@ -112,7 +112,7 @@ describe('WizardStepScheduleConfig', () => {
   })
 
   it('uses default job name when jobName is empty', () => {
-    render(<WizardStepScheduleConfig {...defaultProps} jobName="" />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} jobName="" />)
 
     // Check if the preview uses the default job name
     const preview = screen.getByText(/example-job/)
@@ -125,7 +125,7 @@ describe('WizardStepScheduleConfig', () => {
       cronExpression: '',
     }
 
-    render(<WizardStepScheduleConfig {...defaultProps} data={emptyData} />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} data={emptyData} />)
 
     const cronInput = screen.getByLabelText(/Schedule \(Cron Expression\)/i) as HTMLInputElement
     expect(cronInput.value).toBe('')
@@ -137,21 +137,21 @@ describe('WizardStepScheduleConfig', () => {
       archiveNameTemplate: '',
     }
 
-    render(<WizardStepScheduleConfig {...defaultProps} data={emptyData} />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} data={emptyData} />)
 
     const templateInput = screen.getByLabelText(/Archive Name Template/i) as HTMLInputElement
     expect(templateInput.value).toBe('')
   })
 
   it('applies medium size to inputs', () => {
-    render(<WizardStepScheduleConfig {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
 
     const cronInput = screen.getByLabelText(/Schedule \(Cron Expression\)/i)
     expect(cronInput).toBeInTheDocument()
   })
 
   it('displays first run time inline with next run times label', () => {
-    render(<WizardStepScheduleConfig {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
 
     // First run time is shown inline as text next to the info icon
     expect(screen.getByText(/Next 3 Run Times:/i)).toBeInTheDocument()
@@ -161,7 +161,7 @@ describe('WizardStepScheduleConfig', () => {
   })
 
   it('formats first run time with localeString inline', () => {
-    render(<WizardStepScheduleConfig {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
 
     // First run time is shown inline
     const dates = screen.getAllByText(/1\/1\/2024/i)
@@ -169,7 +169,7 @@ describe('WizardStepScheduleConfig', () => {
   })
 
   it('updates preview when cron expression changes', () => {
-    const { rerender } = render(<WizardStepScheduleConfig {...defaultProps} />)
+    const { rerender } = renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
 
     expect(screen.getByText(/Next 3 Run Times:/i)).toBeInTheDocument()
 
@@ -185,7 +185,7 @@ describe('WizardStepScheduleConfig', () => {
 
   it('handles multiple onChange calls', () => {
     const onChange = vi.fn()
-    render(<WizardStepScheduleConfig {...defaultProps} onChange={onChange} />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} onChange={onChange} />)
 
     const cronInput = screen.getByLabelText(/Schedule \(Cron Expression\)/i)
     fireEvent.change(cronInput, { target: { value: '0 3 * * *' } })
@@ -199,14 +199,14 @@ describe('WizardStepScheduleConfig', () => {
   })
 
   it('renders cron expression as required', () => {
-    render(<WizardStepScheduleConfig {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
 
     const cronInput = screen.getByLabelText(/Schedule \(Cron Expression\)/i)
     expect(cronInput).toBeRequired()
   })
 
   it('displays next run times inline with info tooltip', () => {
-    render(<WizardStepScheduleConfig {...defaultProps} />)
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
 
     // First run time shown inline as text
     expect(screen.getByText(/Next 3 Run Times:/i)).toBeInTheDocument()

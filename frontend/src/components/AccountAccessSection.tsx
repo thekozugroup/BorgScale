@@ -1,4 +1,3 @@
-import { Box, Stack, Typography } from '@mui/material'
 import { ShieldCheck } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import ApiTokensSection from './ApiTokensSection'
@@ -14,18 +13,14 @@ export default function AccountAccessSection({
   const { t } = useTranslation()
 
   return (
-    <Stack spacing={3}>
-      <Box>
-        <Stack direction="row" spacing={1.25} alignItems="center" sx={{ mb: 1 }}>
+    <div className="flex flex-col gap-6">
+      <div>
+        <div className="flex flex-row items-center gap-[5px] mb-1">
           <ShieldCheck size={16} style={{ opacity: 0.6 }} />
-          <Typography variant="subtitle1" fontWeight={700}>
-            {t('settings.account.access.title')}
-          </Typography>
-        </Stack>
-        <Typography variant="body2" color="text.secondary">
-          {t('settings.account.access.description')}
-        </Typography>
-      </Box>
+          <span className="text-sm font-bold">{t('settings.account.access.title')}</span>
+        </div>
+        <p className="text-sm text-muted-foreground">{t('settings.account.access.description')}</p>
+      </div>
       <ApiTokensSection />
       {!hasGlobalRepositoryAccess ? (
         <UserPermissionsPanel
@@ -33,30 +28,16 @@ export default function AccountAccessSection({
           subtitle={t('settings.account.access.permissions.subtitle')}
         />
       ) : (
-        <Box
-          sx={{
-            px: 2.5,
-            py: 2,
-            border: '1px solid',
-            borderColor: 'divider',
-            borderRadius: 2.5,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1.5,
-            bgcolor: 'action.hover',
-          }}
-        >
-          <ShieldCheck size={16} style={{ color: '#f87171', flexShrink: 0 }} />
-          <Box>
-            <Typography variant="body2" fontWeight={700}>
-              {t('settings.account.access.globalAccess.title')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
+        <div className="px-5 py-4 border border-border rounded-xl flex items-center gap-3 bg-muted/40">
+          <ShieldCheck size={16} className="text-destructive flex-shrink-0" />
+          <div>
+            <p className="text-sm font-bold">{t('settings.account.access.globalAccess.title')}</p>
+            <p className="text-xs text-muted-foreground">
               {t('settings.account.access.globalAccess.description')}
-            </Typography>
-          </Box>
-        </Box>
+            </p>
+          </div>
+        </div>
       )}
-    </Stack>
+    </div>
   )
 }

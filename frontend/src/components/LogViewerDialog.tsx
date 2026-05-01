@@ -1,20 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-  Box,
-  IconButton,
-  Tooltip,
-} from '@mui/material'
-import { ContentCopy } from '@mui/icons-material'
+import { Copy } from 'lucide-react'
 import ResponsiveDialog from './ResponsiveDialog'
 import StatusBadge from './StatusBadge'
 import { TerminalLogViewer, TerminalLogViewerHandle } from './TerminalLogViewer'
 import { activityAPI } from '../services/api'
+import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface JobWithLogs {
   id: string | number
@@ -26,7 +18,7 @@ interface LogViewerDialogProps<T extends JobWithLogs> {
   job: T | null
   open: boolean
   onClose: () => void
-  jobTypeLabel?: string // Optional: "Backup", "Check", "Compact", etc.
+  jobTypeLabel?: string
 }
 
 export default function LogViewerDialog<T extends JobWithLogs>({
@@ -36,25 +28,18 @@ export default function LogViewerDialog<T extends JobWithLogs>({
   jobTypeLabel,
 }: LogViewerDialogProps<T>) {
   const { t } = useTranslation()
-  // Determine job type for API endpoint (default to 'backup' for backward compatibility)
   const jobType = job?.type || 'backup'
   const jobId = job?.id
-
-  // Determine display label
   const displayLabel =
     jobTypeLabel || (job?.type ? getTypeLabel(job.type, t) : t('logViewer.typeBackup'))
 
   const logViewerRef = useRef<TerminalLogViewerHandle>(null)
-
-  // Track live status so the badge and log viewer update after the job finishes
   const [currentStatus, setCurrentStatus] = useState(job?.status || 'unknown')
 
-  // Reset status whenever a different job is opened
   useEffect(() => {
     setCurrentStatus(job?.status || 'unknown')
   }, [job?.id, job?.status])
 
-  // Poll the activity list every 3 s while the dialog is open and the job is still running
   useEffect(() => {
     if (!open || !jobId || currentStatus !== 'running') return
     const poll = async () => {
@@ -64,18 +49,16 @@ export default function LogViewerDialog<T extends JobWithLogs>({
         const item = items.find((i) => String(i.id) === String(jobId) && i.type === jobType)
         if (item && item.status !== 'running') setCurrentStatus(item.status)
       } catch {
-        // Ignore network errors — next poll will retry
+        // ignore
       }
     }
     const interval = setInterval(poll, 3000)
     return () => clearInterval(interval)
   }, [open, jobId, jobType, currentStatus])
 
-  // Memoize the fetch function to prevent re-renders from causing duplicate log fetches
   const handleFetchLogs = useCallback(
     async (offset: number) => {
       if (!jobId) return { lines: [], total_lines: 0, has_more: false }
-
       const response = await activityAPI.getLogs(jobType, jobId, offset)
       return response.data
     },
@@ -84,23 +67,38 @@ export default function LogViewerDialog<T extends JobWithLogs>({
 
   if (!job) return null
 
+  const footer = (
+    <div className="hidden md:flex justify-end px-5 py-3">
+      <Button variant="outline" onClick={onClose}>
+        {t('dialogs.logViewer.close')}
+      </Button>
+    </div>
+  )
+
   return (
-    <ResponsiveDialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
-      <DialogTitle>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="h6">
-            {t('logViewer.title', { label: displayLabel, jobId: job.id })}
-          </Typography>
-          <StatusBadge status={currentStatus} />
-          <Box sx={{ flex: 1 }} />
-          <Tooltip title={t('terminalLogViewer.copyLogs')}>
-            <IconButton size="small" onClick={() => logViewerRef.current?.copyLogs()}>
-              <ContentCopy fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </Box>
-      </DialogTitle>
-      <DialogContent dividers>
+    <ResponsiveDialog open={open} onClose={onClose} maxWidth="lg" fullWidth footer={footer}>
+      {/* Header */}
+      <div className="flex items-center gap-3 px-5 pt-5 pb-3">
+        <p className="text-base font-semibold">
+          {t('logViewer.title', { label: displayLabel, jobId: job.id })}
+        </p>
+        <StatusBadge status={currentStatus} />
+        <div className="flex-1" />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              className="w-8 h-8 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              onClick={() => logViewerRef.current?.copyLogs()}
+            >
+              <Copy size={16} />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>{t('terminalLogViewer.copyLogs')}</TooltipContent>
+        </Tooltip>
+      </div>
+
+      {/* Body */}
+      <div className="px-5 pb-4 border-t border-border pt-3">
         <TerminalLogViewer
           ref={logViewerRef}
           jobId={String(job.id)}
@@ -109,30 +107,19 @@ export default function LogViewerDialog<T extends JobWithLogs>({
           showHeader={false}
           onFetchLogs={handleFetchLogs}
         />
-      </DialogContent>
-      <DialogActions sx={{ display: { xs: 'none', md: 'flex' } }}>
-        <Button onClick={onClose}>{t('dialogs.logViewer.close')}</Button>
-      </DialogActions>
+      </div>
     </ResponsiveDialog>
   )
 }
 
-// Helper to get human-readable type labels
 function getTypeLabel(type: string, t: (key: string) => string): string {
   switch (type) {
-    case 'backup':
-      return t('logViewer.typeBackup')
-    case 'restore':
-      return t('logViewer.typeRestore')
-    case 'check':
-      return t('logViewer.typeCheck')
-    case 'compact':
-      return t('logViewer.typeCompact')
-    case 'prune':
-      return t('logViewer.typePrune')
-    case 'package':
-      return t('logViewer.typePackage')
-    default:
-      return type.charAt(0).toUpperCase() + type.slice(1)
+    case 'backup': return t('logViewer.typeBackup')
+    case 'restore': return t('logViewer.typeRestore')
+    case 'check': return t('logViewer.typeCheck')
+    case 'compact': return t('logViewer.typeCompact')
+    case 'prune': return t('logViewer.typePrune')
+    case 'package': return t('logViewer.typePackage')
+    default: return type.charAt(0).toUpperCase() + type.slice(1)
   }
 }

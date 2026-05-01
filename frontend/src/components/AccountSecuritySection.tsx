@@ -1,6 +1,6 @@
-import { Box, Stack, Typography, useTheme } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { Lock } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface AccountSecuritySectionProps {
   onOpenChangePassword: () => void
@@ -10,22 +10,11 @@ export default function AccountSecuritySection({
   onOpenChangePassword,
 }: AccountSecuritySectionProps) {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
   const title = t('settings.account.security.accountPassword')
   const description = t('settings.account.security.changeCredentialsHint')
 
-  const cardBorder = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.09)'
-  const cardBorderHover = isDark ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.16)'
-  const cardGradient = isDark
-    ? 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)'
-    : 'linear-gradient(135deg, rgba(0,0,0,0.015) 0%, rgba(0,0,0,0.005) 100%)'
-  const cardHoverGradient = isDark
-    ? 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.03) 100%)'
-    : 'linear-gradient(135deg, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0.015) 100%)'
-
   return (
-    <Box
+    <div
       onClick={onOpenChangePassword}
       onKeyDown={(event) => {
         if (event.key === 'Enter' || event.key === ' ') {
@@ -36,64 +25,25 @@ export default function AccountSecuritySection({
       role="button"
       tabIndex={0}
       aria-label={title}
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 2,
-        px: 2.5,
-        py: 2,
-        borderRadius: 2.5,
-        cursor: 'pointer',
-        border: '1px solid',
-        borderColor: cardBorder,
-        background: cardGradient,
-        transition: 'border-color 180ms ease, background 180ms ease',
-        '&:hover': {
-          borderColor: cardBorderHover,
-          background: cardHoverGradient,
-        },
-      }}
+      className={cn(
+        'flex items-center justify-between gap-4 px-5 py-4 rounded-xl border cursor-pointer transition-colors',
+        'hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+      )}
     >
-      <Stack direction="row" spacing={2} alignItems="center" sx={{ minWidth: 0 }}>
-        <Box
-          sx={{
-            width: 38,
-            height: 38,
-            borderRadius: 1.5,
-            flexShrink: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: isDark
-              ? 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.03) 100%)'
-              : 'linear-gradient(135deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.02) 100%)',
-            border: '1px solid',
-            borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-          }}
+      <div className="flex flex-row gap-4 items-center min-w-0">
+        <div
+          className="w-9 h-9 rounded-lg flex-shrink-0 flex items-center justify-center border bg-muted/40"
         >
           <Lock size={16} style={{ opacity: 0.45 }} />
-        </Box>
-        <Box sx={{ minWidth: 0 }}>
-          <Typography variant="body2" fontWeight={600} noWrap>
-            {title}
-          </Typography>
-          <Typography variant="caption" color="text.secondary" noWrap>
-            {description}
-          </Typography>
-        </Box>
-      </Stack>
-      <Box
-        sx={{
-          fontSize: '0.75rem',
-          fontWeight: 600,
-          color: 'text.secondary',
-          flexShrink: 0,
-          letterSpacing: '0.02em',
-        }}
-      >
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold truncate">{title}</p>
+          <p className="text-xs text-muted-foreground truncate">{description}</p>
+        </div>
+      </div>
+      <span className="text-xs font-semibold text-muted-foreground flex-shrink-0 tracking-wide">
         →
-      </Box>
-    </Box>
+      </span>
+    </div>
   )
 }

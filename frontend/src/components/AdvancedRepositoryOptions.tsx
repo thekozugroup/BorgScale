@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { TextField, Divider, Typography } from '@mui/material'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
 import ScriptEditorDialog from './ScriptEditorDialog'
 import RepositoryScriptsSection from './RepositoryScriptsSection'
 
@@ -51,46 +53,44 @@ export default function AdvancedRepositoryOptions({
 
   return (
     <>
-      <Divider sx={{ mt: 2 }} />
-      <Typography variant="subtitle2" fontWeight={600} sx={{ mt: 2 }}>
-        {t('advancedRepositoryOptions.title')}
-      </Typography>
-      <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1.5 }}>
+      <Separator className="mt-4" />
+      <p className="mt-4 text-sm font-semibold">{t('advancedRepositoryOptions.title')}</p>
+      <p className="text-xs text-muted-foreground block mb-3">
         {t('advancedRepositoryOptions.subtitle')}
-      </Typography>
+      </p>
 
       {/* Remote Path */}
-      <TextField
-        label={t('advancedRepositoryOptions.remoteBorgPath')}
-        value={remotePath}
-        onChange={(e) => onRemotePathChange(e.target.value)}
-        placeholder="/usr/local/bin/borg"
-        fullWidth
-        helperText={t('advancedRepositoryOptions.remoteBorgPathHint')}
-      />
+      <div className="flex flex-col gap-1">
+        <Label>{t('advancedRepositoryOptions.remoteBorgPath')}</Label>
+        <Input
+          value={remotePath}
+          onChange={(e) => onRemotePathChange(e.target.value)}
+          placeholder="/usr/local/bin/borg"
+        />
+        <p className="text-xs text-muted-foreground">{t('advancedRepositoryOptions.remoteBorgPathHint')}</p>
+      </div>
 
       {/* Custom Flags - Only show for full repositories */}
       {mode === 'full' && (
-        <TextField
-          label={t('advancedRepositoryOptions.customFlags')}
-          value={customFlags}
-          onChange={(e) => onCustomFlagsChange(e.target.value)}
-          placeholder="--stats --list --filter AME"
-          fullWidth
-          helperText={t('advancedRepositoryOptions.customFlagsHint')}
-        />
+        <div className="flex flex-col gap-1 mt-3">
+          <Label>{t('advancedRepositoryOptions.customFlags')}</Label>
+          <Input
+            value={customFlags}
+            onChange={(e) => onCustomFlagsChange(e.target.value)}
+            placeholder="--stats --list --filter AME"
+          />
+          <p className="text-xs text-muted-foreground">{t('advancedRepositoryOptions.customFlagsHint')}</p>
+        </div>
       )}
 
-      {/* Scripts Section - Grouped by timing (pre-backup / post-backup) */}
+      {/* Scripts Section */}
       {mode === 'full' && (
         <>
-          <Divider sx={{ mt: 3, mb: 1.5 }} />
-          <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.5 }}>
-            {t('advancedRepositoryOptions.scripts')}
-          </Typography>
-          <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
+          <Separator className="mt-6 mb-3" />
+          <p className="text-sm font-semibold mb-1">{t('advancedRepositoryOptions.scripts')}</p>
+          <p className="text-xs text-muted-foreground block mb-2">
             {t('advancedRepositoryOptions.scriptsHint')}
-          </Typography>
+          </p>
 
           <RepositoryScriptsSection
             repositoryId={repositoryId}

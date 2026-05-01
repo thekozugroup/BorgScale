@@ -1,24 +1,15 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  Box,
-  Typography,
-  Button,
-  IconButton,
-  TextField,
-  Stack,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Tooltip,
-  CircularProgress,
-  Alert,
-} from '@mui/material'
-import { Plus, Trash2, Key, Copy, Check } from 'lucide-react'
+import { Plus, Trash2, Key, Copy, Check, Loader2 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { tokensAPI } from '../services/api'
 import { formatDateShort } from '../utils/dateUtils'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
 interface Token {
   id: number
@@ -85,229 +76,170 @@ export default function ApiTokensSection() {
   const tokens: Token[] = tokensData ?? []
 
   return (
-    <Box>
-      <Box
-        sx={{
-          border: '1px solid',
-          borderColor: 'divider',
-          borderRadius: 2,
-          overflow: 'hidden',
-          mb: 0,
-        }}
-      >
-        <Box
-          sx={{
-            px: 2.5,
-            py: 2,
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-            bgcolor: 'action.hover',
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            justifyContent: 'space-between',
-            alignItems: { xs: 'flex-start', sm: 'center' },
-            gap: { xs: 1.5, sm: 0 },
-          }}
-        >
-          <Box>
-            <Typography variant="body2" fontWeight={600}>
-              API Tokens
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Programmatic access — shown only once when generated
-            </Typography>
-          </Box>
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={<Plus size={14} />}
-            onClick={() => setGenerateOpen(true)}
-            sx={{ width: { xs: '100%', sm: 'auto' } }}
-          >
+    <div>
+      <div className="border border-border rounded-2xl overflow-hidden">
+        {/* Header */}
+        <div className="px-5 py-4 border-b border-border bg-muted/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold">API Tokens</p>
+            <p className="text-xs text-muted-foreground">Programmatic access — shown only once when generated</p>
+          </div>
+          <Button variant="outline" size="sm" className="gap-1.5 w-full sm:w-auto" onClick={() => setGenerateOpen(true)}>
+            <Plus size={14} />
             Generate
           </Button>
-        </Box>
+        </div>
 
-        <Box>
+        {/* Token list */}
+        <div>
           {isLoading ? (
-            <Box sx={{ p: 3, display: 'flex', justifyContent: 'center' }}>
-              <CircularProgress size={24} />
-            </Box>
+            <div className="p-6 flex justify-center">
+              <Loader2 size={24} className="animate-spin text-muted-foreground" />
+            </div>
           ) : tokens.length === 0 ? (
-            <Box sx={{ p: 3, textAlign: 'center' }}>
-              <Key size={32} style={{ opacity: 0.3, marginBottom: 8 }} />
-              <Typography variant="body2" color="text.secondary">
-                No tokens yet
-              </Typography>
-            </Box>
+            <div className="p-6 text-center">
+              <Key size={32} className="opacity-30 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">No tokens yet</p>
+            </div>
           ) : (
-            <Box component="table" sx={{ width: '100%', borderCollapse: 'collapse' }}>
-              <Box component="thead">
-                <Box component="tr" sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b border-border">
                   {['Name', 'Prefix', 'Created', 'Last used', ''].map((h) => (
-                    <Box
-                      key={h}
-                      component="th"
-                      sx={{
-                        p: 1.5,
-                        textAlign: 'left',
-                        typography: 'caption',
-                        fontWeight: 700,
-                        color: 'text.secondary',
-                      }}
-                    >
+                    <th key={h} className="px-4 py-3 text-left text-xs font-bold text-muted-foreground">
                       {h}
-                    </Box>
+                    </th>
                   ))}
-                </Box>
-              </Box>
-              <Box component="tbody">
+                </tr>
+              </thead>
+              <tbody>
                 {tokens.map((token) => (
-                  <Box
-                    key={token.id}
-                    component="tr"
-                    sx={{
-                      '&:not(:last-child)': { borderBottom: '1px solid', borderColor: 'divider' },
-                    }}
-                  >
-                    <Box component="td" sx={{ p: 1.5 }}>
-                      <Typography variant="body2" fontWeight={500}>
-                        {token.name}
-                      </Typography>
-                    </Box>
-                    <Box component="td" sx={{ p: 1.5 }}>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          fontFamily: 'monospace',
-                          fontSize: '0.8rem',
-                          color: 'text.secondary',
-                        }}
-                      >
+                  <tr key={token.id} className="border-b border-border last:border-b-0">
+                    <td className="px-4 py-3 text-sm font-medium">{token.name}</td>
+                    <td className="px-4 py-3">
+                      <span className="text-sm text-muted-foreground" style={{ fontFamily: 'monospace' }}>
                         {token.prefix}…
-                      </Typography>
-                    </Box>
-                    <Box component="td" sx={{ p: 1.5 }}>
-                      <Typography variant="body2">{formatDateShort(token.created_at)}</Typography>
-                    </Box>
-                    <Box component="td" sx={{ p: 1.5 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        {token.last_used_at ? formatDateShort(token.last_used_at) : 'Never'}
-                      </Typography>
-                    </Box>
-                    <Box component="td" sx={{ p: 1.5, textAlign: 'right' }}>
-                      <Tooltip title="Revoke token">
-                        <IconButton
-                          size="small"
-                          color="error"
-                          onClick={() => revokeMutation.mutate(token.id)}
-                          disabled={revokeMutation.isPending}
-                        >
-                          <Trash2 size={16} />
-                        </IconButton>
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm">{formatDateShort(token.created_at)}</td>
+                    <td className="px-4 py-3 text-sm text-muted-foreground">
+                      {token.last_used_at ? formatDateShort(token.last_used_at) : 'Never'}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            onClick={() => revokeMutation.mutate(token.id)}
+                            disabled={revokeMutation.isPending}
+                            className="flex items-center justify-center w-7 h-7 rounded text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-colors duration-150 disabled:opacity-30"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>Revoke token</TooltipContent>
                       </Tooltip>
-                    </Box>
-                  </Box>
+                    </td>
+                  </tr>
                 ))}
-              </Box>
-            </Box>
+              </tbody>
+            </table>
           )}
-        </Box>
-      </Box>
+        </div>
+      </div>
 
       {/* Generate Token Dialog */}
-      <Dialog
-        open={generateOpen && !newToken}
-        onClose={() => setGenerateOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Generate API Token</DialogTitle>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            generateMutation.mutate(tokenName)
-          }}
-        >
-          <DialogContent>
-            <TextField
-              label="Token name"
-              value={tokenName}
-              onChange={(e) => setTokenName(e.target.value)}
-              placeholder="e.g. CI deploy, Home automation"
-              required
-              fullWidth
-              autoFocus
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setGenerateOpen(false)}>Cancel</Button>
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={generateMutation.isPending || !tokenName.trim()}
-            >
-              {generateMutation.isPending ? <CircularProgress size={16} /> : 'Generate'}
-            </Button>
-          </DialogActions>
-        </form>
+      <Dialog open={generateOpen && !newToken} onOpenChange={(v) => !v && setGenerateOpen(false)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Generate API Token</DialogTitle>
+          </DialogHeader>
+          <form
+            onSubmit={(e) => { e.preventDefault(); generateMutation.mutate(tokenName) }}
+            className="flex flex-col gap-4 pt-2"
+          >
+            <div>
+              <Label className="text-xs font-semibold mb-1.5 block">Token name</Label>
+              <Input
+                value={tokenName}
+                onChange={(e) => setTokenName(e.target.value)}
+                placeholder="e.g. CI deploy, Home automation"
+                required
+                autoFocus
+                className="h-9 text-sm"
+              />
+            </div>
+            <div className="flex items-center justify-end gap-2">
+              <Button type="button" variant="outline" size="sm" onClick={() => setGenerateOpen(false)}>Cancel</Button>
+              <Button type="submit" size="sm" disabled={generateMutation.isPending || !tokenName.trim()} className="gap-1.5">
+                {generateMutation.isPending && <Loader2 size={13} className="animate-spin" />}
+                Generate
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
       </Dialog>
 
       {/* One-time token copy dialog */}
-      <Dialog open={!!newToken} onClose={handleCloseCopyModal} maxWidth="sm" fullWidth>
-        <DialogTitle>Your new API token</DialogTitle>
-        <DialogContent>
-          <Alert severity="warning" sx={{ mb: 2 }}>
-            Copy this token now. You won't be able to see it again.
-          </Alert>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <TextField
-              value={newToken ?? ''}
-              fullWidth
-              InputProps={{ readOnly: true, sx: { fontFamily: 'monospace', fontSize: '0.8rem' } }}
-              onClick={(e) => (e.target as HTMLInputElement).select()}
-            />
-            <Tooltip title={copied ? 'Copied!' : 'Copy to clipboard'}>
-              <IconButton onClick={handleCopy} color={copied ? 'success' : 'default'}>
-                {copied ? <Check size={18} /> : <Copy size={18} />}
-              </IconButton>
-            </Tooltip>
-          </Stack>
+      <Dialog open={!!newToken} onOpenChange={(v) => !v && handleCloseCopyModal()}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Your new API token</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 pt-2">
+            <Alert>
+              <AlertDescription>Copy this token now. You won't be able to see it again.</AlertDescription>
+            </Alert>
+            <div className="flex items-center gap-2">
+              <Input
+                value={newToken ?? ''}
+                readOnly
+                onClick={(e) => (e.target as HTMLInputElement).select()}
+                className="h-9 text-sm font-mono"
+              />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    className={`flex items-center justify-center w-9 h-9 rounded-lg border flex-shrink-0 transition-colors duration-150 ${copied ? 'text-primary border-primary/30' : 'text-muted-foreground border-border hover:text-foreground'}`}
+                  >
+                    {copied ? <Check size={16} /> : <Copy size={16} />}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>{copied ? 'Copied!' : 'Copy to clipboard'}</TooltipContent>
+              </Tooltip>
+            </div>
+            <div className="flex justify-end">
+              <Button size="sm" onClick={handleCloseCopyModal}>Done</Button>
+            </div>
+          </div>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseCopyModal} variant="contained">
-            Done
-          </Button>
-        </DialogActions>
       </Dialog>
 
       {/* Confirm close without copying */}
-      <Dialog
-        open={closeConfirmOpen}
-        onClose={() => setCloseConfirmOpen(false)}
-        maxWidth="xs"
-        fullWidth
-      >
-        <DialogTitle>Close without copying?</DialogTitle>
-        <DialogContent>
-          <Typography variant="body2">
-            You haven't copied the token. Once you close this dialog, the token cannot be retrieved.
-          </Typography>
+      <Dialog open={closeConfirmOpen} onOpenChange={(v) => !v && setCloseConfirmOpen(false)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Close without copying?</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 pt-2">
+            <p className="text-sm text-muted-foreground">
+              You haven't copied the token. Once you close this dialog, the token cannot be retrieved.
+            </p>
+            <div className="flex items-center justify-end gap-2">
+              <Button variant="outline" size="sm" onClick={() => setCloseConfirmOpen(false)}>Go back</Button>
+              <Button variant="destructive" size="sm" onClick={() => {
+                setNewToken(null)
+                setCloseConfirmOpen(false)
+                setGenerateOpen(false)
+              }}>
+                Close anyway
+              </Button>
+            </div>
+          </div>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setCloseConfirmOpen(false)}>Go back</Button>
-          <Button
-            color="error"
-            onClick={() => {
-              setNewToken(null)
-              setCloseConfirmOpen(false)
-              setGenerateOpen(false)
-            }}
-          >
-            Close anyway
-          </Button>
-        </DialogActions>
       </Dialog>
-    </Box>
+    </div>
   )
 }

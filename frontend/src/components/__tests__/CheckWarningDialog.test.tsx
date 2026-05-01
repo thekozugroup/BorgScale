@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { screen, fireEvent, renderWithProviders } from '../../test/test-utils'
 import userEvent from '@testing-library/user-event'
 import CheckWarningDialog from '../CheckWarningDialog'
 
@@ -14,7 +14,7 @@ describe('CheckWarningDialog', () => {
 
   describe('Rendering', () => {
     it('renders dialog title', () => {
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -26,7 +26,7 @@ describe('CheckWarningDialog', () => {
     })
 
     it('renders repository name', () => {
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="my-backup-repo"
@@ -38,7 +38,7 @@ describe('CheckWarningDialog', () => {
     })
 
     it('renders warning about repository being locked', () => {
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -50,7 +50,7 @@ describe('CheckWarningDialog', () => {
     })
 
     it('renders progress tracking info', () => {
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -62,7 +62,7 @@ describe('CheckWarningDialog', () => {
     })
 
     it('renders accessibility info about other repos', () => {
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -74,7 +74,7 @@ describe('CheckWarningDialog', () => {
     })
 
     it('renders max duration input with default value', () => {
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -87,7 +87,7 @@ describe('CheckWarningDialog', () => {
     })
 
     it('renders max duration helper text', () => {
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -99,7 +99,7 @@ describe('CheckWarningDialog', () => {
     })
 
     it('renders Cancel button', () => {
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -111,7 +111,7 @@ describe('CheckWarningDialog', () => {
     })
 
     it('renders Start Check button', () => {
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -123,7 +123,7 @@ describe('CheckWarningDialog', () => {
     })
 
     it('does not render when open is false', () => {
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={false}
           repositoryName="test-repo"
@@ -138,7 +138,7 @@ describe('CheckWarningDialog', () => {
   describe('User interactions', () => {
     it('calls onConfirm with default duration when Start Check is clicked', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -153,7 +153,7 @@ describe('CheckWarningDialog', () => {
 
     it('calls onCancel when Cancel is clicked', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -167,7 +167,7 @@ describe('CheckWarningDialog', () => {
     })
 
     it('calls onConfirm with custom duration', () => {
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -184,7 +184,7 @@ describe('CheckWarningDialog', () => {
     })
 
     it('handles empty input by using default value', () => {
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -201,7 +201,7 @@ describe('CheckWarningDialog', () => {
     })
 
     it('handles invalid input by using default value', () => {
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -218,7 +218,7 @@ describe('CheckWarningDialog', () => {
     })
 
     it('allows zero as duration', () => {
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -236,7 +236,7 @@ describe('CheckWarningDialog', () => {
 
   describe('Loading state', () => {
     it('shows Starting... text when isLoading is true', () => {
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -249,7 +249,7 @@ describe('CheckWarningDialog', () => {
     })
 
     it('disables Cancel button when isLoading is true', () => {
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -262,7 +262,7 @@ describe('CheckWarningDialog', () => {
     })
 
     it('disables confirm button when isLoading is true', () => {
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -275,7 +275,7 @@ describe('CheckWarningDialog', () => {
     })
 
     it('enables buttons when isLoading is false', () => {
-      render(
+      renderWithProviders(
         <CheckWarningDialog
           open={true}
           repositoryName="test-repo"

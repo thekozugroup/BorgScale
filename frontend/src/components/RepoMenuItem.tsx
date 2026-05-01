@@ -1,5 +1,5 @@
-import { Box, Chip, Stack, Typography } from '@mui/material'
 import { Database } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import BorgVersionChip from './BorgVersionChip'
 
 interface RepoMenuItemProps {
@@ -13,16 +13,6 @@ interface RepoMenuItemProps {
   hidePath?: boolean
 }
 
-const observeChipSx = {
-  height: '16px',
-  fontSize: '0.6rem',
-  fontWeight: 600,
-  bgcolor: 'info.main',
-  color: '#fff',
-  border: 'none',
-  '& .MuiChip-label': { px: 0.6 },
-} as const
-
 export default function RepoMenuItem({
   name,
   path,
@@ -33,37 +23,33 @@ export default function RepoMenuItem({
   hidePath = false,
 }: RepoMenuItemProps) {
   return (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0, overflow: 'hidden' }}>
-      <Database size={16} style={{ flexShrink: 0 }} />
-      <Box sx={{ minWidth: 0, overflow: 'hidden' }}>
-        <Stack direction="row" spacing={0.75} alignItems="center">
-          <Typography variant="body2" fontWeight={500}>
-            {name}
-          </Typography>
+    <div className="flex flex-row gap-2 items-center min-w-0 overflow-hidden">
+      <Database size={16} className="flex-shrink-0" />
+      <div className="min-w-0 overflow-hidden">
+        <div className="flex flex-row gap-1.5 items-center">
+          <span className="text-sm font-medium">{name}</span>
           <BorgVersionChip borgVersion={borgVersion} compact />
-          {mode === 'observe' && <Chip label="Observe Only" size="small" sx={observeChipSx} />}
-          {hasRunningMaintenance && (
-            <Typography component="span" variant="caption" color="warning.main">
-              {maintenanceLabel}
-            </Typography>
+          {mode === 'observe' && (
+            <Badge
+              variant="secondary"
+              className="h-4 text-[0.6rem] font-semibold px-1 border-none"
+            >
+              Observe Only
+            </Badge>
           )}
-        </Stack>
+          {hasRunningMaintenance && (
+            <span className="text-xs text-muted-foreground">{maintenanceLabel}</span>
+          )}
+        </div>
         {!hidePath && (
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{
-              fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,SFMono-Regular,monospace',
-              display: 'block',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
+          <p
+            className="text-xs text-muted-foreground truncate"
+            style={{ fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,SFMono-Regular,monospace' }}
           >
             {path}
-          </Typography>
+          </p>
         )}
-      </Box>
-    </Stack>
+      </div>
+    </div>
   )
 }

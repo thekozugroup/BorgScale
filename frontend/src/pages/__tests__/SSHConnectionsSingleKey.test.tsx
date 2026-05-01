@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { renderWithProviders, screen, userEvent, waitFor } from '../../test/test-utils'
+import { renderWithProviders, screen, userEvent, waitFor, fireEvent } from '../../test/test-utils'
 import SSHConnectionsSingleKey from '../SSHConnectionsSingleKey'
 
 const { track, toastSuccess, toastError, mockState } = vi.hoisted(() => ({
@@ -190,8 +190,8 @@ describe('SSHConnectionsSingleKey', () => {
 
     await screen.findByText('Remote Machines')
     await user.click(screen.getByRole('button', { name: /generate system ssh key/i }))
-    await user.click(screen.getByRole('combobox'))
-    await user.click(screen.getByRole('option', { name: 'RSA' }))
+    await screen.findByRole('dialog')
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'rsa' } })
     await user.click(screen.getByRole('button', { name: /^generate key$/i }))
 
     await waitFor(() => {
@@ -215,14 +215,14 @@ describe('SSHConnectionsSingleKey', () => {
         name: /automatically deploy ssh key using password authentication/i,
       })
     )
-    await user.type(screen.getByLabelText(/^host$/i), 'nas.local')
-    await user.type(screen.getByLabelText(/^username$/i), 'root')
-    await user.clear(screen.getByLabelText(/^port$/i))
-    await user.type(screen.getByLabelText(/^port$/i), '2200')
-    await user.type(screen.getByLabelText(/^password$/i), 'secret')
-    await user.type(screen.getByLabelText(/default path/i), '/backups')
-    await user.type(screen.getByLabelText(/mount point/i), 'nas')
-    await user.click(screen.getByRole('button', { name: /^deploy key$/i }))
+    await screen.findByRole('dialog')
+    fireEvent.change(screen.getByLabelText(/^host$/i), { target: { value: 'nas.local' } })
+    fireEvent.change(screen.getByLabelText(/^username$/i), { target: { value: 'root' } })
+    fireEvent.change(screen.getByLabelText(/^port$/i), { target: { value: '2200' } })
+    fireEvent.change(screen.getByLabelText(/^password$/i), { target: { value: 'secret' } })
+    fireEvent.change(screen.getByLabelText(/default path/i), { target: { value: '/backups' } })
+    fireEvent.change(screen.getByLabelText(/mount point/i), { target: { value: 'nas' } })
+    fireEvent.click(screen.getByRole('button', { name: /^deploy key$/i }))
 
     await waitFor(() => {
       expect(sshKeysAPI.deploySSHKey).toHaveBeenCalledWith(7, {
@@ -250,11 +250,11 @@ describe('SSHConnectionsSingleKey', () => {
         name: /add a connection for a manually deployed ssh key/i,
       })
     )
-    await user.type(screen.getByLabelText(/^host$/i), 'manual.example.com')
-    await user.type(screen.getByLabelText(/^username$/i), 'backup')
-    await user.clear(screen.getByLabelText(/^port$/i))
-    await user.type(screen.getByLabelText(/^port$/i), '44')
-    await user.click(screen.getByRole('button', { name: /test & add connection/i }))
+    await screen.findByRole('dialog')
+    fireEvent.change(screen.getByLabelText(/^host$/i), { target: { value: 'manual.example.com' } })
+    fireEvent.change(screen.getByLabelText(/^username$/i), { target: { value: 'backup' } })
+    fireEvent.change(screen.getByLabelText(/^port$/i), { target: { value: '44' } })
+    fireEvent.click(screen.getByRole('button', { name: /test & add connection/i }))
 
     await waitFor(() => {
       expect(sshKeysAPI.testSSHConnection).toHaveBeenCalledWith(7, {
@@ -273,13 +273,12 @@ describe('SSHConnectionsSingleKey', () => {
 
     await screen.findByText('backup-host')
     await user.click(screen.getByRole('button', { name: /edit backup-host/i }))
+    await screen.findByRole('dialog')
     const hostInputs = screen.getAllByLabelText(/^host$/i)
-    await user.clear(hostInputs[0])
-    await user.type(hostInputs[0], 'updated-host')
+    fireEvent.change(hostInputs[0], { target: { value: 'updated-host' } })
     const mountInputs = screen.getAllByLabelText(/mount point/i)
-    await user.clear(mountInputs[0])
-    await user.type(mountInputs[0], 'branch-office')
-    await user.click(screen.getByRole('button', { name: /update connection/i }))
+    fireEvent.change(mountInputs[0], { target: { value: 'branch-office' } })
+    fireEvent.click(screen.getByRole('button', { name: /update connection/i }))
 
     await waitFor(() => {
       expect(sshKeysAPI.updateSSHConnection).toHaveBeenCalledWith(3, {

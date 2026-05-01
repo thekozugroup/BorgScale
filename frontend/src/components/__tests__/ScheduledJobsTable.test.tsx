@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
+import { screen, renderWithProviders } from '../../test/test-utils'
 import ScheduledJobsTable from '../ScheduledJobsTable'
 
 vi.mock('../ScheduleJobCard', () => ({
@@ -51,12 +51,12 @@ const defaultProps = {
 
 describe('ScheduledJobsTable', () => {
   it('renders the section title', () => {
-    render(<ScheduledJobsTable {...defaultProps} />)
+    renderWithProviders(<ScheduledJobsTable {...defaultProps} />)
     expect(screen.getByText('All Scheduled Jobs')).toBeInTheDocument()
   })
 
   it('renders a card for each job', () => {
-    render(<ScheduledJobsTable {...defaultProps} />)
+    renderWithProviders(<ScheduledJobsTable {...defaultProps} />)
     expect(screen.getAllByTestId('schedule-job-card')).toHaveLength(1)
     expect(screen.getByText('Daily Backup')).toBeInTheDocument()
   })
@@ -66,23 +66,25 @@ describe('ScheduledJobsTable', () => {
       ...defaultProps,
       jobs: [baseJob, { ...baseJob, id: 2, name: 'Weekly Backup' }],
     }
-    render(<ScheduledJobsTable {...props} />)
+    renderWithProviders(<ScheduledJobsTable {...props} />)
     expect(screen.getAllByTestId('schedule-job-card')).toHaveLength(2)
   })
 
   it('shows loading state when isLoading is true', () => {
-    const { container } = render(<ScheduledJobsTable {...defaultProps} isLoading={true} />)
-    expect(container.querySelectorAll('.MuiSkeleton-root').length).toBeGreaterThan(0)
+    const { container } = renderWithProviders(<ScheduledJobsTable {...defaultProps} isLoading={true} />)
+    // shadcn Skeleton uses [data-slot="skeleton"] attribute
+    expect(container.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(0)
     expect(screen.queryByTestId('schedule-job-card')).not.toBeInTheDocument()
   })
 
   it('shows empty state when jobs array is empty', () => {
-    render(<ScheduledJobsTable {...defaultProps} jobs={[]} />)
+    renderWithProviders(<ScheduledJobsTable {...defaultProps} jobs={[]} />)
     expect(screen.getByText('No scheduled jobs found')).toBeInTheDocument()
   })
 
   it('renders the jobs list without an outer card wrapper', () => {
-    const { container } = render(<ScheduledJobsTable {...defaultProps} />)
+    const { container } = renderWithProviders(<ScheduledJobsTable {...defaultProps} />)
+    // No MUI Card wrapper — shadcn uses div-based cards
     expect(container.querySelector('.MuiCard-root')).not.toBeInTheDocument()
     expect(screen.getAllByTestId('schedule-job-card')).toHaveLength(1)
   })

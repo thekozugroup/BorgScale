@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen, waitFor } from '@testing-library/react'
-import { renderWithProviders, userEvent } from '../../test/test-utils'
+import { renderWithProviders, userEvent, screen, waitFor } from '../../test/test-utils'
 import UserPermissionsPanel from '../UserPermissionsPanel'
 
 const { refreshUserMock, trackSettingsMock } = vi.hoisted(() => ({

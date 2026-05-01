@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { screen, fireEvent, renderWithProviders } from '../../test/test-utils'
 import DeleteArchiveDialog from '../DeleteArchiveDialog'
 
 describe('DeleteArchiveDialog', () => {
@@ -13,7 +13,7 @@ describe('DeleteArchiveDialog', () => {
   })
 
   it('renders nothing when closed', () => {
-    const { container } = render(
+    const { container } = renderWithProviders(
       <DeleteArchiveDialog open={false} archiveName="backup-2024-01-15" {...mockHandlers} />
     )
 
@@ -21,34 +21,34 @@ describe('DeleteArchiveDialog', () => {
   })
 
   it('renders dialog when open', () => {
-    render(<DeleteArchiveDialog open={true} archiveName="backup-2024-01-15" {...mockHandlers} />)
+    renderWithProviders(<DeleteArchiveDialog open={true} archiveName="backup-2024-01-15" {...mockHandlers} />)
 
     expect(screen.getByText('Delete Archive?')).toBeInTheDocument()
     expect(screen.getAllByText(/backup-2024-01-15/).length).toBeGreaterThan(0)
   })
 
   it('displays warning message', () => {
-    render(<DeleteArchiveDialog open={true} archiveName="backup-2024-01-15" {...mockHandlers} />)
+    renderWithProviders(<DeleteArchiveDialog open={true} archiveName="backup-2024-01-15" {...mockHandlers} />)
 
     expect(screen.getByText(/This action cannot be undone/)).toBeInTheDocument()
   })
 
   it('calls onClose when Cancel button is clicked', () => {
-    render(<DeleteArchiveDialog open={true} archiveName="backup-2024-01-15" {...mockHandlers} />)
+    renderWithProviders(<DeleteArchiveDialog open={true} archiveName="backup-2024-01-15" {...mockHandlers} />)
 
     fireEvent.click(screen.getByRole('button', { name: /cancel/i }))
     expect(mockHandlers.onClose).toHaveBeenCalledTimes(1)
   })
 
   it('calls onConfirm with archive name when Delete button is clicked', () => {
-    render(<DeleteArchiveDialog open={true} archiveName="backup-2024-01-15" {...mockHandlers} />)
+    renderWithProviders(<DeleteArchiveDialog open={true} archiveName="backup-2024-01-15" {...mockHandlers} />)
 
     fireEvent.click(screen.getByRole('button', { name: /delete/i }))
     expect(mockHandlers.onConfirm).toHaveBeenCalledWith('backup-2024-01-15')
   })
 
   it('disables Delete button when deleting', () => {
-    render(
+    renderWithProviders(
       <DeleteArchiveDialog
         open={true}
         archiveName="backup-2024-01-15"
@@ -62,7 +62,7 @@ describe('DeleteArchiveDialog', () => {
   })
 
   it('shows "Deleting..." text when deleting', () => {
-    render(
+    renderWithProviders(
       <DeleteArchiveDialog
         open={true}
         archiveName="backup-2024-01-15"
@@ -75,7 +75,7 @@ describe('DeleteArchiveDialog', () => {
   })
 
   it('does not call onConfirm if archiveName is null', () => {
-    render(<DeleteArchiveDialog open={true} archiveName={null} {...mockHandlers} />)
+    renderWithProviders(<DeleteArchiveDialog open={true} archiveName={null} {...mockHandlers} />)
 
     fireEvent.click(screen.getByRole('button', { name: /delete/i }))
     expect(mockHandlers.onConfirm).not.toHaveBeenCalled()

@@ -1,27 +1,7 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  LinearProgress,
-  Stack,
-  Typography,
-  alpha,
-  useTheme,
-} from '@mui/material'
-import {
-  Activity,
-  Archive,
-  Clock,
-  Database,
-  Eye,
-  FileText,
-  HardDrive,
-  RefreshCw,
-  Square,
-  Zap,
+  Activity, Archive, Clock, Database, Eye, FileText, HardDrive, RefreshCw, Square, Zap,
 } from 'lucide-react'
 import { BackupJob } from '../types'
 import {
@@ -29,8 +9,9 @@ import {
   formatDurationSeconds,
   formatTimeRange,
 } from '../utils/dateUtils'
+import { Button } from '@/components/ui/button'
+import { useTheme } from '../context/ThemeContext'
 
-// Emerald green — matches the "Backup Now" button in RepositoryCard for visual continuity
 const ACCENT_BACKUP = '#059669'
 
 interface RunningBackupsSectionProps {
@@ -50,6 +31,10 @@ const STAT_ICONS = [
   <Clock size={11} />,
 ]
 
+const STAT_COLORS = [
+  ACCENT_BACKUP, '#3b82f6', '#8b5cf6', '#22c55e', '#f97316', '#3b82f6', '#22c55e',
+]
+
 const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
   runningBackupJobs,
   onCancelBackup,
@@ -57,494 +42,207 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
   onViewLogs,
 }) => {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
-
-  const statColors = [
-    ACCENT_BACKUP,
-    theme.palette.primary.main,
-    theme.palette.secondary.main,
-    theme.palette.success.main,
-    theme.palette.warning.main,
-    theme.palette.primary.main,
-    theme.palette.success.main,
-  ]
+  const { effectiveMode } = useTheme()
+  const isDark = effectiveMode === 'dark'
 
   const getVisibleStats = (job: BackupJob) =>
     [
-      {
-        key: 'filesProcessed',
-        label: t('backup.runningJobs.progress.filesProcessed'),
-        value:
-          job.progress_details?.nfiles?.toLocaleString() ||
-          job.processed_files?.toLocaleString() ||
-          '0',
-      },
-      {
-        key: 'originalSize',
-        label: t('backup.runningJobs.progress.originalSize'),
-        value: job.progress_details?.original_size
-          ? formatBytesUtil(job.progress_details.original_size)
-          : job.processed_size || 'Unknown',
-      },
-      {
-        key: 'compressed',
-        label: t('backup.runningJobs.progress.compressed'),
-        value:
-          job.progress_details?.compressed_size !== undefined
-            ? formatBytesUtil(job.progress_details.compressed_size)
-            : null,
-      },
-      {
-        key: 'deduplicated',
-        label: t('backup.runningJobs.progress.deduplicated'),
-        value:
-          job.progress_details?.deduplicated_size !== undefined
-            ? formatBytesUtil(job.progress_details.deduplicated_size)
-            : null,
-        valueColor: 'success.main',
-      },
-      {
-        key: 'totalSourceSize',
-        label: t('backup.runningJobs.progress.totalSourceSize'),
-        value:
-          job.progress_details?.total_expected_size && job.progress_details.total_expected_size > 0
-            ? formatBytesUtil(job.progress_details.total_expected_size)
-            : 'Unknown',
-        valueColor: 'success.main',
-      },
-      {
-        key: 'speed',
-        label: t('backup.runningJobs.progress.speed'),
-        value:
-          job.status === 'running' && job.progress_details?.backup_speed
-            ? `${job.progress_details.backup_speed.toFixed(2)} MB/s`
-            : 'N/A',
-        valueColor: 'primary.main',
-      },
-      {
-        key: 'eta',
-        label: t('backup.runningJobs.progress.eta'),
-        value:
-          (job.progress_details?.estimated_time_remaining || 0) > 0
-            ? formatDurationSeconds(job.progress_details?.estimated_time_remaining || 0)
-            : 'N/A',
-        valueColor: 'success.main',
-      },
+      { key: 'filesProcessed', label: t('backup.runningJobs.progress.filesProcessed'), value: job.progress_details?.nfiles?.toLocaleString() || job.processed_files?.toLocaleString() || '0' },
+      { key: 'originalSize', label: t('backup.runningJobs.progress.originalSize'), value: job.progress_details?.original_size ? formatBytesUtil(job.progress_details.original_size) : job.processed_size || 'Unknown' },
+      { key: 'compressed', label: t('backup.runningJobs.progress.compressed'), value: job.progress_details?.compressed_size !== undefined ? formatBytesUtil(job.progress_details.compressed_size) : null },
+      { key: 'deduplicated', label: t('backup.runningJobs.progress.deduplicated'), value: job.progress_details?.deduplicated_size !== undefined ? formatBytesUtil(job.progress_details.deduplicated_size) : null },
+      { key: 'totalSourceSize', label: t('backup.runningJobs.progress.totalSourceSize'), value: job.progress_details?.total_expected_size && job.progress_details.total_expected_size > 0 ? formatBytesUtil(job.progress_details.total_expected_size) : 'Unknown' },
+      { key: 'speed', label: t('backup.runningJobs.progress.speed'), value: job.status === 'running' && job.progress_details?.backup_speed ? `${job.progress_details.backup_speed.toFixed(2)} MB/s` : 'N/A' },
+      { key: 'eta', label: t('backup.runningJobs.progress.eta'), value: (job.progress_details?.estimated_time_remaining || 0) > 0 ? formatDurationSeconds(job.progress_details?.estimated_time_remaining || 0) : 'N/A' },
     ].filter((stat) => stat.value !== null)
 
   if (runningBackupJobs.length === 0) return null
 
   return (
-    <Card sx={{ mb: 3 }}>
-      <CardContent>
+    <div
+      className="mb-6 rounded-lg overflow-hidden"
+      style={{
+        boxShadow: isDark
+          ? '0 0 0 1px rgba(255,255,255,0.08), 0 4px 16px rgba(0,0,0,0.25)'
+          : '0 0 0 1px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.07)',
+      }}
+    >
+      <div className="px-4 sm:px-6 pt-4 pb-5 bg-background">
         {/* Section Header */}
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.75 }}>
-          <Box sx={{ color: ACCENT_BACKUP, display: 'flex' }}>
+        <div className="flex items-center gap-2 mb-1">
+          <div style={{ color: ACCENT_BACKUP, display: 'flex' }}>
             <RefreshCw size={16} className="animate-spin" />
-          </Box>
-          <Typography variant="h6" fontWeight={600}>
-            {t('backup.runningJobs.title')}
-          </Typography>
-          <Box
-            sx={{
-              px: 0.8,
-              py: 0.15,
-              borderRadius: '10px',
-              bgcolor: alpha(ACCENT_BACKUP, 0.1),
-              border: `1px solid ${alpha(ACCENT_BACKUP, 0.22)}`,
+          </div>
+          <p className="text-base font-semibold">{t('backup.runningJobs.title')}</p>
+          <div
+            className="px-2 py-0.5 rounded-full text-[0.7rem] font-bold"
+            style={{
+              background: `${ACCENT_BACKUP}1a`,
+              border: `1px solid ${ACCENT_BACKUP}38`,
+              color: ACCENT_BACKUP,
+              lineHeight: 1.5,
             }}
           >
-            <Typography
-              sx={{ fontSize: '0.7rem', fontWeight: 700, color: ACCENT_BACKUP, lineHeight: 1.5 }}
-            >
-              {runningBackupJobs.length}
-            </Typography>
-          </Box>
-        </Stack>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
-          {t('backup.runningJobs.subtitle')}
-        </Typography>
+            {runningBackupJobs.length}
+          </div>
+        </div>
+        <p className="text-sm text-muted-foreground mb-5">{t('backup.runningJobs.subtitle')}</p>
 
-        <Stack spacing={2}>
+        <div className="flex flex-col gap-4">
           {runningBackupJobs.map((job: BackupJob) => {
             const visibleStats = getVisibleStats(job)
             const progress = job.progress || 0
             const stageLabel =
-              progress === 0
-                ? t('backup.runningJobs.progress.initializing')
-                : progress >= 100
-                  ? t('backup.runningJobs.progress.finalizing')
-                  : t('backup.runningJobs.progress.processing')
+              progress === 0 ? t('backup.runningJobs.progress.initializing')
+                : progress >= 100 ? t('backup.runningJobs.progress.finalizing')
+                : t('backup.runningJobs.progress.processing')
+
+            const processed = job.progress_details?.original_size ?? 0
+            const total = job.progress_details?.total_expected_size ?? 0
+            const showProgress = processed > 0 && total > 0
+            const pct = showProgress ? Math.min(100, (processed / total) * 100) : 0
 
             return (
-              <Box
+              <div
                 key={job.id}
-                sx={{
-                  position: 'relative',
-                  borderRadius: 2,
-                  bgcolor: isDark ? alpha(ACCENT_BACKUP, 0.07) : alpha(ACCENT_BACKUP, 0.05),
-                  overflow: 'hidden',
-                  boxShadow: isDark
-                    ? `inset 0 0 0 1px ${alpha('#fff', 0.05)}`
-                    : `inset 0 0 0 1px ${alpha('#000', 0.04)}`,
+                className="relative rounded-lg overflow-hidden"
+                style={{
+                  background: isDark ? `${ACCENT_BACKUP}12` : `${ACCENT_BACKUP}0d`,
+                  boxShadow: isDark ? `inset 0 0 0 1px rgba(255,255,255,0.05)` : `inset 0 0 0 1px rgba(0,0,0,0.04)`,
                 }}
               >
                 {/* Ambient glow blob */}
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: -60,
-                    right: -40,
-                    width: 200,
-                    height: 140,
+                <div
+                  className="pointer-events-none absolute"
+                  style={{
+                    top: -60, right: -40, width: 200, height: 140,
                     borderRadius: '50%',
-                    bgcolor: alpha(ACCENT_BACKUP, isDark ? 0.1 : 0.05),
+                    background: isDark ? `${ACCENT_BACKUP}1a` : `${ACCENT_BACKUP}0d`,
                     filter: 'blur(55px)',
-                    pointerEvents: 'none',
                     animation: 'blobPulseJob 3s ease-in-out infinite',
-                    '@keyframes blobPulseJob': {
-                      '0%, 100%': { opacity: 1 },
-                      '50%': { opacity: 0.25 },
-                    },
                   }}
                 />
 
-                <Box sx={{ px: { xs: 1.75, sm: 2.25 }, pt: 2, pb: 2 }}>
-                  {/* Header */}
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'flex-start',
-                      gap: 2,
-                      mb: 2,
-                      flexWrap: { xs: 'wrap', sm: 'nowrap' },
-                    }}
-                  >
-                    {/* Left: Job identity */}
-                    <Box sx={{ minWidth: 0, flex: 1 }}>
-                      <Stack
-                        direction="row"
-                        spacing={0.75}
-                        alignItems="center"
-                        sx={{ mb: 0.5, flexWrap: 'wrap', gap: 0.5 }}
-                      >
-                        {/* Live pulse dot */}
-                        <Box
-                          sx={{
-                            width: 7,
-                            height: 7,
-                            borderRadius: '50%',
-                            bgcolor: ACCENT_BACKUP,
-                            flexShrink: 0,
-                            animation: 'liveDot 2s ease-in-out infinite',
-                            '@keyframes liveDot': {
-                              '0%, 100%': { opacity: 1, transform: 'scale(1)' },
-                              '50%': { opacity: 0.45, transform: 'scale(0.82)' },
-                            },
-                          }}
-                        />
-                        <Typography variant="body1" fontWeight={700} sx={{ lineHeight: 1.3 }}>
-                          {t('backup.runningJobs.jobTitle', { id: job.id })}
-                        </Typography>
-                        {/* Stage badge */}
-                        <Box
-                          sx={{
-                            px: 0.8,
-                            py: 0.2,
-                            borderRadius: 0.75,
-                            bgcolor: alpha(ACCENT_BACKUP, 0.1),
-                            border: `1px solid ${alpha(ACCENT_BACKUP, 0.2)}`,
-                          }}
-                        >
-                          <Typography
-                            sx={{
-                              fontSize: '0.62rem',
-                              fontWeight: 700,
-                              color: ACCENT_BACKUP,
-                              lineHeight: 1,
-                              textTransform: 'uppercase',
-                              letterSpacing: '0.05em',
-                            }}
-                          >
-                            {stageLabel}
-                          </Typography>
-                        </Box>
-                        {/* Maintenance status badge */}
-                        {job.maintenance_status && (
-                          <Box
-                            sx={{
-                              px: 0.8,
-                              py: 0.2,
-                              borderRadius: 0.75,
-                              bgcolor: alpha(theme.palette.info.main, 0.1),
-                              border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`,
-                            }}
-                          >
-                            <Typography
-                              sx={{
-                                fontSize: '0.62rem',
-                                fontWeight: 700,
-                                color: 'info.main',
-                                lineHeight: 1,
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.05em',
-                              }}
-                            >
-                              {job.maintenance_status}
-                            </Typography>
-                          </Box>
-                        )}
-                      </Stack>
-                      <Typography
-                        sx={{
-                          fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace',
-                          fontSize: '0.69rem',
-                          color: 'text.disabled',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {job.repository}
-                      </Typography>
-                    </Box>
+                <style>{`@keyframes blobPulseJob { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } } @keyframes liveDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.82); } }`}</style>
 
-                    {/* Right: Actions */}
-                    <Stack direction="row" spacing={0.75} alignItems="center" flexShrink={0}>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ display: { xs: 'none', sm: 'block' }, mr: 0.5 }}
-                      >
-                        {formatTimeRange(job.started_at, job.completed_at, job.status)}
-                      </Typography>
+                <div className="px-4 sm:px-5 pt-4 pb-4">
+                  {/* Header row */}
+                  <div className="flex justify-between items-start gap-4 mb-4 flex-wrap sm:flex-nowrap">
+                    {/* Left */}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                        <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: ACCENT_BACKUP, animation: 'liveDot 2s ease-in-out infinite' }} />
+                        <p className="font-bold text-base leading-tight">{t('backup.runningJobs.jobTitle', { id: job.id })}</p>
+                        <div className="px-1.5 py-0.5 rounded text-[0.62rem] font-bold uppercase tracking-[0.05em] leading-none" style={{ background: `${ACCENT_BACKUP}1a`, border: `1px solid ${ACCENT_BACKUP}33`, color: ACCENT_BACKUP }}>
+                          {stageLabel}
+                        </div>
+                        {job.maintenance_status && (
+                          <div className="px-1.5 py-0.5 rounded text-[0.62rem] font-bold uppercase tracking-[0.05em] leading-none bg-muted text-muted-foreground border border-border">
+                            {job.maintenance_status}
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-[0.69rem] truncate" style={{ fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace', color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.35)' }}>
+                        {job.repository}
+                      </p>
+                    </div>
+
+                    {/* Right: actions */}
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-xs text-muted-foreground hidden sm:block">{formatTimeRange(job.started_at, job.completed_at, job.status)}</span>
                       {onViewLogs && (
                         <Button
-                          variant="outlined"
-                          size="small"
-                          startIcon={<Eye size={13} />}
+                          size="sm"
+                          variant="outline"
+                          className="h-7 text-xs px-2 gap-1"
+                          style={{ borderColor: `${ACCENT_BACKUP}47`, color: ACCENT_BACKUP }}
                           onClick={() => onViewLogs(job)}
-                          sx={{
-                            height: 28,
-                            fontSize: '0.75rem',
-                            px: 1.25,
-                            borderColor: alpha(ACCENT_BACKUP, 0.28),
-                            color: ACCENT_BACKUP,
-                            '&:hover': {
-                              bgcolor: alpha(ACCENT_BACKUP, 0.07),
-                              borderColor: alpha(ACCENT_BACKUP, 0.5),
-                            },
-                          }}
                         >
+                          <Eye size={12} />
                           {t('backup.runningJobs.viewLogs')}
                         </Button>
                       )}
                       <Button
-                        variant="outlined"
-                        size="small"
-                        startIcon={<Square size={13} />}
-                        color="error"
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs px-2 gap-1 text-destructive border-destructive/30 hover:bg-destructive/10"
                         onClick={() => {
-                          if (
-                            window.confirm(`Are you sure you want to cancel backup job #${job.id}?`)
-                          ) {
+                          if (window.confirm(`Are you sure you want to cancel backup job #${job.id}?`)) {
                             onCancelBackup(job.id)
                           }
                         }}
                         disabled={isCancelling}
-                        sx={{ height: 28, fontSize: '0.75rem', px: 1.25 }}
                       >
+                        <Square size={12} />
                         {t('backup.runningJobs.cancel')}
                       </Button>
-                    </Stack>
-                  </Box>
+                    </div>
+                  </div>
 
-                  {/* Progress bar — only when total source size is known */}
-                  {(() => {
-                    const processed = job.progress_details?.original_size ?? 0
-                    const total = job.progress_details?.total_expected_size ?? 0
-                    if (processed <= 0 || total <= 0) return null
-                    const pct = Math.min(100, (processed / total) * 100)
-                    return (
-                      <Box sx={{ mb: 1.5 }}>
-                        <Stack
-                          direction="row"
-                          justifyContent="space-between"
-                          alignItems="center"
-                          sx={{ mb: 0.5 }}
-                        >
-                          <Typography
-                            sx={{
-                              fontSize: '0.68rem',
-                              fontWeight: 600,
-                              color: ACCENT_BACKUP,
-                              letterSpacing: '0.02em',
-                            }}
-                          >
-                            {pct.toFixed(1)}%
-                          </Typography>
-                          <Typography sx={{ fontSize: '0.65rem', color: 'text.disabled' }}>
-                            {t('backup.runningJobs.progress.totalSourceSize')}
-                          </Typography>
-                        </Stack>
-                        <LinearProgress
-                          variant="determinate"
-                          value={pct}
-                          sx={{
-                            height: 4,
-                            borderRadius: 2,
-                            bgcolor: isDark ? alpha('#fff', 0.07) : alpha('#000', 0.07),
-                            '& .MuiLinearProgress-bar': {
-                              borderRadius: 2,
-                              bgcolor: ACCENT_BACKUP,
-                            },
-                          }}
-                        />
-                      </Box>
-                    )
-                  })()}
+                  {/* Progress bar */}
+                  {showProgress && (
+                    <div className="mb-3">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-[0.68rem] font-semibold" style={{ color: ACCENT_BACKUP }}>{pct.toFixed(1)}%</span>
+                        <span className="text-[0.65rem] text-muted-foreground">{t('backup.runningJobs.progress.totalSourceSize')}</span>
+                      </div>
+                      <div className="h-1 rounded-full overflow-hidden" style={{ background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)' }}>
+                        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: ACCENT_BACKUP }} />
+                      </div>
+                    </div>
+                  )}
 
-                  {/* Stats Band */}
+                  {/* Stats grid */}
                   {visibleStats.length > 0 && (
-                    <Box
-                      sx={{
-                        display: 'grid',
-                        gridTemplateColumns: {
-                          xs: 'repeat(2, 1fr)',
-                          sm: 'repeat(3, 1fr)',
-                          md: 'repeat(4, 1fr)',
-                          lg: `repeat(${visibleStats.length}, 1fr)`,
-                        },
-                        borderRadius: 1.5,
-                        overflow: 'hidden',
-                        mb: job.progress_details?.current_file ? 1.5 : 0,
-                        bgcolor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
+                    <div
+                      className="grid rounded-md overflow-hidden mb-3"
+                      style={{
+                        gridTemplateColumns: `repeat(${Math.min(visibleStats.length, 4)}, 1fr)`,
                         gap: '1px',
+                        background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)',
                       }}
                     >
                       {visibleStats.map((stat, i) => {
-                        const statColor = statColors[i] ?? ACCENT_BACKUP
-                        const isLast = i === visibleStats.length - 1
-                        const total = visibleStats.length
-                        const getSpan = (cols: number) => {
-                          const r = total % cols
-                          return r === 0 ? 'auto' : `span ${cols - r + 1}`
-                        }
+                        const statColor = STAT_COLORS[i] ?? ACCENT_BACKUP
                         return (
-                          <Box
+                          <div
                             key={stat.key}
-                            sx={{
-                              px: 1.5,
-                              py: 1.1,
-                              bgcolor: isDark ? alpha(ACCENT_BACKUP, 0.04) : 'background.paper',
-                              ...(isLast && {
-                                gridColumn: {
-                                  xs: getSpan(2),
-                                  sm: getSpan(3),
-                                  md: getSpan(4),
-                                  lg: 'auto',
-                                },
-                              }),
-                            }}
+                            className="px-3 py-2"
+                            style={{ background: isDark ? `${ACCENT_BACKUP}0a` : 'var(--background)' }}
                           >
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 0.5,
-                                mb: 0.35,
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  color: alpha(statColor, 0.7),
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                }}
-                              >
-                                {STAT_ICONS[i]}
-                              </Box>
-                              <Typography
-                                sx={{
-                                  fontSize: '0.58rem',
-                                  fontWeight: 700,
-                                  textTransform: 'uppercase',
-                                  letterSpacing: '0.07em',
-                                  color: alpha(statColor, 0.7),
-                                  lineHeight: 1,
-                                }}
-                              >
-                                {stat.label}
-                              </Typography>
-                            </Box>
-                            <Typography
-                              variant="body2"
-                              fontWeight={600}
-                              noWrap
-                              sx={{
-                                fontVariantNumeric: 'tabular-nums',
-                                fontSize: '0.85rem',
-                                color: stat.valueColor || 'text.primary',
-                              }}
-                            >
-                              {stat.value}
-                            </Typography>
-                          </Box>
+                            <div className="flex items-center gap-1 mb-0.5">
+                              <span style={{ color: `${statColor}b3`, display: 'flex', alignItems: 'center' }}>{STAT_ICONS[i]}</span>
+                              <span className="text-[0.58rem] font-bold uppercase tracking-[0.07em] leading-none" style={{ color: `${statColor}b3` }}>{stat.label}</span>
+                            </div>
+                            <p className="text-[0.85rem] font-semibold truncate tabular-nums">{stat.value}</p>
+                          </div>
                         )
                       })}
-                    </Box>
+                    </div>
                   )}
 
-                  {/* Current File Terminal Box */}
+                  {/* Current file */}
                   {job.progress_details?.current_file && (
-                    <Box
-                      sx={{
-                        px: 1.5,
-                        py: 0.875,
-                        borderRadius: 1,
-                        bgcolor: isDark ? alpha('#000', 0.3) : alpha('#000', 0.03),
-                        border: '1px solid',
-                        borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1,
-                        overflow: 'hidden',
+                    <div
+                      className="flex items-center gap-2 px-3 py-2 rounded overflow-hidden"
+                      style={{
+                        background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.03)',
+                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)'}`,
                       }}
                     >
-                      <Box
-                        sx={{
-                          color: alpha(ACCENT_BACKUP, 0.65),
-                          display: 'flex',
-                          flexShrink: 0,
-                        }}
-                      >
-                        <FileText size={13} />
-                      </Box>
-                      <Typography
-                        sx={{
-                          fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace',
-                          fontSize: '0.72rem',
-                          color: 'text.secondary',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                          flex: 1,
-                          minWidth: 0,
-                        }}
-                      >
+                      <span style={{ color: `${ACCENT_BACKUP}a6`, display: 'flex', flexShrink: 0 }}><FileText size={13} /></span>
+                      <p className="text-[0.72rem] text-muted-foreground truncate flex-1 min-w-0" style={{ fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace' }}>
                         {job.progress_details.current_file}
-                      </Typography>
-                    </Box>
+                      </p>
+                    </div>
                   )}
-                </Box>
-              </Box>
+                </div>
+              </div>
             )
           })}
-        </Stack>
-      </CardContent>
-    </Card>
+        </div>
+      </div>
+    </div>
   )
 }
 

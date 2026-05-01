@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, renderWithProviders } from '../../test/test-utils'
 import userEvent from '@testing-library/user-event'
 import PathSelectorField from '../PathSelectorField'
 
@@ -58,22 +58,22 @@ describe('PathSelectorField', () => {
 
   describe('Rendering', () => {
     it('renders text field with label', () => {
-      render(<PathSelectorField label="Repository Path" value="" onChange={mockOnChange} />)
+      renderWithProviders(<PathSelectorField label="Repository Path" value="" onChange={mockOnChange} />)
       expect(screen.getByLabelText(/Repository Path/)).toBeInTheDocument()
     })
 
     it('renders with current value', () => {
-      render(<PathSelectorField label="Path" value="/existing/path" onChange={mockOnChange} />)
+      renderWithProviders(<PathSelectorField label="Path" value="/existing/path" onChange={mockOnChange} />)
       expect(screen.getByDisplayValue('/existing/path')).toBeInTheDocument()
     })
 
     it('renders browse button', () => {
-      render(<PathSelectorField label="Path" value="" onChange={mockOnChange} />)
+      renderWithProviders(<PathSelectorField label="Path" value="" onChange={mockOnChange} />)
       expect(screen.getByTitle('Browse filesystem')).toBeInTheDocument()
     })
 
     it('renders placeholder text', () => {
-      render(
+      renderWithProviders(
         <PathSelectorField
           label="Path"
           value=""
@@ -85,12 +85,12 @@ describe('PathSelectorField', () => {
     })
 
     it('renders default placeholder', () => {
-      render(<PathSelectorField label="Path" value="" onChange={mockOnChange} />)
+      renderWithProviders(<PathSelectorField label="Path" value="" onChange={mockOnChange} />)
       expect(screen.getByPlaceholderText('/path/to/directory')).toBeInTheDocument()
     })
 
     it('renders helper text', () => {
-      render(
+      renderWithProviders(
         <PathSelectorField
           label="Path"
           value=""
@@ -102,7 +102,7 @@ describe('PathSelectorField', () => {
     })
 
     it('shows required asterisk when required', () => {
-      render(<PathSelectorField label="Path" value="" onChange={mockOnChange} required={true} />)
+      renderWithProviders(<PathSelectorField label="Path" value="" onChange={mockOnChange} required={true} />)
       // MUI adds * to the label for required fields
       expect(screen.getByText('*')).toBeInTheDocument()
     })
@@ -110,19 +110,19 @@ describe('PathSelectorField', () => {
 
   describe('Disabled state', () => {
     it('disables text input when disabled', () => {
-      render(<PathSelectorField label="Path" value="" onChange={mockOnChange} disabled={true} />)
+      renderWithProviders(<PathSelectorField label="Path" value="" onChange={mockOnChange} disabled={true} />)
       expect(screen.getByLabelText(/Path/)).toBeDisabled()
     })
 
     it('disables browse button when disabled', () => {
-      render(<PathSelectorField label="Path" value="" onChange={mockOnChange} disabled={true} />)
+      renderWithProviders(<PathSelectorField label="Path" value="" onChange={mockOnChange} disabled={true} />)
       expect(screen.getByTitle('Browse filesystem')).toBeDisabled()
     })
   })
 
   describe('Error state', () => {
     it('shows error styling when error is true', () => {
-      render(
+      renderWithProviders(
         <PathSelectorField
           label="Path"
           value=""
@@ -138,7 +138,7 @@ describe('PathSelectorField', () => {
   describe('Text Input', () => {
     it('calls onChange when typing', async () => {
       const user = userEvent.setup()
-      render(<PathSelectorField label="Path" value="" onChange={mockOnChange} />)
+      renderWithProviders(<PathSelectorField label="Path" value="" onChange={mockOnChange} />)
 
       const input = screen.getByLabelText(/Path/)
       await user.type(input, '/new/path')
@@ -151,7 +151,7 @@ describe('PathSelectorField', () => {
   describe('File Explorer Dialog', () => {
     it('opens file explorer when browse button clicked', async () => {
       const user = userEvent.setup()
-      render(<PathSelectorField label="Path" value="" onChange={mockOnChange} />)
+      renderWithProviders(<PathSelectorField label="Path" value="" onChange={mockOnChange} />)
 
       await user.click(screen.getByTitle('Browse filesystem'))
 
@@ -162,7 +162,7 @@ describe('PathSelectorField', () => {
 
     it('closes file explorer when close button clicked', async () => {
       const user = userEvent.setup()
-      render(<PathSelectorField label="Path" value="" onChange={mockOnChange} />)
+      renderWithProviders(<PathSelectorField label="Path" value="" onChange={mockOnChange} />)
 
       await user.click(screen.getByTitle('Browse filesystem'))
       await user.click(screen.getByTestId('close-dialog'))
@@ -174,7 +174,7 @@ describe('PathSelectorField', () => {
 
     it('calls onChange with single path when not multiSelect', async () => {
       const user = userEvent.setup()
-      render(<PathSelectorField label="Path" value="" onChange={mockOnChange} />)
+      renderWithProviders(<PathSelectorField label="Path" value="" onChange={mockOnChange} />)
 
       await user.click(screen.getByTitle('Browse filesystem'))
       await user.click(screen.getByTestId('select-single'))
@@ -184,7 +184,7 @@ describe('PathSelectorField', () => {
 
     it('calls onChange with comma-separated paths when multiSelect', async () => {
       const user = userEvent.setup()
-      render(<PathSelectorField label="Path" value="" onChange={mockOnChange} multiSelect={true} />)
+      renderWithProviders(<PathSelectorField label="Path" value="" onChange={mockOnChange} multiSelect={true} />)
 
       await user.click(screen.getByTitle('Browse filesystem'))
       await user.click(screen.getByTestId('select-multiple'))
@@ -194,7 +194,7 @@ describe('PathSelectorField', () => {
 
     it('passes multiSelect prop to FileExplorerDialog', async () => {
       const user = userEvent.setup()
-      render(<PathSelectorField label="Path" value="" onChange={mockOnChange} multiSelect={true} />)
+      renderWithProviders(<PathSelectorField label="Path" value="" onChange={mockOnChange} multiSelect={true} />)
 
       await user.click(screen.getByTitle('Browse filesystem'))
 
@@ -203,7 +203,7 @@ describe('PathSelectorField', () => {
 
     it('passes selectMode prop to FileExplorerDialog', async () => {
       const user = userEvent.setup()
-      render(<PathSelectorField label="Path" value="" onChange={mockOnChange} selectMode="files" />)
+      renderWithProviders(<PathSelectorField label="Path" value="" onChange={mockOnChange} selectMode="files" />)
 
       await user.click(screen.getByTitle('Browse filesystem'))
 
@@ -212,7 +212,7 @@ describe('PathSelectorField', () => {
 
     it('defaults selectMode to directories', async () => {
       const user = userEvent.setup()
-      render(<PathSelectorField label="Path" value="" onChange={mockOnChange} />)
+      renderWithProviders(<PathSelectorField label="Path" value="" onChange={mockOnChange} />)
 
       await user.click(screen.getByTitle('Browse filesystem'))
 
@@ -222,26 +222,26 @@ describe('PathSelectorField', () => {
 
   describe('Size variations', () => {
     it('renders small size by default', () => {
-      render(<PathSelectorField label="Path" value="" onChange={mockOnChange} />)
+      renderWithProviders(<PathSelectorField label="Path" value="" onChange={mockOnChange} />)
       // The input should have small styling (MUI classes)
       expect(screen.getByLabelText(/Path/)).toBeInTheDocument()
     })
 
     it('renders medium size when specified', () => {
-      render(<PathSelectorField label="Path" value="" onChange={mockOnChange} size="medium" />)
+      renderWithProviders(<PathSelectorField label="Path" value="" onChange={mockOnChange} size="medium" />)
       expect(screen.getByLabelText(/Path/)).toBeInTheDocument()
     })
   })
 
   describe('Width variations', () => {
     it('renders fullWidth by default', () => {
-      render(<PathSelectorField label="Path" value="" onChange={mockOnChange} />)
+      renderWithProviders(<PathSelectorField label="Path" value="" onChange={mockOnChange} />)
       // TextField should have fullWidth styling
       expect(screen.getByLabelText(/Path/)).toBeInTheDocument()
     })
 
     it('renders without fullWidth when specified', () => {
-      render(<PathSelectorField label="Path" value="" onChange={mockOnChange} fullWidth={false} />)
+      renderWithProviders(<PathSelectorField label="Path" value="" onChange={mockOnChange} fullWidth={false} />)
       expect(screen.getByLabelText(/Path/)).toBeInTheDocument()
     })
   })

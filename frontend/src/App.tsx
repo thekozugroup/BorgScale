@@ -58,28 +58,28 @@ function App() {
       return (
         <div className="min-h-screen flex items-center justify-center">
           {authError ? (
-            <div className="max-w-lg rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+            <div className="max-w-lg rounded-2xl border border-border bg-background p-8 shadow-sm">
               <div className="flex items-center gap-2.5">
-                <ShieldAlert size={22} className="shrink-0 text-slate-500" />
-                <h1 className="text-2xl font-semibold text-slate-900">
+                <ShieldAlert size={22} className="shrink-0 text-muted-foreground" />
+                <h1 className="text-2xl font-semibold text-foreground">
                   Proxy authentication required
                 </h1>
               </div>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{authError}</p>
-              <p className="mt-3 text-sm leading-6 text-slate-600">
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">{authError}</p>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 Ensure BorgScale is only reachable through your authenticated reverse proxy and that
                 it forwards the expected user header{proxyAuthHeader ? ` (${proxyAuthHeader})` : ''}
                 .
               </p>
               {proxyAuthWarnings.length > 0 ? (
-                <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
                   <div className="flex items-center gap-2">
-                    <AlertTriangle size={14} className="shrink-0 text-amber-700" />
-                    <h2 className="text-sm font-semibold text-amber-900">
+                    <AlertTriangle size={14} className="shrink-0 text-muted-foreground" />
+                    <h2 className="text-sm font-semibold text-foreground">
                       Proxy auth configuration warnings
                     </h2>
                   </div>
-                  <ul className="mt-2 space-y-1 text-sm text-amber-800">
+                  <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
                     {proxyAuthWarnings.map((warning) => (
                       <li key={warning.code}>{warning.message}</li>
                     ))}
@@ -88,7 +88,7 @@ function App() {
               ) : null}
             </div>
           ) : (
-            <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary-600 border-t-transparent"></div>
+            <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary border-t-transparent"></div>
           )}
         </div>
       )
@@ -98,17 +98,17 @@ function App() {
       return (
         <div className="min-h-screen flex items-center justify-center">
           {authError ? (
-            <div className="max-w-lg rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+            <div className="max-w-lg rounded-2xl border border-border bg-background p-8 shadow-sm">
               <div className="flex items-center gap-2.5">
-                <ShieldAlert size={22} className="shrink-0 text-slate-500" />
-                <h1 className="text-2xl font-semibold text-slate-900">
+                <ShieldAlert size={22} className="shrink-0 text-muted-foreground" />
+                <h1 className="text-2xl font-semibold text-foreground">
                   Anonymous access unavailable
                 </h1>
               </div>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{authError}</p>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">{authError}</p>
             </div>
           ) : (
-            <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary-600 border-t-transparent"></div>
+            <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary border-t-transparent"></div>
           )}
         </div>
       )

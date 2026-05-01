@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+import { screen, renderWithProviders } from '../../../test/test-utils'
 import WizardStepBackupConfig, { BackupConfigStepData } from '../WizardStepBackupConfig'
 
 // Mock CompressionSettings
@@ -74,7 +74,7 @@ const defaultData: BackupConfigStepData = {
 describe('WizardStepBackupConfig', () => {
   describe('Compression Settings', () => {
     it('renders compression settings component', () => {
-      render(
+      renderWithProviders(
         <WizardStepBackupConfig
           dataSource="local"
           repositoryMode="full"
@@ -88,7 +88,7 @@ describe('WizardStepBackupConfig', () => {
     })
 
     it('shows current compression value', () => {
-      render(
+      renderWithProviders(
         <WizardStepBackupConfig
           dataSource="local"
           repositoryMode="full"
@@ -106,7 +106,7 @@ describe('WizardStepBackupConfig', () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
 
-      render(
+      renderWithProviders(
         <WizardStepBackupConfig
           dataSource="local"
           repositoryMode="full"
@@ -124,7 +124,7 @@ describe('WizardStepBackupConfig', () => {
 
   describe('Exclude Patterns - Local Source', () => {
     it('renders exclude pattern input for local data source', () => {
-      render(
+      renderWithProviders(
         <WizardStepBackupConfig
           dataSource="local"
           repositoryMode="full"
@@ -138,7 +138,7 @@ describe('WizardStepBackupConfig', () => {
     })
 
     it('shows current exclude pattern count', () => {
-      render(
+      renderWithProviders(
         <WizardStepBackupConfig
           dataSource="local"
           repositoryMode="full"
@@ -156,7 +156,7 @@ describe('WizardStepBackupConfig', () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
 
-      render(
+      renderWithProviders(
         <WizardStepBackupConfig
           dataSource="local"
           repositoryMode="full"
@@ -178,7 +178,7 @@ describe('WizardStepBackupConfig', () => {
       const user = userEvent.setup()
       const onBrowseExclude = vi.fn()
 
-      render(
+      renderWithProviders(
         <WizardStepBackupConfig
           dataSource="local"
           repositoryMode="full"
@@ -196,7 +196,7 @@ describe('WizardStepBackupConfig', () => {
 
   describe('Remote Data Source', () => {
     it('shows exclude pattern input for remote data source', () => {
-      render(
+      renderWithProviders(
         <WizardStepBackupConfig
           dataSource="remote"
           repositoryMode="full"
@@ -211,7 +211,7 @@ describe('WizardStepBackupConfig', () => {
     })
 
     it('shows info alert for remote data source explaining how excludes work', () => {
-      render(
+      renderWithProviders(
         <WizardStepBackupConfig
           dataSource="remote"
           repositoryMode="full"
@@ -231,7 +231,7 @@ describe('WizardStepBackupConfig', () => {
 
   describe('Advanced Options', () => {
     it('renders advanced repository options', () => {
-      render(
+      renderWithProviders(
         <WizardStepBackupConfig
           dataSource="local"
           repositoryMode="full"
@@ -247,7 +247,7 @@ describe('WizardStepBackupConfig', () => {
     it('passes remote path to advanced options', () => {
       const dataWithRemotePath = { ...defaultData, remotePath: '/usr/local/bin/borg' }
 
-      render(
+      renderWithProviders(
         <WizardStepBackupConfig
           dataSource="local"
           repositoryMode="full"
@@ -263,7 +263,7 @@ describe('WizardStepBackupConfig', () => {
     it('passes custom flags to advanced options', () => {
       const dataWithFlags = { ...defaultData, customFlags: '--stats --progress' }
 
-      render(
+      renderWithProviders(
         <WizardStepBackupConfig
           dataSource="local"
           repositoryMode="full"
@@ -283,7 +283,7 @@ describe('WizardStepBackupConfig', () => {
         postBackupScript: 'echo "done"',
       }
 
-      render(
+      renderWithProviders(
         <WizardStepBackupConfig
           dataSource="local"
           repositoryMode="full"
@@ -302,7 +302,7 @@ describe('WizardStepBackupConfig', () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
 
-      render(
+      renderWithProviders(
         <WizardStepBackupConfig
           dataSource="local"
           repositoryMode="full"
@@ -322,7 +322,7 @@ describe('WizardStepBackupConfig', () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
 
-      render(
+      renderWithProviders(
         <WizardStepBackupConfig
           dataSource="local"
           repositoryMode="full"
@@ -340,7 +340,7 @@ describe('WizardStepBackupConfig', () => {
 
   describe('Repository ID', () => {
     it('passes repository ID to advanced options when editing', () => {
-      render(
+      renderWithProviders(
         <WizardStepBackupConfig
           repositoryId={42}
           dataSource="local"
@@ -355,7 +355,7 @@ describe('WizardStepBackupConfig', () => {
     })
 
     it('handles null repository ID', () => {
-      render(
+      renderWithProviders(
         <WizardStepBackupConfig
           repositoryId={null}
           dataSource="local"

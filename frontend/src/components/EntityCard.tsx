@@ -1,5 +1,8 @@
 import { ReactNode } from 'react'
-import { Box, Typography, IconButton, Button, Tooltip, useTheme, alpha } from '@mui/material'
+import { cn } from '@/lib/utils'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Button } from '@/components/ui/button'
+import { useTheme } from '../context/ThemeContext'
 
 export interface StatItem {
   icon: ReactNode
@@ -46,8 +49,16 @@ export interface EntityCardProps {
   isHighlighted?: boolean
 }
 
-const DEFAULT_ACCENT = '#059669'
-const HIGHLIGHT_ACCENT = '#f59e0b'
+// EntityCard uses semantic accent only for hover box-shadow on the card.
+// Stat and action colours now map to semantic tokens.
+const STAT_COLORS: Record<string, string> = {
+  primary: 'hsl(var(--primary))',
+  success: 'hsl(var(--primary))',
+  warning: 'hsl(var(--muted-foreground))',
+  info: 'hsl(var(--secondary-foreground))',
+  secondary: 'hsl(var(--muted-foreground))',
+}
+
 
 export default function EntityCard({
   title,
@@ -58,282 +69,165 @@ export default function EntityCard({
   tags,
   actions,
   primaryAction,
-  accentColor = DEFAULT_ACCENT,
-  isHighlighted = false,
+  accentColor: _accentColor,
+  isHighlighted: _isHighlighted,
 }: EntityCardProps) {
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
-  const effectiveAccent = isHighlighted ? HIGHLIGHT_ACCENT : accentColor
+  const { effectiveMode } = useTheme()
+  const isDark = effectiveMode === 'dark'
 
-  const iconBtnSx = {
-    width: 32,
-    height: 32,
-    borderRadius: 1.5,
-    color: 'text.secondary',
-    '&:hover': {
-      bgcolor: isDark ? alpha('#fff', 0.07) : alpha('#000', 0.06),
-      color: 'text.primary',
-    },
-  }
-
-  const colorMap: Record<string, string> = {
-    primary: theme.palette.primary.main,
-    error: theme.palette.error.main,
-    warning: theme.palette.warning.main,
-    success: theme.palette.success.main,
-  }
+  const borderBase = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)'
+  const innerBg = isDark ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.018)'
 
   return (
-    <Box
-      sx={{
-        position: 'relative',
-        borderRadius: 2,
-        bgcolor: 'background.paper',
-        overflow: 'hidden',
-        maxWidth: '100%',
-        minWidth: 0,
+    <div
+      className="relative rounded-lg bg-background overflow-hidden max-w-full min-w-0 transition-all duration-200 hover:-translate-y-0.5"
+      style={{
         boxShadow: isDark
-          ? `0 0 0 1px ${alpha('#fff', 0.08)}, 0 4px 16px ${alpha('#000', 0.25)}`
-          : `0 0 0 1px ${alpha('#000', 0.08)}, 0 2px 8px ${alpha('#000', 0.07)}`,
-        transition: 'all 200ms cubic-bezier(0.16,1,0.3,1)',
-        '&:hover': {
-          transform: 'translateY(-2px)',
-          boxShadow: isDark
-            ? `0 0 0 1px ${alpha(effectiveAccent, 0.4)}, 0 8px 24px ${alpha('#000', 0.3)}, 0 2px 8px ${alpha(effectiveAccent, 0.1)}`
-            : `0 0 0 1px ${alpha(effectiveAccent, 0.3)}, 0 8px 24px ${alpha('#000', 0.12)}, 0 2px 8px ${alpha(effectiveAccent, 0.08)}`,
-        },
+          ? `0 0 0 1px rgba(255,255,255,0.08), 0 4px 16px rgba(0,0,0,0.25)`
+          : `0 0 0 1px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.07)`,
+      }}
+      onMouseEnter={(e) => {
+        ;(e.currentTarget as HTMLDivElement).style.boxShadow = isDark
+          ? `0 0 0 1px rgba(255,255,255,0.12), 0 8px 24px rgba(0,0,0,0.3)`
+          : `0 0 0 1px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.12)`
+      }}
+      onMouseLeave={(e) => {
+        ;(e.currentTarget as HTMLDivElement).style.boxShadow = isDark
+          ? `0 0 0 1px rgba(255,255,255,0.08), 0 4px 16px rgba(0,0,0,0.25)`
+          : `0 0 0 1px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.07)`
       }}
     >
-      <Box sx={{ px: { xs: 1.75, sm: 2 }, pt: { xs: 1.75, sm: 2 }, pb: { xs: 1.5, sm: 1.75 } }}>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
-            gap: 1,
-            mb: 1.5,
-          }}
-        >
-          <Box sx={{ minWidth: 0, flex: 1 }}>
-            <Typography variant="subtitle1" fontWeight={700} noWrap sx={{ lineHeight: 1.3 }}>
-              {title}
-            </Typography>
+      <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3.5 sm:pb-4">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-2 mb-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold truncate leading-tight">{title}</p>
             {subtitle && (
-              <Typography
-                variant="body2"
-                noWrap
-                sx={{ fontSize: '0.7rem', color: 'text.disabled', lineHeight: 1.4 }}
-              >
+              <p className="text-[0.7rem] truncate leading-snug text-muted-foreground/60">
                 {subtitle}
-              </Typography>
+              </p>
             )}
-          </Box>
+          </div>
+          {badge && <div className="flex-shrink-0">{badge}</div>}
+        </div>
 
-          {badge && <Box sx={{ flexShrink: 0 }}>{badge}</Box>}
-        </Box>
-
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: `repeat(${stats.length}, 1fr)` },
-            borderRadius: 1.5,
-            border: '1px solid',
-            borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-            overflow: 'hidden',
-            mb: 1.5,
-            bgcolor: isDark ? alpha('#fff', 0.025) : alpha('#000', 0.018),
+        {/* Stats grid */}
+        <div
+          className="grid rounded-md overflow-hidden mb-3 border"
+          style={{
+            gridTemplateColumns: `repeat(${Math.min(stats.length, 4)}, 1fr)`,
+            borderColor: borderBase,
+            background: innerBg,
           }}
         >
           {stats.map((stat, i) => {
-            const isRightColXs = i % 2 === 1
-            const isLastSm = i === stats.length - 1
-            const isFirstRowXs = i < 2
-            const statColor = stat.color
-              ? alpha((theme.palette[stat.color] as { main: string }).main, 0.7)
-              : undefined
+            const statColor = stat.color ? STAT_COLORS[stat.color] : undefined
+            const isLast = i === stats.length - 1
+
             return (
-              <Tooltip key={stat.label} title={stat.tooltip || ''} arrow>
-                <Box
-                  sx={{
-                    px: 1.5,
-                    py: 1.1,
-                    cursor: stat.tooltip ? 'help' : 'default',
-                    borderRight: isLastSm ? 0 : '1px solid',
-                    borderBottom: { xs: isFirstRowXs ? '1px solid' : 0, sm: 0 },
-                    borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-                    ...(isRightColXs && {
-                      borderRight: { xs: 0, sm: isLastSm ? 0 : '1px solid' },
-                    }),
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 0.35 }}>
-                    <Box
-                      sx={{
-                        color: statColor ?? 'text.disabled',
-                        display: 'flex',
-                        alignItems: 'center',
-                      }}
-                    >
-                      {stat.icon}
-                    </Box>
-                    <Typography
-                      sx={{
-                        fontSize: '0.58rem',
-                        fontWeight: 700,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.07em',
-                        color: statColor ?? 'text.disabled',
-                        lineHeight: 1,
-                      }}
-                    >
-                      {stat.label}
-                    </Typography>
-                  </Box>
-                  <Typography
-                    variant="body2"
-                    fontWeight={600}
-                    noWrap
-                    sx={{ fontVariantNumeric: 'tabular-nums', fontSize: '0.85rem' }}
+              <Tooltip key={stat.label}>
+                <TooltipTrigger asChild>
+                  <div
+                    className={cn('px-3 py-2.5', stat.tooltip ? 'cursor-help' : 'cursor-default')}
+                    style={{
+                      borderRight: isLast ? 'none' : `1px solid ${borderBase}`,
+                    }}
                   >
-                    {stat.value}
-                  </Typography>
-                </Box>
+                    <div className="flex items-center gap-1 mb-1">
+                      <span className="flex items-center text-muted-foreground/60" style={statColor ? { color: statColor } : undefined}>
+                        {stat.icon}
+                      </span>
+                      <span
+                        className="text-[0.58rem] font-bold uppercase tracking-widest leading-none text-muted-foreground/60"
+                        style={statColor ? { color: statColor } : undefined}
+                      >
+                        {stat.label}
+                      </span>
+                    </div>
+                    <p className="text-[0.85rem] font-semibold truncate tabular-nums">{stat.value}</p>
+                  </div>
+                </TooltipTrigger>
+                {stat.tooltip && <TooltipContent>{stat.tooltip}</TooltipContent>}
               </Tooltip>
             )
           })}
-        </Box>
+        </div>
 
+        {/* Meta */}
         {meta && meta.length > 0 && (
-          <Box
-            sx={{
-              display: 'flex',
-              gap: { xs: 1.25, sm: 1.75 },
-              flexWrap: 'wrap',
-              mb: 1.5,
-              px: 0.25,
-            }}
-          >
+          <div className="flex flex-wrap gap-3 sm:gap-4 mb-3 px-0.5">
             {meta.map((m) => (
-              <Tooltip key={m.label} title={m.tooltip || ''} arrow>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.4,
-                    cursor: m.tooltip ? 'help' : 'default',
-                  }}
-                >
-                  <Typography sx={{ fontSize: '0.68rem', color: 'text.disabled', lineHeight: 1 }}>
-                    {m.label}:
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontSize: '0.68rem',
-                      fontWeight: 600,
-                      color: 'text.secondary',
-                      lineHeight: 1,
-                    }}
+              <Tooltip key={m.label}>
+                <TooltipTrigger asChild>
+                  <div
+                    className={cn('flex items-center gap-1', m.tooltip ? 'cursor-help' : '')}
                   >
-                    {m.value}
-                  </Typography>
-                </Box>
+                    <span className="text-[0.68rem] leading-none text-muted-foreground/60">
+                      {m.label}:
+                    </span>
+                    <span className="text-[0.68rem] font-semibold text-muted-foreground leading-none">{m.value}</span>
+                  </div>
+                </TooltipTrigger>
+                {m.tooltip && <TooltipContent>{m.tooltip}</TooltipContent>}
               </Tooltip>
             ))}
-          </Box>
+          </div>
         )}
 
-        {tags && <Box sx={{ mb: 1.5 }}>{tags}</Box>}
+        {/* Tags */}
+        {tags && <div className="mb-3">{tags}</div>}
 
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.5,
-            pt: 1.25,
-            borderTop: '1px solid',
-            borderColor: isDark ? alpha('#fff', 0.06) : alpha('#000', 0.07),
-          }}
+        {/* Footer actions */}
+        <div
+          className="flex items-center gap-1 pt-3 border-t"
+          style={{ borderColor: borderBase }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
+          <div className="flex items-center gap-0.5">
             {actions
               .filter((a) => !a.hidden)
               .map((action, i) => {
-                const actionColor =
-                  action.color && action.color !== 'default' ? colorMap[action.color] : undefined
-
-                const resolvedSx = actionColor
-                  ? {
-                      ...iconBtnSx,
-                      color: alpha(actionColor, 0.6),
-                      '&:hover': {
-                        color: actionColor,
-                        bgcolor: alpha(actionColor, 0.1),
-                      },
-                      ...action.sx,
-                    }
-                  : { ...iconBtnSx, ...action.sx }
-
                 return (
-                  <Tooltip key={i} title={action.tooltip} arrow>
-                    <span>
-                      <IconButton
-                        size="small"
+                  <Tooltip key={i}>
+                    <TooltipTrigger asChild>
+                      <button
                         aria-label={action.tooltip}
                         onClick={action.onClick}
                         disabled={action.disabled}
-                        sx={resolvedSx}
+                        className={cn(
+                          'w-8 h-8 rounded-md flex items-center justify-center transition-colors',
+                          'disabled:opacity-50 disabled:cursor-not-allowed',
+                          'text-muted-foreground hover:text-foreground hover:bg-muted'
+                        )}
                       >
                         {action.icon}
-                      </IconButton>
-                    </span>
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>{action.tooltip}</TooltipContent>
                   </Tooltip>
                 )
               })}
-          </Box>
+          </div>
 
           {primaryAction && (
-            <Tooltip title={primaryAction.label} arrow>
-              <span style={{ marginLeft: 'auto' }}>
-                <Button
-                  variant="contained"
-                  size="small"
-                  startIcon={primaryAction.icon}
-                  onClick={primaryAction.onClick}
-                  disabled={primaryAction.disabled}
-                  sx={{
-                    bgcolor: primaryAction.color ?? effectiveAccent,
-                    color: '#fff',
-                    fontSize: '0.78rem',
-                    height: 30,
-                    flexShrink: 0,
-                    px: { xs: 0.85, sm: 1.5 },
-                    minWidth: 'unset',
-                    boxShadow: `0 2px 10px ${alpha(primaryAction.color ?? effectiveAccent, 0.38)}`,
-                    '& .MuiButton-startIcon': {
-                      mr: { xs: 0, sm: 0.5 },
-                      ml: { xs: 0, sm: '-2px' },
-                    },
-                    '&:hover': {
-                      bgcolor: primaryAction.color ?? effectiveAccent,
-                      filter: 'brightness(0.88)',
-                      boxShadow: `0 4px 18px ${alpha(primaryAction.color ?? effectiveAccent, 0.5)}`,
-                    },
-                    '&.Mui-disabled': {
-                      bgcolor: isDark ? alpha('#fff', 0.08) : alpha('#000', 0.08),
-                      color: 'text.disabled',
-                      boxShadow: 'none',
-                    },
-                  }}
-                >
-                  <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                    {primaryAction.label}
-                  </Box>
-                </Button>
-              </span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="ml-auto">
+                  <Button
+                    size="sm"
+                    onClick={primaryAction.onClick}
+                    disabled={primaryAction.disabled}
+                    className="h-7 px-2 sm:px-3 text-[0.78rem] gap-1 min-w-0"
+                  >
+                    <span className="flex-shrink-0">{primaryAction.icon}</span>
+                    <span className="hidden sm:inline">{primaryAction.label}</span>
+                  </Button>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>{primaryAction.label}</TooltipContent>
             </Tooltip>
           )}
-        </Box>
-      </Box>
-    </Box>
+        </div>
+      </div>
+    </div>
   )
 }

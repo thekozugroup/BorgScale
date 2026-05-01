@@ -9,6 +9,19 @@ import { httpClient as borgApiHttpClient } from '../services/borgApi/client'
 // Extend Vitest's expect with jest-dom matchers
 expect.extend(matchers)
 
+// Polyfill PointerEvent for Radix UI components in jsdom
+// Without this, Radix Select/Dialog/etc. do not respond to pointer interactions
+if (!window.PointerEvent) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(window as any).PointerEvent = class PointerEvent extends MouseEvent {
+    constructor(type: string, props: PointerEventInit = {}) {
+      super(type, props)
+    }
+  }
+}
+window.HTMLElement.prototype.releasePointerCapture = vi.fn()
+window.HTMLElement.prototype.hasPointerCapture = vi.fn()
+
 const createDefaultFetchResponse = () =>
   Promise.resolve({
     ok: false,

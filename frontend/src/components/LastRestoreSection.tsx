@@ -1,8 +1,9 @@
-import { Box, Typography, Button, alpha, useTheme } from '@mui/material'
 import { RotateCcw, ExternalLink } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import RestoreJobCard from './RestoreJobCard'
+import { Button } from '@/components/ui/button'
+import { useTheme } from '../context/ThemeContext'
 
 interface RestoreJob {
   id: number
@@ -30,68 +31,36 @@ interface LastRestoreSectionProps {
 export default function LastRestoreSection({ restoreJob }: LastRestoreSectionProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
+  const { effectiveMode } = useTheme()
+  const isDark = effectiveMode === 'dark'
 
   if (!restoreJob) {
     return (
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-        }}
-      >
-        <RotateCcw size={14} color={isDark ? alpha('#fff', 0.25) : alpha('#000', 0.25)} />
-        <Typography variant="body2" color="text.disabled" sx={{ fontSize: '0.78rem' }}>
-          {t('lastRestoreSection.noRestores')}
-        </Typography>
-      </Box>
+      <div className="flex items-center gap-2">
+        <RotateCcw size={14} style={{ color: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)' }} />
+        <span className="text-[0.78rem] text-muted-foreground">{t('lastRestoreSection.noRestores')}</span>
+      </div>
     )
   }
 
   return (
-    <Box>
-      {/* Header row */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          mb: 1.25,
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <RotateCcw size={15} color={theme.palette.secondary.main} />
-          <Typography variant="body2" fontWeight={600} sx={{ fontSize: '0.82rem' }}>
-            {t('lastRestoreSection.title')}
-          </Typography>
-        </Box>
+    <div>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <RotateCcw size={15} className="text-secondary" />
+          <p className="text-[0.82rem] font-semibold">{t('lastRestoreSection.title')}</p>
+        </div>
         <Button
-          variant="outlined"
-          size="small"
-          startIcon={<ExternalLink size={13} />}
+          variant="outline"
+          size="sm"
+          className="h-7 text-xs px-2.5 gap-1 text-muted-foreground"
           onClick={() => navigate('/activity')}
-          sx={{
-            textTransform: 'none',
-            fontSize: '0.72rem',
-            fontWeight: 500,
-            height: 28,
-            borderRadius: 1.5,
-            px: 1.25,
-            borderColor: isDark ? alpha('#fff', 0.12) : alpha('#000', 0.12),
-            color: 'text.secondary',
-            '&:hover': {
-              borderColor: isDark ? alpha('#fff', 0.25) : alpha('#000', 0.2),
-              bgcolor: isDark ? alpha('#fff', 0.04) : alpha('#000', 0.03),
-            },
-          }}
         >
+          <ExternalLink size={12} />
           {t('lastRestoreSection.viewAll')}
         </Button>
-      </Box>
-
+      </div>
       <RestoreJobCard job={restoreJob} showJobId={false} />
-    </Box>
+    </div>
   )
 }

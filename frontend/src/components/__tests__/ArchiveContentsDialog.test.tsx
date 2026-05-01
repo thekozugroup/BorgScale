@@ -1,7 +1,5 @@
-import React from 'react'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { screen, fireEvent, waitFor, renderWithProviders } from '../../test/test-utils'
 import type { AxiosResponse } from 'axios'
 import ArchiveContentsDialog from '../ArchiveContentsDialog'
 
@@ -13,20 +11,6 @@ vi.mock('../../services/borgApi/client', () => ({
 }))
 
 import { BorgApiClient } from '../../services/borgApi/client'
-
-const createTestQueryClient = () =>
-  new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  })
-
-function renderWithProviders(ui: React.ReactElement) {
-  const queryClient = createTestQueryClient()
-  return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>)
-}
 
 describe('ArchiveContentsDialog', () => {
   const mockArchive = {
@@ -380,14 +364,12 @@ describe('ArchiveContentsDialog', () => {
 
     // Open dialog
     rerender(
-      <QueryClientProvider client={createTestQueryClient()}>
-        <ArchiveContentsDialog
-          open={true}
-          archive={mockArchive}
-          repository={mockRepository}
-          {...mockHandlers}
-        />
-      </QueryClientProvider>
+      <ArchiveContentsDialog
+        open={true}
+        archive={mockArchive}
+        repository={mockRepository}
+        {...mockHandlers}
+      />
     )
 
     // Verify it starts at root path

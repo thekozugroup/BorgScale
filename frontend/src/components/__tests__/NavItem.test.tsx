@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { screen } from '@testing-library/react'
-import { renderWithProviders } from '../../test/test-utils'
+import { renderWithProviders, screen } from '../../test/test-utils'
 import { Database } from 'lucide-react'
 import NavItem from '../NavItem'
 

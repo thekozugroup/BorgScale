@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Repository } from '../types'
 import RepoSelect from './RepoSelect'
-import { SxProps, Theme } from '@mui/material'
 
 interface RepositorySelectorCardProps {
   title?: string
@@ -10,7 +9,7 @@ interface RepositorySelectorCardProps {
   onChange: (value: number | string) => void
   loading?: boolean
   valueKey?: 'id' | 'path'
-  sx?: SxProps<Theme>
+  className?: string
 }
 
 export default function RepositorySelectorCard({
@@ -19,21 +18,22 @@ export default function RepositorySelectorCard({
   onChange,
   loading = false,
   valueKey = 'id',
-  sx,
+  className,
 }: RepositorySelectorCardProps) {
   const { t } = useTranslation()
   return (
-    <RepoSelect
-      repositories={repositories}
-      value={value ?? ''}
-      onChange={onChange}
-      loading={loading}
-      valueKey={valueKey}
-      label={t('common.repository')}
-      loadingLabel={t('repositorySelectorCard.loading')}
-      placeholderLabel={t('repositorySelectorCard.placeholder')}
-      maintenanceLabel={t('repositorySelectorCard.maintenanceRunning')}
-      sx={{ mb: 3, ...sx }}
-    />
+    <div className={className ?? 'mb-6'}>
+      <RepoSelect
+        repositories={repositories}
+        value={value ?? ''}
+        onChange={onChange}
+        loading={loading}
+        valueKey={valueKey}
+        label={t('common.repository')}
+        loadingLabel={t('repositorySelectorCard.loading')}
+        placeholderLabel={t('repositorySelectorCard.placeholder')}
+        maintenanceLabel={t('repositorySelectorCard.maintenanceRunning')}
+      />
+    </div>
   )
 }

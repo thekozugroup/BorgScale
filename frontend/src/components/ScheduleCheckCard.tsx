@@ -1,5 +1,5 @@
-import { Chip } from '@mui/material'
 import { useTranslation } from 'react-i18next'
+import { Badge } from '@/components/ui/badge'
 import { CalendarClock, History, CalendarCheck, Timer, Play, Pencil, Trash2 } from 'lucide-react'
 import EntityCard, { StatItem, ActionItem } from './EntityCard'
 import {
@@ -99,13 +99,9 @@ export default function ScheduleCheckCard({
   ]
 
   const badge = (
-    <Chip
-      label={t('schedule.checkCard.badge.healthCheck')}
-      size="small"
-      variant="outlined"
-      color="info"
-      sx={{ fontSize: '0.65rem' }}
-    />
+    <Badge variant="outline" className="text-[0.65rem] border-border text-muted-foreground">
+      {t('schedule.checkCard.badge.healthCheck')}
+    </Badge>
   )
 
   return (

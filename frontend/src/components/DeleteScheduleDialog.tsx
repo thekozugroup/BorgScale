@@ -1,17 +1,8 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-  CircularProgress,
-  Stack,
-  Box,
-} from '@mui/material'
+import { Button } from '@/components/ui/button'
 import ResponsiveDialog from './ResponsiveDialog'
-import { AlertCircle, Trash2 } from 'lucide-react'
+import { AlertCircle, Loader2, Trash2 } from 'lucide-react'
 
 interface ScheduledJob {
   id: number
@@ -60,46 +51,25 @@ const DeleteScheduleDialog: React.FC<DeleteScheduleDialogProps> = ({
   const { t } = useTranslation()
   return (
     <ResponsiveDialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogTitle>
-        <Stack direction="row" spacing={2} alignItems="center">
-          <Box
-            sx={{
-              width: 48,
-              height: 48,
-              borderRadius: '50%',
-              backgroundColor: 'error.lighter',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <AlertCircle size={24} color="#d32f2f" />
-          </Box>
-          <Typography variant="h6" fontWeight={600}>
-            {t('dialogs.deleteSchedule.title')}
-          </Typography>
-        </Stack>
-      </DialogTitle>
-      <DialogContent>
-        <Typography variant="body2">
+      <div className="p-6">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
+            <AlertCircle size={24} className="text-destructive" />
+          </div>
+          <h3 className="text-lg font-semibold">{t('dialogs.deleteSchedule.title')}</h3>
+        </div>
+        <p className="text-sm mb-2">
           {t('dialogs.deleteSchedule.message')} <strong>"{job?.name}"</strong>
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          {t('dialogs.deleteSchedule.warning')}
-        </Typography>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>{t('common.buttons.cancel')}</Button>
-        <Button
-          onClick={onConfirm}
-          variant="contained"
-          color="error"
-          disabled={isDeleting}
-          startIcon={isDeleting ? <CircularProgress size={16} /> : <Trash2 size={16} />}
-        >
-          {isDeleting ? t('dialogs.deleteSchedule.deleting') : t('dialogs.deleteSchedule.confirm')}
-        </Button>
-      </DialogActions>
+        </p>
+        <p className="text-sm text-muted-foreground mb-6">{t('dialogs.deleteSchedule.warning')}</p>
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" onClick={onClose}>{t('common.buttons.cancel')}</Button>
+          <Button variant="destructive" onClick={onConfirm} disabled={isDeleting}>
+            {isDeleting ? <Loader2 size={16} className="mr-2 animate-spin" /> : <Trash2 size={16} className="mr-2" />}
+            {isDeleting ? t('dialogs.deleteSchedule.deleting') : t('dialogs.deleteSchedule.confirm')}
+          </Button>
+        </div>
+      </div>
     </ResponsiveDialog>
   )
 }

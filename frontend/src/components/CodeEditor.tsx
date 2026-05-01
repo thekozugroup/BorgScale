@@ -1,4 +1,3 @@
-import { Box, Typography } from '@mui/material'
 import Editor from '@monaco-editor/react'
 import { useTranslation } from 'react-i18next'
 
@@ -23,27 +22,11 @@ export default function CodeEditor({
 }: CodeEditorProps) {
   const { t } = useTranslation()
   return (
-    <Box sx={{ mb: 2 }}>
+    <div className="mb-4">
       {label && (
-        <Typography variant="subtitle2" sx={{ mb: 0.5, fontWeight: 500 }}>
-          {label}
-        </Typography>
+        <p className="text-sm font-medium mb-1">{label}</p>
       )}
-      <Box
-        sx={{
-          border: '2px solid',
-          borderColor: 'divider',
-          borderRadius: 1,
-          overflow: 'hidden',
-          transition: 'border-color 0.2s',
-          '&:hover': {
-            borderColor: 'text.secondary',
-          },
-          '&:focus-within': {
-            borderColor: 'primary.main',
-          },
-        }}
-      >
+      <div className="border-2 border-border rounded overflow-hidden transition-colors hover:border-muted-foreground focus-within:border-primary">
         <Editor
           height={height}
           language={language}
@@ -76,14 +59,12 @@ export default function CodeEditor({
               strings: true,
             },
           }}
-          loading={<Box sx={{ p: 2, backgroundColor: '#1e1e1e' }}>{t('codeEditor.loading')}</Box>}
+          loading={<div className="p-4 bg-neutral-900 text-neutral-400">{t('codeEditor.loading')}</div>}
         />
-      </Box>
+      </div>
       {helperText && (
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-          {helperText}
-        </Typography>
+        <p className="text-xs text-muted-foreground mt-1">{helperText}</p>
       )}
-    </Box>
+    </div>
   )
 }

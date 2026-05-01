@@ -112,7 +112,7 @@ export default function WizardStepRestoreDestination({
 
       {/* SSH Repository info */}
       {isSSHRepository && (
-        <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}>
+        <div className="flex items-start gap-2 p-3 rounded-xl text-sm border border-border bg-muted/40 text-muted-foreground">
           {t('wizard.restoreDestination.sshToSshNotSupported')}
         </div>
       )}
@@ -121,7 +121,7 @@ export default function WizardStepRestoreDestination({
       {data.destinationType === 'ssh' && (
         <>
           {!Array.isArray(sshConnections) || sshConnections.length === 0 ? (
-            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', color: '#b45309' }}>
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm border border-border bg-muted/40 text-muted-foreground">
               {t('wizard.noSshConnections')}
             </div>
           ) : (
@@ -208,13 +208,13 @@ export default function WizardStepRestoreDestination({
           </div>
 
           {data.customPath && (
-            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}>
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm border border-border bg-muted/40 text-muted-foreground">
               <span className="flex-shrink-0 mt-0.5">
                 {data.destinationType === 'ssh' ? <Cloud size={16} /> : <Server size={16} />}
               </span>
               <div>
                 <p className="text-xs text-muted-foreground mb-1">{t('wizard.restoreDestination.filesWillBeRestoredTo')}</p>
-                <p className="text-sm font-semibold font-mono" style={{ color: '#1976d2' }}>
+                <p className="text-sm font-semibold font-mono text-primary">
                   {data.destinationType === 'ssh' ? getSshUrlPreview() : data.customPath}
                 </p>
               </div>

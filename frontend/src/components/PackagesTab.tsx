@@ -1,23 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
-  Box,
-  Typography,
-  Button,
-  TextField,
-  CircularProgress,
-  Stack,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Chip,
-  Paper,
-  Alert,
-  FormControlLabel,
-  Checkbox,
-} from '@mui/material'
-import {
   Package,
   Plus,
   Play,
@@ -37,6 +20,11 @@ import { formatDateShort } from '../utils/dateUtils'
 import { useTranslation } from 'react-i18next'
 import { translateBackendKey } from '../utils/translateBackendKey'
 import { useAnalytics } from '../hooks/useAnalytics'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { cn } from '@/lib/utils'
 
 interface PackageType {
   id: number
@@ -69,6 +57,13 @@ interface JobStatusType {
   error_message: string | null
 }
 
+const STATUS_BADGE: Record<string, string> = {
+  installed: 'bg-primary/10 text-primary border-primary/20',
+  pending: 'bg-muted text-muted-foreground border-border',
+  installing: 'bg-secondary text-secondary-foreground border-border',
+  failed: 'bg-destructive/10 text-destructive border-destructive/20',
+}
+
 export default function PackagesTab() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
@@ -88,7 +83,6 @@ export default function PackagesTab() {
   })
   const [advancedMode, setAdvancedMode] = useState(false)
 
-  // Fetch packages
   const { data: packagesData, isLoading } = useQuery({
     queryKey: ['packages'],
     queryFn: async () => {
@@ -101,7 +95,6 @@ export default function PackagesTab() {
     [packagesData]
   )
 
-  // Poll job status when activeJobId is set
   useEffect(() => {
     if (!activeJobId) return
 
@@ -111,7 +104,6 @@ export default function PackagesTab() {
         const status: JobStatusType = response.data
         setJobStatus(status)
 
-        // If job is completed or failed, stop polling and show results
         if (status.status === 'completed' || status.status === 'failed') {
           const trackedPackage = packages.find((pkg: PackageType) => pkg.id === status.package_id)
           trackPackage(
@@ -131,22 +123,16 @@ export default function PackagesTab() {
         }
       } catch (error) {
         console.error('Failed to fetch job status:', error)
-        // Stop polling on error
         setActiveJobId(null)
         setActiveJobOperation(null)
       }
     }
 
-    // Poll immediately
     pollJobStatus()
-
-    // Then poll every 2 seconds
     const interval = setInterval(pollJobStatus, 2000)
-
     return () => clearInterval(interval)
   }, [activeJobId, activeJobOperation, packages, queryClient, trackPackage, EventAction])
 
-  // Create package mutation
   const createPackageMutation = useMutation({
     mutationFn: async (data: typeof packageForm) => {
       const response = await api.post('/packages/', data)
@@ -167,7 +153,6 @@ export default function PackagesTab() {
     },
   })
 
-  // Update package mutation
   const updatePackageMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: typeof packageForm }) => {
       const response = await api.put(`/packages/${id}`, data)
@@ -189,7 +174,6 @@ export default function PackagesTab() {
     },
   })
 
-  // Install package mutation
   const installPackageMutation = useMutation({
     mutationFn: async (packageId: number) => {
       const response = await api.post(`/packages/${packageId}/install`)
@@ -199,7 +183,7 @@ export default function PackagesTab() {
       toast.success(translateBackendKey(data.message))
       setActiveJobId(data.job_id)
       setActiveJobOperation('install')
-      setJobStatus(null) // Reset job status
+      setJobStatus(null)
       queryClient.invalidateQueries({ queryKey: ['packages'] })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -210,7 +194,6 @@ export default function PackagesTab() {
     },
   })
 
-  // Delete package mutation
   const deletePackageMutation = useMutation({
     mutationFn: async (packageId: number) => {
       const response = await api.delete(`/packages/${packageId}`)
@@ -230,7 +213,6 @@ export default function PackagesTab() {
     },
   })
 
-  // Reinstall package mutation
   const reinstallPackageMutation = useMutation({
     mutationFn: async (packageId: number) => {
       const response = await api.post(`/packages/${packageId}/reinstall`)
@@ -240,7 +222,7 @@ export default function PackagesTab() {
       toast.success(translateBackendKey(data.message))
       setActiveJobId(data.job_id)
       setActiveJobOperation('reinstall')
-      setJobStatus(null) // Reset job status
+      setJobStatus(null)
       queryClient.invalidateQueries({ queryKey: ['packages'] })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -258,8 +240,6 @@ export default function PackagesTab() {
       install_command: pkg.install_command,
       description: pkg.description || '',
     })
-
-    // Detect if this is a custom install command (not the auto-generated one)
     const autoGeneratedCommand = `sudo apt-get update && sudo apt-get install -y ${pkg.name}`
     setAdvancedMode(pkg.install_command !== autoGeneratedCommand)
     trackPackage(EventAction.VIEW, pkg.name, { source: 'edit_dialog' })
@@ -274,15 +254,12 @@ export default function PackagesTab() {
 
   const handleSubmitPackage = (e: React.FormEvent) => {
     e.preventDefault()
-
-    // Auto-generate install command if not in advanced mode
     const finalPackageData = {
       ...packageForm,
       install_command: advancedMode
         ? packageForm.install_command
         : `sudo apt-get update && sudo apt-get install -y ${packageForm.name}`,
     }
-
     if (editingPackage) {
       updatePackageMutation.mutate({ id: editingPackage.id, data: finalPackageData })
     } else {
@@ -290,66 +267,59 @@ export default function PackagesTab() {
     }
   }
 
-  // Column definitions
+  const statusIcons = {
+    installed: <CheckCircle size={14} />,
+    pending: <Clock size={14} />,
+    installing: <Loader2 size={14} className="animate-spin" />,
+    failed: <XCircle size={14} />,
+  }
+
+  const statusLabels: Record<string, string> = {
+    installed: t('packages.status.installed'),
+    pending: t('packages.status.pending'),
+    installing: t('packages.status.installing'),
+    failed: t('packages.status.failed'),
+  }
+
   const columns: Column<PackageType>[] = [
     {
       id: 'name',
       label: t('packages.columns.package'),
       render: (pkg) => (
-        <Box>
-          <Typography variant="body2" fontWeight={500}>
-            {pkg.name}
-          </Typography>
+        <div>
+          <p className="text-sm font-medium">{pkg.name}</p>
           {pkg.description && (
-            <Typography variant="caption" color="text.secondary">
-              {pkg.description}
-            </Typography>
+            <p className="text-xs text-muted-foreground">{pkg.description}</p>
           )}
-        </Box>
+        </div>
       ),
     },
     {
       id: 'status',
       label: t('packages.columns.status'),
-      render: (pkg) => {
-        const statusConfig = {
-          installed: {
-            color: 'success' as const,
-            icon: <CheckCircle size={16} />,
-            label: t('packages.status.installed'),
-          },
-          pending: {
-            color: 'warning' as const,
-            icon: <Clock size={16} />,
-            label: t('packages.status.pending'),
-          },
-          installing: {
-            color: 'info' as const,
-            icon: <Loader2 size={16} className="animate-spin" />,
-            label: t('packages.status.installing'),
-          },
-          failed: {
-            color: 'error' as const,
-            icon: <XCircle size={16} />,
-            label: t('packages.status.failed'),
-          },
-        }
-        const config = statusConfig[pkg.status]
-        return <Chip icon={config.icon} label={config.label} color={config.color} size="small" />
-      },
+      render: (pkg) => (
+        <span
+          className={cn(
+            'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border',
+            STATUS_BADGE[pkg.status] ?? STATUS_BADGE.pending
+          )}
+        >
+          {statusIcons[pkg.status]}
+          {statusLabels[pkg.status] ?? pkg.status}
+        </span>
+      ),
     },
     {
       id: 'installed_at',
       label: t('packages.columns.installed'),
       render: (pkg) => (
-        <Typography variant="body2" color="text.secondary">
+        <span className="text-sm text-muted-foreground">
           {pkg.installed_at ? formatDateShort(pkg.installed_at) : '-'}
-        </Typography>
+        </span>
       ),
     },
   ]
 
-  // Action buttons
   const actions: ActionButton<PackageType>[] = [
     {
       icon: <Play size={16} />,
@@ -379,7 +349,7 @@ export default function PackagesTab() {
       onClick: handleOpenEdit,
       color: 'default',
       tooltip: t('packages.actions.editTooltip'),
-      show: (pkg) => pkg.status !== 'installing', // Can't edit while installing
+      show: (pkg) => pkg.status !== 'installing',
     },
     {
       icon: <Trash2 size={16} />,
@@ -387,50 +357,34 @@ export default function PackagesTab() {
       onClick: setDeleteConfirmPackage,
       color: 'error',
       tooltip: t('packages.actions.deleteTooltip'),
-      show: (pkg) => pkg.status !== 'installing', // Can't delete while installing
+      show: (pkg) => pkg.status !== 'installing',
     },
   ]
 
   return (
-    <Box>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h6" fontWeight={600} gutterBottom>
-          {t('packages.title')}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {t('packages.subtitle')}
-        </Typography>
-      </Box>
+    <div>
+      <div className="mb-6">
+        <p className="text-lg font-semibold mb-1">{t('packages.title')}</p>
+        <p className="text-sm text-muted-foreground">{t('packages.subtitle')}</p>
+      </div>
 
-      <Alert severity="info" sx={{ mb: 3 }}>
+      <div className="flex items-start gap-2 p-3 rounded-xl text-sm mb-6 border border-border bg-muted/40 text-muted-foreground">
         {t('packages.hint')}
-      </Alert>
+      </div>
 
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          justifyContent: 'space-between',
-          alignItems: { xs: 'stretch', sm: 'center' },
-          gap: 1.5,
-          mb: 3,
-        }}
-      >
-        <Typography variant="h6" fontWeight={600}>
-          {t('packages.installedPackages')}
-        </Typography>
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-4">
+        <p className="text-base font-semibold">{t('packages.installedPackages')}</p>
         <Button
-          variant="contained"
-          startIcon={<Plus size={18} />}
           onClick={() => {
             setShowCreateDialog(true)
             trackPackage(EventAction.VIEW, undefined, { source: 'create_dialog' })
           }}
-          sx={{ width: { xs: '100%', sm: 'auto' } }}
+          className="w-full sm:w-auto gap-1.5"
         >
+          <Plus size={16} />
           {t('packages.addPackage')}
         </Button>
-      </Box>
+      </div>
 
       <DataTable
         data={packages}
@@ -446,256 +400,211 @@ export default function PackagesTab() {
         variant="outlined"
       />
 
-      {/* Create/Edit Package Dialog */}
-      <Dialog
-        open={showCreateDialog || !!editingPackage}
-        onClose={handleCloseDialog}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>
-          {editingPackage
-            ? t('packages.createDialog.titleEdit')
-            : t('packages.createDialog.titleAdd')}
-        </DialogTitle>
-        <form onSubmit={handleSubmitPackage}>
-          <DialogContent>
-            <Stack spacing={3}>
-              <TextField
-                label={t('packages.fields.packageName')}
+      {/* Create/Edit Dialog */}
+      <Dialog open={showCreateDialog || !!editingPackage} onOpenChange={(v) => !v && handleCloseDialog()}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              {editingPackage ? t('packages.createDialog.titleEdit') : t('packages.createDialog.titleAdd')}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmitPackage} className="flex flex-col gap-4 pt-2">
+            <div>
+              <Label className="text-xs font-semibold mb-1.5 block">{t('packages.fields.packageName')}</Label>
+              <Input
                 value={packageForm.name}
                 onChange={(e) => setPackageForm({ ...packageForm, name: e.target.value })}
                 required
-                fullWidth
-                helperText={
-                  advancedMode
-                    ? t('packages.fields.packageNameHintAdvanced')
-                    : t('packages.fields.packageNameHintSimple')
-                }
+                className="h-9 text-sm"
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                {advancedMode
+                  ? t('packages.fields.packageNameHintAdvanced')
+                  : t('packages.fields.packageNameHintSimple')}
+              </p>
+            </div>
 
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={advancedMode}
-                    onChange={(e) => setAdvancedMode(e.target.checked)}
-                  />
-                }
-                label={t('packages.fields.advancedMode')}
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={advancedMode}
+                onChange={(e) => setAdvancedMode(e.target.checked)}
               />
+              <span className="text-sm">{t('packages.fields.advancedMode')}</span>
+            </label>
 
-              {advancedMode && (
-                <TextField
-                  label={t('packages.fields.installCommand')}
+            {advancedMode && (
+              <div>
+                <Label className="text-xs font-semibold mb-1.5 block">{t('packages.fields.installCommand')}</Label>
+                <textarea
                   value={packageForm.install_command}
-                  onChange={(e) =>
-                    setPackageForm({ ...packageForm, install_command: e.target.value })
-                  }
+                  onChange={(e) => setPackageForm({ ...packageForm, install_command: e.target.value })}
                   required={advancedMode}
-                  fullWidth
-                  multiline
                   rows={3}
-                  helperText={t('packages.fields.installCommandHint')}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
                 />
-              )}
+                <p className="text-xs text-muted-foreground mt-1">{t('packages.fields.installCommandHint')}</p>
+              </div>
+            )}
 
-              <TextField
-                label={t('packages.fields.description')}
+            <div>
+              <Label className="text-xs font-semibold mb-1.5 block">{t('packages.fields.description')}</Label>
+              <Input
                 value={packageForm.description}
                 onChange={(e) => setPackageForm({ ...packageForm, description: e.target.value })}
-                fullWidth
-                helperText={t('packages.fields.descriptionHint')}
+                className="h-9 text-sm"
               />
-            </Stack>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>{t('common.buttons.cancel')}</Button>
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={createPackageMutation.isPending || updatePackageMutation.isPending}
-              startIcon={
-                createPackageMutation.isPending || updatePackageMutation.isPending ? (
-                  <CircularProgress size={16} />
-                ) : null
-              }
-            >
-              {editingPackage
-                ? updatePackageMutation.isPending
-                  ? t('packages.buttons.updating')
-                  : t('packages.buttons.updatePackage')
-                : createPackageMutation.isPending
-                  ? t('packages.buttons.adding')
-                  : t('packages.buttons.addPackage')}
-            </Button>
-          </DialogActions>
-        </form>
+              <p className="text-xs text-muted-foreground mt-1">{t('packages.fields.descriptionHint')}</p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-1">
+              <Button type="button" variant="outline" size="sm" onClick={handleCloseDialog}>
+                {t('common.buttons.cancel')}
+              </Button>
+              <Button
+                type="submit"
+                size="sm"
+                disabled={createPackageMutation.isPending || updatePackageMutation.isPending}
+                className="gap-1.5"
+              >
+                {(createPackageMutation.isPending || updatePackageMutation.isPending) && (
+                  <Loader2 size={13} className="animate-spin" />
+                )}
+                {editingPackage
+                  ? updatePackageMutation.isPending
+                    ? t('packages.buttons.updating')
+                    : t('packages.buttons.updatePackage')
+                  : createPackageMutation.isPending
+                    ? t('packages.buttons.adding')
+                    : t('packages.buttons.addPackage')}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog
-        open={!!deleteConfirmPackage}
-        onClose={() => setDeleteConfirmPackage(null)}
-        maxWidth="xs"
-        fullWidth
-      >
-        <DialogTitle>{t('packages.deleteDialog.title')}</DialogTitle>
-        <DialogContent>
-          <Typography variant="body2">
-            {t('packages.deleteDialog.message', { name: deleteConfirmPackage?.name })}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            {t('packages.deleteDialog.note')}
-          </Typography>
+      <Dialog open={!!deleteConfirmPackage} onOpenChange={(v) => !v && setDeleteConfirmPackage(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{t('packages.deleteDialog.title')}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 pt-2">
+            <p className="text-sm">
+              {t('packages.deleteDialog.message', { name: deleteConfirmPackage?.name })}
+            </p>
+            <p className="text-sm text-muted-foreground">{t('packages.deleteDialog.note')}</p>
+            <div className="flex items-center justify-end gap-2">
+              <Button variant="outline" size="sm" onClick={() => setDeleteConfirmPackage(null)}>
+                {t('common.buttons.cancel')}
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => deleteConfirmPackage && deletePackageMutation.mutate(deleteConfirmPackage.id)}
+                disabled={deletePackageMutation.isPending}
+                className="gap-1.5"
+              >
+                {deletePackageMutation.isPending && <Loader2 size={13} className="animate-spin" />}
+                {deletePackageMutation.isPending
+                  ? t('packages.deleteDialog.deleting')
+                  : t('packages.deleteDialog.confirm')}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteConfirmPackage(null)}>
-            {t('common.buttons.cancel')}
-          </Button>
-          <Button
-            onClick={() =>
-              deleteConfirmPackage && deletePackageMutation.mutate(deleteConfirmPackage.id)
-            }
-            variant="contained"
-            color="error"
-            disabled={deletePackageMutation.isPending}
-            startIcon={deletePackageMutation.isPending ? <CircularProgress size={16} /> : null}
-          >
-            {deletePackageMutation.isPending
-              ? t('packages.deleteDialog.deleting')
-              : t('packages.deleteDialog.confirm')}
-          </Button>
-        </DialogActions>
       </Dialog>
 
       {/* Install Result Dialog */}
-      <Dialog
-        open={showResultDialog}
-        onClose={() => setShowResultDialog(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {jobStatus?.status === 'completed' ? (
-              <>
-                <CheckCircle size={24} color="#4caf50" />
-                <Typography variant="h6">{t('packages.resultDialog.successful')}</Typography>
-              </>
-            ) : jobStatus?.status === 'failed' ? (
-              <>
-                <XCircle size={24} color="#f44336" />
-                <Typography variant="h6">{t('packages.resultDialog.failed')}</Typography>
-              </>
-            ) : (
-              <>
-                <Loader2 size={24} className="animate-spin" color="#2196f3" />
-                <Typography variant="h6">{t('packages.resultDialog.installing')}</Typography>
-              </>
+      <Dialog open={showResultDialog} onOpenChange={(v) => !v && setShowResultDialog(false)}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                {jobStatus?.status === 'completed' ? (
+                  <>
+                    <CheckCircle size={20} className="text-primary" />
+                    {t('packages.resultDialog.successful')}
+                  </>
+                ) : jobStatus?.status === 'failed' ? (
+                  <>
+                    <XCircle size={20} className="text-destructive" />
+                    {t('packages.resultDialog.failed')}
+                  </>
+                ) : (
+                  <>
+                    <Loader2 size={20} className="animate-spin text-muted-foreground" />
+                    {t('packages.resultDialog.installing')}
+                  </>
+                )}
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 pt-2">
+            {jobStatus?.error_message && (
+              <div className="flex items-start gap-2 p-3 rounded-xl text-sm border border-destructive/25 bg-destructive/10 text-destructive">
+                {jobStatus.error_message}
+              </div>
             )}
-          </Box>
-        </DialogTitle>
-        <DialogContent>
-          <Stack spacing={2}>
-            {jobStatus?.error_message && <Alert severity="error">{jobStatus.error_message}</Alert>}
 
             {jobStatus?.status === 'installing' && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <CircularProgress size={20} />
-                <Typography variant="body2" color="text.secondary">
-                  {t('packages.resultDialog.installingDesc')}
-                </Typography>
-              </Box>
+              <div className="flex items-center gap-3">
+                <Loader2 size={18} className="animate-spin text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">{t('packages.resultDialog.installingDesc')}</p>
+              </div>
             )}
 
             {jobStatus?.stdout && (
-              <Box>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ mb: 0.5, display: 'block' }}
-                >
-                  {t('packages.resultDialog.stdout')}
-                </Typography>
-                <Paper
-                  sx={{
-                    p: 2,
-                    bgcolor: '#1e1e1e',
-                    maxHeight: '300px',
-                    overflow: 'auto',
-                    fontFamily: 'monospace',
-                    fontSize: '0.875rem',
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-word',
-                  }}
-                >
-                  <Typography
-                    component="pre"
-                    sx={{ m: 0, color: '#d4d4d4', fontFamily: 'inherit', fontSize: 'inherit' }}
-                  >
+              <div>
+                <p className="text-xs text-muted-foreground mb-1.5">{t('packages.resultDialog.stdout')}</p>
+                <div className="p-3 rounded-xl overflow-auto max-h-72 bg-neutral-900">
+                  <pre className="text-sm whitespace-pre-wrap break-words m-0 text-neutral-200 font-mono">
                     {jobStatus.stdout}
-                  </Typography>
-                </Paper>
-              </Box>
+                  </pre>
+                </div>
+              </div>
             )}
 
             {jobStatus?.stderr && (
-              <Box>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ mb: 0.5, display: 'block' }}
-                >
-                  {t('packages.resultDialog.stderr')}
-                </Typography>
-                <Paper
-                  sx={{
-                    p: 2,
-                    bgcolor: '#1e1e1e',
-                    maxHeight: '300px',
-                    overflow: 'auto',
-                    fontFamily: 'monospace',
-                    fontSize: '0.875rem',
-                    whiteSpace: 'pre-wrap',
-                    wordBreak: 'break-word',
-                  }}
-                >
-                  <Typography
-                    component="pre"
-                    sx={{ m: 0, color: '#f48771', fontFamily: 'inherit', fontSize: 'inherit' }}
-                  >
+              <div>
+                <p className="text-xs text-muted-foreground mb-1.5">{t('packages.resultDialog.stderr')}</p>
+                <div className="p-3 rounded-xl overflow-auto max-h-72 bg-neutral-900">
+                  <pre className="text-sm whitespace-pre-wrap break-words m-0 text-destructive font-mono">
                     {jobStatus.stderr}
-                  </Typography>
-                </Paper>
-              </Box>
+                  </pre>
+                </div>
+              </div>
             )}
 
             {jobStatus?.exit_code !== null && jobStatus?.exit_code !== undefined && (
-              <Box>
-                <Chip
-                  label={t('packages.resultDialog.exitCode', { code: jobStatus.exit_code })}
-                  size="small"
-                  color={jobStatus.exit_code === 0 ? 'success' : 'error'}
-                />
-              </Box>
+              <span
+                className={cn(
+                  'self-start inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border',
+                  jobStatus.exit_code === 0
+                    ? 'bg-primary/10 text-primary border-primary/20'
+                    : 'bg-destructive/10 text-destructive border-destructive/20'
+                )}
+              >
+                {t('packages.resultDialog.exitCode', { code: jobStatus.exit_code })}
+              </span>
             )}
-          </Stack>
+
+            <div className="flex justify-end pt-1">
+              <Button
+                size="sm"
+                onClick={() => { setShowResultDialog(false); setJobStatus(null) }}
+                disabled={jobStatus?.status === 'installing'}
+                className="gap-1.5"
+              >
+                {jobStatus?.status === 'installing' && <Loader2 size={13} className="animate-spin" />}
+                {jobStatus?.status === 'installing'
+                  ? t('packages.resultDialog.installing')
+                  : t('packages.resultDialog.close')}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              setShowResultDialog(false)
-              setJobStatus(null)
-            }}
-            variant="contained"
-            disabled={jobStatus?.status === 'installing'}
-          >
-            {jobStatus?.status === 'installing'
-              ? t('packages.resultDialog.installing')
-              : t('packages.resultDialog.close')}
-          </Button>
-        </DialogActions>
       </Dialog>
-    </Box>
+    </div>
   )
 }

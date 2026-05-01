@@ -111,8 +111,8 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
               open ? 'bg-muted/70' : 'hover:bg-muted/50'
             )}
           >
-            <Avatar className="size-8 rounded-lg border border-emerald-500/30 bg-emerald-500/15">
-              <AvatarFallback className="rounded-lg bg-transparent text-[0.8rem] font-bold text-emerald-400">
+            <Avatar className="size-8 rounded-lg border border-primary/30 bg-primary/15">
+              <AvatarFallback className="rounded-lg bg-transparent text-[0.8rem] font-bold text-primary">
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -132,9 +132,9 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
           className="w-[300px] gap-0 overflow-hidden rounded-2xl p-0 shadow-xl ring-1 ring-border/20"
         >
           {/* ── 1. Hero header ── */}
-          <div className="flex items-center gap-3 border-b border-border/10 bg-emerald-500/5 px-3.5 py-3">
-            <Avatar className="size-11 rounded-xl border border-emerald-400/20 bg-emerald-500/12">
-              <AvatarFallback className="rounded-xl bg-transparent text-base font-extrabold text-emerald-400">
+          <div className="flex items-center gap-3 border-b border-border/10 bg-primary/5 px-3.5 py-3">
+            <Avatar className="size-11 rounded-xl border border-primary/20 bg-primary/12">
+              <AvatarFallback className="rounded-xl bg-transparent text-base font-extrabold text-primary">
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -219,12 +219,12 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
                 trackAuth(EventAction.LOGOUT, { surface: 'user_menu' })
                 logout()
               }}
-              className="flex w-full cursor-pointer items-center gap-3 border-0 bg-transparent px-3 py-1.75 font-[inherit] text-left transition-colors hover:bg-red-500/5"
+              className="flex w-full cursor-pointer items-center gap-3 border-0 bg-transparent px-3 py-1.75 font-[inherit] text-left transition-colors hover:bg-destructive/5"
             >
-              <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-red-500/12 bg-red-500/5">
-                <LogOut size={14} className="text-red-500 dark:text-red-400" />
+              <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-destructive/20 bg-destructive/5">
+                <LogOut size={14} className="text-destructive" />
               </div>
-              <span className="text-[0.77rem] font-semibold text-red-500 dark:text-red-400">
+              <span className="text-[0.77rem] font-semibold text-destructive">
                 {t('navigation.logout')}
               </span>
             </button>

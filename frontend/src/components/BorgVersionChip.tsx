@@ -1,4 +1,4 @@
-import { Chip } from '@mui/material'
+import { Badge } from '@/components/ui/badge'
 
 interface BorgVersionChipProps {
   borgVersion: number | undefined
@@ -10,20 +10,17 @@ export default function BorgVersionChip({ borgVersion, compact = false }: BorgVe
   if (borgVersion !== 2) return null
 
   return (
-    <Chip
-      label="v2"
-      size="small"
-      sx={{
+    <Badge
+      className="font-mono font-bold bg-primary text-primary-foreground border-transparent"
+      style={{
         height: compact ? '16px' : '18px',
         fontSize: compact ? '0.6rem' : '0.65rem',
-        fontWeight: 700,
-        fontFamily: 'monospace',
-        bgcolor: '#6366f1',
-        color: '#fff',
-        border: 'none',
-        letterSpacing: 0.5,
-        '& .MuiChip-label': { px: compact ? 0.6 : 0.75 },
+        letterSpacing: '0.5px',
+        paddingLeft: compact ? '3px' : '6px',
+        paddingRight: compact ? '3px' : '6px',
       }}
-    />
+    >
+      v2
+    </Badge>
   )
 }

@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+import { screen, renderWithProviders } from '../../../test/test-utils'
 import WizardStepLocation from '../WizardStepLocation'
 
 vi.mock('../../../hooks/usePlan', () => ({
@@ -42,7 +42,7 @@ const defaultData = {
 describe('WizardStepLocation', () => {
   describe('Create Mode', () => {
     it('renders Repository Name input', () => {
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="create"
           data={defaultData}
@@ -56,7 +56,7 @@ describe('WizardStepLocation', () => {
     })
 
     it('renders Repository Path input', () => {
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="create"
           data={defaultData}
@@ -70,7 +70,7 @@ describe('WizardStepLocation', () => {
     })
 
     it('renders location selection cards', () => {
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="create"
           data={defaultData}
@@ -85,7 +85,7 @@ describe('WizardStepLocation', () => {
     })
 
     it('does NOT show Repository Mode selector in create mode', () => {
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="create"
           data={defaultData}
@@ -102,7 +102,7 @@ describe('WizardStepLocation', () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
 
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="create"
           data={defaultData}
@@ -121,7 +121,7 @@ describe('WizardStepLocation', () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
 
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="create"
           data={defaultData}
@@ -140,7 +140,7 @@ describe('WizardStepLocation', () => {
       const user = userEvent.setup()
       const onBrowsePath = vi.fn()
 
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="create"
           data={defaultData}
@@ -157,7 +157,7 @@ describe('WizardStepLocation', () => {
     })
 
     it('shows Borg 2 beta as tooltip affordance without inline alert', () => {
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="create"
           data={{ ...defaultData, borgVersion: 2 }}
@@ -174,7 +174,7 @@ describe('WizardStepLocation', () => {
 
   describe('Import Mode', () => {
     it('shows Repository Mode selector', () => {
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="import"
           data={defaultData}
@@ -190,7 +190,7 @@ describe('WizardStepLocation', () => {
     it('shows bypass lock checkbox when observe mode is selected', () => {
       const observeData = { ...defaultData, repositoryMode: 'observe' as const }
 
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="import"
           data={observeData}
@@ -204,7 +204,7 @@ describe('WizardStepLocation', () => {
     })
 
     it('does NOT show bypass lock checkbox in full mode', () => {
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="import"
           data={defaultData}
@@ -224,7 +224,7 @@ describe('WizardStepLocation', () => {
       const onChange = vi.fn()
       const sshData = { ...defaultData, repositoryLocation: 'ssh' as const }
 
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="create"
           data={sshData}
@@ -248,7 +248,7 @@ describe('WizardStepLocation', () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
 
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="create"
           data={defaultData}
@@ -273,7 +273,7 @@ describe('WizardStepLocation', () => {
     it('shows SSH connection dropdown when Remote Client is selected', () => {
       const sshData = { ...defaultData, repositoryLocation: 'ssh' as const }
 
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="create"
           data={sshData}
@@ -291,7 +291,7 @@ describe('WizardStepLocation', () => {
     it('shows warning when no SSH connections available', () => {
       const sshData = { ...defaultData, repositoryLocation: 'ssh' as const }
 
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="create"
           data={sshData}
@@ -307,7 +307,7 @@ describe('WizardStepLocation', () => {
     it('disables browse button when Remote Client selected but no connection chosen', () => {
       const sshData = { ...defaultData, repositoryLocation: 'ssh' as const }
 
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="create"
           data={sshData}
@@ -328,7 +328,7 @@ describe('WizardStepLocation', () => {
         repoSshConnectionId: 1,
       }
 
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="create"
           data={sshData}
@@ -345,7 +345,7 @@ describe('WizardStepLocation', () => {
 
   describe('Path Placeholder', () => {
     it('shows local path placeholder when BorgScale Server selected', () => {
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="create"
           data={defaultData}
@@ -361,7 +361,7 @@ describe('WizardStepLocation', () => {
     it('shows remote path placeholder when Remote Client selected', () => {
       const sshData = { ...defaultData, repositoryLocation: 'ssh' as const }
 
-      render(
+      renderWithProviders(
         <WizardStepLocation
           mode="create"
           data={sshData}

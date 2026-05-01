@@ -1,26 +1,10 @@
 import { useState, useEffect } from 'react'
-import {
-  Box,
-  Typography,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Breadcrumbs,
-  Link,
-  CircularProgress,
-  Alert,
-  Chip,
-  IconButton,
-  Tooltip,
-  alpha,
-} from '@mui/material'
-import { Folder, File, ChevronRight, Home, CheckSquare, Square, MinusSquare } from 'lucide-react'
+import { Folder, File, ChevronRight, Home, CheckSquare, Square, MinusSquare, Loader2 } from 'lucide-react'
 import { BorgApiClient, type Repository } from '../../services/borgApi/client'
 import type { Archive } from '../../types'
 import { useTranslation } from 'react-i18next'
 import { translateBackendKey } from '../../utils/translateBackendKey'
+import { cn } from '@/lib/utils'
 
 interface ArchiveItem {
   name: string
@@ -53,12 +37,10 @@ export default function WizardStepRestoreFiles({
   const [error, setError] = useState<string | null>(null)
   const selectedPaths = new Set(data.selectedPaths || [])
 
-  // Fetch archive contents for current path
   useEffect(() => {
     const fetchContents = async () => {
       setLoading(true)
       setError(null)
-
       try {
         const response = await new BorgApiClient(repository).getArchiveContents(
           archive.id,
@@ -76,14 +58,11 @@ export default function WizardStepRestoreFiles({
         setLoading(false)
       }
     }
-
     fetchContents()
   }, [repository, archive, currentPath, t])
 
-  // Parse breadcrumb path
   const pathParts = currentPath ? currentPath.split('/').filter(Boolean) : []
 
-  // Handle item click
   const handleItemClick = (item: ArchiveItem) => {
     if (item.type === 'directory') {
       setCurrentPath(item.path)
@@ -92,23 +71,12 @@ export default function WizardStepRestoreFiles({
     }
   }
 
-  // Toggle path selection
   const toggleSelection = (path: string) => {
     const newPaths = new Set(selectedPaths)
-    if (newPaths.has(path)) {
-      newPaths.delete(path)
-    } else {
-      newPaths.add(path)
-    }
+    if (newPaths.has(path)) { newPaths.delete(path) } else { newPaths.add(path) }
     onChange({ selectedPaths: Array.from(newPaths) })
   }
 
-  // Navigate to path
-  const navigateToPath = (targetPath: string) => {
-    setCurrentPath(targetPath)
-  }
-
-  // Format file size
   const formatSize = (bytes?: number): string => {
     if (!bytes) return '0 B'
     const k = 1024
@@ -117,224 +85,142 @@ export default function WizardStepRestoreFiles({
     return `${(bytes / Math.pow(k, i)).toFixed(1)} ${sizes[i]}`
   }
 
-  // Check if path or any parent is selected
-  const isSelected = (path: string): boolean => {
-    return selectedPaths.has(path)
-  }
+  const isSelected = (path: string): boolean => selectedPaths.has(path)
 
-  // Check if any children are selected
-  const hasSelectedChildren = (dirPath: string): boolean => {
-    return Array.from(selectedPaths).some((p) => p.startsWith(dirPath + '/'))
-  }
+  const hasSelectedChildren = (dirPath: string): boolean =>
+    Array.from(selectedPaths).some((p) => p.startsWith(dirPath + '/'))
 
-  // Get selection icon for directory
   const getDirectoryIcon = (item: ArchiveItem) => {
-    if (isSelected(item.path)) {
-      return <CheckSquare size={20} color="#1976d2" />
-    } else if (hasSelectedChildren(item.path)) {
-      return <MinusSquare size={20} color="#1976d2" />
-    } else {
-      return <Square size={20} />
-    }
+    if (isSelected(item.path)) return <CheckSquare size={18} className="text-primary" />
+    if (hasSelectedChildren(item.path)) return <MinusSquare size={18} className="text-primary" />
+    return <Square size={18} />
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div className="flex flex-col h-full">
       {/* Header */}
-      <Box sx={{ mb: 2 }}>
-        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-          {t('wizard.restoreFiles.title')}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {t('wizard.restoreFiles.subtitle')}
-        </Typography>
-      </Box>
+      <div className="mb-4">
+        <p className="text-base font-semibold mb-1">{t('wizard.restoreFiles.title')}</p>
+        <p className="text-sm text-muted-foreground">{t('wizard.restoreFiles.subtitle')}</p>
+      </div>
 
-      {/* Breadcrumbs - Fixed height to prevent layout shift */}
-      <Box
-        sx={{
-          minHeight: 32,
-          display: 'flex',
-          alignItems: 'center',
-          mb: 2,
-        }}
-      >
-        <Breadcrumbs
-          separator={<ChevronRight size={16} />}
-          sx={{
-            flexWrap: 'nowrap',
-            '& .MuiBreadcrumbs-ol': {
-              display: 'flex',
-            },
-            '& .MuiBreadcrumbs-li': {
-              display: 'flex',
-            },
-          }}
+      {/* Breadcrumbs */}
+      <div className="flex items-center gap-1 min-h-8 mb-3 flex-wrap">
+        <button
+          type="button"
+          onClick={() => setCurrentPath('')}
+          className="flex items-center gap-1 text-sm text-primary hover:underline"
         >
-          <Link
-            component="button"
-            variant="body2"
-            onClick={() => navigateToPath('')}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              cursor: 'pointer',
-              textDecoration: 'none',
-              '&:hover': { textDecoration: 'underline' },
-            }}
-          >
-            <Home size={16} />
-            {t('wizard.restoreFiles.root')}
-          </Link>
-          {pathParts.map((part, index) => {
-            const pathUpToHere = pathParts.slice(0, index + 1).join('/')
-            const isLast = index === pathParts.length - 1
-            return (
-              <Link
-                key={pathUpToHere}
-                component="button"
-                variant="body2"
-                onClick={() => !isLast && navigateToPath(pathUpToHere)}
-                sx={{
-                  cursor: isLast ? 'default' : 'pointer',
-                  textDecoration: 'none',
-                  fontWeight: isLast ? 600 : 400,
-                  '&:hover': { textDecoration: isLast ? 'none' : 'underline' },
-                  whiteSpace: 'nowrap',
-                }}
+          <Home size={14} />
+          {t('wizard.restoreFiles.root')}
+        </button>
+        {pathParts.map((part, index) => {
+          const pathUpToHere = pathParts.slice(0, index + 1).join('/')
+          const isLast = index === pathParts.length - 1
+          return (
+            <span key={pathUpToHere} className="flex items-center gap-1">
+              <ChevronRight size={14} className="text-muted-foreground flex-shrink-0" />
+              <button
+                type="button"
+                onClick={() => !isLast && setCurrentPath(pathUpToHere)}
+                className={cn(
+                  'text-sm whitespace-nowrap',
+                  isLast ? 'font-semibold cursor-default' : 'text-primary hover:underline cursor-pointer'
+                )}
               >
                 {part}
-              </Link>
-            )
-          })}
-        </Breadcrumbs>
-      </Box>
+              </button>
+            </span>
+          )
+        })}
+      </div>
 
-      {/* File list with selection info header */}
-      <Box
-        sx={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          border: '1px solid',
-          borderColor: 'divider',
-          borderRadius: 1,
-          bgcolor: 'background.paper',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Fixed selection header inside the box */}
-        <Box
-          sx={{
-            px: 2,
-            py: 1,
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-            bgcolor: (theme) => alpha(theme.palette.primary.main, 0.05),
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            height: 40,
-            minHeight: 40,
-            maxHeight: 40,
-          }}
-        >
-          <CheckSquare size={16} />
-          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+      {/* File list */}
+      <div className="flex-1 flex flex-col border border-border rounded-xl overflow-hidden bg-background">
+        {/* Selection header */}
+        <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-primary/5" style={{ height: 40, minHeight: 40, maxHeight: 40 }}>
+          <CheckSquare size={14} />
+          <p className="text-sm font-medium">
             {selectedPaths.size > 0
               ? t('wizard.restoreFiles.itemsSelected', { count: selectedPaths.size })
               : t('wizard.restoreFiles.noItemsSelected')}
-          </Typography>
+          </p>
           {selectedPaths.size > 0 && (
-            <Chip
-              label={t('wizard.restoreFiles.clearAll')}
-              size="small"
+            <button
+              type="button"
               onClick={() => onChange({ selectedPaths: [] })}
-              sx={{ ml: 'auto', cursor: 'pointer', height: 24 }}
-            />
+              className="ml-auto text-xs text-muted-foreground hover:text-foreground border border-border rounded-full px-2 py-0.5 transition-colors"
+            >
+              {t('wizard.restoreFiles.clearAll')}
+            </button>
           )}
-        </Box>
+        </div>
 
-        {/* Scrollable file list */}
-        <Box sx={{ flex: 1, overflow: 'auto' }}>
+        {/* Scrollable list */}
+        <div className="flex-1 overflow-auto">
           {loading && (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-              <CircularProgress size={32} />
-            </Box>
+            <div className="flex justify-center p-8">
+              <Loader2 size={28} className="animate-spin text-muted-foreground" />
+            </div>
           )}
 
           {error && (
-            <Box sx={{ p: 2 }}>
-              <Alert severity="error">{error}</Alert>
-            </Box>
+            <div className="p-3 m-3 rounded-xl text-sm border border-destructive/25 bg-destructive/10 text-destructive">
+              {error}
+            </div>
           )}
 
           {!loading && !error && items.length === 0 && (
-            <Box sx={{ p: 4, textAlign: 'center' }}>
-              <Typography variant="body2" color="text.secondary">
-                {t('wizard.restoreFiles.noItemsFound')}
-              </Typography>
-            </Box>
+            <div className="p-8 text-center">
+              <p className="text-sm text-muted-foreground">{t('wizard.restoreFiles.noItemsFound')}</p>
+            </div>
           )}
 
           {!loading && !error && items.length > 0 && (
-            <List dense disablePadding>
+            <div className="divide-y divide-border">
               {items.map((item) => (
-                <ListItem
-                  key={item.path}
-                  disablePadding
-                  secondaryAction={
-                    item.type === 'directory' ? (
-                      <Tooltip title={t('wizard.restoreFiles.selectDirTooltip')}>
-                        <IconButton
-                          edge="end"
-                          size="small"
-                          onClick={() => toggleSelection(item.path)}
-                        >
-                          {getDirectoryIcon(item)}
-                        </IconButton>
-                      </Tooltip>
-                    ) : null
-                  }
-                >
-                  <ListItemButton
+                <div key={item.path} className="flex items-center hover:bg-muted/30 transition-colors">
+                  <button
+                    type="button"
                     onClick={() => handleItemClick(item)}
-                    sx={{
-                      '&:hover': {
-                        bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
-                      },
-                    }}
+                    className="flex-1 flex items-center gap-2 px-4 py-2.5 text-left min-w-0"
                   >
-                    <ListItemIcon sx={{ minWidth: 36 }}>
+                    <span className="flex-shrink-0 text-muted-foreground">
                       {item.type === 'directory' ? (
-                        <Folder size={20} />
+                        <Folder size={18} />
                       ) : isSelected(item.path) ? (
-                        <CheckSquare size={20} color="#1976d2" />
+                        <CheckSquare size={18} className="text-primary" />
                       ) : (
-                        <File size={20} />
+                        <File size={18} />
                       )}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={item.name}
-                      secondary={item.size ? formatSize(item.size) : undefined}
-                      primaryTypographyProps={{
-                        sx: { fontSize: '0.875rem', fontWeight: isSelected(item.path) ? 600 : 400 },
-                      }}
-                      secondaryTypographyProps={{ sx: { fontSize: '0.75rem' } }}
-                    />
-                  </ListItemButton>
-                </ListItem>
+                    </span>
+                    <span className={cn('text-sm truncate', isSelected(item.path) && 'font-semibold')}>
+                      {item.name}
+                    </span>
+                    {item.size && (
+                      <span className="text-xs text-muted-foreground flex-shrink-0 ml-auto">
+                        {formatSize(item.size)}
+                      </span>
+                    )}
+                  </button>
+                  {item.type === 'directory' && (
+                    <button
+                      type="button"
+                      onClick={() => toggleSelection(item.path)}
+                      title={t('wizard.restoreFiles.selectDirTooltip')}
+                      className="p-2 mr-2 flex-shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {getDirectoryIcon(item)}
+                    </button>
+                  )}
+                </div>
               ))}
-            </List>
+            </div>
           )}
-        </Box>
-      </Box>
+        </div>
+      </div>
 
-      {/* Help text */}
-      <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-        {t('wizard.restoreFiles.helpText')}
-      </Typography>
-    </Box>
+      <p className="text-xs text-muted-foreground mt-2">{t('wizard.restoreFiles.helpText')}</p>
+    </div>
   )
 }

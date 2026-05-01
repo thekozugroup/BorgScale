@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+import { screen, renderWithProviders } from '../../../test/test-utils'
 import WizardStepReview, { WizardReviewData } from '../WizardStepReview'
 
 // Mock CommandPreview
@@ -54,7 +54,7 @@ const defaultData: WizardReviewData = {
 describe('WizardStepReview', () => {
   describe('Configuration Summary', () => {
     it('renders configuration summary header', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -62,7 +62,7 @@ describe('WizardStepReview', () => {
     })
 
     it('shows repository name', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -70,7 +70,7 @@ describe('WizardStepReview', () => {
     })
 
     it('shows repository path', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -78,7 +78,7 @@ describe('WizardStepReview', () => {
     })
 
     it('shows Full mode chip', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -88,7 +88,7 @@ describe('WizardStepReview', () => {
     it('shows Observe Only mode chip', () => {
       const observeData = { ...defaultData, repositoryMode: 'observe' as const }
 
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={observeData} sshConnections={mockSshConnections} />
       )
 
@@ -96,7 +96,7 @@ describe('WizardStepReview', () => {
     })
 
     it('shows BorgScale Server for local location', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -108,7 +108,7 @@ describe('WizardStepReview', () => {
     it('shows SSH Remote for ssh location', () => {
       const sshData = { ...defaultData, repositoryLocation: 'ssh' as const }
 
-      render(<WizardStepReview mode="create" data={sshData} sshConnections={mockSshConnections} />)
+      renderWithProviders(<WizardStepReview mode="create" data={sshData} sshConnections={mockSshConnections} />)
 
       expect(screen.getByText('SSH Remote')).toBeInTheDocument()
     })
@@ -116,7 +116,7 @@ describe('WizardStepReview', () => {
 
   describe('Data Source Section', () => {
     it('shows data source section for full mode', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -126,7 +126,7 @@ describe('WizardStepReview', () => {
     it('hides data source section for observe mode', () => {
       const observeData = { ...defaultData, repositoryMode: 'observe' as const }
 
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={observeData} sshConnections={mockSshConnections} />
       )
 
@@ -136,7 +136,7 @@ describe('WizardStepReview', () => {
     it('shows Remote Client for remote data source', () => {
       const remoteData = { ...defaultData, dataSource: 'remote' as const, sourceSshConnectionId: 1 }
 
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={remoteData} sshConnections={mockSshConnections} />
       )
 
@@ -144,7 +144,7 @@ describe('WizardStepReview', () => {
     })
 
     it('shows directory count for local source', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -154,7 +154,7 @@ describe('WizardStepReview', () => {
     })
 
     it('shows exclude pattern count for local source', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -166,7 +166,7 @@ describe('WizardStepReview', () => {
 
   describe('Security Section', () => {
     it('shows security section', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -174,7 +174,7 @@ describe('WizardStepReview', () => {
     })
 
     it('shows encryption chip for create mode', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -184,7 +184,7 @@ describe('WizardStepReview', () => {
     it('shows Keyfile encryption chip', () => {
       const keyfileData = { ...defaultData, encryption: 'keyfile' }
 
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={keyfileData} sshConnections={mockSshConnections} />
       )
 
@@ -194,7 +194,7 @@ describe('WizardStepReview', () => {
     it('shows Repokey encryption chip for Borg v2 repokey modes', () => {
       const borg2RepokeyData = { ...defaultData, encryption: 'repokey-aes-ocb' }
 
-      render(
+      renderWithProviders(
         <WizardStepReview
           mode="create"
           data={borg2RepokeyData}
@@ -208,7 +208,7 @@ describe('WizardStepReview', () => {
     it('shows Keyfile encryption chip for Borg v2 keyfile modes', () => {
       const borg2KeyfileData = { ...defaultData, encryption: 'keyfile-chacha20-poly1305' }
 
-      render(
+      renderWithProviders(
         <WizardStepReview
           mode="create"
           data={borg2KeyfileData}
@@ -222,7 +222,7 @@ describe('WizardStepReview', () => {
     it('shows None encryption chip', () => {
       const noEncryptionData = { ...defaultData, encryption: 'none' }
 
-      render(
+      renderWithProviders(
         <WizardStepReview
           mode="create"
           data={noEncryptionData}
@@ -234,7 +234,7 @@ describe('WizardStepReview', () => {
     })
 
     it('hides encryption row for import mode', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="import" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -243,7 +243,7 @@ describe('WizardStepReview', () => {
     })
 
     it('shows masked passphrase when set', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -253,7 +253,7 @@ describe('WizardStepReview', () => {
     it('shows (not set) when passphrase is empty', () => {
       const noPassphraseData = { ...defaultData, passphrase: '' }
 
-      render(
+      renderWithProviders(
         <WizardStepReview
           mode="create"
           data={noPassphraseData}
@@ -267,7 +267,7 @@ describe('WizardStepReview', () => {
 
   describe('Backup Configuration Section', () => {
     it('shows backup configuration section for full mode', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -277,7 +277,7 @@ describe('WizardStepReview', () => {
     it('hides backup configuration section for observe mode', () => {
       const observeData = { ...defaultData, repositoryMode: 'observe' as const }
 
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={observeData} sshConnections={mockSshConnections} />
       )
 
@@ -285,7 +285,7 @@ describe('WizardStepReview', () => {
     })
 
     it('shows compression value', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -295,7 +295,7 @@ describe('WizardStepReview', () => {
     it('shows custom flags when set', () => {
       const customFlagsData = { ...defaultData, customFlags: '--stats --progress' }
 
-      render(
+      renderWithProviders(
         <WizardStepReview
           mode="create"
           data={customFlagsData}
@@ -309,7 +309,7 @@ describe('WizardStepReview', () => {
 
   describe('Command Preview', () => {
     it('shows command preview for full mode', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -317,7 +317,7 @@ describe('WizardStepReview', () => {
     })
 
     it('shows create mode in command preview for create mode', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -325,7 +325,7 @@ describe('WizardStepReview', () => {
     })
 
     it('shows import mode in command preview for import mode', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="import" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -335,7 +335,7 @@ describe('WizardStepReview', () => {
 
   describe('Backup Flow Preview', () => {
     it('shows backup flow preview for full mode', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -345,7 +345,7 @@ describe('WizardStepReview', () => {
     it('hides backup flow preview for observe mode', () => {
       const observeData = { ...defaultData, repositoryMode: 'observe' as const }
 
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={observeData} sshConnections={mockSshConnections} />
       )
 
@@ -355,7 +355,7 @@ describe('WizardStepReview', () => {
 
   describe('Action Alerts', () => {
     it('shows initialization alert for create mode with full repository', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -365,7 +365,7 @@ describe('WizardStepReview', () => {
     it('hides initialization alert for create mode with observe repository', () => {
       const observeData = { ...defaultData, repositoryMode: 'observe' as const }
 
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={observeData} sshConnections={mockSshConnections} />
       )
 
@@ -373,7 +373,7 @@ describe('WizardStepReview', () => {
     })
 
     it('shows import alert for import mode', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="import" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -381,7 +381,7 @@ describe('WizardStepReview', () => {
     })
 
     it('shows edit alert for edit mode', () => {
-      render(
+      renderWithProviders(
         <WizardStepReview mode="edit" data={defaultData} sshConnections={mockSshConnections} />
       )
 
@@ -395,7 +395,7 @@ describe('WizardStepReview', () => {
     it('shows (not set) for empty path', () => {
       const emptyPathData = { ...defaultData, path: '' }
 
-      render(
+      renderWithProviders(
         <WizardStepReview mode="create" data={emptyPathData} sshConnections={mockSshConnections} />
       )
 

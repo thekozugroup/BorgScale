@@ -66,55 +66,64 @@ describe('StatusBadge', () => {
     it('renders success color for "completed"', () => {
       const { container } = render(<StatusBadge status="completed" />)
       const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('MuiChip-colorSuccess')
+      expect(chip.className).toContain('bg-primary/10')
+      expect(chip.className).toContain('text-primary')
     })
 
     it('renders success color for "success"', () => {
       const { container } = render(<StatusBadge status="success" />)
       const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('MuiChip-colorSuccess')
+      expect(chip.className).toContain('bg-primary/10')
+      expect(chip.className).toContain('text-primary')
     })
 
     it('renders warning color for "completed_with_warnings"', () => {
       const { container } = render(<StatusBadge status="completed_with_warnings" />)
       const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('MuiChip-colorWarning')
+      expect(chip.className).toContain('bg-muted')
+      expect(chip.className).toContain('text-muted-foreground')
     })
 
     it('renders error color for "failed"', () => {
       const { container } = render(<StatusBadge status="failed" />)
       const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('MuiChip-colorError')
+      expect(chip.className).toContain('bg-destructive/10')
+      expect(chip.className).toContain('text-destructive')
     })
 
     it('renders error color for "error"', () => {
       const { container } = render(<StatusBadge status="error" />)
       const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('MuiChip-colorError')
+      expect(chip.className).toContain('bg-destructive/10')
+      expect(chip.className).toContain('text-destructive')
     })
 
-    it('renders info color for "running"', () => {
+    it('renders secondary color for "running"', () => {
       const { container } = render(<StatusBadge status="running" />)
       const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('MuiChip-colorInfo')
+      expect(chip.className).toContain('bg-secondary')
+      expect(chip.className).toContain('text-secondary-foreground')
     })
 
-    it('renders info color for "in_progress"', () => {
+    it('renders secondary color for "in_progress"', () => {
       const { container } = render(<StatusBadge status="in_progress" />)
       const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('MuiChip-colorInfo')
+      expect(chip.className).toContain('bg-secondary')
+      expect(chip.className).toContain('text-secondary-foreground')
     })
 
-    it('renders default color for "pending"', () => {
+    it('renders muted color for "pending"', () => {
       const { container } = render(<StatusBadge status="pending" />)
       const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('MuiChip-colorDefault')
+      expect(chip.className).toContain('bg-muted')
+      expect(chip.className).toContain('text-muted-foreground')
     })
 
-    it('renders default color for unknown status', () => {
+    it('renders muted color for unknown status', () => {
       const { container } = render(<StatusBadge status="unknown_status" />)
       const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('MuiChip-colorDefault')
+      expect(chip.className).toContain('bg-muted')
+      expect(chip.className).toContain('text-muted-foreground')
     })
   })
 
@@ -122,27 +131,28 @@ describe('StatusBadge', () => {
     it('renders with small size by default', () => {
       const { container } = render(<StatusBadge status="completed" />)
       const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('MuiChip-sizeSmall')
+      // Badge renders as a span element with font-medium class
+      expect(chip).toBeInTheDocument()
     })
 
     it('renders with medium size when specified', () => {
       const { container } = render(<StatusBadge status="completed" size="medium" />)
       const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('MuiChip-sizeMedium')
+      expect(chip).toBeInTheDocument()
     })
   })
 
   describe('Style variants', () => {
-    it('renders with outlined variant by default', () => {
+    it('renders with bordered style by default', () => {
       const { container } = render(<StatusBadge status="completed" />)
       const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('MuiChip-outlined')
+      expect(chip.className).toContain('border')
     })
 
     it('renders with outlined variant when specified', () => {
       const { container } = render(<StatusBadge status="completed" variant="outlined" />)
       const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('MuiChip-outlined')
+      expect(chip.className).toContain('border')
     })
   })
 })

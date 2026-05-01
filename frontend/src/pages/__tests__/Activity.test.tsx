@@ -86,8 +86,7 @@ describe('Activity page', () => {
       })
     )
 
-    fireEvent.mouseDown(screen.getAllByRole('combobox')[0])
-    await user.click(await screen.findByRole('option', { name: /restore/i }))
+    fireEvent.change(screen.getAllByRole('combobox')[0], { target: { value: 'restore' } })
 
     await waitFor(() => {
       expect(activityAPI.list).toHaveBeenLastCalledWith({
@@ -100,8 +99,7 @@ describe('Activity page', () => {
       filter_value: 'restore',
     })
 
-    fireEvent.mouseDown(screen.getAllByRole('combobox')[1])
-    await user.click(await screen.findByRole('option', { name: /failed/i }))
+    fireEvent.change(screen.getAllByRole('combobox')[1], { target: { value: 'failed' } })
 
     await waitFor(() => {
       expect(activityAPI.list).toHaveBeenLastCalledWith({

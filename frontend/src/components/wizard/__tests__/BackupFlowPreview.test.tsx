@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import { screen, renderWithProviders } from '../../../test/test-utils'
 import BackupFlowPreview from '../BackupFlowPreview'
 
 const mockSshConnection = {
@@ -12,7 +12,7 @@ const mockSshConnection = {
 describe('BackupFlowPreview', () => {
   describe('Local to Local Backup', () => {
     it('shows correct summary text', () => {
-      render(
+      renderWithProviders(
         <BackupFlowPreview
           repositoryLocation="local"
           dataSource="local"
@@ -25,7 +25,7 @@ describe('BackupFlowPreview', () => {
     })
 
     it('shows BorgScale Server as source', () => {
-      render(
+      renderWithProviders(
         <BackupFlowPreview
           repositoryLocation="local"
           dataSource="local"
@@ -40,7 +40,7 @@ describe('BackupFlowPreview', () => {
     })
 
     it('shows BorgScale Server as repository location', () => {
-      render(
+      renderWithProviders(
         <BackupFlowPreview
           repositoryLocation="local"
           dataSource="local"
@@ -55,7 +55,7 @@ describe('BackupFlowPreview', () => {
     })
 
     it('shows repository path', () => {
-      render(
+      renderWithProviders(
         <BackupFlowPreview
           repositoryLocation="local"
           dataSource="local"
@@ -68,7 +68,7 @@ describe('BackupFlowPreview', () => {
     })
 
     it('shows directory count', () => {
-      render(
+      renderWithProviders(
         <BackupFlowPreview
           repositoryLocation="local"
           dataSource="local"
@@ -81,7 +81,7 @@ describe('BackupFlowPreview', () => {
     })
 
     it('shows singular "dir" for one directory', () => {
-      render(
+      renderWithProviders(
         <BackupFlowPreview
           repositoryLocation="local"
           dataSource="local"
@@ -96,7 +96,7 @@ describe('BackupFlowPreview', () => {
 
   describe('Local to Remote Backup', () => {
     it('shows correct summary text', () => {
-      render(
+      renderWithProviders(
         <BackupFlowPreview
           repositoryLocation="ssh"
           dataSource="local"
@@ -110,7 +110,7 @@ describe('BackupFlowPreview', () => {
     })
 
     it('shows SSH connection details for repository', () => {
-      render(
+      renderWithProviders(
         <BackupFlowPreview
           repositoryLocation="ssh"
           dataSource="local"
@@ -126,7 +126,7 @@ describe('BackupFlowPreview', () => {
 
   describe('Remote to Local Backup (SSHFS)', () => {
     it('shows correct summary text', () => {
-      render(
+      renderWithProviders(
         <BackupFlowPreview
           repositoryLocation="local"
           dataSource="remote"
@@ -142,7 +142,7 @@ describe('BackupFlowPreview', () => {
     })
 
     it('shows SSHFS intermediate node', () => {
-      render(
+      renderWithProviders(
         <BackupFlowPreview
           repositoryLocation="local"
           dataSource="remote"
@@ -158,7 +158,7 @@ describe('BackupFlowPreview', () => {
     })
 
     it('shows SSH connection details for source', () => {
-      render(
+      renderWithProviders(
         <BackupFlowPreview
           repositoryLocation="local"
           dataSource="remote"
@@ -174,7 +174,7 @@ describe('BackupFlowPreview', () => {
 
   describe('Edge Cases', () => {
     it('handles empty repository path', () => {
-      render(
+      renderWithProviders(
         <BackupFlowPreview
           repositoryLocation="local"
           dataSource="local"
@@ -188,7 +188,7 @@ describe('BackupFlowPreview', () => {
     })
 
     it('handles empty source directories', () => {
-      render(
+      renderWithProviders(
         <BackupFlowPreview
           repositoryLocation="local"
           dataSource="local"
@@ -202,7 +202,7 @@ describe('BackupFlowPreview', () => {
     })
 
     it('shows Remote Client when source is remote but no connection provided', () => {
-      render(
+      renderWithProviders(
         <BackupFlowPreview
           repositoryLocation="local"
           dataSource="remote"
@@ -215,7 +215,7 @@ describe('BackupFlowPreview', () => {
     })
 
     it('shows Remote Storage when repository is remote but no connection provided', () => {
-      render(
+      renderWithProviders(
         <BackupFlowPreview
           repositoryLocation="ssh"
           dataSource="local"

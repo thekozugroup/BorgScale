@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
+import { screen, fireEvent, renderWithProviders } from '../../../../test/test-utils'
 import WizardStepMaintenance from '../WizardStepMaintenance'
 
 describe('WizardStepMaintenance', () => {
@@ -20,7 +20,7 @@ describe('WizardStepMaintenance', () => {
   }
 
   it('renders maintenance options title and description', () => {
-    render(<WizardStepMaintenance {...defaultProps} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} />)
 
     expect(screen.getByText(/Maintenance Options/i)).toBeInTheDocument()
     expect(
@@ -29,7 +29,7 @@ describe('WizardStepMaintenance', () => {
   })
 
   it('renders info tooltip explaining prune and compact', () => {
-    render(<WizardStepMaintenance {...defaultProps} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} />)
 
     // Hint text is accessible via aria-label on the info icon next to the title
     const tooltip = screen.getByLabelText(/Prune removes old archives/i)
@@ -37,7 +37,7 @@ describe('WizardStepMaintenance', () => {
   })
 
   it('renders prune toggle switch', () => {
-    render(<WizardStepMaintenance {...defaultProps} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} />)
 
     const switches = screen.getAllByRole('switch')
     expect(switches).toHaveLength(2)
@@ -45,7 +45,7 @@ describe('WizardStepMaintenance', () => {
   })
 
   it('renders compact toggle switch', () => {
-    render(<WizardStepMaintenance {...defaultProps} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} />)
 
     const switches = screen.getAllByRole('switch')
     expect(switches).toHaveLength(2)
@@ -54,7 +54,7 @@ describe('WizardStepMaintenance', () => {
 
   it('calls onChange when prune toggle is clicked', () => {
     const onChange = vi.fn()
-    render(<WizardStepMaintenance {...defaultProps} onChange={onChange} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} onChange={onChange} />)
 
     const switches = screen.getAllByRole('switch')
     fireEvent.click(switches[0])
@@ -64,7 +64,7 @@ describe('WizardStepMaintenance', () => {
 
   it('calls onChange when compact toggle is clicked', () => {
     const onChange = vi.fn()
-    render(<WizardStepMaintenance {...defaultProps} onChange={onChange} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} onChange={onChange} />)
 
     const switches = screen.getAllByRole('switch')
     fireEvent.click(switches[1])
@@ -73,7 +73,7 @@ describe('WizardStepMaintenance', () => {
   })
 
   it('does not show PruneSettingsInput when prune is disabled', () => {
-    render(<WizardStepMaintenance {...defaultProps} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} />)
 
     expect(screen.queryByRole('spinbutton', { name: /Keep Hourly/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('spinbutton', { name: /Keep Daily/i })).not.toBeInTheDocument()
@@ -85,7 +85,7 @@ describe('WizardStepMaintenance', () => {
       runPruneAfter: true,
     }
 
-    render(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} />)
 
     expect(screen.getByLabelText(/Keep Hourly/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/Keep Daily/i)).toBeInTheDocument()
@@ -101,14 +101,14 @@ describe('WizardStepMaintenance', () => {
       runPruneAfter: true,
     }
 
-    render(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} />)
 
     expect(screen.getByText(/Caution:/i)).toBeInTheDocument()
     expect(screen.getByText(/Pruning permanently deletes old backups/i)).toBeInTheDocument()
   })
 
   it('displays compact info tooltip accessible via icon aria-label', () => {
-    render(<WizardStepMaintenance {...defaultProps} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} />)
 
     // Compact info icon is always rendered in the toggle label
     const tooltip = screen.getByRole('button', { name: /Compact reclaims disk space after prune/i })
@@ -122,7 +122,7 @@ describe('WizardStepMaintenance', () => {
       runPruneAfter: true,
     }
 
-    render(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} onChange={onChange} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} onChange={onChange} />)
 
     const dailyInput = screen.getByLabelText(/Keep Daily/i)
     fireEvent.change(dailyInput, { target: { value: '14' } })
@@ -145,7 +145,7 @@ describe('WizardStepMaintenance', () => {
       pruneKeepWeekly: 5,
     }
 
-    render(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} />)
 
     expect(screen.getByLabelText(/Keep Daily/i)).toHaveValue(10)
     expect(screen.getByLabelText(/Keep Weekly/i)).toHaveValue(5)
@@ -157,7 +157,7 @@ describe('WizardStepMaintenance', () => {
       runPruneAfter: true,
     }
 
-    render(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} />)
 
     const switches = screen.getAllByRole('switch')
     expect(switches[0]).toBeChecked()
@@ -169,20 +169,20 @@ describe('WizardStepMaintenance', () => {
       runCompactAfter: true,
     }
 
-    render(<WizardStepMaintenance {...defaultProps} data={dataWithCompact} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} data={dataWithCompact} />)
 
     const switches = screen.getAllByRole('switch')
     expect(switches[1]).toBeChecked()
   })
 
   it('displays prune switch description', () => {
-    render(<WizardStepMaintenance {...defaultProps} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} />)
 
     expect(screen.getByText(/Remove old archives based on retention policy/i)).toBeInTheDocument()
   })
 
   it('displays compact switch description', () => {
-    render(<WizardStepMaintenance {...defaultProps} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} />)
 
     expect(screen.getByText(/Reclaim disk space by freeing segments/i)).toBeInTheDocument()
   })
@@ -194,7 +194,7 @@ describe('WizardStepMaintenance', () => {
       runPruneAfter: true,
     }
 
-    render(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} onChange={onChange} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} onChange={onChange} />)
 
     const hourlyInput = screen.getByLabelText(/Keep Hourly/i)
     fireEvent.change(hourlyInput, { target: { value: '24' } })
@@ -211,7 +211,7 @@ describe('WizardStepMaintenance', () => {
       runPruneAfter: true,
     }
 
-    render(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} />)
 
     const alert = screen.getByRole('alert')
     expect(alert).toBeInTheDocument()
@@ -219,7 +219,7 @@ describe('WizardStepMaintenance', () => {
   })
 
   it('renders info tooltip for maintenance hint', () => {
-    render(<WizardStepMaintenance {...defaultProps} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} />)
 
     // Hint text is accessible via aria-label on the info icon next to the title
     const tooltip = screen.getByLabelText(/Prune removes old archives/i)
@@ -227,7 +227,7 @@ describe('WizardStepMaintenance', () => {
   })
 
   it('collapses prune settings when disabled', () => {
-    const { rerender } = render(
+    const { rerender } = renderWithProviders(
       <WizardStepMaintenance {...defaultProps} data={{ ...defaultData, runPruneAfter: true }} />
     )
 
@@ -254,7 +254,7 @@ describe('WizardStepMaintenance', () => {
       runPruneAfter: true,
     }
 
-    render(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} onChange={onChange} />)
+    renderWithProviders(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} onChange={onChange} />)
 
     const monthlyInput = screen.getByLabelText(/Keep Monthly/i)
     fireEvent.change(monthlyInput, { target: { value: '12' } })

@@ -235,6 +235,11 @@ describe('Scripts page', () => {
       expect.objectContaining({ success: true })
     )
 
+    // Close test dialog before clicking delete (dialog sets pointer-events:none on body)
+    const closeButtons = within(testDialog).getAllByRole('button', { name: /close/i })
+    await user.click(closeButtons[closeButtons.length - 1])
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+
     expect(deleteButton).toBeTruthy()
     await user.click(deleteButton!)
 

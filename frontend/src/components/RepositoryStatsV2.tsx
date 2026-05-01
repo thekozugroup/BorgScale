@@ -1,8 +1,8 @@
-import { Box, Card, CardContent, Typography, Alert } from '@mui/material'
-import { DataUsage, Inventory, Folder, Schedule } from '@mui/icons-material'
-import { Info } from '@mui/icons-material'
+import { HardDrive, Database, Folder, Clock, Info } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatBytes, formatDateShort } from '../utils/dateUtils'
+import { Card, CardContent } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export interface ArchiveEntry {
   name?: string
@@ -22,13 +22,12 @@ export default function RepositoryStatsV2({ archives }: RepositoryStatsV2Props) 
 
   if (archives.length === 0) {
     return (
-      <Alert severity="info" icon={<Info />}>
-        <Typography variant="body2" fontWeight={600} gutterBottom>
-          {t('dialogs.repositoryInfo.noBackupsYet')}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {t('repositoryInfoDialog.noArchivesDescription')}
-        </Typography>
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertDescription>
+          <p className="font-semibold mb-1">{t('dialogs.repositoryInfo.noBackupsYet')}</p>
+          <p className="text-sm text-muted-foreground">{t('repositoryInfoDialog.noArchivesDescription')}</p>
+        </AlertDescription>
       </Alert>
     )
   }
@@ -38,90 +37,56 @@ export default function RepositoryStatsV2({ archives }: RepositoryStatsV2Props) 
 
   return (
     <>
-      <Typography variant="h6" fontWeight={600} sx={{ mt: 1 }}>
-        {t('dialogs.repositoryInfo.storageStatistics')}
-      </Typography>
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' },
-          gap: 2,
-        }}
-      >
-        <Card sx={{ backgroundColor: '#e8f5e9' }}>
-          <CardContent sx={{ py: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <DataUsage sx={{ color: '#2e7d32', fontSize: 24 }} />
-              <Typography variant="caption" color="text.secondary" fontWeight={500}>
-                {t('dialogs.repositoryInfo.latestBackupSize')}
-              </Typography>
-            </Box>
-            <Typography variant="h6" fontWeight={700} sx={{ color: '#2e7d32' }}>
-              {formatBytes(latest.stats?.original_size || 0)}
-            </Typography>
+      <h3 className="text-base font-semibold mt-2 mb-3">{t('dialogs.repositoryInfo.storageStatistics')}</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+        <Card className="bg-muted/40">
+          <CardContent className="py-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Database size={20} className="text-muted-foreground" />
+              <span className="text-xs text-muted-foreground font-medium">{t('dialogs.repositoryInfo.latestBackupSize')}</span>
+            </div>
+            <p className="text-xl font-bold text-foreground">{formatBytes(latest.stats?.original_size || 0)}</p>
           </CardContent>
         </Card>
-        <Card sx={{ backgroundColor: '#fff3e0' }}>
-          <CardContent sx={{ py: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <Inventory sx={{ color: '#e65100', fontSize: 24 }} />
-              <Typography variant="caption" color="text.secondary" fontWeight={500}>
-                {t('dialogs.repositoryInfo.files')}
-              </Typography>
-            </Box>
-            <Typography variant="h6" fontWeight={700} sx={{ color: '#e65100' }}>
-              {(latest.stats?.nfiles ?? 0).toLocaleString()}
-            </Typography>
+        <Card className="bg-muted/40">
+          <CardContent className="py-4">
+            <div className="flex items-center gap-2 mb-2">
+              <HardDrive size={20} className="text-muted-foreground" />
+              <span className="text-xs text-muted-foreground font-medium">{t('dialogs.repositoryInfo.files')}</span>
+            </div>
+            <p className="text-xl font-bold text-foreground">{(latest.stats?.nfiles ?? 0).toLocaleString()}</p>
           </CardContent>
         </Card>
-        <Card sx={{ backgroundColor: '#e3f2fd' }}>
-          <CardContent sx={{ py: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <Folder sx={{ color: '#1565c0', fontSize: 24 }} />
-              <Typography variant="caption" color="text.secondary" fontWeight={500}>
-                {t('dialogs.repositoryInfo.archiveCount')}
-              </Typography>
-            </Box>
-            <Typography variant="h6" fontWeight={700} sx={{ color: '#1565c0' }}>
-              {archives.length.toLocaleString()}
-            </Typography>
+        <Card className="bg-muted/40">
+          <CardContent className="py-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Folder size={20} className="text-muted-foreground" />
+              <span className="text-xs text-muted-foreground font-medium">{t('dialogs.repositoryInfo.archiveCount')}</span>
+            </div>
+            <p className="text-xl font-bold text-foreground">{archives.length.toLocaleString()}</p>
           </CardContent>
         </Card>
-      </Box>
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
-          gap: 2,
-        }}
-      >
-        <Card variant="outlined">
-          <CardContent sx={{ py: 1.5 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-              <Schedule sx={{ color: 'text.secondary', fontSize: 18 }} />
-              <Typography variant="caption" color="text.secondary" display="block">
-                {t('dialogs.repositoryInfo.firstBackup')}
-              </Typography>
-            </Box>
-            <Typography variant="body2" fontWeight={600}>
-              {first.time ? formatDateShort(first.time) : t('common.na')}
-            </Typography>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Card className="border border-border">
+          <CardContent className="py-3">
+            <div className="flex items-center gap-2 mb-1">
+              <Clock size={16} className="text-muted-foreground" />
+              <p className="text-xs text-muted-foreground">{t('dialogs.repositoryInfo.firstBackup')}</p>
+            </div>
+            <p className="text-sm font-semibold">{first.time ? formatDateShort(first.time) : t('common.na')}</p>
           </CardContent>
         </Card>
-        <Card variant="outlined">
-          <CardContent sx={{ py: 1.5 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-              <Schedule sx={{ color: 'text.secondary', fontSize: 18 }} />
-              <Typography variant="caption" color="text.secondary" display="block">
-                {t('dialogs.repositoryInfo.latestBackup')}
-              </Typography>
-            </Box>
-            <Typography variant="body2" fontWeight={600}>
-              {latest.time ? formatDateShort(latest.time) : t('common.na')}
-            </Typography>
+        <Card className="border border-border">
+          <CardContent className="py-3">
+            <div className="flex items-center gap-2 mb-1">
+              <Clock size={16} className="text-muted-foreground" />
+              <p className="text-xs text-muted-foreground">{t('dialogs.repositoryInfo.latestBackup')}</p>
+            </div>
+            <p className="text-sm font-semibold">{latest.time ? formatDateShort(latest.time) : t('common.na')}</p>
           </CardContent>
         </Card>
-      </Box>
+      </div>
     </>
   )
 }

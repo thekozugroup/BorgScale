@@ -1,33 +1,37 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { fireEvent, screen, renderWithProviders } from '../../test/test-utils'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import RunningBackupsSection from '../RunningBackupsSection'
 import { BackupJob } from '../../types'
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string, opts?: Record<string, unknown>) => {
-      const map: Record<string, string> = {
-        'backup.runningJobs.title': 'Running Jobs',
-        'backup.runningJobs.subtitle': 'Currently active backup operations',
-        'backup.runningJobs.viewLogs': 'View Logs',
-        'backup.runningJobs.cancel': 'Cancel',
-        'backup.runningJobs.progress.filesProcessed': 'Files Processed',
-        'backup.runningJobs.progress.originalSize': 'Original Size',
-        'backup.runningJobs.progress.compressed': 'Compressed',
-        'backup.runningJobs.progress.deduplicated': 'Deduplicated',
-        'backup.runningJobs.progress.totalSourceSize': 'Total Source Size',
-        'backup.runningJobs.progress.speed': 'Speed',
-        'backup.runningJobs.progress.eta': 'ETA',
-        'backup.runningJobs.progress.initializing': 'Initializing',
-        'backup.runningJobs.progress.processing': 'Processing',
-        'backup.runningJobs.progress.finalizing': 'Finalizing',
-      }
-      if (key === 'backup.runningJobs.jobTitle') return `Backup Job ${opts?.id}`
-      return map[key] ?? key
-    },
-    i18n: { language: 'en' },
-  }),
-}))
+vi.mock('react-i18next', async () => {
+  const actual = await vi.importActual<typeof import('react-i18next')>('react-i18next')
+  return {
+    ...actual,
+    useTranslation: () => ({
+      t: (key: string, opts?: Record<string, unknown>) => {
+        const map: Record<string, string> = {
+          'backup.runningJobs.title': 'Running Jobs',
+          'backup.runningJobs.subtitle': 'Currently active backup operations',
+          'backup.runningJobs.viewLogs': 'View Logs',
+          'backup.runningJobs.cancel': 'Cancel',
+          'backup.runningJobs.progress.filesProcessed': 'Files Processed',
+          'backup.runningJobs.progress.originalSize': 'Original Size',
+          'backup.runningJobs.progress.compressed': 'Compressed',
+          'backup.runningJobs.progress.deduplicated': 'Deduplicated',
+          'backup.runningJobs.progress.totalSourceSize': 'Total Source Size',
+          'backup.runningJobs.progress.speed': 'Speed',
+          'backup.runningJobs.progress.eta': 'ETA',
+          'backup.runningJobs.progress.initializing': 'Initializing',
+          'backup.runningJobs.progress.processing': 'Processing',
+          'backup.runningJobs.progress.finalizing': 'Finalizing',
+        }
+        if (key === 'backup.runningJobs.jobTitle') return `Backup Job ${opts?.id}`
+        return map[key] ?? key
+      },
+      i18n: { language: 'en' },
+    }),
+  }
+})
 
 vi.mock('../../utils/dateUtils', () => ({
   formatBytes: vi.fn((bytes: number) => `${bytes} bytes`),
@@ -61,18 +65,18 @@ describe('RunningBackupsSection', () => {
   })
 
   it('renders nothing when runningBackupJobs is empty', () => {
-    const { container } = render(
+    renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={[]}
         onCancelBackup={mockOnCancelBackup}
         isCancelling={false}
       />
     )
-    expect(container.firstChild).toBeNull()
+    expect(screen.queryByText('Running Jobs')).not.toBeInTheDocument()
   })
 
   it('renders section header with job count', () => {
-    render(
+    renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={[mockRunningJob]}
         onCancelBackup={mockOnCancelBackup}
@@ -84,7 +88,7 @@ describe('RunningBackupsSection', () => {
   })
 
   it('displays job ID', () => {
-    render(
+    renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={[mockRunningJob]}
         onCancelBackup={mockOnCancelBackup}
@@ -95,7 +99,7 @@ describe('RunningBackupsSection', () => {
   })
 
   it('displays repository path', () => {
-    render(
+    renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={[mockRunningJob]}
         onCancelBackup={mockOnCancelBackup}
@@ -106,7 +110,7 @@ describe('RunningBackupsSection', () => {
   })
 
   it('displays current file being processed', () => {
-    render(
+    renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={[mockRunningJob]}
         onCancelBackup={mockOnCancelBackup}
@@ -117,7 +121,7 @@ describe('RunningBackupsSection', () => {
   })
 
   it('displays stats labels and values', () => {
-    render(
+    renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={[mockRunningJob]}
         onCancelBackup={mockOnCancelBackup}
@@ -145,7 +149,7 @@ describe('RunningBackupsSection', () => {
         estimated_time_remaining: 300,
       },
     }
-    render(
+    renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={[borg2Job]}
         onCancelBackup={mockOnCancelBackup}
@@ -158,7 +162,7 @@ describe('RunningBackupsSection', () => {
   })
 
   it('displays ETA when estimated_time_remaining is present', () => {
-    render(
+    renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={[mockRunningJob]}
         onCancelBackup={mockOnCancelBackup}
@@ -174,7 +178,7 @@ describe('RunningBackupsSection', () => {
       ...mockRunningJob,
       progress_details: { ...mockRunningJob.progress_details!, estimated_time_remaining: 0 },
     }
-    render(
+    renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={[jobNoETA]}
         onCancelBackup={mockOnCancelBackup}
@@ -189,7 +193,7 @@ describe('RunningBackupsSection', () => {
       ...mockRunningJob,
       maintenance_status: 'prune_running',
     }
-    render(
+    renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={[jobWithMaintenance]}
         onCancelBackup={mockOnCancelBackup}
@@ -200,7 +204,7 @@ describe('RunningBackupsSection', () => {
   })
 
   it('renders cancel button enabled', () => {
-    render(
+    renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={[mockRunningJob]}
         onCancelBackup={mockOnCancelBackup}
@@ -215,7 +219,7 @@ describe('RunningBackupsSection', () => {
   it('calls onCancelBackup when confirmed', () => {
     const confirmSpy = vi.fn(() => true)
     vi.stubGlobal('confirm', confirmSpy)
-    render(
+    renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={[mockRunningJob]}
         onCancelBackup={mockOnCancelBackup}
@@ -231,7 +235,7 @@ describe('RunningBackupsSection', () => {
   it('does not call onCancelBackup when confirmation is declined', () => {
     const confirmSpy = vi.fn(() => false)
     vi.stubGlobal('confirm', confirmSpy)
-    render(
+    renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={[mockRunningJob]}
         onCancelBackup={mockOnCancelBackup}
@@ -244,7 +248,7 @@ describe('RunningBackupsSection', () => {
   })
 
   it('disables cancel button when isCancelling is true', () => {
-    render(
+    renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={[mockRunningJob]}
         onCancelBackup={mockOnCancelBackup}
@@ -259,7 +263,7 @@ describe('RunningBackupsSection', () => {
       { ...mockRunningJob, id: 1 },
       { ...mockRunningJob, id: 2 },
     ]
-    render(
+    renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={jobs}
         onCancelBackup={mockOnCancelBackup}
@@ -276,7 +280,7 @@ describe('RunningBackupsSection', () => {
       ...mockRunningJob,
       progress_details: { ...mockRunningJob.progress_details!, current_file: '' },
     }
-    render(
+    renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={[jobWithoutFile]}
         onCancelBackup={mockOnCancelBackup}
@@ -287,7 +291,7 @@ describe('RunningBackupsSection', () => {
   })
 
   it('hides View Logs button when onViewLogs is not provided', () => {
-    render(
+    renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={[mockRunningJob]}
         onCancelBackup={mockOnCancelBackup}
@@ -299,7 +303,7 @@ describe('RunningBackupsSection', () => {
 
   it('shows View Logs button and calls onViewLogs when provided', () => {
     const onViewLogs = vi.fn()
-    render(
+    renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={[mockRunningJob]}
         onCancelBackup={mockOnCancelBackup}

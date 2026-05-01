@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
+import { screen, fireEvent, renderWithProviders } from '../../test/test-utils'
 import DeleteScheduleDialog from '../DeleteScheduleDialog'
 
 describe('DeleteScheduleDialog', () => {
@@ -36,7 +36,7 @@ describe('DeleteScheduleDialog', () => {
     const onClose = vi.fn()
     const onConfirm = vi.fn()
 
-    render(
+    renderWithProviders(
       <DeleteScheduleDialog
         open={true}
         job={mockJob}
@@ -55,7 +55,7 @@ describe('DeleteScheduleDialog', () => {
     const onClose = vi.fn()
     const onConfirm = vi.fn()
 
-    render(
+    renderWithProviders(
       <DeleteScheduleDialog
         open={false}
         job={mockJob}
@@ -72,7 +72,7 @@ describe('DeleteScheduleDialog', () => {
     const onClose = vi.fn()
     const onConfirm = vi.fn()
 
-    render(
+    renderWithProviders(
       <DeleteScheduleDialog
         open={true}
         job={mockJob}
@@ -89,7 +89,7 @@ describe('DeleteScheduleDialog', () => {
     const onClose = vi.fn()
     const onConfirm = vi.fn()
 
-    render(
+    renderWithProviders(
       <DeleteScheduleDialog
         open={true}
         job={mockJob}
@@ -110,7 +110,7 @@ describe('DeleteScheduleDialog', () => {
     const onClose = vi.fn()
     const onConfirm = vi.fn()
 
-    render(
+    renderWithProviders(
       <DeleteScheduleDialog
         open={true}
         job={mockJob}
@@ -131,7 +131,7 @@ describe('DeleteScheduleDialog', () => {
     const onClose = vi.fn()
     const onConfirm = vi.fn()
 
-    render(
+    renderWithProviders(
       <DeleteScheduleDialog
         open={true}
         job={mockJob}
@@ -148,7 +148,7 @@ describe('DeleteScheduleDialog', () => {
     const onClose = vi.fn()
     const onConfirm = vi.fn()
 
-    render(
+    renderWithProviders(
       <DeleteScheduleDialog
         open={true}
         job={mockJob}
@@ -166,7 +166,7 @@ describe('DeleteScheduleDialog', () => {
     const onClose = vi.fn()
     const onConfirm = vi.fn()
 
-    render(
+    renderWithProviders(
       <DeleteScheduleDialog
         open={true}
         job={mockJob}
@@ -183,7 +183,7 @@ describe('DeleteScheduleDialog', () => {
     const onClose = vi.fn()
     const onConfirm = vi.fn()
 
-    render(
+    renderWithProviders(
       <DeleteScheduleDialog
         open={true}
         job={null}
@@ -200,7 +200,7 @@ describe('DeleteScheduleDialog', () => {
     const onClose = vi.fn()
     const onConfirm = vi.fn()
 
-    render(
+    renderWithProviders(
       <DeleteScheduleDialog
         open={true}
         job={mockJob}

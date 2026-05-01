@@ -1,4 +1,3 @@
-import { Box, Switch, Tooltip, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import {
   CalendarClock,
@@ -11,6 +10,8 @@ import {
   Trash2,
 } from 'lucide-react'
 import EntityCard, { StatItem, MetaItem, ActionItem } from './EntityCard'
+import { Switch } from '@/components/ui/switch'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import {
   formatDateCompact,
   formatDateTimeFull,
@@ -140,10 +141,7 @@ export default function ScheduleJobCard({
       tooltip: formatDateTimeFull(job.last_prune),
     })
   if (job.run_compact_after)
-    meta.push({
-      label: t('schedule.card.meta.compact'),
-      value: t('schedule.card.meta.afterBackup'),
-    })
+    meta.push({ label: t('schedule.card.meta.compact'), value: t('schedule.card.meta.afterBackup') })
   if (job.last_compact)
     meta.push({
       label: t('schedule.card.meta.lastCompact'),
@@ -176,47 +174,31 @@ export default function ScheduleJobCard({
   ]
 
   const badge = (
-    <Tooltip
-      title={
-        canManage
-          ? job.enabled
-            ? t('schedule.card.badge.clickToDisable')
-            : t('schedule.card.badge.clickToEnable')
-          : ''
-      }
-      arrow
-    >
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 0.25,
-          cursor: canManage ? 'pointer' : 'default',
-          userSelect: 'none',
-        }}
-        onClick={canManage ? onToggle : undefined}
-      >
-        <Switch
-          checked={job.enabled}
-          size="small"
-          color="success"
-          disabled={!canManage}
-          onChange={() => {}} // controlled by parent Box onClick
-          sx={{ pointerEvents: 'none' }}
-        />
-        <Typography
-          variant="caption"
-          sx={{
-            fontWeight: 600,
-            fontSize: '0.7rem',
-            color: job.enabled ? 'success.main' : 'text.disabled',
-            lineHeight: 1,
-            mr: 0.5,
-          }}
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div
+          className="flex items-center gap-1 select-none"
+          style={{ cursor: canManage ? 'pointer' : 'default' }}
+          onClick={canManage ? onToggle : undefined}
         >
-          {job.enabled ? t('schedule.card.badge.enabled') : t('schedule.card.badge.disabled')}
-        </Typography>
-      </Box>
+          <Switch
+            checked={job.enabled}
+            disabled={!canManage}
+            onCheckedChange={() => {}}
+            className="pointer-events-none scale-75"
+          />
+          <span
+            className={`text-[0.7rem] font-semibold mr-1 ${job.enabled ? 'text-primary' : ''}`}
+          >
+            {job.enabled ? t('schedule.card.badge.enabled') : t('schedule.card.badge.disabled')}
+          </span>
+        </div>
+      </TooltipTrigger>
+      {canManage && (
+        <TooltipContent>
+          {job.enabled ? t('schedule.card.badge.clickToDisable') : t('schedule.card.badge.clickToEnable')}
+        </TooltipContent>
+      )}
     </Tooltip>
   )
 

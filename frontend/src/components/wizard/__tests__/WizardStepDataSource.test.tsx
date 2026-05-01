@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+import { screen, renderWithProviders } from '../../../test/test-utils'
 import WizardStepDataSource from '../WizardStepDataSource'
 
 // Mock SourceDirectoriesInput
@@ -57,7 +57,7 @@ const defaultData = {
 describe('WizardStepDataSource', () => {
   describe('Rendering', () => {
     it('renders data source question', () => {
-      render(
+      renderWithProviders(
         <WizardStepDataSource
           repositoryLocation="local"
           repoSshConnectionId=""
@@ -74,7 +74,7 @@ describe('WizardStepDataSource', () => {
     })
 
     it('renders BorgScale Server and Remote Client cards', () => {
-      render(
+      renderWithProviders(
         <WizardStepDataSource
           repositoryLocation="local"
           repoSshConnectionId=""
@@ -92,7 +92,7 @@ describe('WizardStepDataSource', () => {
     })
 
     it('renders source directories input when local is selected', () => {
-      render(
+      renderWithProviders(
         <WizardStepDataSource
           repositoryLocation="local"
           repoSshConnectionId=""
@@ -111,7 +111,7 @@ describe('WizardStepDataSource', () => {
 
   describe('Remote-to-Remote Blocking', () => {
     it('disables Remote Client card when repository is on SSH', () => {
-      render(
+      renderWithProviders(
         <WizardStepDataSource
           repositoryLocation="ssh"
           repoSshConnectionId={1}
@@ -129,7 +129,7 @@ describe('WizardStepDataSource', () => {
     })
 
     it('shows explanation alert when remote-to-remote is blocked', () => {
-      render(
+      renderWithProviders(
         <WizardStepDataSource
           repositoryLocation="ssh"
           repoSshConnectionId={1}
@@ -146,7 +146,7 @@ describe('WizardStepDataSource', () => {
     })
 
     it('allows Remote Client when repository is local', () => {
-      render(
+      renderWithProviders(
         <WizardStepDataSource
           repositoryLocation="local"
           repoSshConnectionId=""
@@ -176,7 +176,7 @@ describe('WizardStepDataSource', () => {
         sourceDirs: [],
       }
 
-      render(
+      renderWithProviders(
         <WizardStepDataSource
           repositoryLocation="local"
           repoSshConnectionId=""
@@ -203,7 +203,7 @@ describe('WizardStepDataSource', () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
 
-      render(
+      renderWithProviders(
         <WizardStepDataSource
           repositoryLocation="local"
           repoSshConnectionId=""
@@ -229,7 +229,7 @@ describe('WizardStepDataSource', () => {
     it('does NOT call onChange when clicking disabled Remote Client', () => {
       const onChange = vi.fn()
 
-      render(
+      renderWithProviders(
         <WizardStepDataSource
           repositoryLocation="ssh"
           repoSshConnectionId={1}
@@ -253,7 +253,7 @@ describe('WizardStepDataSource', () => {
     it('shows warning when local directories exist and trying to select remote', () => {
       const dataWithDirs = { ...defaultData, sourceDirs: ['/home/user'] }
 
-      render(
+      renderWithProviders(
         <WizardStepDataSource
           repositoryLocation="local"
           repoSshConnectionId=""
@@ -276,7 +276,7 @@ describe('WizardStepDataSource', () => {
         sourceDirs: ['/remote/dir'],
       }
 
-      render(
+      renderWithProviders(
         <WizardStepDataSource
           repositoryLocation="local"
           repoSshConnectionId=""
@@ -301,7 +301,7 @@ describe('WizardStepDataSource', () => {
         sourceDirs: [], // No directories
       }
 
-      render(
+      renderWithProviders(
         <WizardStepDataSource
           repositoryLocation="local"
           repoSshConnectionId=""
@@ -327,7 +327,7 @@ describe('WizardStepDataSource', () => {
 
   describe('Observe Mode', () => {
     it('shows source directories as optional in observe mode', () => {
-      render(
+      renderWithProviders(
         <WizardStepDataSource
           repositoryLocation="local"
           repoSshConnectionId=""
@@ -344,7 +344,7 @@ describe('WizardStepDataSource', () => {
     })
 
     it('shows source directories as required in full mode', () => {
-      render(
+      renderWithProviders(
         <WizardStepDataSource
           repositoryLocation="local"
           repoSshConnectionId=""
@@ -365,7 +365,7 @@ describe('WizardStepDataSource', () => {
     it('shows SSH connection dropdown when remote is selected', () => {
       const remoteData = { ...defaultData, dataSource: 'remote' as const }
 
-      render(
+      renderWithProviders(
         <WizardStepDataSource
           repositoryLocation="local"
           repoSshConnectionId=""
@@ -386,7 +386,7 @@ describe('WizardStepDataSource', () => {
     it('shows warning when no SSH connections available for remote source', () => {
       const remoteData = { ...defaultData, dataSource: 'remote' as const }
 
-      render(
+      renderWithProviders(
         <WizardStepDataSource
           repositoryLocation="local"
           repoSshConnectionId=""

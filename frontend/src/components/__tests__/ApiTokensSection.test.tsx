@@ -1,8 +1,7 @@
 import type { AxiosResponse } from 'axios'
 import { describe, it, expect, vi } from 'vitest'
-import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { renderWithProviders } from '../../test/test-utils'
+import { renderWithProviders, screen, waitFor } from '../../test/test-utils'
 import ApiTokensSection from '../ApiTokensSection'
 
 interface MockToken {

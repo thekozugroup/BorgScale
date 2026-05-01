@@ -1,9 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import MqttSettingsTab from '../MqttSettingsTab'
 import { settingsAPI } from '@/services/api.ts'
-import { renderWithProviders } from '../../test/test-utils'
+import { renderWithProviders, screen, waitFor } from '../../test/test-utils'
 import { AxiosResponse } from 'axios'
 
 vi.mock('../../services/api', () => ({
@@ -52,7 +51,8 @@ describe('MqttSettingsTab', () => {
     it('shows loading spinner while fetching settings', () => {
       vi.mocked(settingsAPI.getSystemSettings).mockImplementation(() => new Promise(() => {}))
       renderWithProviders(<MqttSettingsTab />)
-      expect(screen.getByRole('progressbar')).toBeInTheDocument()
+      const spinner = document.querySelector('.animate-spin')
+      expect(spinner).toBeInTheDocument()
     })
 
     it('renders MQTT settings header', async () => {

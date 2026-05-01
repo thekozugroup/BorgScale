@@ -295,10 +295,10 @@ export default function Scripts() {
   }
 
   const RUN_ON_BADGE: Record<string, string> = {
-    success: 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30',
-    failure: 'bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/30',
-    warning: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30',
-    always: 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/30',
+    success: 'bg-primary/10 text-primary border-primary/20',
+    failure: 'bg-destructive/10 text-destructive border-destructive/20',
+    warning: 'bg-muted text-muted-foreground border-border',
+    always: 'bg-secondary text-secondary-foreground border-border',
   }
 
   if (!canManageScripts) {
@@ -319,7 +319,7 @@ export default function Scripts() {
             )}
           </div>
           {script.parameters && script.parameters.length > 0 && (
-            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-semibold border border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400 flex-shrink-0">
+            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-semibold border border-border bg-muted text-muted-foreground flex-shrink-0">
               {script.parameters.length} param{script.parameters.length > 1 ? 's' : ''}
             </span>
           )}
@@ -436,8 +436,9 @@ export default function Scripts() {
           </DialogHeader>
           <div className="flex flex-col gap-4 pt-1">
             <div>
-              <Label className="text-xs font-semibold mb-1.5 block">{t('scripts.fields.name')} *</Label>
+              <Label htmlFor="script-form-name" className="text-xs font-semibold mb-1.5 block">{t('scripts.fields.name')} *</Label>
               <Input
+                id="script-form-name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
@@ -447,8 +448,9 @@ export default function Scripts() {
             </div>
 
             <div>
-              <Label className="text-xs font-semibold mb-1.5 block">{t('scripts.fields.description')}</Label>
+              <Label htmlFor="script-form-description" className="text-xs font-semibold mb-1.5 block">{t('scripts.fields.description')}</Label>
               <textarea
+                id="script-form-description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={2}
@@ -471,7 +473,7 @@ export default function Scripts() {
               </select>
             </div>
 
-            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}>
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm border border-border bg-muted/40 text-muted-foreground">
               {t('scripts.runOn.note')}
             </div>
 
@@ -501,18 +503,14 @@ export default function Scripts() {
             {detectedParameters.length > 0 && (
               <div>
                 <p className="text-sm font-semibold mb-2">{t('scripts.fields.parameters')}</p>
-                <div className="flex items-start gap-2 p-3 rounded-xl text-sm mb-3" style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}>
+                <div className="flex items-start gap-2 p-3 rounded-xl text-sm mb-3 border border-border bg-muted/40 text-muted-foreground">
                   {t('scripts.fields.parametersHint')}
                 </div>
                 <div className="rounded-xl border border-border p-3 flex flex-col gap-3">
                   {detectedParameters.map((param) => (
                     <div
                       key={param.name}
-                      className="flex items-center justify-between p-3 rounded-lg border"
-                      style={{
-                        backgroundColor: param.type === 'password' ? 'rgba(255,152,0,0.08)' : 'transparent',
-                        borderColor: param.type === 'password' ? 'rgba(245,158,11,0.4)' : 'var(--border)',
-                      }}
+                      className={`flex items-center justify-between p-3 rounded-lg border ${param.type === 'password' ? 'border-border bg-muted/30' : 'border-border'}`}
                     >
                       <div className="flex-1">
                         <p className="text-sm font-semibold font-mono">{param.name}</p>
@@ -521,7 +519,7 @@ export default function Scripts() {
                             <span className="text-xs text-muted-foreground">Default: {param.default}</span>
                           )}
                           {param.required && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-semibold border border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-400">
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-semibold border border-destructive/20 bg-destructive/10 text-destructive">
                               Required
                             </span>
                           )}
@@ -543,7 +541,7 @@ export default function Scripts() {
             )}
 
             {editingScript && editingScript.usage_count > 0 && (
-              <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}>
+              <div className="flex items-start gap-2 p-3 rounded-xl text-sm border border-border bg-muted/40 text-muted-foreground">
                 {t('scripts.usedInPlaces', { count: editingScript.usage_count })}
               </div>
             )}
@@ -573,7 +571,7 @@ export default function Scripts() {
             <div className="flex flex-col gap-4 pt-1">
               {testingScriptData?.parameters && testingScriptData.parameters.length > 0 ? (
                 <>
-                  <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}>
+                  <div className="flex items-start gap-2 p-3 rounded-xl text-sm border border-border bg-muted/40 text-muted-foreground">
                     {t('scripts.testDialog.hasParams')}
                   </div>
                   <ScriptParameterInputs
@@ -583,7 +581,7 @@ export default function Scripts() {
                   />
                 </>
               ) : (
-                <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}>
+                <div className="flex items-start gap-2 p-3 rounded-xl text-sm border border-border bg-muted/40 text-muted-foreground">
                   {t('scripts.testDialog.noParams')}
                 </div>
               )}
@@ -606,13 +604,7 @@ export default function Scripts() {
           ) : testResult ? (
             <div className="flex flex-col gap-3">
               {/* Status */}
-              <div
-                className="flex items-start gap-2 p-3 rounded-xl text-sm"
-                style={testResult.success
-                  ? { background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#15803d' }
-                  : { background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#b91c1c' }
-                }
-              >
+              <div className={`flex items-start gap-2 p-3 rounded-xl text-sm border ${testResult.success ? 'border-primary/20 bg-primary/10 text-primary' : 'border-destructive/25 bg-destructive/10 text-destructive'}`}>
                 {testResult.success ? <CheckCircle size={18} className="flex-shrink-0 mt-0.5" /> : <XCircle size={18} className="flex-shrink-0 mt-0.5" />}
                 <div>
                   <p className="font-semibold">
@@ -628,8 +620,8 @@ export default function Scripts() {
               {testResult.stdout && (
                 <div>
                   <p className="text-sm font-semibold mb-1">{t('scripts.testDialog.stdout')}</p>
-                  <div className="p-3 rounded-xl overflow-auto max-h-48" style={{ background: '#1e1e1e', color: '#d4d4d4' }}>
-                    <pre className="text-sm font-mono whitespace-pre-wrap m-0">{testResult.stdout}</pre>
+                  <div className="p-3 rounded-xl overflow-auto max-h-48 bg-neutral-900">
+                    <pre className="text-sm font-mono whitespace-pre-wrap m-0 text-neutral-200">{testResult.stdout}</pre>
                   </div>
                 </div>
               )}
@@ -637,9 +629,9 @@ export default function Scripts() {
               {/* Stderr */}
               {testResult.stderr && (
                 <div>
-                  <p className="text-sm font-semibold mb-1 text-red-600 dark:text-red-400">{t('scripts.testDialog.stderr')}</p>
-                  <div className="p-3 rounded-xl overflow-auto max-h-48" style={{ background: '#1e1e1e', color: '#f48771' }}>
-                    <pre className="text-sm font-mono whitespace-pre-wrap m-0">{testResult.stderr}</pre>
+                  <p className="text-sm font-semibold mb-1 text-destructive">{t('scripts.testDialog.stderr')}</p>
+                  <div className="p-3 rounded-xl overflow-auto max-h-48 bg-neutral-900">
+                    <pre className="text-sm font-mono whitespace-pre-wrap m-0 text-destructive">{testResult.stderr}</pre>
                   </div>
                 </div>
               )}

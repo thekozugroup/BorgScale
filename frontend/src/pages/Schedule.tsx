@@ -479,7 +479,7 @@ const Schedule: React.FC = () => {
         <div>
           {/* No repositories warning */}
           {!loadingRepositories && (!repositories || repositories.length === 0) && (
-            <div className="flex items-start gap-2 p-3 rounded-xl text-sm mb-6" style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}>
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm mb-6 border border-border bg-muted/40 text-muted-foreground">
               {t('schedule.noRepositories')}
             </div>
           )}

@@ -21,16 +21,15 @@ describe('BorgVersionChip', () => {
 
   it('applies compact sizing when compact prop is true', () => {
     const { container } = renderWithProviders(<BorgVersionChip borgVersion={2} compact />)
-    const chip = container.querySelector('.MuiChip-root') as HTMLElement
-    // MUI applies sx height via CSS class, not inline style — verify chip renders
+    const chip = container.querySelector('span') as HTMLElement
     expect(chip).toBeInTheDocument()
-    expect(chip).toHaveClass('MuiChip-root')
+    expect(chip.style.height).toBe('16px')
   })
 
   it('applies default sizing when compact is false', () => {
     const { container } = renderWithProviders(<BorgVersionChip borgVersion={2} />)
-    const chip = container.querySelector('.MuiChip-root') as HTMLElement
+    const chip = container.querySelector('span') as HTMLElement
     expect(chip).toBeInTheDocument()
-    expect(chip).toHaveClass('MuiChip-root')
+    expect(chip.style.height).toBe('18px')
   })
 })

@@ -1,5 +1,4 @@
 import React from 'react'
-import { Box, Typography, Paper } from '@mui/material'
 import { generateBorgCreateCommand, generateBorgInitCommand } from '../utils/borgUtils'
 import { useTranslation } from 'react-i18next'
 
@@ -27,27 +26,18 @@ interface CommandPreviewProps {
   customFlags?: string
   remotePath?: string
   repositoryMode?: 'full' | 'observe'
-  // Remote source props
   dataSource?: 'local' | 'remote'
   sourceSshConnection?: SourceSshConnection | null
 }
 
 const CommandBox = ({ children }: { children: React.ReactNode }) => (
-  <Box
-    sx={{
-      bgcolor: 'grey.900',
-      color: 'grey.100',
-      p: 1.5,
-      borderRadius: 1,
-      fontFamily: 'monospace',
-      fontSize: '0.8rem',
-      overflow: 'auto',
-      whiteSpace: 'pre-wrap',
-      wordBreak: 'break-all',
-    }}
-  >
+  <div className="bg-neutral-900 text-neutral-100 p-3 rounded font-mono text-xs overflow-auto whitespace-pre-wrap break-all">
     {children}
-  </Box>
+  </div>
+)
+
+const StepLabel = ({ children }: { children: React.ReactNode }) => (
+  <p className="text-xs text-primary font-semibold mb-1 block">{children}</p>
 )
 
 export default function CommandPreview({
@@ -73,7 +63,6 @@ export default function CommandPreview({
   const { t } = useTranslation()
   const isRemoteSource = dataSource === 'remote' && sourceSshConnection
 
-  // Build full repository path
   let fullRepoPath = repositoryPath || '/path/to/repository'
   if (repositoryLocation === 'ssh' && host && username) {
     fullRepoPath = `ssh://${username}@${host}:${port}${repositoryPath.startsWith('/') ? '' : '/'}${repositoryPath}`
@@ -81,7 +70,6 @@ export default function CommandPreview({
 
   const remotePathFlag = remotePath ? `--remote-path ${remotePath} ` : ''
 
-  // Generate init command
   const initCommand = generateBorgInitCommand({
     repositoryPath: fullRepoPath,
     borgVersion,
@@ -89,8 +77,6 @@ export default function CommandPreview({
     remotePathFlag,
   })
 
-  // For remote source, show the preserved path structure (strips leading slash)
-  // Example: /var/snap/docker/.../portainer/_data -> var/snap/docker/.../portainer/_data
   const getPreservedRemotePath = (path: string) => {
     return path.startsWith('/') ? path.substring(1) : path
   }
@@ -121,8 +107,6 @@ export default function CommandPreview({
       ? sourceDirs
       : ['/path/to/source']
 
-  // Generate create command
-  // Note: Exclude patterns now work for remote sources since paths are preserved
   const createCommand = generateBorgCreateCommand({
     repositoryPath: fullRepoPath,
     borgVersion,
@@ -136,38 +120,26 @@ export default function CommandPreview({
 
   if (displayMode === 'backup-only') {
     return (
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-        <Typography variant="subtitle2" gutterBottom sx={{ mb: 1.5 }}>
-          {t('backup.commandPreview')}
-        </Typography>
+      <div className="border border-border rounded-lg p-4 mb-4">
+        <p className="text-sm font-semibold mb-3">{t('backup.commandPreview')}</p>
         <CommandBox>{createCommand}</CommandBox>
-      </Paper>
+      </div>
     )
   }
 
-  // For remote source backup flow
   if (isRemoteSource && repositoryMode === 'full') {
-    // Determine unique parent directories that will be mounted
-    // Note: SSHFS can only mount directories, not files
-    // For files like /home/user/file.txt, we mount /home/user/
-    // Multiple files in the same parent share one mount (deduplication)
-
     const getParentOrSelf = (path: string): string => {
-      // Heuristic: if path has an extension, it's likely a file -> use parent
-      // Otherwise, treat as directory
       const hasExtension = path.includes('.') && !path.endsWith('/')
       if (hasExtension) {
-        // File: return parent directory
         const lastSlash = path.lastIndexOf('/')
         return lastSlash > 0 ? path.substring(0, lastSlash) : '/'
       }
-      // Directory: return as-is
       return path
     }
 
     const mountPaths =
       resolvedRemoteSourceDirs.length > 0
-        ? [...new Set(resolvedRemoteSourceDirs.map(getParentOrSelf))] // Deduplicate
+        ? [...new Set(resolvedRemoteSourceDirs.map(getParentOrSelf))]
         : ['/path']
 
     const sshfsMountCommands = mountPaths.map(
@@ -181,137 +153,76 @@ export default function CommandPreview({
         : t('commandPreview.mountDisplayTextMultiple', { count: mountPaths.length })
 
     return (
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-        <Typography variant="subtitle2" gutterBottom sx={{ mb: 2 }}>
-          {mode === 'create'
-            ? t('commandPreview.howBackupWillWork')
-            : t('commandPreview.howBackupWorks')}
-        </Typography>
+      <div className="border border-border rounded-lg p-4 mb-4">
+        <p className="text-sm font-semibold mb-4">
+          {mode === 'create' ? t('commandPreview.howBackupWillWork') : t('commandPreview.howBackupWorks')}
+        </p>
 
         {mode === 'create' && (
-          <Box sx={{ mb: 2 }}>
-            <Typography
-              variant="caption"
-              color="primary.main"
-              fontWeight={600}
-              sx={{ mb: 0.5, display: 'block' }}
-            >
-              {t('commandPreview.step1InitRepo')}
-            </Typography>
+          <div className="mb-4">
+            <StepLabel>{t('commandPreview.step1InitRepo')}</StepLabel>
             <CommandBox>{initCommand}</CommandBox>
-          </Box>
+          </div>
         )}
 
-        <Box sx={{ mb: 2 }}>
-          <Typography
-            variant="caption"
-            color="primary.main"
-            fontWeight={600}
-            sx={{ mb: 0.5, display: 'block' }}
-          >
+        <div className="mb-4">
+          <StepLabel>
             {mode === 'create'
               ? t('commandPreview.step2MountRemote', {
-                  type:
-                    mountPaths.length > 1
-                      ? t('commandPreview.mountDirectories')
-                      : t('commandPreview.mountDirectory'),
+                  type: mountPaths.length > 1 ? t('commandPreview.mountDirectories') : t('commandPreview.mountDirectory'),
                 })
               : t('commandPreview.step1MountRemote', {
-                  type:
-                    mountPaths.length > 1
-                      ? t('commandPreview.mountDirectories')
-                      : t('commandPreview.mountDirectory'),
+                  type: mountPaths.length > 1 ? t('commandPreview.mountDirectories') : t('commandPreview.mountDirectory'),
                 })}
-          </Typography>
+          </StepLabel>
           <CommandBox>{sshfsMountCommands.join('\n')}</CommandBox>
-          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-            {mountDisplayText}
-          </Typography>
-        </Box>
+          <p className="text-xs text-muted-foreground mt-1">{mountDisplayText}</p>
+        </div>
 
-        <Box sx={{ mb: 2 }}>
-          <Typography
-            variant="caption"
-            color="primary.main"
-            fontWeight={600}
-            sx={{ mb: 0.5, display: 'block' }}
-          >
-            {mode === 'create'
-              ? t('commandPreview.step3RunBackup')
-              : t('commandPreview.step2RunBackup')}
-          </Typography>
+        <div className="mb-4">
+          <StepLabel>
+            {mode === 'create' ? t('commandPreview.step3RunBackup') : t('commandPreview.step2RunBackup')}
+          </StepLabel>
           <CommandBox>{createCommand}</CommandBox>
-          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-            {t('commandPreview.archivesPreserve')}
-          </Typography>
-        </Box>
+          <p className="text-xs text-muted-foreground mt-1">{t('commandPreview.archivesPreserve')}</p>
+        </div>
 
-        <Box>
-          <Typography
-            variant="caption"
-            color="primary.main"
-            fontWeight={600}
-            sx={{ mb: 0.5, display: 'block' }}
-          >
-            {mode === 'create'
-              ? t('commandPreview.step4Cleanup')
-              : t('commandPreview.step3Cleanup')}
-          </Typography>
+        <div>
+          <StepLabel>
+            {mode === 'create' ? t('commandPreview.step4Cleanup') : t('commandPreview.step3Cleanup')}
+          </StepLabel>
           <CommandBox>fusermount -u /tmp/sshfs_mount/</CommandBox>
-          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-            {t('commandPreview.cleanupDesc')}
-          </Typography>
-        </Box>
-      </Paper>
+          <p className="text-xs text-muted-foreground mt-1">{t('commandPreview.cleanupDesc')}</p>
+        </div>
+      </div>
     )
   }
 
-  // Standard local source flow
   return (
-    <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-      <Typography variant="subtitle2" gutterBottom sx={{ mb: 2 }}>
-        {mode === 'create'
-          ? t('commandPreview.howBackupWillWork')
-          : t('commandPreview.howBackupWorks')}
-      </Typography>
+    <div className="border border-border rounded-lg p-4 mb-4">
+      <p className="text-sm font-semibold mb-4">
+        {mode === 'create' ? t('commandPreview.howBackupWillWork') : t('commandPreview.howBackupWorks')}
+      </p>
 
       {mode === 'create' && (
-        <Box sx={{ mb: 2 }}>
-          <Typography
-            variant="caption"
-            color="primary.main"
-            fontWeight={600}
-            sx={{ mb: 0.5, display: 'block' }}
-          >
-            {t('commandPreview.step1InitRepo')}
-          </Typography>
+        <div className="mb-4">
+          <StepLabel>{t('commandPreview.step1InitRepo')}</StepLabel>
           <CommandBox>{initCommand}</CommandBox>
-          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-            {t('commandPreview.initRepositoryDesc')}
-          </Typography>
-        </Box>
+          <p className="text-xs text-muted-foreground mt-1">{t('commandPreview.initRepositoryDesc')}</p>
+        </div>
       )}
 
       {repositoryMode === 'full' && (
-        <Box>
-          <Typography
-            variant="caption"
-            color="primary.main"
-            fontWeight={600}
-            sx={{ mb: 0.5, display: 'block' }}
-          >
-            {mode === 'create'
-              ? t('commandPreview.step2RunBackup')
-              : t('commandPreview.stepRunBackup')}
-          </Typography>
+        <div>
+          <StepLabel>
+            {mode === 'create' ? t('commandPreview.step2RunBackup') : t('commandPreview.stepRunBackup')}
+          </StepLabel>
           <CommandBox>{createCommand}</CommandBox>
-          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-            {mode === 'create'
-              ? t('commandPreview.backupSourceDirs')
-              : t('commandPreview.futureBackups')}
-          </Typography>
-        </Box>
+          <p className="text-xs text-muted-foreground mt-1">
+            {mode === 'create' ? t('commandPreview.backupSourceDirs') : t('commandPreview.futureBackups')}
+          </p>
+        </div>
       )}
-    </Paper>
+    </div>
   )
 }

@@ -1,12 +1,13 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { fireEvent, screen, renderWithProviders } from '../../test/test-utils'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import LastRestoreSection from '../LastRestoreSection'
 
 // Mock react-router-dom
 const mockNavigate = vi.fn()
-vi.mock('react-router-dom', () => ({
-  useNavigate: () => mockNavigate,
-}))
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
+  return { ...actual, useNavigate: () => mockNavigate }
+})
 
 // Mock RestoreJobCard since it's tested separately
 vi.mock('../RestoreJobCard', () => ({
@@ -32,32 +33,32 @@ describe('LastRestoreSection', () => {
   })
 
   it('renders "no restores" message when restoreJob is null', () => {
-    render(<LastRestoreSection restoreJob={null} />)
+    renderWithProviders(<LastRestoreSection restoreJob={null} />)
 
     expect(screen.getByText('No recent restores')).toBeInTheDocument()
   })
 
   it('renders RestoreJobCard when restoreJob exists', () => {
-    render(<LastRestoreSection restoreJob={mockRestoreJob} />)
+    renderWithProviders(<LastRestoreSection restoreJob={mockRestoreJob} />)
 
     expect(screen.getByTestId('restore-job-card')).toBeInTheDocument()
     expect(screen.getByText('Restore Job: backup-2024-01-15')).toBeInTheDocument()
   })
 
   it('renders "Last Restore" header when job exists', () => {
-    render(<LastRestoreSection restoreJob={mockRestoreJob} />)
+    renderWithProviders(<LastRestoreSection restoreJob={mockRestoreJob} />)
 
     expect(screen.getByText('Last Restore')).toBeInTheDocument()
   })
 
   it('does not render "Last Restore" header when no job', () => {
-    render(<LastRestoreSection restoreJob={null} />)
+    renderWithProviders(<LastRestoreSection restoreJob={null} />)
 
     expect(screen.queryByText('Last Restore')).not.toBeInTheDocument()
   })
 
   it('renders icon in both states', () => {
-    const { rerender } = render(<LastRestoreSection restoreJob={null} />)
+    const { rerender } = renderWithProviders(<LastRestoreSection restoreJob={null} />)
 
     // Check icon is present (we can't easily test Lucide icons, but component renders)
     expect(screen.getByText('No recent restores')).toBeInTheDocument()
@@ -82,7 +83,7 @@ describe('LastRestoreSection', () => {
       },
     }
 
-    render(<LastRestoreSection restoreJob={runningJob} />)
+    renderWithProviders(<LastRestoreSection restoreJob={runningJob} />)
 
     expect(screen.getByTestId('restore-job-card')).toBeInTheDocument()
   })
@@ -94,25 +95,25 @@ describe('LastRestoreSection', () => {
       error_message: 'Restore failed: disk full',
     }
 
-    render(<LastRestoreSection restoreJob={failedJob} />)
+    renderWithProviders(<LastRestoreSection restoreJob={failedJob} />)
 
     expect(screen.getByTestId('restore-job-card')).toBeInTheDocument()
   })
 
   it('renders "View All Restores" button when job exists', () => {
-    render(<LastRestoreSection restoreJob={mockRestoreJob} />)
+    renderWithProviders(<LastRestoreSection restoreJob={mockRestoreJob} />)
 
     expect(screen.getByRole('button', { name: /view all restores/i })).toBeInTheDocument()
   })
 
   it('does not render "View All Restores" button when no job', () => {
-    render(<LastRestoreSection restoreJob={null} />)
+    renderWithProviders(<LastRestoreSection restoreJob={null} />)
 
     expect(screen.queryByRole('button', { name: /view all restores/i })).not.toBeInTheDocument()
   })
 
   it('navigates to activity page when button is clicked', () => {
-    render(<LastRestoreSection restoreJob={mockRestoreJob} />)
+    renderWithProviders(<LastRestoreSection restoreJob={mockRestoreJob} />)
 
     const button = screen.getByRole('button', { name: /view all restores/i })
     fireEvent.click(button)

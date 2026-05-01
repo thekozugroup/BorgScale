@@ -5,7 +5,6 @@ import { BrowserRouter } from 'react-router-dom'
 import { BASE_PATH } from './utils/basePath'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from 'react-hot-toast'
-import CssBaseline from '@mui/material/CssBaseline'
 import { AuthProvider } from './hooks/useAuth.tsx'
 import { AppProvider } from './context/AppContext'
 import { ThemeProvider } from './context/ThemeContext'
@@ -28,7 +27,6 @@ const queryClient = new QueryClient({
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ThemeProvider>
-      <CssBaseline />
       <QueryClientProvider client={queryClient}>
         <BrowserRouter basename={BASE_PATH || '/'}>
           <AuthProvider>

@@ -1,30 +1,23 @@
 import { useState, useEffect } from 'react'
-import {
-  Box,
-  Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  TextField,
-  Checkbox,
-  FormControlLabel,
-  Alert,
-  Stack,
-} from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { buildCompressionString, parseCompressionString } from '../utils/compressionUtils'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface CompressionSettingsProps {
-  value: string // The full compression string (e.g., "auto,lz4,6")
+  value: string
   onChange: (compressionString: string) => void
   disabled?: boolean
 }
 
-// Valid borg obfuscation levels:
-//   1-6: relative random reciprocal (small overhead)
-//   110-123: random additive padding (up to 8MB)
-//   250: Padmé deterministic padding (≤12% overhead, added in borg 1.4.1)
 const isValidObfuscateLevel = (val: string): boolean => {
   if (val === '') return true
   const n = parseInt(val, 10)
@@ -45,120 +38,106 @@ export default function CompressionSettings({
   const [obfuscate, setObfuscate] = useState(parsed.obfuscate)
   const obfuscateError = !isValidObfuscateLevel(obfuscate)
 
-  // Update parent when any value changes
   useEffect(() => {
     const newCompression = buildCompressionString(algorithm, level, autoDetect, obfuscate)
     onChange(newCompression)
   }, [algorithm, level, autoDetect, obfuscate, onChange])
 
-  // Sync with external changes
   useEffect(() => {
-    const parsed = parseCompressionString(value || 'lz4')
-    setAlgorithm(parsed.algorithm)
-    setLevel(parsed.level)
-    setAutoDetect(parsed.autoDetect)
-    setObfuscate(parsed.obfuscate)
+    const p = parseCompressionString(value || 'lz4')
+    setAlgorithm(p.algorithm)
+    setLevel(p.level)
+    setAutoDetect(p.autoDetect)
+    setObfuscate(p.obfuscate)
   }, [value])
 
   return (
-    <Box>
-      <Typography variant="subtitle2" gutterBottom sx={{ mb: 1.5 }}>
-        {t('compressionSettings.title')}
-      </Typography>
+    <div>
+      <p className="text-sm font-semibold mb-3">{t('compressionSettings.title')}</p>
 
-      <Stack spacing={2}>
-        <FormControl fullWidth disabled={disabled}>
-          <InputLabel>{t('compressionSettings.algorithmLabel')}</InputLabel>
-          <Select
-            value={algorithm}
-            label={t('compressionSettings.algorithmLabel')}
-            onChange={(e) => setAlgorithm(e.target.value)}
-          >
-            <MenuItem value="none">{t('compressionSettings.algorithmNone')}</MenuItem>
-            <MenuItem value="lz4">{t('compressionSettings.algorithmLz4')}</MenuItem>
-            <MenuItem value="zstd">{t('compressionSettings.algorithmZstd')}</MenuItem>
-            <MenuItem value="zlib">{t('compressionSettings.algorithmZlib')}</MenuItem>
-            <MenuItem value="lzma">{t('compressionSettings.algorithmLzma')}</MenuItem>
-            <MenuItem value="auto">{t('compressionSettings.algorithmAuto')}</MenuItem>
+      <div className="flex flex-col gap-4">
+        <div>
+          <Label className="mb-1 block">{t('compressionSettings.algorithmLabel')}</Label>
+          <Select value={algorithm} onValueChange={setAlgorithm} disabled={disabled}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">{t('compressionSettings.algorithmNone')}</SelectItem>
+              <SelectItem value="lz4">{t('compressionSettings.algorithmLz4')}</SelectItem>
+              <SelectItem value="zstd">{t('compressionSettings.algorithmZstd')}</SelectItem>
+              <SelectItem value="zlib">{t('compressionSettings.algorithmZlib')}</SelectItem>
+              <SelectItem value="lzma">{t('compressionSettings.algorithmLzma')}</SelectItem>
+              <SelectItem value="auto">{t('compressionSettings.algorithmAuto')}</SelectItem>
+            </SelectContent>
           </Select>
-        </FormControl>
+        </div>
 
         {algorithm !== 'none' && (
           <>
-            <TextField
-              label={t('compressionSettings.levelLabel')}
-              type="number"
-              value={level}
-              onChange={(e) => setLevel(e.target.value)}
-              placeholder={
-                algorithm === 'zstd'
-                  ? t('compressionSettings.levelPlaceholderZstd')
-                  : algorithm === 'zlib'
-                    ? t('compressionSettings.levelPlaceholderZlib')
-                    : algorithm === 'lzma'
-                      ? t('compressionSettings.levelPlaceholderLzma')
-                      : t('compressionSettings.levelPlaceholderDefault')
-              }
-              helperText={
-                algorithm === 'auto'
-                  ? t('compressionSettings.levelHelperAuto')
-                  : algorithm === 'zstd'
-                    ? t('compressionSettings.levelHelperZstd')
-                    : algorithm === 'zlib'
-                      ? t('compressionSettings.levelHelperZlib')
-                      : algorithm === 'lzma'
-                        ? t('compressionSettings.levelHelperLzma')
-                        : t('compressionSettings.levelHelperDefault')
-              }
-              fullWidth
-              disabled={disabled || algorithm === 'auto'}
-            />
+            <div>
+              <Label className="mb-1 block">{t('compressionSettings.levelLabel')}</Label>
+              <Input
+                type="number"
+                value={level}
+                onChange={(e) => setLevel(e.target.value)}
+                placeholder={
+                  algorithm === 'zstd' ? t('compressionSettings.levelPlaceholderZstd')
+                    : algorithm === 'zlib' ? t('compressionSettings.levelPlaceholderZlib')
+                    : algorithm === 'lzma' ? t('compressionSettings.levelPlaceholderLzma')
+                    : t('compressionSettings.levelPlaceholderDefault')
+                }
+                disabled={disabled || algorithm === 'auto'}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {algorithm === 'auto' ? t('compressionSettings.levelHelperAuto')
+                  : algorithm === 'zstd' ? t('compressionSettings.levelHelperZstd')
+                  : algorithm === 'zlib' ? t('compressionSettings.levelHelperZlib')
+                  : algorithm === 'lzma' ? t('compressionSettings.levelHelperLzma')
+                  : t('compressionSettings.levelHelperDefault')}
+              </p>
+            </div>
 
             {algorithm !== 'auto' && algorithm !== 'obfuscate' && (
-              <>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={autoDetect}
-                      onChange={(e) => setAutoDetect(e.target.checked)}
-                      disabled={disabled}
-                    />
-                  }
-                  label={t('compressionSettings.autoDetect')}
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={autoDetect}
+                  onChange={(e) => setAutoDetect(e.target.checked)}
+                  disabled={disabled}
+                  className="rounded border-border"
                 />
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ mt: -1, mb: 1, display: 'block' }}
-                >
-                  {t('compressionSettings.autoDetectDesc')}
-                </Typography>
-              </>
+                <div>
+                  <span className="text-sm">{t('compressionSettings.autoDetect')}</span>
+                  <p className="text-xs text-muted-foreground">{t('compressionSettings.autoDetectDesc')}</p>
+                </div>
+              </label>
             )}
 
-            <TextField
-              label={t('compressionSettings.obfuscateLabel')}
-              type="number"
-              value={obfuscate}
-              onChange={(e) => setObfuscate(e.target.value)}
-              placeholder={t('compressionSettings.obfuscatePlaceholder')}
-              helperText={
-                obfuscateError
-                  ? t('compressionSettings.obfuscateErrorInvalid')
-                  : t('compressionSettings.obfuscateHelper')
-              }
-              error={obfuscateError}
-              fullWidth
-              disabled={disabled}
-            />
+            <div>
+              <Label className="mb-1 block">{t('compressionSettings.obfuscateLabel')}</Label>
+              <Input
+                type="number"
+                value={obfuscate}
+                onChange={(e) => setObfuscate(e.target.value)}
+                placeholder={t('compressionSettings.obfuscatePlaceholder')}
+                disabled={disabled}
+                className={obfuscateError ? 'border-destructive' : ''}
+              />
+              <p className={`text-xs mt-1 ${obfuscateError ? 'text-destructive' : 'text-muted-foreground'}`}>
+                {obfuscateError ? t('compressionSettings.obfuscateErrorInvalid') : t('compressionSettings.obfuscateHelper')}
+              </p>
+            </div>
 
-            <Alert severity="info" sx={{ mt: 1 }}>
-              {t('compressionSettings.finalSpec')}{' '}
-              <strong>{buildCompressionString(algorithm, level, autoDetect, obfuscate)}</strong>
+            <Alert>
+              <AlertDescription>
+                {t('compressionSettings.finalSpec')}{' '}
+                <strong>{buildCompressionString(algorithm, level, autoDetect, obfuscate)}</strong>
+              </AlertDescription>
             </Alert>
           </>
         )}
-      </Stack>
-    </Box>
+      </div>
+    </div>
   )
 }

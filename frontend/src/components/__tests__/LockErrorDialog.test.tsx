@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, renderWithProviders } from '../../test/test-utils'
 import userEvent from '@testing-library/user-event'
 import LockErrorDialog from '../LockErrorDialog'
 import { repositoriesAPI } from '../../services/api'
@@ -17,6 +17,7 @@ vi.mock('react-hot-toast', () => ({
     success: vi.fn(),
     error: vi.fn(),
   },
+  Toaster: () => null,
 }))
 
 describe('LockErrorDialog', () => {
@@ -49,24 +50,24 @@ describe('LockErrorDialog', () => {
 
   describe('Rendering', () => {
     it('renders dialog title', () => {
-      render(<LockErrorDialog {...defaultProps} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} />)
       expect(screen.getByText('Repository Locked')).toBeInTheDocument()
     })
 
     it('renders repository name in subtitle', () => {
-      render(<LockErrorDialog {...defaultProps} repositoryName="my-backup" />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} repositoryName="my-backup" />)
       expect(screen.getByText(/my-backup/)).toBeInTheDocument()
     })
 
     it('renders warning alert', () => {
-      render(<LockErrorDialog {...defaultProps} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} />)
       expect(
         screen.getByText(/If no backup is currently running, this is likely a stale lock/)
       ).toBeInTheDocument()
     })
 
     it('renders causes list', () => {
-      render(<LockErrorDialog {...defaultProps} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} />)
       expect(screen.getByText('What causes this?')).toBeInTheDocument()
       expect(screen.getByText(/Previous backup was interrupted or crashed/)).toBeInTheDocument()
       expect(screen.getByText(/Network connection dropped during SSH backup/)).toBeInTheDocument()
@@ -75,7 +76,7 @@ describe('LockErrorDialog', () => {
     })
 
     it('renders precautions list', () => {
-      render(<LockErrorDialog {...defaultProps} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} />)
       expect(screen.getByText('Before breaking the lock:')).toBeInTheDocument()
       expect(
         screen.getByText(/Make sure no backup process is currently running/)
@@ -89,17 +90,17 @@ describe('LockErrorDialog', () => {
     })
 
     it('renders Cancel button', () => {
-      render(<LockErrorDialog {...defaultProps} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} />)
       expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
     })
 
     it('renders Break Lock button', () => {
-      render(<LockErrorDialog {...defaultProps} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} />)
       expect(screen.getByRole('button', { name: /Break Lock/ })).toBeInTheDocument()
     })
 
     it('does not render when open is false', () => {
-      render(<LockErrorDialog {...defaultProps} open={false} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} open={false} />)
       expect(screen.queryByText('Repository Locked')).not.toBeInTheDocument()
     })
   })
@@ -107,7 +108,7 @@ describe('LockErrorDialog', () => {
   describe('User interactions', () => {
     it('calls onClose when Cancel is clicked', async () => {
       const user = userEvent.setup()
-      render(<LockErrorDialog {...defaultProps} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} />)
 
       await user.click(screen.getByRole('button', { name: 'Cancel' }))
       expect(mockOnClose).toHaveBeenCalledTimes(1)
@@ -116,7 +117,7 @@ describe('LockErrorDialog', () => {
     it('shows confirmation dialog when Break Lock is clicked', async () => {
       mockConfirm.mockReturnValue(false)
       const user = userEvent.setup()
-      render(<LockErrorDialog {...defaultProps} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} />)
 
       await user.click(screen.getByRole('button', { name: /Break Lock/ }))
       expect(mockConfirm).toHaveBeenCalledWith(
@@ -127,7 +128,7 @@ describe('LockErrorDialog', () => {
     it('does not call API when confirmation is cancelled', async () => {
       mockConfirm.mockReturnValue(false)
       const user = userEvent.setup()
-      render(<LockErrorDialog {...defaultProps} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} />)
 
       await user.click(screen.getByRole('button', { name: /Break Lock/ }))
       expect(repositoriesAPI.breakLock).not.toHaveBeenCalled()
@@ -137,7 +138,7 @@ describe('LockErrorDialog', () => {
       mockConfirm.mockReturnValue(true)
       vi.mocked(repositoriesAPI.breakLock).mockResolvedValue({} as AxiosResponse)
       const user = userEvent.setup()
-      render(<LockErrorDialog {...defaultProps} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} />)
 
       await user.click(screen.getByRole('button', { name: /Break Lock/ }))
 
@@ -150,7 +151,7 @@ describe('LockErrorDialog', () => {
       mockConfirm.mockReturnValue(true)
       vi.mocked(repositoriesAPI.breakLock).mockResolvedValue({} as AxiosResponse)
       const user = userEvent.setup()
-      render(<LockErrorDialog {...defaultProps} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} />)
 
       await user.click(screen.getByRole('button', { name: /Break Lock/ }))
 
@@ -165,7 +166,7 @@ describe('LockErrorDialog', () => {
       mockConfirm.mockReturnValue(true)
       vi.mocked(repositoriesAPI.breakLock).mockResolvedValue({} as AxiosResponse)
       const user = userEvent.setup()
-      render(<LockErrorDialog {...defaultProps} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} />)
 
       await user.click(screen.getByRole('button', { name: /Break Lock/ }))
 
@@ -178,7 +179,7 @@ describe('LockErrorDialog', () => {
       mockConfirm.mockReturnValue(true)
       vi.mocked(repositoriesAPI.breakLock).mockResolvedValue({} as AxiosResponse)
       const user = userEvent.setup()
-      render(<LockErrorDialog {...defaultProps} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} />)
 
       await user.click(screen.getByRole('button', { name: /Break Lock/ }))
 
@@ -193,7 +194,7 @@ describe('LockErrorDialog', () => {
         response: { data: { detail: 'Lock operation failed' } },
       })
       const user = userEvent.setup()
-      render(<LockErrorDialog {...defaultProps} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} />)
 
       await user.click(screen.getByRole('button', { name: /Break Lock/ }))
 
@@ -206,7 +207,7 @@ describe('LockErrorDialog', () => {
       mockConfirm.mockReturnValue(true)
       vi.mocked(repositoriesAPI.breakLock).mockRejectedValue({})
       const user = userEvent.setup()
-      render(<LockErrorDialog {...defaultProps} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} />)
 
       await user.click(screen.getByRole('button', { name: /Break Lock/ }))
 
@@ -222,7 +223,7 @@ describe('LockErrorDialog', () => {
       // Make the API call hang
       vi.mocked(repositoriesAPI.breakLock).mockImplementation(() => new Promise(() => {}))
       const user = userEvent.setup()
-      render(<LockErrorDialog {...defaultProps} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} />)
 
       await user.click(screen.getByRole('button', { name: /Break Lock/ }))
 
@@ -235,7 +236,7 @@ describe('LockErrorDialog', () => {
       mockConfirm.mockReturnValue(true)
       vi.mocked(repositoriesAPI.breakLock).mockImplementation(() => new Promise(() => {}))
       const user = userEvent.setup()
-      render(<LockErrorDialog {...defaultProps} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} />)
 
       await user.click(screen.getByRole('button', { name: /Break Lock/ }))
 
@@ -248,7 +249,7 @@ describe('LockErrorDialog', () => {
       mockConfirm.mockReturnValue(true)
       vi.mocked(repositoriesAPI.breakLock).mockImplementation(() => new Promise(() => {}))
       const user = userEvent.setup()
-      render(<LockErrorDialog {...defaultProps} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} />)
 
       await user.click(screen.getByRole('button', { name: /Break Lock/ }))
 
@@ -263,7 +264,7 @@ describe('LockErrorDialog', () => {
       mockConfirm.mockReturnValue(true)
       vi.mocked(repositoriesAPI.breakLock).mockResolvedValue({} as AxiosResponse)
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <LockErrorDialog
           open={true}
           onClose={mockOnClose}
@@ -285,13 +286,13 @@ describe('LockErrorDialog', () => {
 
   describe('Break-lock permissions', () => {
     it('enables Break Lock button when permission is granted', () => {
-      render(<LockErrorDialog {...defaultProps} canBreakLock={true} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} canBreakLock={true} />)
       const breakLockButton = screen.getByRole('button', { name: /Break Lock/ })
       expect(breakLockButton).not.toBeDisabled()
     })
 
     it('disables Break Lock button when permission is not granted', () => {
-      render(<LockErrorDialog {...defaultProps} canBreakLock={false} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} canBreakLock={false} />)
       const breakLockButton = screen.getByRole('button', { name: /Break Lock/ })
       expect(breakLockButton).toBeDisabled()
     })
@@ -299,25 +300,25 @@ describe('LockErrorDialog', () => {
     it('disables Break Lock button when canBreakLock is undefined (defaults to false)', () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { canBreakLock, ...propsWithoutPermission } = defaultProps
-      render(<LockErrorDialog {...propsWithoutPermission} />)
+      renderWithProviders(<LockErrorDialog {...propsWithoutPermission} />)
       const breakLockButton = screen.getByRole('button', { name: /Break Lock/ })
       expect(breakLockButton).toBeDisabled()
     })
 
     it('shows the warning alert when permission is not granted', () => {
-      render(<LockErrorDialog {...defaultProps} canBreakLock={false} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} canBreakLock={false} />)
       expect(screen.getByText(/Admin privileges required/)).toBeInTheDocument()
       expect(screen.getByText(/Only administrators can break repository locks/)).toBeInTheDocument()
     })
 
     it('does not show the warning alert when permission is granted', () => {
-      render(<LockErrorDialog {...defaultProps} canBreakLock={true} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} canBreakLock={true} />)
       expect(screen.queryByText(/Admin privileges required/)).not.toBeInTheDocument()
     })
 
     it('does not call API when the disabled Break Lock button is clicked', async () => {
       mockConfirm.mockReturnValue(true)
-      render(<LockErrorDialog {...defaultProps} canBreakLock={false} />)
+      renderWithProviders(<LockErrorDialog {...defaultProps} canBreakLock={false} />)
 
       const breakLockButton = screen.getByRole('button', { name: /Break Lock/ })
       expect(breakLockButton).toBeDisabled()

@@ -1,25 +1,8 @@
 import { useState, useImperativeHandle, forwardRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  Box,
-  Typography,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Stack,
-  Skeleton,
-  Alert,
-  Button,
-  InputAdornment,
-  Tooltip,
-  alpha,
-  Select,
-  MenuItem,
-} from '@mui/material'
-import ResponsiveDialog from './ResponsiveDialog'
 import { Shield, Info } from 'lucide-react'
+import ResponsiveDialog from './ResponsiveDialog'
 import { repositoriesAPI } from '../services/api'
 import { BorgApiClient } from '../services/borgApi'
 import RepoSelect from './RepoSelect'
@@ -32,6 +15,19 @@ import BackupJobsTable from './BackupJobsTable'
 import { usePermissions } from '../hooks/usePermissions'
 import type { Repository } from '../types'
 import type { Job } from '../types/jobs'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface ScheduledCheck {
   repository_id: number
@@ -62,29 +58,20 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
   const { canDo } = usePermissions()
   const [showDialog, setShowDialog] = useState(false)
   const [selectedRepositoryId, setSelectedRepositoryId] = useState<number | null>(null)
-  const [formData, setFormData] = useState({
-    cron_expression: '0 2 * * 0', // Default: Weekly on Sunday at 2 AM
-    max_duration: 3600,
-  })
+  const [formData, setFormData] = useState({ cron_expression: '0 2 * * 0', max_duration: 3600 })
   const [historyRepositoryFilter, setHistoryRepositoryFilter] = useState<number | 'all'>('all')
   const [historyStatusFilter, setHistoryStatusFilter] = useState<string | 'all'>('all')
 
-  // Fetch repositories
   const { data: repositoriesData, isLoading: loadingRepositories } = useQuery({
     queryKey: ['repositories'],
     queryFn: repositoriesAPI.getRepositories,
   })
 
   const repositories = repositoriesData?.data?.repositories || []
-  const manageableRepositories = repositories.filter((repo: { id: number }) =>
-    canDo(repo.id, 'maintenance')
-  )
-  const selectedRepository = manageableRepositories.find(
-    (repo: Repository) => repo.id === selectedRepositoryId
-  ) as Repository | undefined
+  const manageableRepositories = repositories.filter((repo: { id: number }) => canDo(repo.id, 'maintenance'))
+  const selectedRepository = manageableRepositories.find((repo: Repository) => repo.id === selectedRepositoryId) as Repository | undefined
   const isSelectedRepoBorg2 = selectedRepository?.borg_version === 2
 
-  // Fetch scheduled checks for all repositories
   const { data: scheduledChecks, isLoading } = useQuery({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     queryKey: ['scheduled-checks', repositories.map((r: any) => r.id)],
@@ -93,12 +80,8 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
       for (const repo of repositories) {
         try {
           const response = await repositoriesAPI.getCheckSchedule(repo.id)
-          if (response.data.enabled) {
-            checks.push(response.data)
-          }
-        } catch {
-          // Skip repos without check schedules
-        }
+          if (response.data.enabled) checks.push(response.data)
+        } catch { /* skip */ }
       }
       return checks
     },
@@ -106,29 +89,22 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
   })
 
   const { data: checkHistoryData, isLoading: loadingCheckHistory } = useQuery({
-    queryKey: [
-      'scheduled-check-history',
-      manageableRepositories.map((repo: Repository) => repo.id),
-    ],
+    queryKey: ['scheduled-check-history', manageableRepositories.map((repo: Repository) => repo.id)],
     queryFn: async () => {
       const jobs: CheckHistoryJob[] = []
       for (const repo of manageableRepositories) {
         try {
           const response = await repositoriesAPI.getRepositoryCheckJobs(repo.id, 10, true)
           const repoJobs = response.data.jobs || []
-          jobs.push(
-            ...repoJobs.map((job: Job & { scheduled_check?: boolean }) => ({
-              ...job,
-              repository_id: repo.id,
-              repository: repo.path,
-              repository_path: repo.path,
-              type: 'check' as const,
-              scheduled_check: Boolean(job.scheduled_check),
-            }))
-          )
-        } catch {
-          // Ignore per-repository history failures
-        }
+          jobs.push(...repoJobs.map((job: Job & { scheduled_check?: boolean }) => ({
+            ...job,
+            repository_id: repo.id,
+            repository: repo.path,
+            repository_path: repo.path,
+            type: 'check' as const,
+            scheduled_check: Boolean(job.scheduled_check),
+          })))
+        } catch { /* skip */ }
       }
       return jobs.sort((a, b) => {
         const aTime = new Date(a.started_at || a.completed_at || 0).getTime()
@@ -142,17 +118,12 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
 
   const checkHistory = checkHistoryData || []
   const filteredCheckHistory = checkHistory.filter((job) => {
-    if (historyRepositoryFilter !== 'all' && job.repository_id !== historyRepositoryFilter) {
-      return false
-    }
-    if (historyStatusFilter !== 'all' && job.status !== historyStatusFilter) {
-      return false
-    }
+    if (historyRepositoryFilter !== 'all' && job.repository_id !== historyRepositoryFilter) return false
+    if (historyStatusFilter !== 'all' && job.status !== historyStatusFilter) return false
     return true
   })
   const historyHasFilters = historyRepositoryFilter !== 'all' || historyStatusFilter !== 'all'
 
-  // Update check schedule mutation
   const updateMutation = useMutation({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mutationFn: async ({ repoId, data }: { repoId: number; data: any }) => {
@@ -167,14 +138,10 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast.error(
-        translateBackendKey(error.response?.data?.detail) ||
-          t('scheduledChecks.toasts.updateFailed')
-      )
+      toast.error(translateBackendKey(error.response?.data?.detail) || t('scheduledChecks.toasts.updateFailed'))
     },
   })
 
-  // Run check now mutation
   const runCheckMutation = useMutation({
     mutationFn: async (repoId: number) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -182,208 +149,102 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
       if (!repo) throw new Error('Repository not found')
       return new BorgApiClient(repo).checkRepository()
     },
-    onSuccess: () => {
-      toast.success(t('scheduledChecks.toasts.checkStarted'))
-    },
+    onSuccess: () => { toast.success(t('scheduledChecks.toasts.checkStarted')) },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast.error(
-        translateBackendKey(error.response?.data?.detail) || t('scheduledChecks.toasts.checkFailed')
-      )
+      toast.error(translateBackendKey(error.response?.data?.detail) || t('scheduledChecks.toasts.checkFailed'))
     },
   })
 
   const openAddDialog = () => {
     setSelectedRepositoryId(null)
-    setFormData({
-      cron_expression: '0 2 * * 0', // Weekly on Sunday at 2 AM
-      max_duration: 3600,
-    })
+    setFormData({ cron_expression: '0 2 * * 0', max_duration: 3600 })
     setShowDialog(true)
   }
 
   const openEditDialog = (check: ScheduledCheck) => {
     setSelectedRepositoryId(check.repository_id)
-    // Convert UTC cron expression to local time for editing
-    const localCron = check.check_cron_expression
-      ? convertCronToLocal(check.check_cron_expression)
-      : '0 2 * * 0'
-    setFormData({
-      cron_expression: localCron,
-      max_duration: check.check_max_duration,
-    })
+    const localCron = check.check_cron_expression ? convertCronToLocal(check.check_cron_expression) : '0 2 * * 0'
+    setFormData({ cron_expression: localCron, max_duration: check.check_max_duration })
     setShowDialog(true)
   }
 
-  // Expose openAddDialog to parent via ref
-  useImperativeHandle(ref, () => ({
-    openAddDialog,
-  }))
+  useImperativeHandle(ref, () => ({ openAddDialog }))
 
   const handleSubmit = () => {
     if (!selectedRepositoryId) {
       toast.error(t('scheduledChecks.validation.selectRepository'))
       return
     }
-
-    // Convert cron expression from local time to UTC before sending to server
     const utcCron = convertCronToUTC(formData.cron_expression)
-
-    updateMutation.mutate({
-      repoId: selectedRepositoryId,
-      data: {
-        ...formData,
-        cron_expression: utcCron,
-      },
-    })
+    updateMutation.mutate({ repoId: selectedRepositoryId, data: { ...formData, cron_expression: utcCron } })
   }
 
   const handleDelete = (check: ScheduledCheck) => {
     if (confirm(t('scheduledChecks.confirmDisable', { repositoryName: check.repository_name }))) {
-      updateMutation.mutate({
-        repoId: check.repository_id,
-        data: { cron_expression: '' },
-      })
+      updateMutation.mutate({ repoId: check.repository_id, data: { cron_expression: '' } })
     }
   }
 
+  const dialogFooter = (
+    <div className="flex justify-end gap-2 px-5 py-3">
+      <Button variant="outline" onClick={() => setShowDialog(false)}>{t('common.buttons.cancel')}</Button>
+      <Button
+        onClick={handleSubmit}
+        disabled={!selectedRepositoryId || updateMutation.isPending}
+      >
+        {selectedRepositoryId ? t('scheduledChecks.update') : t('scheduledChecks.create')}
+      </Button>
+    </div>
+  )
+
   return (
-    <Box>
-      {/* No repositories warning */}
+    <div>
       {!loadingRepositories && manageableRepositories.length === 0 && (
-        <Alert severity="info" sx={{ mb: 3 }}>
-          {t('scheduledChecks.needRepository')}
+        <Alert className="mb-6">
+          <AlertDescription>{t('scheduledChecks.needRepository')}</AlertDescription>
         </Alert>
       )}
 
       {/* Scheduled Checks */}
       {isLoading || loadingRepositories ? (
-        <Stack spacing={2}>
+        <div className="flex flex-col gap-4">
           {[0, 1, 2].map((i) => (
-            <Box
+            <div
               key={i}
-              sx={{
-                borderRadius: 2,
-                bgcolor: 'background.paper',
-                overflow: 'hidden',
-                boxShadow: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? `0 0 0 1px ${alpha('#fff', 0.08)}, 0 4px 16px ${alpha('#000', 0.25)}`
-                    : `0 0 0 1px ${alpha('#000', 0.08)}, 0 2px 8px ${alpha('#000', 0.07)}`,
-                opacity: Math.max(0.4, 1 - i * 0.2),
-              }}
+              className="rounded-lg bg-background overflow-hidden"
+              style={{ boxShadow: '0 0 0 1px rgba(255,255,255,0.08), 0 4px 16px rgba(0,0,0,0.25)', opacity: Math.max(0.4, 1 - i * 0.2) }}
             >
-              <Box
-                sx={{ px: { xs: 1.75, sm: 2 }, pt: { xs: 1.75, sm: 2 }, pb: { xs: 1.5, sm: 1.75 } }}
-              >
-                {/* Title row */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    justifyContent: 'space-between',
-                    gap: 1,
-                    mb: 1.5,
-                  }}
-                >
-                  <Box sx={{ flex: 1 }}>
-                    <Skeleton
-                      variant="text"
-                      width={[150, 190, 130][i]}
-                      height={28}
-                      sx={{ transform: 'none', borderRadius: 0.5 }}
-                    />
-                  </Box>
-                  <Skeleton
-                    variant="rounded"
-                    width={72}
-                    height={20}
-                    sx={{ borderRadius: 1, flexShrink: 0 }}
-                  />
-                </Box>
-
-                {/* Stats grid — 4 columns matching EntityCard */}
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' },
-                    borderRadius: 1.5,
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    overflow: 'hidden',
-                    mb: 1.5,
-                  }}
-                >
+              <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3.5 sm:pb-4">
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <Skeleton className="h-6 rounded" style={{ width: [150, 190, 130][i] }} />
+                  <Skeleton className="h-5 w-18 rounded" />
+                </div>
+                <div className="grid grid-cols-4 rounded-md overflow-hidden mb-3 border border-border">
                   {[0, 1, 2, 3].map((j) => (
-                    <Box
-                      key={j}
-                      sx={{
-                        px: 1.5,
-                        py: 1.1,
-                        borderRight: j < 3 ? '1px solid' : 0,
-                        borderColor: 'divider',
-                      }}
-                    >
-                      <Skeleton
-                        variant="text"
-                        width={38}
-                        height={10}
-                        sx={{ transform: 'none', borderRadius: 0.5, mb: 0.5 }}
-                      />
-                      <Skeleton
-                        variant="text"
-                        width={[58, 48, 54, 44][j]}
-                        height={16}
-                        sx={{ transform: 'none', borderRadius: 0.5 }}
-                      />
-                    </Box>
+                    <div key={j} className="px-3 py-2.5" style={{ borderRight: j < 3 ? '1px solid var(--border)' : 'none' }}>
+                      <Skeleton className="h-2.5 mb-1.5 rounded" style={{ width: 38 }} />
+                      <Skeleton className="h-4 rounded" style={{ width: [58, 48, 54, 44][j] }} />
+                    </div>
                   ))}
-                </Box>
-
-                {/* Actions row */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.5,
-                    pt: 1.25,
-                    borderTop: '1px solid',
-                    borderColor: 'divider',
-                  }}
-                >
-                  <Skeleton variant="rounded" width={32} height={32} sx={{ borderRadius: 1.5 }} />
-                  <Skeleton variant="rounded" width={32} height={32} sx={{ borderRadius: 1.5 }} />
-                  <Skeleton
-                    variant="rounded"
-                    width={88}
-                    height={30}
-                    sx={{ borderRadius: 1, ml: 'auto' }}
-                  />
-                </Box>
-              </Box>
-            </Box>
+                </div>
+                <div className="flex items-center gap-1 pt-3 border-t border-border">
+                  <Skeleton className="w-8 h-8 rounded-md" />
+                  <Skeleton className="w-8 h-8 rounded-md" />
+                  <Skeleton className="w-22 h-7 rounded ml-auto" style={{ width: 88 }} />
+                </div>
+              </div>
+            </div>
           ))}
-        </Stack>
+        </div>
       ) : !scheduledChecks || scheduledChecks.length === 0 ? (
-        <Box
-          sx={{
-            py: 6,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            color: 'text.secondary',
-          }}
-        >
+        <div className="py-12 flex flex-col items-center text-muted-foreground">
           <Shield size={40} style={{ opacity: 0.25, marginBottom: 12 }} />
-          <Typography variant="body1" gutterBottom>
-            {t('scheduledChecks.noScheduledChecks')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('scheduledChecks.noScheduledChecksDesc')}
-          </Typography>
-        </Box>
+          <p className="text-base mb-1">{t('scheduledChecks.noScheduledChecks')}</p>
+          <p className="text-sm text-muted-foreground">{t('scheduledChecks.noScheduledChecksDesc')}</p>
+        </div>
       ) : (
-        <Stack spacing={2}>
+        <div className="flex flex-col gap-4">
           {scheduledChecks.map((check) => (
             <ScheduleCheckCard
               key={check.repository_id}
@@ -394,218 +255,132 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
               onRunNow={() => runCheckMutation.mutate(check.repository_id)}
             />
           ))}
-        </Stack>
+        </div>
       )}
 
       {!loadingRepositories && manageableRepositories.length > 0 && (
-        <Box sx={{ mt: 3 }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent: 'space-between',
-              mb: 2,
-              gap: 1,
-            }}
-          >
-            <Box>
-              <Typography variant="h6" fontWeight={600}>
-                {t('scheduledChecks.historyTitle')}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
+        <div className="mt-6">
+          <div className="flex items-start justify-between mb-4 gap-2">
+            <div>
+              <p className="text-base font-semibold">{t('scheduledChecks.historyTitle')}</p>
+              <p className="text-sm text-muted-foreground">
                 {historyHasFilters
-                  ? t('scheduledChecks.historyShowingFiltered', {
-                      filtered: filteredCheckHistory.length,
-                      total: checkHistory.length,
-                    })
-                  : t('scheduledChecks.historyShowing', {
-                      filtered: filteredCheckHistory.length,
-                      total: checkHistory.length,
-                    })}
-              </Typography>
-            </Box>
-
+                  ? t('scheduledChecks.historyShowingFiltered', { filtered: filteredCheckHistory.length, total: checkHistory.length })
+                  : t('scheduledChecks.historyShowing', { filtered: filteredCheckHistory.length, total: checkHistory.length })}
+              </p>
+            </div>
             {historyHasFilters && (
-              <Button
-                size="small"
-                variant="text"
-                onClick={() => {
-                  setHistoryRepositoryFilter('all')
-                  setHistoryStatusFilter('all')
-                }}
-                sx={{ px: 1, minWidth: 'auto', fontWeight: 700, borderRadius: 2, flexShrink: 0 }}
-              >
+              <Button size="sm" variant="ghost" className="font-bold flex-shrink-0" onClick={() => { setHistoryRepositoryFilter('all'); setHistoryStatusFilter('all') }}>
                 {t('common.clearFilters', { defaultValue: 'Clear filters' })}
               </Button>
             )}
-          </Box>
+          </div>
 
-          <Box sx={{ mb: 2.5, display: 'flex', flexWrap: 'wrap', gap: 1.5, alignItems: 'center' }}>
-            <Select
-              size="small"
-              value={historyRepositoryFilter}
-              displayEmpty
-              onChange={(e) => setHistoryRepositoryFilter(e.target.value as number | 'all')}
-              sx={{ flex: 2, minWidth: { xs: '100%', sm: 220 } }}
-            >
-              <MenuItem value="all">{t('scheduledChecks.allRepositories')}</MenuItem>
-              {manageableRepositories.map((repo: Repository) => (
-                <MenuItem key={repo.id} value={repo.id}>
-                  {repo.name}
-                </MenuItem>
-              ))}
+          <div className="mb-5 flex flex-wrap gap-3">
+            <Select value={String(historyRepositoryFilter)} onValueChange={(v) => setHistoryRepositoryFilter(v === 'all' ? 'all' : Number(v))}>
+              <SelectTrigger className="flex-[2] min-w-[220px] h-9 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('scheduledChecks.allRepositories')}</SelectItem>
+                {manageableRepositories.map((repo: Repository) => (
+                  <SelectItem key={repo.id} value={String(repo.id)}>{repo.name}</SelectItem>
+                ))}
+              </SelectContent>
             </Select>
 
-            <Select
-              size="small"
-              value={historyStatusFilter}
-              displayEmpty
-              onChange={(e) => setHistoryStatusFilter(e.target.value)}
-              sx={{ flex: 1, minWidth: { xs: '100%', sm: 160 } }}
-            >
-              <MenuItem value="all">{t('scheduledChecks.allStatus')}</MenuItem>
-              <MenuItem value="completed">{t('backupHistory.completed')}</MenuItem>
-              <MenuItem value="failed">{t('backupHistory.failed')}</MenuItem>
-              <MenuItem value="cancelled">Cancelled</MenuItem>
-              <MenuItem value="running">Running</MenuItem>
+            <Select value={historyStatusFilter} onValueChange={setHistoryStatusFilter}>
+              <SelectTrigger className="flex-1 min-w-[160px] h-9 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('scheduledChecks.allStatus')}</SelectItem>
+                <SelectItem value="completed">{t('backupHistory.completed')}</SelectItem>
+                <SelectItem value="failed">{t('backupHistory.failed')}</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectItem value="running">Running</SelectItem>
+              </SelectContent>
             </Select>
-          </Box>
+          </div>
 
           <BackupJobsTable
             jobs={filteredCheckHistory}
             repositories={manageableRepositories}
             loading={loadingCheckHistory}
-            actions={{
-              viewLogs: true,
-              viewArchive: false,
-              downloadLogs: true,
-              cancel: true,
-              errorInfo: true,
-              breakLock: false,
-              runNow: false,
-              delete: true,
-            }}
+            actions={{ viewLogs: true, viewArchive: false, downloadLogs: true, cancel: true, errorInfo: true, breakLock: false, runNow: false, delete: true }}
             canDeleteJobs
-            emptyState={{
-              title: t('scheduledChecks.noHistoryTitle'),
-              description: t('scheduledChecks.noHistoryDescription'),
-            }}
+            emptyState={{ title: t('scheduledChecks.noHistoryTitle'), description: t('scheduledChecks.noHistoryDescription') }}
             tableId="scheduled-check-history"
           />
-        </Box>
+        </div>
       )}
 
       {/* Add/Edit Dialog */}
-      <ResponsiveDialog
-        open={showDialog}
-        onClose={() => setShowDialog(false)}
-        maxWidth="sm"
-        fullWidth
-        footer={
-          <DialogActions sx={{ px: 3, pb: 2 }}>
-            <Button onClick={() => setShowDialog(false)}>{t('common.buttons.cancel')}</Button>
-            <Box sx={{ flex: 1 }} />
-            <Button
-              onClick={handleSubmit}
-              variant="contained"
-              disabled={!selectedRepositoryId || updateMutation.isPending}
-            >
-              {selectedRepositoryId ? t('scheduledChecks.update') : t('scheduledChecks.create')}
-            </Button>
-          </DialogActions>
-        }
-      >
-        <DialogTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span>
-              {selectedRepositoryId
-                ? t('scheduledChecks.editCheckSchedule')
-                : t('scheduledChecks.addCheckSchedule')}
-            </span>
-            <Tooltip title={t('scheduledChecks.notificationHint')} arrow placement="left">
-              <Box
-                component="span"
-                tabIndex={0}
-                aria-label={t('scheduledChecks.notificationHint')}
-                sx={{
-                  display: 'inline-flex',
-                  cursor: 'help',
-                  color: 'text.disabled',
-                  '&:hover': { color: 'text.secondary' },
-                  '&:focus-visible': {
-                    outline: '2px solid',
-                    outlineColor: 'primary.main',
-                    borderRadius: 0.5,
-                  },
-                }}
-              >
+      <ResponsiveDialog open={showDialog} onClose={() => setShowDialog(false)} maxWidth="sm" fullWidth footer={dialogFooter}>
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 pt-5 pb-3">
+          <p className="text-base font-semibold">
+            {selectedRepositoryId ? t('scheduledChecks.editCheckSchedule') : t('scheduledChecks.addCheckSchedule')}
+          </p>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button type="button" aria-label={t('scheduledChecks.notificationHint')} className="text-muted-foreground hover:text-foreground">
                 <Info size={16} />
-              </Box>
-            </Tooltip>
-          </Box>
-        </DialogTitle>
-        <DialogContent>
-          <Stack spacing={3} sx={{ mt: 1 }}>
-            <RepoSelect
-              repositories={manageableRepositories}
-              value={selectedRepositoryId || ''}
-              onChange={(v) => setSelectedRepositoryId(v ? Number(v) : null)}
-              loading={loadingRepositories}
-              valueKey="id"
-              label={t('scheduledChecks.repository')}
-              disabled={manageableRepositories.length === 0}
-            />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="left">{t('scheduledChecks.notificationHint')}</TooltipContent>
+          </Tooltip>
+        </div>
 
-            <TextField
-              label={t('scheduledChecks.checkScheduleLabel')}
-              value={formData.cron_expression}
-              onChange={(e) => setFormData({ ...formData, cron_expression: e.target.value })}
-              required
-              fullWidth
-              size="medium"
-              placeholder="0 2 * * 0"
-              InputProps={{
-                sx: {
-                  fontFamily: 'monospace',
-                  fontSize: '1.1rem',
-                  letterSpacing: '0.1em',
-                },
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <CronBuilderDialog
-                      value={formData.cron_expression}
-                      onChange={(localCron) =>
-                        setFormData({ ...formData, cron_expression: localCron })
-                      }
-                      label={t('scheduledChecks.checkScheduleLabel')}
-                      helperText={t('scheduledChecks.checkScheduleHelperText')}
-                      dialogTitle={t('scheduledChecks.checkScheduleBuilderTitle')}
-                    />
-                  </InputAdornment>
-                ),
-              }}
-              InputLabelProps={{
-                sx: { fontSize: '1.1rem' },
-              }}
-            />
+        {/* Body */}
+        <div className="px-5 pb-4 flex flex-col gap-4">
+          <RepoSelect
+            repositories={manageableRepositories}
+            value={selectedRepositoryId || ''}
+            onChange={(v) => setSelectedRepositoryId(v ? Number(v) : null)}
+            loading={loadingRepositories}
+            valueKey="id"
+            label={t('scheduledChecks.repository')}
+            disabled={manageableRepositories.length === 0}
+          />
 
-            <TextField
-              label={t('scheduledChecks.maxDuration')}
+          <div>
+            <Label className="mb-1 block">{t('scheduledChecks.checkScheduleLabel')}</Label>
+            <div className="relative">
+              <Input
+                value={formData.cron_expression}
+                onChange={(e) => setFormData({ ...formData, cron_expression: e.target.value })}
+                required
+                placeholder="0 2 * * 0"
+                className="pr-10 font-mono text-lg tracking-widest"
+              />
+              <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                <CronBuilderDialog
+                  value={formData.cron_expression}
+                  onChange={(localCron) => setFormData({ ...formData, cron_expression: localCron })}
+                  label={t('scheduledChecks.checkScheduleLabel')}
+                  helperText={t('scheduledChecks.checkScheduleHelperText')}
+                  dialogTitle={t('scheduledChecks.checkScheduleBuilderTitle')}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <Label className="mb-1 block">{t('scheduledChecks.maxDuration')}</Label>
+            <Input
               type="number"
               value={formData.max_duration}
               onChange={(e) => setFormData({ ...formData, max_duration: Number(e.target.value) })}
-              helperText={
-                isSelectedRepoBorg2
-                  ? t('scheduledChecks.maxDurationHintBorg2')
-                  : t('scheduledChecks.maxDurationHint')
-              }
-              fullWidth
-              inputProps={{ min: 60 }}
+              min={60}
             />
-          </Stack>
-        </DialogContent>
+            <p className="text-xs text-muted-foreground mt-1">
+              {isSelectedRepoBorg2 ? t('scheduledChecks.maxDurationHintBorg2') : t('scheduledChecks.maxDurationHint')}
+            </p>
+          </div>
+        </div>
       </ResponsiveDialog>
-    </Box>
+    </div>
   )
 })
 

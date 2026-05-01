@@ -91,7 +91,7 @@ function ScriptSection({
             <FileCode size={16} className="flex-shrink-0 text-muted-foreground" />
             <span>{inlineScriptLabel}</span>
             {inlineScript && (
-              <span className="ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-500/10 text-green-700 dark:text-green-400 border border-green-500/30">
+              <span className="ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
                 {configuredLabel}
               </span>
             )}

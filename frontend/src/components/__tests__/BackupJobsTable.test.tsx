@@ -156,7 +156,7 @@ describe('BackupJobsTable', () => {
     it('shows loading state', () => {
       const { container } = renderWithProviders(<BackupJobsTable jobs={mockJobs} loading={true} />)
 
-      expect(container.querySelectorAll('.MuiSkeleton-root').length).toBeGreaterThan(0)
+      expect(container.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(0)
       expect(screen.queryByText('#1')).not.toBeInTheDocument()
     })
   })

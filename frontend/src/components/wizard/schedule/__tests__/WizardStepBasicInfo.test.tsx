@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
+import { screen, fireEvent, renderWithProviders } from '../../../../test/test-utils'
 import WizardStepBasicInfo from '../WizardStepBasicInfo'
 
 describe('WizardStepBasicInfo', () => {
@@ -22,7 +22,7 @@ describe('WizardStepBasicInfo', () => {
   }
 
   it('renders name input field', () => {
-    render(<WizardStepBasicInfo {...defaultProps} />)
+    renderWithProviders(<WizardStepBasicInfo {...defaultProps} />)
 
     const nameInput = screen.getByLabelText(/Job Name/i)
     expect(nameInput).toBeInTheDocument()
@@ -30,7 +30,7 @@ describe('WizardStepBasicInfo', () => {
   })
 
   it('renders description textarea', () => {
-    render(<WizardStepBasicInfo {...defaultProps} />)
+    renderWithProviders(<WizardStepBasicInfo {...defaultProps} />)
 
     const descriptionInput = screen.getByLabelText(/Description/i)
     expect(descriptionInput).toBeInTheDocument()
@@ -38,14 +38,14 @@ describe('WizardStepBasicInfo', () => {
   })
 
   it('renders MultiRepositorySelector', () => {
-    render(<WizardStepBasicInfo {...defaultProps} />)
+    renderWithProviders(<WizardStepBasicInfo {...defaultProps} />)
 
     expect(screen.getByText(/Use arrows to change backup order/i)).toBeInTheDocument()
   })
 
   it('calls onChange when name changes', () => {
     const onChange = vi.fn()
-    render(<WizardStepBasicInfo {...defaultProps} onChange={onChange} />)
+    renderWithProviders(<WizardStepBasicInfo {...defaultProps} onChange={onChange} />)
 
     const nameInput = screen.getByLabelText(/Job Name/i)
     fireEvent.change(nameInput, { target: { value: 'Daily Backup' } })
@@ -55,7 +55,7 @@ describe('WizardStepBasicInfo', () => {
 
   it('calls onChange when description changes', () => {
     const onChange = vi.fn()
-    render(<WizardStepBasicInfo {...defaultProps} onChange={onChange} />)
+    renderWithProviders(<WizardStepBasicInfo {...defaultProps} onChange={onChange} />)
 
     const descriptionInput = screen.getByLabelText(/Description/i)
     fireEvent.change(descriptionInput, { target: { value: 'Backup all servers daily' } })
@@ -64,7 +64,7 @@ describe('WizardStepBasicInfo', () => {
   })
 
   it('displays warning when no repositories are selected', () => {
-    render(<WizardStepBasicInfo {...defaultProps} data={defaultData} />)
+    renderWithProviders(<WizardStepBasicInfo {...defaultProps} data={defaultData} />)
 
     expect(screen.getByText(/Select at least one repository to continue/i)).toBeInTheDocument()
   })
@@ -75,7 +75,7 @@ describe('WizardStepBasicInfo', () => {
       repositoryIds: [1, 2],
     }
 
-    render(<WizardStepBasicInfo {...defaultProps} data={dataWithRepos} />)
+    renderWithProviders(<WizardStepBasicInfo {...defaultProps} data={dataWithRepos} />)
 
     expect(
       screen.queryByText(/Select at least one repository to continue/i)
@@ -88,7 +88,7 @@ describe('WizardStepBasicInfo', () => {
       name: 'Weekly Backup',
     }
 
-    render(<WizardStepBasicInfo {...defaultProps} data={dataWithName} />)
+    renderWithProviders(<WizardStepBasicInfo {...defaultProps} data={dataWithName} />)
 
     const nameInput = screen.getByLabelText(/Job Name/i) as HTMLInputElement
     expect(nameInput.value).toBe('Weekly Backup')
@@ -100,26 +100,26 @@ describe('WizardStepBasicInfo', () => {
       description: 'Run backup every week',
     }
 
-    render(<WizardStepBasicInfo {...defaultProps} data={dataWithDescription} />)
+    renderWithProviders(<WizardStepBasicInfo {...defaultProps} data={dataWithDescription} />)
 
     const descriptionInput = screen.getByLabelText(/Description/i) as HTMLTextAreaElement
     expect(descriptionInput.value).toBe('Run backup every week')
   })
 
   it('displays placeholder text for name input', () => {
-    render(<WizardStepBasicInfo {...defaultProps} />)
+    renderWithProviders(<WizardStepBasicInfo {...defaultProps} />)
 
     expect(screen.getByPlaceholderText(/Daily backup/i)).toBeInTheDocument()
   })
 
   it('displays placeholder text for description input', () => {
-    render(<WizardStepBasicInfo {...defaultProps} />)
+    renderWithProviders(<WizardStepBasicInfo {...defaultProps} />)
 
     expect(screen.getByPlaceholderText(/Optional description/i)).toBeInTheDocument()
   })
 
   it('displays helper text for repositories selector', () => {
-    render(<WizardStepBasicInfo {...defaultProps} />)
+    renderWithProviders(<WizardStepBasicInfo {...defaultProps} />)
 
     expect(screen.getByText(/Use arrows to change backup order/i)).toBeInTheDocument()
   })
@@ -131,7 +131,7 @@ describe('WizardStepBasicInfo', () => {
       name: 'Test',
     }
 
-    render(<WizardStepBasicInfo {...defaultProps} data={dataWithName} onChange={onChange} />)
+    renderWithProviders(<WizardStepBasicInfo {...defaultProps} data={dataWithName} onChange={onChange} />)
 
     const nameInput = screen.getByPlaceholderText(/Daily backup/i) as HTMLInputElement
     expect(nameInput.value).toBe('Test')
@@ -148,7 +148,7 @@ describe('WizardStepBasicInfo', () => {
       description: 'Test description',
     }
 
-    render(<WizardStepBasicInfo {...defaultProps} data={dataWithDescription} onChange={onChange} />)
+    renderWithProviders(<WizardStepBasicInfo {...defaultProps} data={dataWithDescription} onChange={onChange} />)
 
     const descriptionInput = screen.getByPlaceholderText(
       /Optional description/i
@@ -161,14 +161,14 @@ describe('WizardStepBasicInfo', () => {
   })
 
   it('applies medium size to inputs by default', () => {
-    render(<WizardStepBasicInfo {...defaultProps} />)
+    renderWithProviders(<WizardStepBasicInfo {...defaultProps} />)
 
     const nameInput = screen.getByLabelText(/Job Name/i)
     expect(nameInput).toBeInTheDocument()
   })
 
   it('renders with empty repositories list', () => {
-    render(<WizardStepBasicInfo {...defaultProps} repositories={[]} />)
+    renderWithProviders(<WizardStepBasicInfo {...defaultProps} repositories={[]} />)
 
     const inputs = screen.getAllByRole('textbox')
     expect(inputs.length).toBeGreaterThan(0)
@@ -177,7 +177,7 @@ describe('WizardStepBasicInfo', () => {
 
   it('handles multiple onChange calls correctly', () => {
     const onChange = vi.fn()
-    render(<WizardStepBasicInfo {...defaultProps} onChange={onChange} />)
+    renderWithProviders(<WizardStepBasicInfo {...defaultProps} onChange={onChange} />)
 
     const nameInput = screen.getByLabelText(/Job Name/i)
     fireEvent.change(nameInput, { target: { value: 'First Name' } })

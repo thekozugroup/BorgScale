@@ -1,16 +1,10 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Stack,
-  TextField,
-  Typography,
-  useTheme,
-} from '@mui/material'
-import { User, Building2, Pencil, ShieldCheck, KeyRound, Calendar, Fingerprint } from 'lucide-react'
+import { User, Building2, Pencil, ShieldCheck, KeyRound, Calendar, Fingerprint, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import AccountSecuritySection from './AccountSecuritySection'
 import { formatDateShort } from '../utils/dateUtils'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 export interface AccountProfileFormData {
   username: string
@@ -60,496 +54,195 @@ export default function AccountProfileSection({
   passkeyCount,
 }: AccountProfileSectionProps) {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
 
-  // Theme-aware surface tokens
-  const subtleBorder = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.09)'
-  const subtleBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'
-  const cardBorder = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.09)'
-  const cardBorderHover = isDark ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.16)'
-  const cardGradient = isDark
-    ? 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)'
-    : 'linear-gradient(135deg, rgba(0,0,0,0.015) 0%, rgba(0,0,0,0.005) 100%)'
-  const cardHoverGradient = isDark
-    ? 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.03) 100%)'
-    : 'linear-gradient(135deg, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0.015) 100%)'
-  const iconBoxGradient = isDark
-    ? 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.03) 100%)'
-    : 'linear-gradient(135deg, rgba(0,0,0,0.04) 0%, rgba(0,0,0,0.02) 100%)'
-  const iconBoxBorder = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'
-
-  // Badge color schemes
-  const roleBadge = isAdmin
-    ? {
-        bg: 'rgba(168,85,247,0.12)',
-        border: 'rgba(168,85,247,0.28)',
-        text: 'rgb(192,132,252)',
-        icon: ShieldCheck,
-      }
-    : isOperator
-      ? {
-          bg: 'rgba(14,165,233,0.12)',
-          border: 'rgba(14,165,233,0.28)',
-          text: 'rgb(56,189,248)',
-          icon: KeyRound,
-        }
-      : {
-          bg: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
-          border: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)',
-          text: isDark ? 'rgb(161,161,170)' : 'rgb(113,113,122)',
-          icon: User,
-        }
-
-  const RoleIcon = roleBadge.icon
+  const RoleIcon = isAdmin ? ShieldCheck : isOperator ? KeyRound : User
 
   return (
-    <Stack spacing={3.5}>
+    <div className="flex flex-col gap-7">
       {/* ── Info banner ── */}
-      <Box
-        sx={{
-          px: { xs: 2, md: 3 },
-          py: { xs: 2.25, md: 2.75 },
-          borderRadius: 3,
-          border: '1px solid',
-          borderColor: 'rgba(14,165,233,0.18)',
-          background:
-            'linear-gradient(135deg, rgba(2,132,199,0.12) 0%, rgba(8,47,73,0.06) 55%, rgba(255,255,255,0.02) 100%)',
-        }}
-      >
-        <Stack spacing={2.5}>
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            justifyContent="space-between"
-            alignItems={{ xs: 'flex-start', sm: 'center' }}
-            gap={1.5}
-          >
-            <Stack direction="row" spacing={1.25} alignItems="center">
-              <Box
-                sx={{
-                  width: 34,
-                  height: 34,
-                  borderRadius: 1.75,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  bgcolor: 'rgba(14,165,233,0.14)',
-                  border: '1px solid rgba(14,165,233,0.24)',
-                }}
-              >
+      <div className="px-4 md:px-6 py-5 md:py-6 rounded-2xl border border-border bg-muted/20">
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-muted border border-border">
                 <User size={16} />
-              </Box>
-              <Box>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    display: 'block',
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    color: 'info.light',
-                    mb: 0.35,
-                  }}
-                >
+              </div>
+              <div>
+                <p className="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-0.5 text-muted-foreground">
                   {t('settings.account.profile.title')}
-                </Typography>
-                <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1.1 }}>
+                </p>
+                <p className="text-lg font-bold leading-tight">
                   {profileForm.full_name || profileForm.username}
-                </Typography>
-              </Box>
-            </Stack>
+                </p>
+              </div>
+            </div>
 
-            {/* ── Role & status badges ── */}
-            <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
+            {/* ── Badges ── */}
+            <div className="flex flex-wrap gap-1.5">
               {/* Role badge */}
-              <Box
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 0.6,
-                  px: 1.25,
-                  py: 0.5,
-                  borderRadius: 10,
-                  bgcolor: roleBadge.bg,
-                  border: '1px solid',
-                  borderColor: roleBadge.border,
-                }}
-              >
-                <RoleIcon size={12} style={{ color: roleBadge.text }} />
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontWeight: 700,
-                    color: roleBadge.text,
-                    lineHeight: 1,
-                    letterSpacing: '0.02em',
-                  }}
-                >
-                  {roleLabel}
-                </Typography>
-              </Box>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border border-border bg-muted text-foreground">
+                <RoleIcon size={12} />
+                {roleLabel}
+              </span>
 
-              {/* TOTP badge */}
               {totpEnabled && (
-                <Box
-                  sx={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 0.6,
-                    px: 1.25,
-                    py: 0.5,
-                    borderRadius: 10,
-                    bgcolor: 'rgba(34,197,94,0.10)',
-                    border: '1px solid rgba(34,197,94,0.24)',
-                  }}
-                >
-                  <ShieldCheck size={12} style={{ color: 'rgb(74,222,128)' }} />
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      fontWeight: 700,
-                      color: 'rgb(74,222,128)',
-                      lineHeight: 1,
-                      letterSpacing: '0.02em',
-                    }}
-                  >
-                    {t('settings.account.profile.badges.totpActive')}
-                  </Typography>
-                </Box>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border border-border bg-primary/10 text-foreground">
+                  <ShieldCheck size={12} />
+                  {t('settings.account.profile.badges.totpActive')}
+                </span>
               )}
 
-              {/* Passkey badge */}
               {passkeyCount > 0 && (
-                <Box
-                  sx={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 0.6,
-                    px: 1.25,
-                    py: 0.5,
-                    borderRadius: 10,
-                    bgcolor: 'rgba(251,191,36,0.10)',
-                    border: '1px solid rgba(251,191,36,0.24)',
-                  }}
-                >
-                  <Fingerprint size={12} style={{ color: 'rgb(252,211,77)' }} />
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      fontWeight: 700,
-                      color: 'rgb(252,211,77)',
-                      lineHeight: 1,
-                      letterSpacing: '0.02em',
-                    }}
-                  >
-                    {t('settings.account.profile.badges.passkeyActive', { count: passkeyCount })}
-                  </Typography>
-                </Box>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border border-border bg-muted text-foreground">
+                  <Fingerprint size={12} />
+                  {t('settings.account.profile.badges.passkeyActive', { count: passkeyCount })}
+                </span>
               )}
 
-              {/* Member since badge */}
               {createdAt && (
-                <Box
-                  sx={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 0.6,
-                    px: 1.25,
-                    py: 0.5,
-                    borderRadius: 10,
-                    bgcolor: subtleBg,
-                    border: '1px solid',
-                    borderColor: subtleBorder,
-                  }}
-                >
-                  <Calendar size={12} style={{ color: 'rgb(161,161,170)', opacity: 0.8 }} />
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      fontWeight: 600,
-                      color: 'text.secondary',
-                      lineHeight: 1,
-                      letterSpacing: '0.02em',
-                    }}
-                  >
-                    {t('settings.account.profile.badges.memberSince', {
-                      date: formatDateShort(createdAt),
-                    })}
-                  </Typography>
-                </Box>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-muted-foreground border border-border bg-muted/40">
+                  <Calendar size={12} style={{ opacity: 0.8 }} />
+                  {t('settings.account.profile.badges.memberSince', { date: formatDateShort(createdAt) })}
+                </span>
               )}
-            </Stack>
-          </Stack>
+            </div>
+          </div>
 
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ maxWidth: 720, fontSize: { md: '0.95rem' } }}
-          >
+          <p className="text-sm md:text-[0.95rem] text-muted-foreground max-w-2xl">
             {t('settings.account.profile.description')}
-          </Typography>
+          </p>
 
-          {/* Highlights */}
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' },
-              gap: 1.5,
-            }}
-          >
+          {/* Highlights grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {[
-              {
-                label: t('settings.users.fields.username'),
-                value: profileForm.username || '—',
-              },
-              {
-                label: t('settings.users.fields.email'),
-                value: profileForm.email || '—',
-              },
-              {
-                label: t('settings.users.fields.fullName'),
-                value: profileForm.full_name || '—',
-              },
+              { label: t('settings.users.fields.username'), value: profileForm.username || '—' },
+              { label: t('settings.users.fields.email'), value: profileForm.email || '—' },
+              { label: t('settings.users.fields.fullName'), value: profileForm.full_name || '—' },
             ].map((item) => (
-              <Box
+              <div
                 key={item.label}
-                sx={{
-                  p: 1.75,
-                  borderRadius: 2.5,
-                  border: '1px solid',
-                  borderColor: subtleBorder,
-                  bgcolor: subtleBg,
-                }}
+                className="p-3.5 rounded-2xl border border-border bg-muted/30"
               >
-                <Typography
-                  variant="caption"
-                  sx={{
-                    display: 'block',
-                    mb: 0.75,
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.06em',
-                    color: 'text.secondary',
-                  }}
-                >
+                <p className="text-[0.65rem] font-bold uppercase tracking-[0.06em] text-muted-foreground mb-1.5">
                   {item.label}
-                </Typography>
-                <Typography variant="subtitle2" fontWeight={700} noWrap>
-                  {item.value}
-                </Typography>
-              </Box>
+                </p>
+                <p className="text-sm font-bold truncate">{item.value}</p>
+              </div>
             ))}
-          </Box>
-        </Stack>
-      </Box>
+          </div>
+        </div>
+      </div>
 
       {/* ── Two-column grid: Edit Profile card + Password card ── */}
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', xl: 'repeat(2, minmax(0, 1fr))' },
-          gap: 3,
-          alignItems: 'start',
-        }}
-      >
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
         {/* Edit profile — clickable card */}
-        <Box>
-          <Box
+        <div>
+          <button
+            type="button"
             onClick={onOpenEditProfile}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault()
-                onOpenEditProfile()
-              }
-            }}
-            role="button"
-            tabIndex={0}
             aria-label={t('settings.account.editProfile')}
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 2,
-              px: 2.5,
-              py: 2,
-              borderRadius: 2.5,
-              cursor: 'pointer',
-              border: '1px solid',
-              borderColor: cardBorder,
-              background: cardGradient,
-              transition: 'border-color 180ms ease, background 180ms ease',
-              '&:hover': {
-                borderColor: cardBorderHover,
-                background: cardHoverGradient,
-              },
-            }}
+            className="w-full flex items-center justify-between gap-4 px-5 py-4 rounded-2xl cursor-pointer transition-all duration-150 border border-border hover:border-border/80 hover:bg-muted/20"
           >
-            <Stack direction="row" spacing={2} alignItems="center" sx={{ minWidth: 0 }}>
-              <Box
-                sx={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: 1.5,
-                  flexShrink: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: iconBoxGradient,
-                  border: '1px solid',
-                  borderColor: iconBoxBorder,
-                }}
-              >
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center border border-border bg-muted/30">
                 <Pencil size={16} style={{ opacity: 0.45 }} />
-              </Box>
-              <Box sx={{ minWidth: 0 }}>
-                <Typography variant="body2" fontWeight={600} noWrap>
-                  {t('settings.account.editProfile')}
-                </Typography>
-                <Typography variant="caption" color="text.secondary" noWrap>
+              </div>
+              <div className="min-w-0 text-left">
+                <p className="text-sm font-semibold truncate">{t('settings.account.editProfile')}</p>
+                <p className="text-xs text-muted-foreground truncate">
                   {profileForm.username} · {profileForm.email}
-                </Typography>
-              </Box>
-            </Stack>
-            <Box
-              sx={{
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                color: 'text.secondary',
-                flexShrink: 0,
-              }}
-            >
-              →
-            </Box>
-          </Box>
-        </Box>
+                </p>
+              </div>
+            </div>
+            <span className="text-sm font-semibold text-muted-foreground flex-shrink-0">→</span>
+          </button>
+        </div>
 
         {/* Password section */}
-        <Box>
+        <div>
           <AccountSecuritySection onOpenChangePassword={onOpenChangePassword} />
-        </Box>
-      </Box>
+        </div>
+      </div>
 
       {/* ── Deployment profile (admin only) ── */}
       {canManageSystem && (
-        <Box>
-          <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-            {t('settings.account.profile.deployment.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {t('settings.account.profile.deployment.description')}
-          </Typography>
+        <div>
+          <p className="text-sm font-bold mb-1">{t('settings.account.profile.deployment.title')}</p>
+          <p className="text-sm text-muted-foreground mb-4">{t('settings.account.profile.deployment.description')}</p>
 
-          <Box
-            sx={{
-              p: 2.5,
-              borderRadius: 2.5,
-              border: '1px solid',
-              borderColor: 'divider',
-              background: cardGradient,
-            }}
+          <div
+            className="p-5 rounded-2xl border border-border"
           >
-            <Stack spacing={2.5}>
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' },
-                  gap: 1.5,
-                }}
-              >
-                {(
-                  [
-                    {
-                      key: 'individual',
-                      title: t('settings.account.profile.deployment.individual'),
-                      body: t('settings.account.profile.deployment.individualDesc'),
-                      icon: <User size={16} />,
-                    },
-                    {
-                      key: 'enterprise',
-                      title: t('settings.account.profile.deployment.enterprise'),
-                      body: t('settings.account.profile.deployment.enterpriseDesc'),
-                      icon: <Building2 size={16} />,
-                    },
-                  ] as const
-                ).map((option) => {
+            <div className="flex flex-col gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {([
+                  {
+                    key: 'individual',
+                    title: t('settings.account.profile.deployment.individual'),
+                    body: t('settings.account.profile.deployment.individualDesc'),
+                    icon: <User size={16} />,
+                  },
+                  {
+                    key: 'enterprise',
+                    title: t('settings.account.profile.deployment.enterprise'),
+                    body: t('settings.account.profile.deployment.enterpriseDesc'),
+                    icon: <Building2 size={16} />,
+                  },
+                ] as const).map((option) => {
                   const isSelected = deploymentForm.deployment_type === option.key
                   return (
-                    <Box
+                    <button
+                      type="button"
                       key={option.key}
                       onClick={() => onDeploymentFormChange({ deployment_type: option.key })}
-                      sx={{
-                        p: 2,
-                        border: '1px solid',
-                        borderColor: isSelected ? 'rgba(14,165,233,0.35)' : cardBorder,
-                        borderRadius: 2.5,
-                        cursor: 'pointer',
-                        background: isSelected
-                          ? 'linear-gradient(135deg, rgba(2,132,199,0.1) 0%, rgba(8,47,73,0.05) 100%)'
-                          : cardGradient,
-                        transition: 'border-color 180ms ease, background 180ms ease',
-                        '&:hover': {
-                          borderColor: isSelected ? 'rgba(14,165,233,0.5)' : cardBorderHover,
-                        },
-                      }}
+                      className={`p-4 rounded-2xl text-left transition-all duration-150 border ${isSelected ? 'border-border bg-primary/5' : 'border-border'}`}
                     >
-                      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1 }}>
-                        <Box
-                          sx={{
-                            width: 30,
-                            height: 30,
-                            borderRadius: 1.5,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            bgcolor: isSelected ? 'rgba(14,165,233,0.14)' : subtleBg,
-                            border: '1px solid',
-                            borderColor: isSelected ? 'rgba(14,165,233,0.24)' : subtleBorder,
-                          }}
-                        >
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center border border-border ${isSelected ? 'bg-primary/10' : 'bg-muted/30'}`}>
                           {option.icon}
-                        </Box>
-                        <Typography variant="subtitle2" fontWeight={700}>
-                          {option.title}
-                        </Typography>
-                      </Stack>
-                      <Typography variant="body2" color="text.secondary" sx={{ pl: '42px' }}>
-                        {option.body}
-                      </Typography>
-                    </Box>
+                        </div>
+                        <p className="text-sm font-bold">{option.title}</p>
+                      </div>
+                      <p className="text-sm text-muted-foreground pl-11">{option.body}</p>
+                    </button>
                   )
                 })}
-              </Box>
+              </div>
 
               {deploymentForm.deployment_type === 'enterprise' && (
-                <TextField
-                  label={t('settings.account.profile.deployment.orgName')}
-                  value={deploymentForm.enterprise_name}
-                  onChange={(e) => onDeploymentFormChange({ enterprise_name: e.target.value })}
-                  fullWidth
-                  size="small"
-                />
+                <div>
+                  <Label htmlFor="deployment-org-name" className="text-xs font-semibold mb-1.5 block">
+                    {t('settings.account.profile.deployment.orgName')}
+                  </Label>
+                  <Input
+                    id="deployment-org-name"
+                    value={deploymentForm.enterprise_name}
+                    onChange={(e) => onDeploymentFormChange({ enterprise_name: e.target.value })}
+                    className="h-9 text-sm"
+                  />
+                </div>
               )}
 
-              <Box>
+              <div>
                 <Button
-                  variant="contained"
                   disabled={
                     isSavingDeployment ||
                     (deploymentForm.deployment_type === 'enterprise' &&
                       !deploymentForm.enterprise_name.trim())
                   }
-                  startIcon={isSavingDeployment ? <CircularProgress size={14} /> : null}
+                  className="gap-1.5"
                   onClick={onSaveDeployment}
                 >
+                  {isSavingDeployment && <Loader2 size={14} className="animate-spin" />}
                   {isSavingDeployment
                     ? t('settings.account.profile.saving')
                     : t('settings.account.profile.deployment.saveButton')}
                 </Button>
-              </Box>
-            </Stack>
-          </Box>
-        </Box>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
-    </Stack>
+    </div>
   )
 }

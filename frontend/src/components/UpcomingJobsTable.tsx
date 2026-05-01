@@ -1,11 +1,9 @@
 import React from 'react'
-import { Box, Typography, Stack, useTheme, alpha, Tooltip } from '@mui/material'
 import { Clock } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatDate, formatRelativeTime } from '../utils/dateUtils'
 import { Repository } from '../types'
-
-const ACCENT = '#059669'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface UpcomingJob {
   id: number
@@ -31,12 +29,8 @@ const UpcomingJobsTable: React.FC<UpcomingJobsTableProps> = ({
   getRepositoryName,
 }) => {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
 
-  if (upcomingJobs.length === 0) {
-    return null
-  }
+  if (upcomingJobs.length === 0) return null
 
   const getRepoLabel = (job: UpcomingJob): string => {
     if (job.repository_ids && job.repository_ids.length > 0) {
@@ -49,118 +43,43 @@ const UpcomingJobsTable: React.FC<UpcomingJobsTableProps> = ({
   }
 
   return (
-    <Box sx={{ mb: 3 }}>
+    <div className="mb-6">
       {/* Section label */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-        <Box
-          sx={{
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            bgcolor: ACCENT,
-            boxShadow: `0 0 6px ${alpha(ACCENT, 0.7)}`,
-            flexShrink: 0,
-          }}
-        />
-        <Typography
-          variant="caption"
-          sx={{
-            fontWeight: 700,
-            fontSize: '0.68rem',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: 'text.secondary',
-          }}
-        >
+      <div className="flex items-center gap-2 mb-3">
+        <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-primary" />
+        <span className="text-[0.68rem] font-bold uppercase tracking-[0.08em] text-muted-foreground">
           {t('upcomingJobs.title')}
-        </Typography>
-      </Box>
+        </span>
+      </div>
 
-      {/* Job rows */}
-      <Stack spacing={1}>
+      <div className="flex flex-col gap-2">
         {upcomingJobs.slice(0, 5).map((job) => (
-          <Tooltip key={job.id} title={formatDate(job.next_run)} placement="top" arrow>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2,
-                px: 2,
-                py: 1.5,
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: alpha(ACCENT, isDark ? 0.2 : 0.15),
-                bgcolor: alpha(ACCENT, isDark ? 0.06 : 0.03),
-                transition: 'border-color 0.15s, box-shadow 0.15s',
-                '&:hover': {
-                  borderColor: alpha(ACCENT, isDark ? 0.38 : 0.28),
-                  boxShadow: `0 2px 14px ${alpha(ACCENT, 0.1)}`,
-                },
-              }}
-            >
-              {/* Left accent bar */}
-              <Box
-                sx={{
-                  width: 3,
-                  height: 32,
-                  borderRadius: 4,
-                  bgcolor: ACCENT,
-                  flexShrink: 0,
-                  boxShadow: `0 0 8px ${alpha(ACCENT, 0.5)}`,
-                }}
-              />
+          <Tooltip key={job.id}>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-4 px-4 py-3 rounded-lg border border-border bg-muted/30 transition-all duration-150 cursor-default hover:bg-muted/50">
+                {/* Left accent bar */}
+                <div className="w-0.5 h-8 rounded-full flex-shrink-0 bg-primary" />
 
-              {/* Job name + repo — single line */}
-              <Box
-                sx={{
-                  flex: 1,
-                  minWidth: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1.5,
-                  overflow: 'hidden',
-                }}
-              >
-                <Typography variant="body2" fontWeight={600} noWrap sx={{ flexShrink: 0 }}>
-                  {job.name}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  noWrap
-                  sx={{ fontSize: '0.8rem', minWidth: 0 }}
-                >
-                  {getRepoLabel(job)}
-                </Typography>
-              </Box>
+                {/* Name + repo */}
+                <div className="flex-1 min-w-0 flex items-center gap-3 overflow-hidden">
+                  <p className="text-sm font-semibold truncate flex-shrink-0">{job.name}</p>
+                  <p className="text-[0.8rem] text-muted-foreground truncate min-w-0">{getRepoLabel(job)}</p>
+                </div>
 
-              {/* Countdown */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5,
-                  px: 1.25,
-                  py: 0.5,
-                  borderRadius: 1.5,
-                  bgcolor: alpha(ACCENT, isDark ? 0.15 : 0.1),
-                  flexShrink: 0,
-                }}
-              >
-                <Box component="span" sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Clock size={11} color={ACCENT} />
-                </Box>
-                <Typography
-                  sx={{ fontSize: '0.75rem', fontWeight: 700, color: ACCENT, lineHeight: 1 }}
-                >
-                  {formatRelativeTime(job.next_run)}
-                </Typography>
-              </Box>
-            </Box>
+                {/* Countdown */}
+                <div className="flex items-center gap-1 px-2.5 py-1 rounded-md flex-shrink-0 bg-muted">
+                  <Clock size={11} className="text-muted-foreground" />
+                  <span className="text-[0.75rem] font-bold leading-none text-foreground">
+                    {formatRelativeTime(job.next_run)}
+                  </span>
+                </div>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>{formatDate(job.next_run)}</TooltipContent>
           </Tooltip>
         ))}
-      </Stack>
-    </Box>
+      </div>
+    </div>
   )
 }
 

@@ -1,6 +1,7 @@
-import { Box, Button, IconButton, Stack, Typography, useTheme } from '@mui/material'
 import { KeyRound, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import type { PasskeyCredentialResponse } from '../services/api'
 
 interface AccountPasskeysSectionProps {
@@ -17,139 +18,92 @@ export default function AccountPasskeysSection({
   onDelete,
 }: AccountPasskeysSectionProps) {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
-  const cardGradient = isDark
-    ? 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)'
-    : 'linear-gradient(135deg, rgba(0,0,0,0.015) 0%, rgba(0,0,0,0.005) 100%)'
-  const neutralIconBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'
 
   return (
-    <Box>
-      <Typography variant="subtitle2" fontWeight={700} gutterBottom>
+    <div>
+      <p className="text-sm font-bold mb-1">
         {t('settings.account.security.passkeysTitle')}
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+      </p>
+      <p className="text-sm text-muted-foreground mb-3">
         {t('settings.account.security.passkeysDescription')}
-      </Typography>
-      <Box
-        sx={{
-          p: 2.5,
-          mb: 1.5,
-          borderRadius: 2.5,
-          border: '1px solid',
-          borderColor: passkeys.length > 0 ? 'rgba(59,130,246,0.2)' : 'divider',
-          background:
-            passkeys.length > 0
-              ? 'linear-gradient(135deg, rgba(59,130,246,0.08) 0%, rgba(14,116,144,0.05) 100%)'
-              : cardGradient,
-        }}
+      </p>
+      <div
+        className={cn(
+          'p-5 mb-3 rounded-2xl border border-border',
+          passkeys.length > 0 ? 'bg-primary/5' : 'bg-muted/20'
+        )}
       >
-        <Stack
-          direction={{ xs: 'column', md: 'row' }}
-          spacing={2}
-          justifyContent="space-between"
-          alignItems={{ xs: 'flex-start', md: 'center' }}
-        >
-          <Stack direction="row" spacing={1.5} alignItems="center">
-            <Box
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: 2,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                bgcolor: passkeys.length > 0 ? 'rgba(59,130,246,0.16)' : neutralIconBg,
-              }}
-            >
+        <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+          <div className="flex flex-row gap-3 items-center">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-muted/40">
               <KeyRound size={18} />
-            </Box>
-            <Box>
-              <Typography
-                variant="caption"
-                sx={{
-                  display: 'block',
-                  mb: 0.35,
-                  fontWeight: 700,
-                  letterSpacing: '0.04em',
-                  textTransform: 'uppercase',
-                  color: passkeys.length > 0 ? 'info.light' : 'text.secondary',
-                }}
+            </div>
+            <div>
+              <span
+                className={cn(
+                  'block text-xs font-bold uppercase tracking-wide mb-0.5',
+                  passkeys.length > 0 ? 'text-foreground' : 'text-muted-foreground'
+                )}
               >
                 {passkeys.length > 0
                   ? t('settings.account.security.statusReady')
                   : t('settings.account.security.statusNotConfigured')}
-              </Typography>
-              <Typography variant="body2" fontWeight={700}>
+              </span>
+              <p className="text-sm font-bold">
                 {passkeys.length > 0
                   ? t('settings.account.security.passkeysCount', { count: passkeys.length })
                   : t('settings.account.security.noPasskeys')}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
+              </p>
+              <p className="text-xs text-muted-foreground">
                 {passkeys.length > 0
                   ? t('settings.account.security.passkeysManageHint')
                   : t('settings.account.security.passkeyEmptyHint')}
-              </Typography>
-            </Box>
-          </Stack>
+              </p>
+            </div>
+          </div>
 
           <Button
-            variant="outlined"
+            variant="outline"
             onClick={onAdd}
             disabled={loading}
-            sx={{
-              minWidth: { xs: '100%', md: 'auto' },
-              alignSelf: { md: 'center' },
-              whiteSpace: 'nowrap',
-            }}
+            className="w-full md:w-auto whitespace-nowrap self-stretch md:self-center"
           >
             {t('settings.account.security.addPasskey')}
           </Button>
-        </Stack>
-      </Box>
+        </div>
+      </div>
 
-      <Stack spacing={1.5}>
+      <div className="flex flex-col gap-3">
         {passkeys.length > 0 &&
           passkeys.map((passkey) => (
-            <Box
+            <div
               key={passkey.id}
-              sx={{
-                p: 2,
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: 'divider',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 2,
-              }}
+              className="p-4 rounded-lg border border-border flex items-center justify-between gap-4"
             >
-              <Stack direction="row" spacing={1.5} alignItems="center">
+              <div className="flex flex-row gap-3 items-center">
                 <KeyRound size={16} />
-                <Box>
-                  <Typography variant="body2" fontWeight={600}>
-                    {passkey.name}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
+                <div>
+                  <p className="text-sm font-semibold">{passkey.name}</p>
+                  <p className="text-xs text-muted-foreground">
                     {passkey.last_used_at
                       ? t('settings.account.security.passkeyLastUsed', {
                           date: new Date(passkey.last_used_at).toLocaleString(),
                         })
                       : t('settings.account.security.passkeyNeverUsed')}
-                  </Typography>
-                </Box>
-              </Stack>
-              <IconButton
+                  </p>
+                </div>
+              </div>
+              <button
                 aria-label={t('common.buttons.delete')}
                 onClick={() => onDelete(passkey.id)}
                 disabled={loading}
+                className="p-1.5 rounded hover:bg-muted transition-colors disabled:opacity-50"
               >
                 <Trash2 size={16} />
-              </IconButton>
-            </Box>
+              </button>
+            </div>
           ))}
-      </Stack>
-    </Box>
+      </div>
+    </div>
   )
 }

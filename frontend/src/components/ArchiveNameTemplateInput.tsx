@@ -1,6 +1,9 @@
 import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { TextField, Alert, Box } from '@mui/material'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Info } from 'lucide-react'
 
 interface ArchiveNameTemplateInputProps {
   value: string
@@ -18,7 +21,6 @@ const ArchiveNameTemplateInput: React.FC<ArchiveNameTemplateInputProps> = ({
   jobName = 'example-job',
 }) => {
   const { t } = useTranslation()
-  // Generate preview of archive name with current timestamp
   const previewName = useMemo(() => {
     const now = new Date()
     const timestamp = Math.floor(now.getTime() / 1000)
@@ -35,31 +37,29 @@ const ArchiveNameTemplateInput: React.FC<ArchiveNameTemplateInputProps> = ({
   }, [value, jobName])
 
   return (
-    <Box>
-      <TextField
-        label={t('archiveNameTemplate.label')}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        fullWidth
-        size={size}
-        disabled={disabled}
-        helperText={t('archiveNameTemplate.hint')}
-        InputProps={{
-          sx: {
-            fontSize: size === 'medium' ? '1.1rem' : '0.875rem',
-            fontFamily: 'monospace',
-          },
-        }}
-        InputLabelProps={{
-          sx: { fontSize: size === 'medium' ? '1.1rem' : '0.875rem' },
-        }}
-      />
+    <div>
+      <div className="flex flex-col gap-1">
+        <Label htmlFor="archive-name-template" className={size === 'medium' ? 'text-base' : 'text-sm'}>
+          {t('archiveNameTemplate.label')}
+        </Label>
+        <Input
+          id="archive-name-template"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          disabled={disabled}
+          className={size === 'medium' ? 'font-mono text-lg' : 'font-mono text-sm'}
+        />
+        <p className="text-xs text-muted-foreground">{t('archiveNameTemplate.hint')}</p>
+      </div>
       {value && (
-        <Alert severity="info" sx={{ mt: 2, fontFamily: 'monospace', fontSize: '0.875rem' }}>
-          <strong>{t('archiveNameTemplate.preview')}</strong> {previewName}
+        <Alert className="mt-4 font-mono text-sm">
+          <Info className="h-4 w-4" />
+          <AlertDescription>
+            <strong>{t('archiveNameTemplate.preview')}</strong> {previewName}
+          </AlertDescription>
         </Alert>
       )}
-    </Box>
+    </div>
   )
 }
 

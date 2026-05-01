@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { screen, renderWithProviders } from '../../test/test-utils'
 import RemoteMachineCard from '../RemoteMachineCard'
 
 describe('RemoteMachineCard', () => {
@@ -46,7 +46,7 @@ describe('RemoteMachineCard', () => {
 
   describe('Rendering', () => {
     it('renders host name as title when no mount_point', () => {
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={baseMachine}
           onEdit={mockOnEdit}
@@ -61,7 +61,7 @@ describe('RemoteMachineCard', () => {
 
     it('renders mount_point as title when available', () => {
       const machineWithMount = { ...baseMachine, mount_point: '/mnt/backup' }
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={machineWithMount}
           onEdit={mockOnEdit}
@@ -77,7 +77,7 @@ describe('RemoteMachineCard', () => {
     })
 
     it('renders connection string', () => {
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={baseMachine}
           onEdit={mockOnEdit}
@@ -91,7 +91,7 @@ describe('RemoteMachineCard', () => {
     })
 
     it('renders status chip for connected', () => {
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={baseMachine}
           onEdit={mockOnEdit}
@@ -106,7 +106,7 @@ describe('RemoteMachineCard', () => {
 
     it('renders status chip for failed', () => {
       const failedMachine = { ...baseMachine, status: 'failed' }
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={failedMachine}
           onEdit={mockOnEdit}
@@ -121,7 +121,7 @@ describe('RemoteMachineCard', () => {
 
     it('renders status chip for testing', () => {
       const testingMachine = { ...baseMachine, status: 'testing' }
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={testingMachine}
           onEdit={mockOnEdit}
@@ -136,7 +136,7 @@ describe('RemoteMachineCard', () => {
 
     it('renders unknown status', () => {
       const unknownMachine = { ...baseMachine, status: 'unknown' }
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={unknownMachine}
           onEdit={mockOnEdit}
@@ -152,7 +152,7 @@ describe('RemoteMachineCard', () => {
 
   describe('Storage Info', () => {
     it('renders storage info when available', () => {
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={machineWithStorage}
           onEdit={mockOnEdit}
@@ -167,7 +167,7 @@ describe('RemoteMachineCard', () => {
     })
 
     it('renders No storage info when storage is null', () => {
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={baseMachine}
           onEdit={mockOnEdit}
@@ -181,7 +181,7 @@ describe('RemoteMachineCard', () => {
     })
 
     it('renders refresh storage button when no storage', () => {
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={baseMachine}
           onEdit={mockOnEdit}
@@ -196,7 +196,7 @@ describe('RemoteMachineCard', () => {
 
     it('calls onRefreshStorage when refresh button clicked', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={baseMachine}
           onEdit={mockOnEdit}
@@ -215,7 +215,7 @@ describe('RemoteMachineCard', () => {
         ...baseMachine,
         storage: { ...machineWithStorage.storage, percent_used: 80 },
       }
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={highUsageMachine}
           onEdit={mockOnEdit}
@@ -233,7 +233,7 @@ describe('RemoteMachineCard', () => {
         ...baseMachine,
         storage: { ...machineWithStorage.storage, percent_used: 95 },
       }
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={criticalUsageMachine}
           onEdit={mockOnEdit}
@@ -250,7 +250,7 @@ describe('RemoteMachineCard', () => {
   describe('Optional fields', () => {
     it('renders default_path when available', () => {
       const machineWithPath = { ...baseMachine, default_path: '/data/backups' }
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={machineWithPath}
           onEdit={mockOnEdit}
@@ -265,7 +265,7 @@ describe('RemoteMachineCard', () => {
     })
 
     it('does not render default_path when not available', () => {
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={baseMachine}
           onEdit={mockOnEdit}
@@ -280,7 +280,7 @@ describe('RemoteMachineCard', () => {
 
     it('renders mount_point section when different from host', () => {
       const machineWithMount = { ...baseMachine, mount_point: '/mnt/backup' }
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={machineWithMount}
           onEdit={mockOnEdit}
@@ -295,7 +295,7 @@ describe('RemoteMachineCard', () => {
 
     it('does not render mount_point section when same as host', () => {
       const machineWithSameMount = { ...baseMachine, mount_point: 'server.example.com' }
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={machineWithSameMount}
           onEdit={mockOnEdit}
@@ -310,7 +310,7 @@ describe('RemoteMachineCard', () => {
 
     it('renders error message when present', () => {
       const machineWithError = { ...baseMachine, error_message: 'Connection refused' }
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={machineWithError}
           onEdit={mockOnEdit}
@@ -326,7 +326,7 @@ describe('RemoteMachineCard', () => {
 
   describe('Context Menu', () => {
     it('renders all action buttons', () => {
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={baseMachine}
           onEdit={mockOnEdit}
@@ -346,7 +346,7 @@ describe('RemoteMachineCard', () => {
 
     it('calls onTestConnection from menu', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={baseMachine}
           onEdit={mockOnEdit}
@@ -363,7 +363,7 @@ describe('RemoteMachineCard', () => {
 
     it('calls onDeployKey from menu', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={baseMachine}
           onEdit={mockOnEdit}
@@ -380,7 +380,7 @@ describe('RemoteMachineCard', () => {
 
     it('calls onRefreshStorage from menu', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={baseMachine}
           onEdit={mockOnEdit}
@@ -397,7 +397,7 @@ describe('RemoteMachineCard', () => {
 
     it('calls onEdit from menu', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={baseMachine}
           onEdit={mockOnEdit}
@@ -414,7 +414,7 @@ describe('RemoteMachineCard', () => {
 
     it('calls onDelete from menu', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={baseMachine}
           onEdit={mockOnEdit}
@@ -430,7 +430,7 @@ describe('RemoteMachineCard', () => {
     })
 
     it('hides management actions when connection management is not allowed', () => {
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={baseMachine}
           onEdit={mockOnEdit}
@@ -451,7 +451,7 @@ describe('RemoteMachineCard', () => {
 
     it('closes menu after action', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <RemoteMachineCard
           machine={baseMachine}
           onEdit={mockOnEdit}

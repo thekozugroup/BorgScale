@@ -182,9 +182,9 @@ function StatusDot({ status }: { status: 'healthy' | 'warning' | 'critical' | 'u
 }
 
 function DimIcon({ status }: { status: string }) {
-  if (status === 'healthy') return <CheckCircle2 className="h-3 w-3 text-green-500" />
-  if (status === 'warning') return <AlertTriangle className="h-3 w-3 text-yellow-500" />
-  if (status === 'critical') return <XCircle className="h-3 w-3 text-red-500" />
+  if (status === 'healthy') return <CheckCircle2 className="h-3 w-3 text-primary" />
+  if (status === 'warning') return <AlertTriangle className="h-3 w-3 text-muted-foreground" />
+  if (status === 'critical') return <XCircle className="h-3 w-3 text-destructive" />
   return <MinusCircle className="h-3 w-3 text-neutral-400" />
 }
 
@@ -221,7 +221,7 @@ function ScheduleBadge({
     return (
       <Badge
         variant="outline"
-        className="gap-1 font-mono text-[0.6rem] border-yellow-300 text-yellow-700 bg-yellow-50 dark:border-yellow-800 dark:text-yellow-400 dark:bg-yellow-900/20"
+        className="gap-1 font-mono text-[0.6rem] border-border text-muted-foreground bg-muted"
         title={
           scheduleName
             ? t('dashboard.scheduleBadge.pausedTitle', { name: scheduleName })
@@ -238,7 +238,7 @@ function ScheduleBadge({
     return (
       <Badge
         variant="outline"
-        className="gap-1 font-mono text-[0.6rem] border-blue-300 text-blue-700 bg-blue-50 dark:border-blue-800 dark:text-blue-400 dark:bg-blue-900/20"
+        className="gap-1 font-mono text-[0.6rem] border-border text-muted-foreground bg-muted"
         title={scheduleName ?? t('dashboard.scheduleBadge.scheduled')}
       >
         <RotateCw className="h-2.5 w-2.5" />
@@ -706,7 +706,7 @@ export default function DashboardV3() {
                 </p>
               </div>
               <div className="flex flex-col items-end gap-0.5">
-                <span className="font-mono text-sm font-semibold text-green-600 dark:text-green-400">
+                <span className="font-mono text-sm font-semibold text-primary">
                   {summary.successful_jobs_30d}
                 </span>
                 <span className="font-mono text-xs text-muted-foreground">

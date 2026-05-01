@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
+import { screen, renderWithProviders } from '../../../../test/test-utils'
 import WizardStepScripts from '../WizardStepScripts'
 
 describe('WizardStepScripts', () => {
@@ -24,7 +24,7 @@ describe('WizardStepScripts', () => {
   }
 
   it('renders info tooltip with script level explanation', () => {
-    render(<WizardStepScripts {...defaultProps} />)
+    renderWithProviders(<WizardStepScripts {...defaultProps} />)
 
     // Hint text is accessible via aria-label on the info icon
     const tooltip = screen.getByLabelText(/Schedule-level:/i)
@@ -32,7 +32,7 @@ describe('WizardStepScripts', () => {
   })
 
   it('renders ScriptSelectorSection when repositories are selected', () => {
-    render(<WizardStepScripts {...defaultProps} />)
+    renderWithProviders(<WizardStepScripts {...defaultProps} />)
 
     // Check that ScriptSelectorSection is rendered by looking for its unique elements
     const selects = screen.getAllByRole('combobox')
@@ -41,7 +41,7 @@ describe('WizardStepScripts', () => {
   })
 
   it('displays warning when repositoryCount is 0', () => {
-    render(<WizardStepScripts {...defaultProps} repositoryCount={0} />)
+    renderWithProviders(<WizardStepScripts {...defaultProps} repositoryCount={0} />)
 
     expect(
       screen.getByText(/Select at least one repository in Step 1 to configure scripts/i)
@@ -49,7 +49,7 @@ describe('WizardStepScripts', () => {
   })
 
   it('does not render ScriptSelectorSection when repositoryCount is 0', () => {
-    render(<WizardStepScripts {...defaultProps} repositoryCount={0} />)
+    renderWithProviders(<WizardStepScripts {...defaultProps} repositoryCount={0} />)
 
     expect(screen.queryByLabelText(/Pre-Backup Script/i)).not.toBeInTheDocument()
     expect(screen.queryByLabelText(/Post-Backup Script/i)).not.toBeInTheDocument()
@@ -57,7 +57,7 @@ describe('WizardStepScripts', () => {
 
   it('calls onChange when pre-backup script is selected', () => {
     const onChange = vi.fn()
-    render(<WizardStepScripts {...defaultProps} onChange={onChange} />)
+    renderWithProviders(<WizardStepScripts {...defaultProps} onChange={onChange} />)
 
     // This would require interacting with the ScriptSelectorSection
     // The actual onChange is tested in ScriptSelectorSection tests
@@ -67,7 +67,7 @@ describe('WizardStepScripts', () => {
 
   it('calls onChange when post-backup script is selected', () => {
     const onChange = vi.fn()
-    render(<WizardStepScripts {...defaultProps} onChange={onChange} />)
+    renderWithProviders(<WizardStepScripts {...defaultProps} onChange={onChange} />)
 
     const selects = screen.getAllByRole('combobox')
     expect(selects[1]).toBeInTheDocument()
@@ -75,7 +75,7 @@ describe('WizardStepScripts', () => {
 
   it('calls onChange when runRepositoryScripts is toggled', () => {
     const onChange = vi.fn()
-    render(<WizardStepScripts {...defaultProps} onChange={onChange} />)
+    renderWithProviders(<WizardStepScripts {...defaultProps} onChange={onChange} />)
 
     expect(
       screen.getByRole('checkbox', { name: /Run repository-level scripts/i })
@@ -83,7 +83,7 @@ describe('WizardStepScripts', () => {
   })
 
   it('passes scripts to ScriptSelectorSection', () => {
-    render(<WizardStepScripts {...defaultProps} />)
+    renderWithProviders(<WizardStepScripts {...defaultProps} />)
 
     // Check that scripts are available in the selector
     const selects = screen.getAllByRole('combobox')
@@ -96,7 +96,7 @@ describe('WizardStepScripts', () => {
       preBackupScriptId: 1,
     }
 
-    render(<WizardStepScripts {...defaultProps} data={dataWithPreScript} />)
+    renderWithProviders(<WizardStepScripts {...defaultProps} data={dataWithPreScript} />)
 
     expect(screen.getByText('Wake Server')).toBeInTheDocument()
   })
@@ -107,7 +107,7 @@ describe('WizardStepScripts', () => {
       postBackupScriptId: 2,
     }
 
-    render(<WizardStepScripts {...defaultProps} data={dataWithPostScript} />)
+    renderWithProviders(<WizardStepScripts {...defaultProps} data={dataWithPostScript} />)
 
     expect(screen.getByText('Shutdown Server')).toBeInTheDocument()
   })
@@ -118,7 +118,7 @@ describe('WizardStepScripts', () => {
       runRepositoryScripts: true,
     }
 
-    render(<WizardStepScripts {...defaultProps} data={dataWithRepoScripts} />)
+    renderWithProviders(<WizardStepScripts {...defaultProps} data={dataWithRepoScripts} />)
 
     const checkbox = screen.getByRole('checkbox', { name: /Run repository-level scripts/i })
     expect(checkbox).toBeChecked()
@@ -147,7 +147,7 @@ describe('WizardStepScripts', () => {
       preBackupScriptParameters: { db_name: 'mydb' },
     }
 
-    render(
+    renderWithProviders(
       <WizardStepScripts {...defaultProps} scripts={scriptsWithParams} data={dataWithParams} />
     )
 
@@ -155,21 +155,21 @@ describe('WizardStepScripts', () => {
   })
 
   it('handles empty scripts array', () => {
-    render(<WizardStepScripts {...defaultProps} scripts={[]} />)
+    renderWithProviders(<WizardStepScripts {...defaultProps} scripts={[]} />)
 
     const selects = screen.getAllByRole('combobox')
     expect(selects).toHaveLength(2)
   })
 
   it('applies medium size to ScriptSelectorSection', () => {
-    render(<WizardStepScripts {...defaultProps} />)
+    renderWithProviders(<WizardStepScripts {...defaultProps} />)
 
     const selects = screen.getAllByRole('combobox')
     expect(selects).toHaveLength(2)
   })
 
   it('renders with multiple repositories', () => {
-    render(<WizardStepScripts {...defaultProps} repositoryCount={5} />)
+    renderWithProviders(<WizardStepScripts {...defaultProps} repositoryCount={5} />)
 
     const selects = screen.getAllByRole('combobox')
     expect(selects).toHaveLength(2)
@@ -177,14 +177,14 @@ describe('WizardStepScripts', () => {
   })
 
   it('displays info tooltip for script level note', () => {
-    render(<WizardStepScripts {...defaultProps} />)
+    renderWithProviders(<WizardStepScripts {...defaultProps} />)
 
     const tooltip = screen.getByLabelText(/Schedule-level:/i)
     expect(tooltip).toBeInTheDocument()
   })
 
   it('displays alert when no repositories', () => {
-    render(<WizardStepScripts {...defaultProps} repositoryCount={0} />)
+    renderWithProviders(<WizardStepScripts {...defaultProps} repositoryCount={0} />)
 
     // shadcn Alert renders as role="alert"
     const alert = screen.getByRole('alert')
@@ -193,7 +193,7 @@ describe('WizardStepScripts', () => {
   })
 
   it('provides concise script level explanation in info tooltip', () => {
-    render(<WizardStepScripts {...defaultProps} />)
+    renderWithProviders(<WizardStepScripts {...defaultProps} />)
 
     // Hint text is accessible via aria-label on the info icon
     const tooltip = screen.getByLabelText(/Schedule-level:/i)
@@ -223,7 +223,7 @@ describe('WizardStepScripts', () => {
       preBackupScriptParameters: {},
     }
 
-    render(
+    renderWithProviders(
       <WizardStepScripts {...defaultProps} scripts={scriptsWithParams} data={dataWithScript} />
     )
 
@@ -253,7 +253,7 @@ describe('WizardStepScripts', () => {
       postBackupScriptParameters: { post_param: 'value' },
     }
 
-    render(
+    renderWithProviders(
       <WizardStepScripts {...defaultProps} scripts={scriptsWithParams} data={dataWithPostParams} />
     )
 
