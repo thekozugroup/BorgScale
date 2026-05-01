@@ -11,6 +11,37 @@ import { ThemeProvider } from './context/ThemeContext'
 import App from './App.tsx'
 import './index.css'
 
+// recharts stores element refs in its Redux/immer state. immer's autoFreeze
+// recursively deep-freezes the produced state, and because recharts stores
+// references to DOM elements and React fiber objects, the freeze propagates
+// through __reactFiber$* properties and fiber fields into the entire fiber tree.
+// Frozen fibers cause "Cannot assign to read only property 'lanes'" errors
+// that silently drop all subsequent setState calls — including dialog close
+// handlers (e.g. PasskeyEnrollmentPrompt snooze).
+//
+// Fix: intercept Object.isFrozen to report React fiber objects as "already
+// frozen" so immer's autoFreeze skips them (immer calls isFrozen as its first
+// guard: `if (isFrozen(e)) return`). DOM nodes are similarly guarded.
+// Neither type is actually frozen, so React's scheduler can still mutate
+// fiber.lanes / fiber.childLanes as needed.
+function _isReactFiber(obj: object): boolean {
+  const o = obj as Record<string, unknown>
+  return (
+    typeof o['tag'] === 'number' &&
+    'stateNode' in o &&
+    'elementType' in o &&
+    ('child' in o || o['child'] === null) &&
+    'pendingProps' in o
+  )
+}
+const _origIsFrozen = Object.isFrozen
+;(Object.isFrozen as (obj: object) => boolean) = function isFrozen(obj: object): boolean {
+  if (obj == null || typeof obj !== 'object') return _origIsFrozen(obj)
+  if (obj instanceof Node) return true
+  if (_isReactFiber(obj)) return true
+  return _origIsFrozen(obj)
+}
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
