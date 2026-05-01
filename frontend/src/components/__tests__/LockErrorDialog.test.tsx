@@ -71,7 +71,7 @@ describe('LockErrorDialog', () => {
       expect(screen.getByText('What causes this?')).toBeInTheDocument()
       expect(screen.getByText(/Previous backup was interrupted or crashed/)).toBeInTheDocument()
       expect(screen.getByText(/Network connection dropped during SSH backup/)).toBeInTheDocument()
-      expect(screen.getByText(/Container was restarted during an operation/)).toBeInTheDocument()
+      expect(screen.getByText(/The app was restarted during an operation/)).toBeInTheDocument()
       expect(screen.getByText(/Repository cache locks from stale operations/)).toBeInTheDocument()
     })
 

@@ -64,15 +64,15 @@ export default function ArchiveCard({
           <Badge
             variant="outline"
             className={cn(
-              'h-[18px] text-2xs font-bold tracking-wider uppercase px-1.5 shrink-0',
+              'h-[18px] text-2xs font-bold tracking-wider px-1.5 shrink-0',
               isManual
                 ? 'bg-primary/10 text-primary border-primary/20'
                 : 'bg-muted text-muted-foreground border-border'
             )}
           >
             {isManual
-              ? t('archivesList.manualAbbr', 'MAN')
-              : t('archivesList.scheduledAbbr', 'SCH')}
+              ? t('archivesList.manualAbbr', 'Manual')
+              : t('archivesList.scheduledAbbr', 'Scheduled')}
           </Badge>
           {/* Date shown inline with badge on mobile */}
           <span className="text-xs text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis md:hidden">

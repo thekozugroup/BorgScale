@@ -542,15 +542,16 @@ export default function Scripts() {
                           )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <label htmlFor={`scripts-treat-as-secret-${param.name}`} className="flex items-center gap-2 cursor-pointer">
                         <span className="text-sm text-muted-foreground">{t('scripts.fields.treatAsSecret')}</span>
                         <input
+                          id={`scripts-treat-as-secret-${param.name}`}
                           type="checkbox"
                           checked={param.type === 'password'}
                           onChange={() => handleParameterTypeToggle(param.name)}
-                          style={{ width: 18, height: 18, cursor: 'pointer' }}
+                          className="w-[18px] h-[18px] cursor-pointer"
                         />
-                      </div>
+                      </label>
                     </div>
                   ))}
                 </div>

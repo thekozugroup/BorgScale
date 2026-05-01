@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '../components/ui/button'
 import { Plus } from 'lucide-react'
@@ -439,6 +439,7 @@ const Schedule: React.FC = () => {
             <Button
               onClick={openCreateWizard}
               disabled={!canCreateSchedule}
+              size="lg"
               className="w-full sm:w-auto gap-1.5"
             >
               <Plus size={18} />
@@ -479,8 +480,11 @@ const Schedule: React.FC = () => {
         <div>
           {/* No repositories warning */}
           {!loadingRepositories && (!repositories || repositories.length === 0) && (
-            <div className="flex items-start gap-2 p-3 rounded-xl text-sm mb-6 border border-border bg-muted/40 text-muted-foreground">
-              {t('schedule.noRepositories')}
+            <div className="flex flex-col items-start gap-3 p-3 rounded-xl text-sm mb-6 border border-border bg-muted/40 text-muted-foreground">
+              <span>{t('schedule.noRepositories')}</span>
+              <Button asChild size="lg">
+                <Link to="/repositories?action=create">{t('repositories.createRepository')}</Link>
+              </Button>
             </div>
           )}
 

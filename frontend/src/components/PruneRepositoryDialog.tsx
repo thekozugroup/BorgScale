@@ -167,14 +167,7 @@ function ColorizedOutput({ text, isFailed = false }: ColorizedOutputProps) {
 
   return (
     <div
-      className="font-mono overflow-auto"
-      style={{
-        margin: 0,
-        padding: '0.5rem',
-        fontSize: '0.745rem',
-        lineHeight: 1.7,
-        maxHeight: 380,
-      }}
+      className="font-mono overflow-auto text-xs leading-[1.7] p-2 max-h-[380px]"
     >
       {lines.map((line, i) => {
         const type = classifyLine(line)

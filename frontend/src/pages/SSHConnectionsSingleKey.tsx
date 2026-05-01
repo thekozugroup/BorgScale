@@ -809,8 +809,8 @@ export default function SSHConnectionsSingleKey() {
                 This will generate a new SSH key pair for your system. You can only have one system key at a time.
               </AlertDescription>
             </Alert>
-            <FormField label={t('sshConnections.generateDialog.keyType')}>
-              <select value={keyType} onChange={(e) => setKeyType(e.target.value)} className="w-full rounded-md border border-input bg-background h-9 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring">
+            <FormField label={t('sshConnections.generateDialog.keyType')} fieldId="generate-keytype">
+              <select id="generate-keytype" value={keyType} onChange={(e) => setKeyType(e.target.value)} className="w-full rounded-md border border-input bg-background h-9 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="ed25519">{t('sshConnections.generateDialog.ed25519')}</option>
                 <option value="rsa">{t('sshConnections.generateDialog.rsa')}</option>
                 <option value="ecdsa">{t('sshConnections.generateDialog.ecdsa')}</option>
@@ -836,17 +836,17 @@ export default function SSHConnectionsSingleKey() {
                 Import an existing SSH key from your filesystem (e.g., mounted volume). The key will be read from the specified paths and stored in the database.
               </AlertDescription>
             </Alert>
-            <FormField label={t('sshConnections.importDialog.keyName')}>
-              <Input value={importForm.name} onChange={(e) => setImportForm({ ...importForm, name: e.target.value })} placeholder="System SSH Key" className="h-9 text-sm" />
+            <FormField label={t('sshConnections.importDialog.keyName')} fieldId="import-keyname">
+              <Input id="import-keyname" value={importForm.name} onChange={(e) => setImportForm({ ...importForm, name: e.target.value })} placeholder="System SSH Key" className="h-9 text-sm" />
             </FormField>
-            <FormField label={`${t('sshConnections.importDialog.privateKeyPath')} *`} helper="Absolute path to the private key file">
-              <Input value={importForm.private_key_path} onChange={(e) => setImportForm({ ...importForm, private_key_path: e.target.value })} placeholder="/home/borg/.ssh/id_ed25519 or /root/.ssh/id_rsa" className="h-9 text-sm" required />
+            <FormField label={`${t('sshConnections.importDialog.privateKeyPath')} *`} helper="Absolute path to the private key file" fieldId="import-private-key-path">
+              <Input id="import-private-key-path" value={importForm.private_key_path} onChange={(e) => setImportForm({ ...importForm, private_key_path: e.target.value })} placeholder="/home/borg/.ssh/id_ed25519 or /root/.ssh/id_rsa" className="h-9 text-sm" required />
             </FormField>
-            <FormField label={t('sshConnections.importDialog.publicKeyPath')} helper="If not provided, will try {private_key_path}.pub">
-              <Input value={importForm.public_key_path} onChange={(e) => setImportForm({ ...importForm, public_key_path: e.target.value })} placeholder="Leave empty to auto-detect (adds .pub to private key path)" className="h-9 text-sm" />
+            <FormField label={t('sshConnections.importDialog.publicKeyPath')} helper="If not provided, will try {private_key_path}.pub" fieldId="import-public-key-path">
+              <Input id="import-public-key-path" value={importForm.public_key_path} onChange={(e) => setImportForm({ ...importForm, public_key_path: e.target.value })} placeholder="Leave empty to auto-detect (adds .pub to private key path)" className="h-9 text-sm" />
             </FormField>
-            <FormField label={t('sshConnections.importDialog.description')}>
-              <textarea value={importForm.description} onChange={(e) => setImportForm({ ...importForm, description: e.target.value })} placeholder="Imported system SSH key" rows={2} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
+            <FormField label={t('sshConnections.importDialog.description')} fieldId="import-description">
+              <textarea id="import-description" value={importForm.description} onChange={(e) => setImportForm({ ...importForm, description: e.target.value })} placeholder="Imported system SSH key" rows={2} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
             </FormField>
             <div className="flex justify-end gap-2 pt-1">
               <Button variant="outline" onClick={() => setImportDialogOpen(false)}>Cancel</Button>

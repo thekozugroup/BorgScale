@@ -12,6 +12,11 @@ export default {
         '3xs': ['0.625rem', { lineHeight: '0.875rem' }],
         '2xs': ['0.6875rem', { lineHeight: '1rem' }],
       },
+      animation: {
+        'borg-pulse': 'borgPulse 5s ease-in-out infinite',
+        'borg-float': 'borgFloat 7s ease-in-out infinite',
+        'fade-in-up': 'fadeInUp 0.4s ease both',
+      },
       colors: {
         primary: {
           50: '#eff6ff',

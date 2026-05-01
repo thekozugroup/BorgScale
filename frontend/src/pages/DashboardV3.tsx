@@ -398,6 +398,7 @@ function ActivityAreaChart({ activities }: { activities: DashboardOverview['acti
   const data = buildChartData(activities)
 
   return (
+    <div className="text-xs">
     <ResponsiveContainer width="100%" height={180}>
       <AreaChart data={data} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
         <defs>
@@ -413,13 +414,13 @@ function ActivityAreaChart({ activities }: { activities: DashboardOverview['acti
         <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
         <XAxis
           dataKey="date"
-          tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+          tick={{ fill: 'hsl(var(--muted-foreground))' }}
           tickLine={false}
           axisLine={false}
           interval={1}
         />
         <YAxis
-          tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+          tick={{ fill: 'hsl(var(--muted-foreground))' }}
           tickLine={false}
           axisLine={false}
           allowDecimals={false}
@@ -429,7 +430,6 @@ function ActivityAreaChart({ activities }: { activities: DashboardOverview['acti
             background: 'hsl(var(--card))',
             border: '1px solid hsl(var(--border))',
             borderRadius: '8px',
-            fontSize: '12px',
           }}
           labelStyle={{ color: 'hsl(var(--foreground))' }}
         />
@@ -453,6 +453,7 @@ function ActivityAreaChart({ activities }: { activities: DashboardOverview['acti
         />
       </AreaChart>
     </ResponsiveContainer>
+    </div>
   )
 }
 

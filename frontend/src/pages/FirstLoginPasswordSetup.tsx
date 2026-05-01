@@ -97,7 +97,7 @@ export default function PasswordSetupCard({ onComplete }: { onComplete: () => vo
     <>
       {/* Heading */}
       <div className="mb-7">
-        <h2 className="text-[1.375rem] font-semibold tracking-tight text-foreground mb-1.5">
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground mb-1.5">
           {t('firstLoginSetup.title')}
         </h2>
         <p className="text-sm text-muted-foreground">{t('firstLoginSetup.description')}</p>
