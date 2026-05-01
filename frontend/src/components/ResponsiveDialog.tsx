@@ -3,8 +3,6 @@ import { cn } from '@/lib/utils'
 import {
   Dialog,
   DialogContent,
-  DialogOverlay,
-  DialogPortal,
 } from '@/components/ui/dialog'
 import { X } from 'lucide-react'
 
@@ -112,23 +110,24 @@ export default function ResponsiveDialog({
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) handleClose() }}>
-      <DialogPortal>
-        <DialogOverlay />
-        <DialogContent
-          className={cn(
-            mwClass,
-            fullWidth ? 'w-full' : '',
-            'p-0 gap-0 overflow-hidden'
-          )}
-          onEscapeKeyDown={() => onClose?.({}, 'escapeKeyDown')}
-          onInteractOutside={handleClose}
-          // hide the default X button — our dialog contents provide their own close UX
-          showCloseButton={false}
-        >
-          {children}
-          {footer}
-        </DialogContent>
-      </DialogPortal>
+      {/* DialogContent already renders its own DialogPortal + DialogOverlay internally.
+          Do NOT wrap in an extra <DialogPortal><DialogOverlay /> here — doing so creates
+          two overlays under the same Dialog root, and Radix leaves both in data-state="open"
+          permanently (neither animates out), blocking all pointer events after modal close. */}
+      <DialogContent
+        className={cn(
+          mwClass,
+          fullWidth ? 'w-full' : '',
+          'p-0 gap-0 overflow-hidden'
+        )}
+        onEscapeKeyDown={() => onClose?.({}, 'escapeKeyDown')}
+        onInteractOutside={handleClose}
+        // hide the default X button — our dialog contents provide their own close UX
+        showCloseButton={false}
+      >
+        {children}
+        {footer}
+      </DialogContent>
     </Dialog>
   )
 }
