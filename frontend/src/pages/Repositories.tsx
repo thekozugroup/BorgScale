@@ -31,6 +31,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 interface Repository extends RepositoryData {
   id: number
@@ -102,6 +112,7 @@ export default function Repositories() {
   const [checkingRepository, setCheckingRepository] = useState<Repository | null>(null)
   const [compactingRepository, setCompactingRepository] = useState<Repository | null>(null)
   const [pruningRepository, setPruningRepository] = useState<Repository | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<Repository | null>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [pruneResults, setPruneResults] = useState<any>(null)
   const [lockError, setLockError] = useState<{
@@ -273,8 +284,13 @@ export default function Repositories() {
 
   // Event handlers
   const handleDeleteRepository = (repository: Repository) => {
-    if (window.confirm(`Are you sure you want to delete repository "${repository.name}"?`)) {
-      deleteRepositoryMutation.mutate(repository.id)
+    setPendingDelete(repository)
+  }
+
+  const confirmDelete = () => {
+    if (pendingDelete) {
+      deleteRepositoryMutation.mutate(pendingDelete.id)
+      setPendingDelete(null)
     }
   }
 
@@ -626,7 +642,7 @@ export default function Repositories() {
               })
             }}
           >
-            <SelectTrigger className="min-w-[160px] flex-1 text-xs font-semibold">
+            <SelectTrigger className="min-w-[160px] flex-1 text-xs font-semibold" aria-label={t('repositories.sort.ariaLabel', 'Sort repositories')}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -662,7 +678,7 @@ export default function Repositories() {
               })
             }}
           >
-            <SelectTrigger className="min-w-[120px] flex-1 text-xs font-semibold">
+            <SelectTrigger className="min-w-[120px] flex-1 text-xs font-semibold" aria-label={t('repositories.group.ariaLabel', 'Group by')}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -827,6 +843,30 @@ export default function Repositories() {
         repository={wizardRepository || undefined}
         onSubmit={handleWizardSubmit}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!pendingDelete} onOpenChange={(o) => !o && setPendingDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('repositories.deleteDialog.title', 'Delete repository?')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('repositories.deleteDialog.description', {
+                defaultValue: 'This removes {{name}} from BorgScale. Backup archives in the underlying borg repository remain on disk.',
+                name: pendingDelete?.name ?? '',
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.buttons.cancel', 'Cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t('repositories.deleteDialog.confirm', 'Delete')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

@@ -204,7 +204,7 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
             className="flex items-center gap-1 text-[0.65rem] font-semibold px-2 py-0.5 rounded-full border bg-muted text-foreground border-border cursor-help"
           >
             <Rocket size={10} />
-            Ready to Initialize
+            {t('wizard.review.readyToInitialize')}
           </span>
         )}
       </div>

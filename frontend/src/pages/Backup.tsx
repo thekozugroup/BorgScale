@@ -3,7 +3,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '../components/ui/button'
-import { Loader2, Clock, Info, Play } from 'lucide-react'
+import { Loader2, Clock, Info, Play, ChevronDown, ChevronUp } from 'lucide-react'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '../components/ui/collapsible'
 import { backupAPI, repositoriesAPI } from '../services/api'
 import { BorgApiClient } from '../services/borgApi'
 import { toast } from 'react-hot-toast'
@@ -25,6 +30,7 @@ import { getJobDurationSeconds } from '../utils/analyticsProperties'
 const Backup: React.FC = () => {
   const [selectedRepository, setSelectedRepository] = useState<string>('')
   const [logJob, setLogJob] = useState<BackupJob | null>(null)
+  const [showCommandPreview, setShowCommandPreview] = useState(false)
   const queryClient = useQueryClient()
   const location = useLocation()
   const { trackBackup, EventAction } = useAnalytics()
@@ -228,22 +234,32 @@ const Backup: React.FC = () => {
         )}
       </div>
 
-      {/* Command Preview Card */}
+      {/* Command Preview Card — collapsed by default */}
       {selectedRepoData && (
-        <CommandPreview
-          mode="import"
-          displayMode="backup-only"
-          borgVersion={selectedRepoData.borg_version}
-          repositoryPath={selectedRepoData.path}
-          archiveName="manual-backup-{now}"
-          compression={selectedRepoData.compression}
-          excludePatterns={selectedRepoData.exclude_patterns}
-          sourceDirs={selectedRepoData.source_directories}
-          customFlags={selectedRepoData.custom_flags ?? ''}
-          remotePath={selectedRepoData.remote_path ?? ''}
-          repositoryMode="full"
-          dataSource="local"
-        />
+        <Collapsible open={showCommandPreview} onOpenChange={setShowCommandPreview}>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground px-0">
+              {showCommandPreview ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+              {t('backup.showCommand', 'Show command')}
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <CommandPreview
+              mode="import"
+              displayMode="backup-only"
+              borgVersion={selectedRepoData.borg_version}
+              repositoryPath={selectedRepoData.path}
+              archiveName="manual-backup-{now}"
+              compression={selectedRepoData.compression}
+              excludePatterns={selectedRepoData.exclude_patterns}
+              sourceDirs={selectedRepoData.source_directories}
+              customFlags={selectedRepoData.custom_flags ?? ''}
+              remotePath={selectedRepoData.remote_path ?? ''}
+              repositoryMode="full"
+              dataSource="local"
+            />
+          </CollapsibleContent>
+        </Collapsible>
       )}
 
       {/* Running Jobs */}

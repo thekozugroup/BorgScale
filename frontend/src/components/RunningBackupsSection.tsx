@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { useTheme } from '../context/ThemeContext'
 
-const ACCENT_BACKUP = '#059669'
+// ACCENT_BACKUP replaced with semantic token classes below
 
 interface RunningBackupsSectionProps {
   runningBackupJobs: BackupJob[]
@@ -31,9 +31,7 @@ const STAT_ICONS = [
   <Clock size={11} />,
 ]
 
-const STAT_COLORS = [
-  ACCENT_BACKUP, '#3b82f6', '#8b5cf6', '#22c55e', '#f97316', '#3b82f6', '#22c55e',
-]
+// STAT_COLORS removed — replaced with uniform muted-foreground styling below
 
 const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
   runningBackupJobs,
@@ -70,18 +68,13 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
       <div className="px-4 sm:px-6 pt-4 pb-5 bg-background">
         {/* Section Header */}
         <div className="flex items-center gap-2 mb-1">
-          <div style={{ color: ACCENT_BACKUP, display: 'flex' }}>
+          <div className="text-primary flex">
             <RefreshCw size={16} className="animate-spin" />
           </div>
           <p className="text-base font-semibold">{t('backup.runningJobs.title')}</p>
           <div
-            className="px-2 py-0.5 rounded-full text-[0.7rem] font-bold"
-            style={{
-              background: `${ACCENT_BACKUP}1a`,
-              border: `1px solid ${ACCENT_BACKUP}38`,
-              color: ACCENT_BACKUP,
-              lineHeight: 1.5,
-            }}
+            className="px-2 py-0.5 rounded-full text-[0.7rem] font-bold bg-primary/10 border border-primary/20 text-primary"
+            style={{ lineHeight: 1.5 }}
           >
             {runningBackupJobs.length}
           </div>
@@ -105,19 +98,14 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
             return (
               <div
                 key={job.id}
-                className="relative rounded-lg overflow-hidden"
-                style={{
-                  background: isDark ? `${ACCENT_BACKUP}12` : `${ACCENT_BACKUP}0d`,
-                  boxShadow: isDark ? `inset 0 0 0 1px rgba(255,255,255,0.05)` : `inset 0 0 0 1px rgba(0,0,0,0.04)`,
-                }}
+                className="relative rounded-lg overflow-hidden bg-primary/5 shadow-[inset_0_0_0_1px_theme(colors.border)]"
               >
                 {/* Ambient glow blob */}
                 <div
-                  className="pointer-events-none absolute"
+                  className="pointer-events-none absolute bg-primary/10"
                   style={{
                     top: -60, right: -40, width: 200, height: 140,
                     borderRadius: '50%',
-                    background: isDark ? `${ACCENT_BACKUP}1a` : `${ACCENT_BACKUP}0d`,
                     filter: 'blur(55px)',
                     animation: 'blobPulseJob 3s ease-in-out infinite',
                   }}
@@ -131,9 +119,9 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                     {/* Left */}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-                        <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: ACCENT_BACKUP, animation: 'liveDot 2s ease-in-out infinite' }} />
+                        <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-primary" style={{ animation: 'liveDot 2s ease-in-out infinite' }} />
                         <p className="font-bold text-base leading-tight">{t('backup.runningJobs.jobTitle', { id: job.id })}</p>
-                        <div className="px-1.5 py-0.5 rounded text-[0.62rem] font-bold uppercase tracking-[0.05em] leading-none" style={{ background: `${ACCENT_BACKUP}1a`, border: `1px solid ${ACCENT_BACKUP}33`, color: ACCENT_BACKUP }}>
+                        <div className="px-1.5 py-0.5 rounded text-[0.62rem] font-bold uppercase tracking-[0.05em] leading-none bg-primary/10 border border-primary/20 text-primary">
                           {stageLabel}
                         </div>
                         {job.maintenance_status && (
@@ -154,8 +142,7 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                         <Button
                           size="sm"
                           variant="outline"
-                          className="h-7 text-xs px-2 gap-1"
-                          style={{ borderColor: `${ACCENT_BACKUP}47`, color: ACCENT_BACKUP }}
+                          className="h-7 text-xs px-2 gap-1 border-primary/30 text-primary"
                           onClick={() => onViewLogs(job)}
                         >
                           <Eye size={12} />
@@ -167,9 +154,7 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                         variant="outline"
                         className="h-7 text-xs px-2 gap-1 text-destructive border-destructive/30 hover:bg-destructive/10"
                         onClick={() => {
-                          if (window.confirm(`Are you sure you want to cancel backup job #${job.id}?`)) {
-                            onCancelBackup(job.id)
-                          }
+                          onCancelBackup(job.id)
                         }}
                         disabled={isCancelling}
                       >
@@ -183,11 +168,11 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                   {showProgress && (
                     <div className="mb-3">
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-[0.68rem] font-semibold" style={{ color: ACCENT_BACKUP }}>{pct.toFixed(1)}%</span>
+                        <span className="text-[0.68rem] font-semibold text-primary">{pct.toFixed(1)}%</span>
                         <span className="text-[0.65rem] text-muted-foreground">{t('backup.runningJobs.progress.totalSourceSize')}</span>
                       </div>
                       <div className="h-1 rounded-full overflow-hidden" style={{ background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)' }}>
-                        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: ACCENT_BACKUP }} />
+                        <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
                       </div>
                     </div>
                   )}
@@ -202,22 +187,18 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                         background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)',
                       }}
                     >
-                      {visibleStats.map((stat, i) => {
-                        const statColor = STAT_COLORS[i] ?? ACCENT_BACKUP
-                        return (
-                          <div
-                            key={stat.key}
-                            className="px-3 py-2"
-                            style={{ background: isDark ? `${ACCENT_BACKUP}0a` : 'var(--background)' }}
-                          >
-                            <div className="flex items-center gap-1 mb-0.5">
-                              <span style={{ color: `${statColor}b3`, display: 'flex', alignItems: 'center' }}>{STAT_ICONS[i]}</span>
-                              <span className="text-[0.58rem] font-bold uppercase tracking-[0.07em] leading-none" style={{ color: `${statColor}b3` }}>{stat.label}</span>
-                            </div>
-                            <p className="text-[0.85rem] font-semibold truncate tabular-nums">{stat.value}</p>
+                      {visibleStats.map((stat, i) => (
+                        <div
+                          key={stat.key}
+                          className="px-3 py-2 bg-background/60"
+                        >
+                          <div className="flex items-center gap-1 mb-0.5">
+                            <span className="text-muted-foreground/70 flex items-center">{STAT_ICONS[i]}</span>
+                            <span className="text-[0.58rem] font-bold uppercase tracking-[0.07em] leading-none text-muted-foreground/70">{stat.label}</span>
                           </div>
-                        )
-                      })}
+                          <p className="text-[0.85rem] font-semibold truncate tabular-nums">{stat.value}</p>
+                        </div>
+                      ))}
                     </div>
                   )}
 
@@ -230,7 +211,7 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                         border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)'}`,
                       }}
                     >
-                      <span style={{ color: `${ACCENT_BACKUP}a6`, display: 'flex', flexShrink: 0 }}><FileText size={13} /></span>
+                      <span className="text-primary/60 flex shrink-0"><FileText size={13} /></span>
                       <p className="text-[0.72rem] text-muted-foreground truncate flex-1 min-w-0" style={{ fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace' }}>
                         {job.progress_details.current_file}
                       </p>

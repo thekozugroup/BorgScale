@@ -611,7 +611,12 @@ export default function PruneRepositoryDialog({
                 }}
               >
                 <span className="text-muted-foreground flex flex-shrink-0">{field.icon}</span>
-                <p className="flex-1 text-sm">{field.label}</p>
+                <label
+                  htmlFor={`prune-${field.key}`}
+                  className="flex-1 text-sm cursor-pointer"
+                >
+                  {field.label}
+                </label>
                 <div
                   className="flex items-center rounded px-2 py-1"
                   style={{
@@ -621,6 +626,7 @@ export default function PruneRepositoryDialog({
                   }}
                 >
                   <input
+                    id={`prune-${field.key}`}
                     type="number"
                     value={pruneForm[field.key]}
                     min={0}

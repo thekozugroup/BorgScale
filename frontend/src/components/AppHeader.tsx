@@ -27,10 +27,10 @@ interface AppHeaderProps {
 
 function getRoleBadgeClass(roleLabel: string) {
   if (roleLabel === 'Admin') {
-    return 'bg-emerald-500/15 text-emerald-400 dark:text-emerald-300'
+    return 'bg-primary/15 text-primary'
   }
   if (roleLabel === 'Operator') {
-    return 'bg-blue-500/15 text-blue-600 dark:text-blue-300'
+    return 'bg-muted text-muted-foreground'
   }
   return 'bg-muted text-muted-foreground'
 }

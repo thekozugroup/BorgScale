@@ -331,9 +331,7 @@ const Schedule: React.FC = () => {
   }
 
   const handleRunJobNow = (job: ScheduledJob) => {
-    if (window.confirm(`Run "${job.name}" now?`)) {
-      runJobNowMutation.mutate(job)
-    }
+    runJobNowMutation.mutate(job)
   }
 
   const handleDuplicateJob = (job: ScheduledJob) => {

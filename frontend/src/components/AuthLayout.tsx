@@ -23,8 +23,8 @@ const ArchiveNode = ({ x, y, delay, duration, size, opacity }: NodeProps) => (
       width: size,
       height: size,
       borderRadius: '50%',
-      border: `1px solid rgba(0, 221, 0, ${opacity * 0.6})`,
-      backgroundColor: `rgba(0, 221, 0, ${opacity * 0.08})`,
+      border: `1px solid rgba(var(--foreground-rgb,255,255,255), ${opacity * 0.25})`,
+      backgroundColor: `rgba(var(--foreground-rgb,255,255,255), ${opacity * 0.04})`,
       animation: `borgPulse ${duration} ease-in-out ${delay} infinite`,
       pointerEvents: 'none',
     }}
@@ -51,7 +51,7 @@ const FloatingDot = ({
       width: 3,
       height: 3,
       borderRadius: '50%',
-      backgroundColor: 'rgba(0, 221, 0, 0.5)',
+      backgroundColor: 'rgba(var(--foreground-rgb,255,255,255), 0.2)',
       animation: `borgFloat ${duration} ease-in-out ${delay} infinite`,
       pointerEvents: 'none',
     }}
@@ -92,7 +92,7 @@ export const AUTH_STYLES = `
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 8px;
-    color: #e2e8f0;
+    color: hsl(var(--foreground));
     font-size: 14px;
     outline: none;
     transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
@@ -136,22 +136,20 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       <style>{AUTH_STYLES}</style>
 
       <div
-        className="flex-col lg:flex-row lg:h-screen"
+        className="flex-col lg:flex-row lg:h-screen bg-background"
         style={{
           minHeight: '100vh',
           display: 'flex',
-          backgroundColor: '#080808',
           fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
           overflow: 'hidden',
         }}
       >
         {/* ── LEFT: Brand panel ──────────────────────────────────────────────── */}
         <div
-          className="flex lg:w-[52%] xl:w-[55%]"
+          className="flex lg:w-[52%] xl:w-[55%] bg-muted"
           style={{
             position: 'relative',
             overflow: 'hidden',
-            backgroundColor: '#040a04',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
@@ -186,12 +184,12 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           >
             {/* Logo + wordmark */}
             <div className="flex items-center gap-3" style={{ marginBottom: 20, marginTop: 8 }}>
-              <Boxes className="h-10 w-10" style={{ color: 'rgba(0,221,0,0.85)' }} />
+              <Boxes className="h-10 w-10" />
               <span
+                className="text-foreground"
                 style={{
                   fontSize: '2rem',
                   fontWeight: 700,
-                  color: '#f1f5f9',
                   letterSpacing: '0.1em',
                   textTransform: 'uppercase',
                   lineHeight: 1.1,
@@ -203,10 +201,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
             {/* Tagline — desktop only */}
             <p
-              className="hidden lg:block"
+              className="hidden lg:block text-muted-foreground"
               style={{
                 fontSize: '1.05rem',
-                color: '#94a3b8',
                 maxWidth: 340,
                 lineHeight: 1.6,
                 margin: '0 0 40px',
@@ -219,20 +216,19 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           {/* Bottom decoration — desktop only */}
           <div
             aria-hidden="true"
-            className="hidden lg:block"
+            className="hidden lg:block text-muted-foreground/35"
             style={{
               position: 'absolute',
               bottom: 24,
               left: '50%',
               transform: 'translateX(-50%)',
               fontSize: 11,
-              color: 'rgba(148,163,184,0.35)',
               fontFamily: "'JetBrains Mono', monospace",
               letterSpacing: '0.08em',
               whiteSpace: 'nowrap',
             }}
           >
-            borgbackup · encrypted · open-source
+            Encrypted · Deduplicated · Open source
           </div>
         </div>
 

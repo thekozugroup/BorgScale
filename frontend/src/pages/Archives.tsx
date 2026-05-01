@@ -15,8 +15,10 @@ import LastRestoreSection from '../components/LastRestoreSection'
 import DeleteArchiveDialog from '../components/DeleteArchiveDialog'
 import MountArchiveDialog from '../components/MountArchiveDialog'
 import ArchiveContentsDialog from '../components/ArchiveContentsDialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../components/ui/dialog'
+import { Button } from '../components/ui/button'
 import { toast } from 'react-hot-toast'
-import MountSuccessToast from '../components/MountSuccessToast'
+// MountSuccessToast replaced by inline dialog — import removed
 import { Archive, Repository } from '@/types'
 import LockErrorDialog from '../components/LockErrorDialog'
 import { useAnalytics } from '../hooks/useAnalytics'
@@ -64,6 +66,7 @@ const Archives: React.FC = () => {
   } | null>(null)
   const [mountDialogArchive, setMountDialogArchive] = useState<Archive | null>(null)
   const [customMountPoint, setCustomMountPoint] = useState<string>('')
+  const [showMountCommand, setShowMountCommand] = useState<{ command: string; archiveName: string } | null>(null)
 
   // Restore functionality
   const [restoreArchive, setRestoreArchive] = useState<Archive | null>(null)
@@ -187,10 +190,12 @@ const Archives: React.FC = () => {
       const mountPoint = data.data.mount_point
       const containerName = 'borg-web-ui'
       const accessCommand = `docker exec -it ${containerName} bash -c "cd ${mountPoint} && bash"`
+      const archiveName = variables.archive_name
 
-      toast.custom((t) => <MountSuccessToast toastId={t.id} command={accessCommand} />, {
-        duration: 15000,
-      })
+      setShowMountCommand({ command: accessCommand, archiveName })
+      toast.success(
+        `Archive mounted at ${mountPoint}. Open Files tab to browse or use Show command for terminal access.`
+      )
       trackArchive(EventAction.MOUNT, selectedRepository || undefined, {
         operation: 'mount_archive',
         archive_age_bucket: getArchiveAgeBucket(variables.archive_start),
@@ -547,6 +552,33 @@ const Archives: React.FC = () => {
             queryClient.invalidateQueries({ queryKey: ['repository-info', lockError.repositoryId] })
           }}
         />
+      )}
+
+      {/* Mount Command Dialog */}
+      {showMountCommand && (
+        <Dialog open onOpenChange={() => setShowMountCommand(null)}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>{t('archives.mountCommandTitle', 'Terminal access command')}</DialogTitle>
+              <DialogDescription>
+                {t('archives.mountCommandDesc', 'Run this command inside the BorgScale container to open a shell at the mount point.')}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="rounded-lg bg-muted p-3 font-mono text-xs break-all border border-border">
+              {showMountCommand.command}
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" size="sm" onClick={() => {
+                navigator.clipboard.writeText(showMountCommand.command)
+              }}>
+                {t('common.copy', 'Copy')}
+              </Button>
+              <Button size="sm" onClick={() => setShowMountCommand(null)}>
+                {t('common.buttons.close', 'Close')}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
 
       {/* Restore Wizard */}

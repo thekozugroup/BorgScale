@@ -152,6 +152,7 @@
     "cancelled": "Annullato"
   },
   "dashboard": {
+    "pageTitle": "Panoramica",
     "title": "Dashboard",
     "subtitle": "Panoramica completa della tua infrastruttura di backup",
     "stats": {
@@ -180,11 +181,11 @@
       "neverChecked": "Mai controllato",
       "neverCompacted": "Mai compattato",
       "dimensionLabels": {
-        "backup": "BACKUP",
-        "check": "CHECK",
-        "compact": "COMPACT",
-        "freshness": "RECENTE",
-        "archives": "ARCHIVI"
+        "backup": "Salvato",
+        "check": "Verificato",
+        "compact": "Compattato",
+        "freshness": "Recente",
+        "archives": "Archivi"
       },
       "archiveCountShort": "{{count}} arx"
     },
@@ -2104,6 +2105,7 @@
       "remoteSshNote": "Il server BorgScale si connetterà via SSH alla macchina remota per sfogliare e fare il backup delle directory selezionate. Assicurati che la connessione SSH sia configurata correttamente con i permessi necessari."
     },
     "location": {
+      "borgVersionLabel": "Versione Borg",
       "repositoryNameLabel": "Nome Repository",
       "repositoryNameHelper": "Un nome descrittivo per identificare questo repository",
       "repositoryModeLabel": "Modalità Repository",
@@ -2201,6 +2203,7 @@
       "everythingLooksGood": "Tutto a posto! Clicca \"Ripristina File\" per iniziare l'operazione di ripristino."
     },
     "review": {
+      "readyToInitialize": "Pronto per l'inizializzazione",
       "configurationSummary": "Riepilogo Configurazione",
       "repository": "REPOSITORY",
       "name": "Nome",

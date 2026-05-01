@@ -31,7 +31,6 @@ export default function LockErrorDialog({
   const [breaking, setBreaking] = useState(false)
 
   const handleBreakLock = async () => {
-    if (!window.confirm(t('dialogs.lockError.breakLockWarning'))) return
     setBreaking(true)
     try {
       await repositoriesAPI.breakLock(repositoryId)

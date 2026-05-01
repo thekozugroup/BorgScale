@@ -328,8 +328,8 @@ describe('DashboardV3', () => {
       mockFetchSuccess(makeOverview())
       renderDashboard()
       await waitFor(() => expect(screen.getAllByText('Observe Only').length).toBeGreaterThan(0))
-      expect(screen.getByText('FRESH')).toBeInTheDocument()
-      expect(screen.getByText('ARCHIVES')).toBeInTheDocument()
+      expect(screen.getByText('Fresh')).toBeInTheDocument()
+      expect(screen.getByText('Archives')).toBeInTheDocument()
     })
   })
 

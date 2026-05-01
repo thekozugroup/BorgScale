@@ -298,7 +298,7 @@ export default function ArchivesList({
                     : t('archivesList.manual')
               const activeColor =
                 opt === 'scheduled'
-                  ? 'border-emerald-500/35 dark:border-emerald-500/45 bg-emerald-500/8 dark:bg-emerald-500/14 text-emerald-600 dark:text-emerald-400'
+                  ? 'border-primary/35 bg-primary/10 text-primary'
                   : opt === 'manual'
                     ? 'border-primary/35 dark:border-primary/45 bg-primary/8 dark:bg-primary/14 text-primary'
                     : undefined
