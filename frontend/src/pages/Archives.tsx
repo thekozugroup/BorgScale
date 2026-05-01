@@ -453,7 +453,7 @@ const Archives: React.FC = () => {
       {/* Context panel: stats + last restore */}
       {selectedRepositoryId &&
         (loadingRepoInfo || repositoryStats || restoreJobsData?.data?.jobs) && (
-          <div className="rounded-2xl border border-neutral-200/70 dark:border-neutral-700/40 overflow-hidden mb-6">
+          <div className="rounded-2xl border border-border overflow-hidden mb-6">
             {/* Stats */}
             <div className="p-5">
               {loadingRepoInfo ? (
@@ -469,7 +469,7 @@ const Archives: React.FC = () => {
             </div>
             {/* Last Restore */}
             {restoreJobsData?.data?.jobs && (
-              <div className="px-5 py-4 border-t border-neutral-100 dark:border-neutral-800/50 bg-neutral-50/50 dark:bg-neutral-900/20">
+              <div className="px-5 py-4 border-t border-border bg-muted/30">
                 <LastRestoreSection restoreJob={lastRestoreJob} />
               </div>
             )}

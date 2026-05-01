@@ -28,6 +28,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 interface ScheduledCheck {
   repository_id: number
@@ -61,6 +71,7 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
   const [formData, setFormData] = useState({ cron_expression: '0 2 * * 0', max_duration: 3600 })
   const [historyRepositoryFilter, setHistoryRepositoryFilter] = useState<number | 'all'>('all')
   const [historyStatusFilter, setHistoryStatusFilter] = useState<string | 'all'>('all')
+  const [pendingDeleteCheck, setPendingDeleteCheck] = useState<ScheduledCheck | null>(null)
 
   const { data: repositoriesData, isLoading: loadingRepositories } = useQuery({
     queryKey: ['repositories'],
@@ -181,8 +192,13 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
   }
 
   const handleDelete = (check: ScheduledCheck) => {
-    if (confirm(t('scheduledChecks.confirmDisable', { repositoryName: check.repository_name }))) {
-      updateMutation.mutate({ repoId: check.repository_id, data: { cron_expression: '' } })
+    setPendingDeleteCheck(check)
+  }
+
+  const confirmDelete = () => {
+    if (pendingDeleteCheck) {
+      updateMutation.mutate({ repoId: pendingDeleteCheck.repository_id, data: { cron_expression: '' } })
+      setPendingDeleteCheck(null)
     }
   }
 
@@ -212,8 +228,8 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="rounded-lg bg-background overflow-hidden"
-              style={{ boxShadow: '0 0 0 1px rgba(255,255,255,0.08), 0 4px 16px rgba(0,0,0,0.25)', opacity: Math.max(0.4, 1 - i * 0.2) }}
+              className="rounded-lg bg-card border border-border overflow-hidden shadow-sm"
+              style={{ opacity: Math.max(0.4, 1 - i * 0.2) }}
             >
               <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3.5 sm:pb-4">
                 <div className="flex items-start justify-between gap-2 mb-3">
@@ -380,6 +396,24 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
           </div>
         </div>
       </ResponsiveDialog>
+
+      {/* Disable-check confirmation */}
+      <AlertDialog open={!!pendingDeleteCheck} onOpenChange={(open) => { if (!open) setPendingDeleteCheck(null) }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('scheduledChecks.confirmDisableTitle', { defaultValue: 'Disable scheduled check?' })}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingDeleteCheck
+                ? t('scheduledChecks.confirmDisable', { repositoryName: pendingDeleteCheck.repository_name })
+                : ''}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.buttons.cancel')}</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={confirmDelete}>{t('common.buttons.disable', { defaultValue: 'Disable' })}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 })

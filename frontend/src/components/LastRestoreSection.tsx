@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import RestoreJobCard from './RestoreJobCard'
 import { Button } from '@/components/ui/button'
-import { useTheme } from '../context/ThemeContext'
 
 interface RestoreJob {
   id: number
@@ -31,13 +30,11 @@ interface LastRestoreSectionProps {
 export default function LastRestoreSection({ restoreJob }: LastRestoreSectionProps) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { effectiveMode } = useTheme()
-  const isDark = effectiveMode === 'dark'
 
   if (!restoreJob) {
     return (
       <div className="flex items-center gap-2">
-        <RotateCcw size={14} style={{ color: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)' }} />
+        <RotateCcw size={14} className="text-foreground/25" />
         <span className="text-[0.78rem] text-muted-foreground">{t('lastRestoreSection.noRestores')}</span>
       </div>
     )

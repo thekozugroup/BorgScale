@@ -395,7 +395,7 @@ const NotificationsTab: React.FC = () => {
           <p className="text-sm text-muted-foreground mb-3 mt-2">
             {t('notifications.alertDescription')}
           </p>
-          <div className="font-mono text-xs bg-neutral-900 text-neutral-100 p-3 rounded-lg border border-neutral-700 overflow-auto leading-relaxed">
+          <div className="font-mono text-xs bg-foreground text-background p-3 rounded-lg border border-border overflow-auto leading-relaxed">
             {[
               {
                 label: t('notifications.exampleEmailGmail'),
@@ -419,7 +419,7 @@ const NotificationsTab: React.FC = () => {
               },
             ].map(({ label, value }) => (
               <div key={value}>
-                <span className="text-neutral-500">{label} </span>
+                <span className="text-background/50">{label} </span>
                 <span>{value}</span>
               </div>
             ))}

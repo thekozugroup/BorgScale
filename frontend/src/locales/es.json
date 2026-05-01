@@ -95,9 +95,9 @@
   "navigation": {
     "appName": "BorgScale",
     "sections": {
-      "dashboard": "PANEL",
-      "backup": "COPIA DE SEGURIDAD",
-      "settings": "CONFIGURACIÓN"
+      "dashboard": "Panel",
+      "backup": "Copia de seguridad",
+      "settings": "Configuración"
     },
     "items": {
       "dashboard": "Panel",
@@ -345,7 +345,7 @@
     "mountTimeout": "Tiempo de espera de montaje: Los repositorios grandes pueden necesitar más tiempo para montarse.",
     "mountFailed": "Error al montar el archivo: {{error}}",
     "restoreStarted": "¡Trabajo de restauración iniciado! Comprueba la pestaña de Actividad para monitorizar el progreso.",
-    "mountSuccess": "¡Archivo montado correctamente!\n\nEl montaje está dentro del contenedor. Para acceder a los archivos, ejecuta:\n\n{{command}}",
+    "mountSuccess": "Archivo montado. Para acceder a los archivos en una terminal:\n\n{{command}}",
     "mountCommandTitle": "Comando de acceso al terminal",
     "mountCommandDesc": "Abre este comando en un terminal para explorar la carpeta montada.",
     "toasts": {
@@ -1253,7 +1253,7 @@
       "tip": "Consejo: Ejecuta la compactación después de podar archivos antiguos para liberar espacio. Otros repositorios seguirán siendo accesibles."
     },
     "mount": {
-      "readOnlyInfo": "El archivo se montará como un sistema de archivos de solo lectura dentro del contenedor. Recibirás un comando para acceder a él a través del terminal.",
+      "readOnlyInfo": "El archivo se montará como un sistema de archivos de solo lectura.",
       "mountPointPlaceholder": "mi-copia-2024",
       "mountPointHint": "Se montará en: {{path}}"
     },
@@ -1774,7 +1774,7 @@
   },
   "mountsManagement": {
     "title": "Montajes activos",
-    "subtitle": "Gestiona archivos Borg montados. Los archivos se desmontan automáticamente al reiniciar el contenedor.",
+    "subtitle": "Gestiona archivos Borg montados. Los archivos se desmontan automáticamente al reiniciar la aplicación.",
     "empty": "Sin montajes activos",
     "unmount": "Desmontar",
     "unmounting": "Desmontando...",
@@ -2207,7 +2207,7 @@
     "review": {
       "readyToInitialize": "Listo para inicializar",
       "configurationSummary": "Resumen de configuración",
-      "repository": "REPOSITORIO",
+      "repository": "Repositorio",
       "name": "Nombre",
       "mode": "Modo",
       "full": "Completo",
@@ -2217,13 +2217,13 @@
       "notSet": "(no establecido)",
       "borgUiServer": "Servidor BorgScale",
       "sshRemote": "SSH remoto",
-      "dataSource": "FUENTE DE DATOS",
+      "dataSource": "Fuente de datos",
       "source": "Fuente",
       "remoteClient": "Cliente remoto",
       "directories": "Directorios",
       "directoriesCount": "{{count}} configurados",
       "excludePatterns": "Patrones de exclusión",
-      "security": "SEGURIDAD",
+      "security": "Seguridad",
       "encryption": "Cifrado",
       "encryptionRepokey": "Repokey",
       "encryptionKeyfile": "Archivo de clave",
@@ -2231,7 +2231,7 @@
       "passphrase": "Frase de contraseña",
       "passphraseSet": "••••••••",
       "passphraseNotSet": "(no establecido)",
-      "backupConfiguration": "CONFIGURACIÓN DE COPIA DE SEGURIDAD",
+      "backupConfiguration": "Configuración de copia de seguridad",
       "compression": "Compresión",
       "customFlags": "Indicadores personalizados",
       "repositoryInitialized": "El repositorio será inicializado",
@@ -2814,7 +2814,7 @@
       "forceUnmountTooltip": "Forzar desmontaje (usar si está ocupado)"
     },
     "copiedToClipboard": "{{label}} copiado al portapapeles",
-    "infoAlert": "Nota: Los archivos montados aparecen como sistemas de archivos de solo lectura en tu gestor de archivos. Accede a ellos en la ruta del punto de montaje. Los montajes se limpian automáticamente al reiniciar el contenedor.",
+    "infoAlert": "Nota: Los archivos montados aparecen como sistemas de archivos de solo lectura en tu gestor de archivos. Accede a ellos en la ruta del punto de montaje. Los montajes se limpian automáticamente al reiniciar la aplicación.",
     "emptyDescription": "Monta archivos desde la página de Archivos para explorar su contenido directamente en tu gestor de archivos.",
     "activeMounts": "Montajes activos"
   },

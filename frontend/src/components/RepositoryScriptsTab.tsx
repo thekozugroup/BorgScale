@@ -18,6 +18,16 @@ import ScriptParameterInputs, { ScriptParameter } from './ScriptParameterInputs'
 import { useAnalytics } from '../hooks/useAnalytics'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 
@@ -81,6 +91,7 @@ export default function RepositoryScriptsTab({
   const [loading, setLoading] = useState(true)
   const [addDialogOpen, setAddDialogOpen] = useState(false)
   const [selectedScriptId, setSelectedScriptId] = useState<number | ''>('')
+  const [pendingRemoveId, setPendingRemoveId] = useState<number | null>(null)
   const [editParametersDialog, setEditParametersDialog] = useState<{
     open: boolean
     script: RepositoryScript | null
@@ -178,8 +189,14 @@ export default function RepositoryScriptsTab({
     }
   }
 
-  const handleRemoveScript = async (scriptAssignmentId: number) => {
-    if (!confirm(t('repositoryScripts.confirmRemove'))) return
+  const handleRemoveScript = (scriptAssignmentId: number) => {
+    setPendingRemoveId(scriptAssignmentId)
+  }
+
+  const confirmRemoveScript = async () => {
+    const scriptAssignmentId = pendingRemoveId
+    if (scriptAssignmentId === null) return
+    setPendingRemoveId(null)
     const removedScript = scripts.find((s) => s.id === scriptAssignmentId)
 
     try {
@@ -443,6 +460,22 @@ export default function RepositoryScriptsTab({
         running={testDialog.running}
         result={testDialog.result}
       />
+
+      {/* Remove-script confirmation */}
+      <AlertDialog open={pendingRemoveId !== null} onOpenChange={(open) => { if (!open) setPendingRemoveId(null) }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('repositoryScripts.confirmRemoveTitle', { defaultValue: 'Remove script?' })}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('repositoryScripts.confirmRemove')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.buttons.cancel')}</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={confirmRemoveScript}>{t('common.buttons.remove', { defaultValue: 'Remove' })}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
@@ -723,8 +756,8 @@ function ScriptTestDialog({ open, onClose, scriptName, running, result }: Script
               {result.stdout && (
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">{t('scriptEditor.stdout')}</p>
-                  <div className="p-3 rounded-xl overflow-auto max-h-72 bg-neutral-900">
-                    <pre className="text-sm whitespace-pre-wrap break-words m-0 text-neutral-200 font-mono">
+                  <div className="p-3 rounded-xl overflow-auto max-h-72 bg-foreground">
+                    <pre className="text-sm whitespace-pre-wrap break-words m-0 text-background font-mono">
                       {result.stdout}
                     </pre>
                   </div>
@@ -733,7 +766,7 @@ function ScriptTestDialog({ open, onClose, scriptName, running, result }: Script
               {result.stderr && (
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">{t('scriptEditor.stderr')}</p>
-                  <div className="p-3 rounded-xl overflow-auto max-h-48 bg-neutral-900">
+                  <div className="p-3 rounded-xl overflow-auto max-h-48 bg-foreground">
                     <pre className="text-sm whitespace-pre-wrap break-words m-0 text-destructive font-mono">
                       {result.stderr}
                     </pre>

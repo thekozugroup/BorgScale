@@ -11,7 +11,6 @@ import {
   Key,
 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { useTheme } from '../context/ThemeContext'
 
 interface StorageInfo {
   total: number
@@ -90,11 +89,7 @@ export default function RemoteMachineCard({
   canManageConnections = true,
 }: RemoteMachineCardProps) {
   const { t } = useTranslation()
-  const { effectiveMode } = useTheme()
-  const isDark = effectiveMode === 'dark'
   const statusClass = getStatusClass(machine.status)
-
-  const borderColorSoft = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)'
 
   const iconBtnBase =
     'flex items-center justify-center w-10 h-10 sm:w-9 sm:h-9 rounded-lg transition-colors duration-150 text-muted-foreground hover:text-foreground'
@@ -104,24 +99,7 @@ export default function RemoteMachineCard({
 
   return (
     <div
-      className="w-full flex flex-col rounded-2xl bg-background transition-all duration-200"
-      style={{
-        boxShadow: isDark
-          ? `0 0 0 1px rgba(255,255,255,0.08), 0 4px 16px rgba(0,0,0,0.25)`
-          : `0 0 0 1px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.07)`,
-      }}
-      onMouseEnter={(e) => {
-        ;(e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'
-        ;(e.currentTarget as HTMLDivElement).style.boxShadow = isDark
-          ? `0 0 0 1px rgba(255,255,255,0.12), 0 8px 24px rgba(0,0,0,0.3)`
-          : `0 0 0 1px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.12)`
-      }}
-      onMouseLeave={(e) => {
-        ;(e.currentTarget as HTMLDivElement).style.transform = ''
-        ;(e.currentTarget as HTMLDivElement).style.boxShadow = isDark
-          ? `0 0 0 1px rgba(255,255,255,0.08), 0 4px 16px rgba(0,0,0,0.25)`
-          : `0 0 0 1px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.07)`
-      }}
+      className="w-full flex flex-col rounded-2xl border border-border bg-card shadow-sm hover:shadow-md hover:-translate-y-0.5 transition"
     >
       <div className="flex-1 flex flex-col px-4 sm:px-5 pt-4 sm:pt-5 pb-3.5 sm:pb-4">
 
@@ -162,11 +140,7 @@ export default function RemoteMachineCard({
         {/* ── Storage Stats Band ── */}
         {machine.storage ? (
           <div
-            className="rounded-xl overflow-hidden mb-3"
-            style={{
-              border: `1px solid ${borderColorSoft}`,
-              background: isDark ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.018)',
-            }}
+            className="rounded-xl overflow-hidden mb-3 border border-border bg-muted/30"
           >
             {/* Two-column stats */}
             <div className="grid grid-cols-2">
@@ -176,8 +150,7 @@ export default function RemoteMachineCard({
               ].map((col, i) => (
                 <div
                   key={col.label}
-                  className="px-4 sm:px-5 py-3 sm:py-2.5 min-w-0"
-                  style={{ borderRight: i === 0 ? `1px solid ${borderColorSoft}` : 'none' }}
+                  className={`px-4 sm:px-5 py-3 sm:py-2.5 min-w-0${i === 0 ? ' border-r border-border' : ''}`}
                 >
                   <p
                     className={`text-[0.6rem] font-bold uppercase tracking-[0.06em] leading-none mb-1 truncate ${col.colorClass}`}
@@ -193,8 +166,7 @@ export default function RemoteMachineCard({
 
             {/* Usage bar */}
             <div
-              className="px-4 sm:px-5 pb-2.5 pt-1.5 border-t"
-              style={{ borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)' }}
+              className="px-4 sm:px-5 pb-2.5 pt-1.5 border-t border-border"
             >
               <div className="flex justify-between items-center mb-1">
                 <span className="text-[0.58rem] text-muted-foreground leading-none">
@@ -205,8 +177,7 @@ export default function RemoteMachineCard({
                 </span>
               </div>
               <div
-                className="h-1.5 rounded-full overflow-hidden"
-                style={{ background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }}
+                className="h-1.5 rounded-full overflow-hidden bg-muted"
               >
                 <div
                   className={`h-full rounded-full ${getStorageBarClass(machine.storage.percent_used)}`}
@@ -217,11 +188,7 @@ export default function RemoteMachineCard({
           </div>
         ) : (
           <div
-            className="flex items-center gap-2 px-3 py-2.5 mb-3 rounded-xl"
-            style={{
-              border: `1px solid ${borderColorSoft}`,
-              background: isDark ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.018)',
-            }}
+            className="flex items-center gap-2 px-3 py-2.5 mb-3 rounded-xl border border-border bg-muted/30"
           >
             <HardDrive size={14} className="opacity-40 flex-shrink-0" />
             <span className="text-sm text-muted-foreground flex-1 truncate">
@@ -278,11 +245,7 @@ export default function RemoteMachineCard({
         {/* ── Error Message ── */}
         {machine.error_message && (
           <div
-            className="mb-3 px-3 py-2.5 rounded-xl border"
-            style={{
-              background: isDark ? 'rgba(239,68,68,0.1)' : 'rgba(239,68,68,0.06)',
-              borderColor: 'rgba(239,68,68,0.25)',
-            }}
+            className="mb-3 px-3 py-2.5 rounded-xl bg-destructive/10 border border-destructive/25 text-destructive"
           >
             <p className="text-[0.7rem] text-destructive break-words leading-snug">
               {machine.error_message}
@@ -292,8 +255,7 @@ export default function RemoteMachineCard({
 
         {/* ── Action Bar ── */}
         <div
-          className="mt-auto flex items-center gap-2 sm:gap-1.5 pt-3 sm:pt-2.5 border-t"
-          style={{ borderColor: borderColorSoft }}
+          className="mt-auto flex items-center gap-2 sm:gap-1.5 pt-3 sm:pt-2.5 border-t border-border"
         >
           {/* Left cluster */}
           <div className="flex items-center gap-1 sm:gap-0.5 flex-1">
@@ -344,8 +306,8 @@ export default function RemoteMachineCard({
           {canManageConnections && (
             <div className="flex items-center gap-1 sm:gap-0.5">
               <div
-                className="w-px h-4.5 flex-shrink-0 mx-0.5"
-                style={{ background: borderColorSoft, height: 18 }}
+                className="w-px flex-shrink-0 mx-0.5 bg-border"
+                style={{ height: 18 }}
               />
               <Tooltip>
                 <TooltipTrigger asChild>

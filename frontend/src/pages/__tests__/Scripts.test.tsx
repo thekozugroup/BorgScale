@@ -243,6 +243,10 @@ describe('Scripts page', () => {
     expect(deleteButton).toBeTruthy()
     await user.click(deleteButton!)
 
+    // Confirm via AlertDialog
+    const confirmBtn = await screen.findByRole('button', { name: /delete/i })
+    await user.click(confirmBtn)
+
     await waitFor(() => {
       expect(api.delete).toHaveBeenCalledWith('/scripts/1')
     })

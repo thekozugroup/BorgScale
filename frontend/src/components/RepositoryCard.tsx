@@ -417,7 +417,7 @@ export default function RepositoryCard({
                         iconBtnBase,
                         compactJob
                           ? 'bg-primary/10 text-primary hover:bg-primary/18 hover:text-primary'
-                          : 'text-neutral-500/55 hover:bg-neutral-500/10 hover:text-neutral-600 dark:hover:text-neutral-400'
+                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                       )}
                     >
                       {compactJob ? (

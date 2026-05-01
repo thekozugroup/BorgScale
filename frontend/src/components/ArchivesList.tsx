@@ -170,8 +170,8 @@ export default function ArchivesList({
     <div
       className={cn(
         'hidden md:grid grid-cols-[minmax(0,1fr)_76px_minmax(180px,220px)_132px] items-center gap-2',
-        'px-4 py-2 bg-neutral-50/80 dark:bg-neutral-900/30',
-        'border-b border-b-neutral-200 dark:border-b-neutral-700/60',
+        'px-4 py-2 bg-muted/30',
+        'border-b border-border',
         'text-[0.65rem] font-semibold uppercase tracking-widest text-muted-foreground'
       )}
     >
@@ -207,7 +207,7 @@ export default function ArchivesList({
             <Skeleton className="h-5 w-11 rounded-full" />
           </div>
         </div>
-        <div className="rounded-2xl border border-neutral-200/70 dark:border-neutral-700/40 overflow-hidden">
+        <div className="rounded-2xl border border-border overflow-hidden">
           {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
             <ArchiveCardSkeleton key={i} index={i} />
           ))}
@@ -233,8 +233,8 @@ export default function ArchivesList({
       active
         ? colorActive
           ? colorActive
-          : 'border-neutral-400/40 dark:border-neutral-500/40 bg-neutral-100/80 dark:bg-neutral-700/50 text-foreground'
-        : 'border-neutral-200 dark:border-neutral-700/60 bg-transparent text-muted-foreground hover:border-neutral-300 dark:hover:border-neutral-600 hover:text-foreground'
+          : 'border-border bg-accent/50 text-foreground'
+        : 'border-border bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground'
     )
 
   return (
@@ -253,7 +253,7 @@ export default function ArchivesList({
           <span
             className={cn(
               'text-[0.72rem] font-semibold px-1.5 py-0.5 rounded',
-              'bg-neutral-100 dark:bg-neutral-700/60 text-muted-foreground leading-[1.6]'
+              'bg-border text-muted-foreground leading-[1.6]'
             )}
           >
             {filter === 'all' || sortedArchives.length === archives.length
@@ -283,7 +283,7 @@ export default function ArchivesList({
                   </button>
                 ))}
               </div>
-              <div className="hidden sm:block w-px self-stretch bg-neutral-200 dark:bg-neutral-700/60 shrink-0" />
+              <div className="hidden sm:block w-px self-stretch bg-border shrink-0" />
             </>
           )}
 
@@ -315,7 +315,7 @@ export default function ArchivesList({
             })}
           </div>
 
-          <div className="hidden sm:block w-px self-stretch bg-neutral-200 dark:bg-neutral-700/60 shrink-0" />
+          <div className="hidden sm:block w-px self-stretch bg-border shrink-0" />
 
           {/* View mode group */}
           <div className="flex gap-1 items-center">
@@ -353,7 +353,7 @@ export default function ArchivesList({
             return (
               <div
                 key={group.key}
-                className="rounded-lg border border-neutral-200 dark:border-neutral-700/60 overflow-hidden"
+                className="rounded-lg border border-border overflow-hidden"
               >
                 <button
                   type="button"
@@ -362,7 +362,7 @@ export default function ArchivesList({
                   className={cn(
                     'w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/50 transition-colors',
                     'border-b border-transparent',
-                    isExpanded && 'border-b-neutral-200 dark:border-b-neutral-700/60'
+                    isExpanded && 'border-b-border'
                   )}
                 >
                   {group.iconName === 'Calendar' ? (
@@ -403,7 +403,7 @@ export default function ArchivesList({
       ) : (
         /* Flat view */
         <>
-          <div className="rounded-2xl border border-neutral-200/70 dark:border-neutral-700/40 overflow-hidden mb-4">
+          <div className="rounded-2xl border border-border overflow-hidden mb-4">
             {tableHeader}
             {sortedArchives
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)

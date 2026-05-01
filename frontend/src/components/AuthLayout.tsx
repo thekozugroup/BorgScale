@@ -100,8 +100,6 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <style>{AUTH_STYLES}</style>
-
       <div
         className="flex-col lg:flex-row lg:h-screen bg-background"
         style={{

@@ -95,9 +95,9 @@
   "navigation": {
     "appName": "BorgScale",
     "sections": {
-      "dashboard": "DASHBOARD",
-      "backup": "SICHERUNG",
-      "settings": "EINSTELLUNGEN"
+      "dashboard": "Dashboard",
+      "backup": "Sicherung",
+      "settings": "Einstellungen"
     },
     "items": {
       "dashboard": "Dashboard",
@@ -345,7 +345,7 @@
     "mountTimeout": "Einhänge-Timeout: Große Repositories benötigen möglicherweise mehr Zeit zum Einhängen.",
     "mountFailed": "Fehler beim Einhängen des Archivs: {{error}}",
     "restoreStarted": "Wiederherstellungsaufgabe gestartet! Überprüfe den Aktivitäts-Tab, um den Fortschritt zu überwachen.",
-    "mountSuccess": "Archiv erfolgreich eingehängt!\n\nEinhängepunkt befindet sich im Container. Um auf Dateien zuzugreifen, ausführen:\n\n{{command}}",
+    "mountSuccess": "Archiv eingehängt. So greifen Sie in einem Terminal auf Dateien zu:\n\n{{command}}",
     "mountCommandTitle": "Terminal-Zugriffsbefehl",
     "mountCommandDesc": "Öffne diesen Befehl in einem Terminal, um den Einhängeordner zu durchsuchen.",
     "toasts": {
@@ -1253,7 +1253,7 @@
       "tip": "Tipp: Komprimierung nach dem Bereinigen alter Archive ausführen, um Speicherplatz freizugeben. Andere Repositories bleiben zugänglich."
     },
     "mount": {
-      "readOnlyInfo": "Das Archiv wird als schreibgeschütztes Dateisystem im Container eingehängt. Du erhältst einen Befehl für den Zugriff über das Terminal.",
+      "readOnlyInfo": "Das Archiv wird als schreibgeschütztes Dateisystem eingehängt.",
       "mountPointPlaceholder": "meine-sicherung-2024",
       "mountPointHint": "Wird eingehängt unter: {{path}}"
     },
@@ -1774,7 +1774,7 @@
   },
   "mountsManagement": {
     "title": "Aktive Einhängepunkte",
-    "subtitle": "Verwalte eingehängte Borg-Archive. Archive werden beim Container-Neustart automatisch ausgehängt.",
+    "subtitle": "Verwalte eingehängte Borg-Archive. Archive werden beim App-Neustart automatisch ausgehängt.",
     "empty": "Keine aktiven Einhängepunkte",
     "unmount": "Aushängen",
     "unmounting": "Hängt aus...",
@@ -2207,7 +2207,7 @@
     "review": {
       "readyToInitialize": "Bereit zur Initialisierung",
       "configurationSummary": "Konfigurationsübersicht",
-      "repository": "REPOSITORY",
+      "repository": "Repository",
       "name": "Name",
       "mode": "Modus",
       "full": "Vollständig",
@@ -2217,13 +2217,13 @@
       "notSet": "(nicht gesetzt)",
       "borgUiServer": "Borg-UI-Server",
       "sshRemote": "SSH-Remote",
-      "dataSource": "DATENQUELLE",
+      "dataSource": "Datenquelle",
       "source": "Quelle",
       "remoteClient": "Remote-Client",
       "directories": "Verzeichnisse",
       "directoriesCount": "{{count}} konfiguriert",
       "excludePatterns": "Ausschlussmuster",
-      "security": "SICHERHEIT",
+      "security": "Sicherheit",
       "encryption": "Verschlüsselung",
       "encryptionRepokey": "Repokey",
       "encryptionKeyfile": "Schlüsseldatei",
@@ -2231,7 +2231,7 @@
       "passphrase": "Passphrase",
       "passphraseSet": "••••••••",
       "passphraseNotSet": "(nicht gesetzt)",
-      "backupConfiguration": "SICHERUNGSKONFIGURATION",
+      "backupConfiguration": "Sicherungskonfiguration",
       "compression": "Komprimierung",
       "customFlags": "Benutzerdefinierte Flags",
       "repositoryInitialized": "Repository wird initialisiert",
@@ -2814,7 +2814,7 @@
       "forceUnmountTooltip": "Erzwungenes Aushängen (bei Beschäftigung verwenden)"
     },
     "copiedToClipboard": "{{label}} in Zwischenablage kopiert",
-    "infoAlert": "Hinweis: Eingehängte Archive erscheinen als schreibgeschützte Dateisysteme im Dateimanager. Zugriff über den Einhängepunkt-Pfad. Einhängepunkte werden beim Container-Neustart automatisch bereinigt.",
+    "infoAlert": "Hinweis: Eingehängte Archive erscheinen als schreibgeschützte Dateisysteme im Dateimanager. Zugriff über den Einhängepunkt-Pfad. Einhängepunkte werden beim App-Neustart automatisch bereinigt.",
     "emptyDescription": "Archive von der Archive-Seite einhängen, um deren Inhalt direkt im Dateimanager zu durchsuchen.",
     "activeMounts": "Aktive Einhängepunkte"
   },

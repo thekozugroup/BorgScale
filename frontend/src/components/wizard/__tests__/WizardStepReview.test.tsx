@@ -120,7 +120,7 @@ describe('WizardStepReview', () => {
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
-      expect(screen.getByText('DATA SOURCE')).toBeInTheDocument()
+      expect(screen.getByText('Data source')).toBeInTheDocument()
     })
 
     it('hides data source section for observe mode', () => {
@@ -130,7 +130,7 @@ describe('WizardStepReview', () => {
         <WizardStepReview mode="create" data={observeData} sshConnections={mockSshConnections} />
       )
 
-      expect(screen.queryByText('DATA SOURCE')).not.toBeInTheDocument()
+      expect(screen.queryByText('Data source')).not.toBeInTheDocument()
     })
 
     it('shows Remote Client for remote data source', () => {
@@ -170,7 +170,7 @@ describe('WizardStepReview', () => {
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
-      expect(screen.getByText('SECURITY')).toBeInTheDocument()
+      expect(screen.getByText('Security')).toBeInTheDocument()
     })
 
     it('shows encryption chip for create mode', () => {
@@ -271,7 +271,7 @@ describe('WizardStepReview', () => {
         <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
-      expect(screen.getByText('BACKUP CONFIGURATION')).toBeInTheDocument()
+      expect(screen.getByText('Backup configuration')).toBeInTheDocument()
     })
 
     it('hides backup configuration section for observe mode', () => {
@@ -281,7 +281,7 @@ describe('WizardStepReview', () => {
         <WizardStepReview mode="create" data={observeData} sshConnections={mockSshConnections} />
       )
 
-      expect(screen.queryByText('BACKUP CONFIGURATION')).not.toBeInTheDocument()
+      expect(screen.queryByText('Backup configuration')).not.toBeInTheDocument()
     })
 
     it('shows compression value', () => {

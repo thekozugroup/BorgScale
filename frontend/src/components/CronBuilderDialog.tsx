@@ -47,7 +47,6 @@ export const CronBuilderDialog: React.FC<CronBuilderDialogProps> = ({
       <Button variant="outline" onClick={handleCancel}>{t('common.buttons.cancel')}</Button>
       <Button
         onClick={handleApply}
-        style={{ boxShadow: '0 2px 8px rgba(37,99,235,0.3)' }}
       >
         {buttonLabel || t('cronBuilder.applySchedule')}
       </Button>

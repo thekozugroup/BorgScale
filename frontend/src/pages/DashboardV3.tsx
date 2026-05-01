@@ -187,7 +187,7 @@ function DimIcon({ status }: { status: string }) {
   if (status === 'healthy') return <CheckCircle2 className="h-3 w-3 text-primary" />
   if (status === 'warning') return <AlertTriangle className="h-3 w-3 text-muted-foreground" />
   if (status === 'critical') return <XCircle className="h-3 w-3 text-destructive" />
-  return <MinusCircle className="h-3 w-3 text-neutral-400" />
+  return <MinusCircle className="h-3 w-3 text-muted-foreground" />
 }
 
 /**
