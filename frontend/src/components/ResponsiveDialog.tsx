@@ -63,13 +63,11 @@ export default function ResponsiveDialog({
       <>
         {open && (
           <div
-            className="fixed inset-0 z-50 flex items-end"
-            style={{ background: 'rgba(0,0,0,0.5)' }}
+            className="fixed inset-0 z-50 flex items-end bg-foreground/50"
             onClick={handleClose}
           >
             <div
-              className="w-full bg-background rounded-t-2xl max-h-[90vh] flex flex-col"
-              style={{ boxShadow: '0 -4px 32px rgba(0,0,0,0.25)' }}
+              className="w-full bg-background rounded-t-2xl max-h-[90vh] flex flex-col shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Drag handle row */}

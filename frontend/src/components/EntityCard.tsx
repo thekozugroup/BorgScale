@@ -2,7 +2,6 @@ import { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button'
-import { useTheme } from '../context/ThemeContext'
 
 export interface StatItem {
   icon: ReactNode
@@ -49,8 +48,7 @@ export interface EntityCardProps {
   isHighlighted?: boolean
 }
 
-// EntityCard uses semantic accent only for hover box-shadow on the card.
-// Stat and action colours now map to semantic tokens.
+// Stat colours map to semantic tokens
 const STAT_COLORS: Record<string, string> = {
   primary: 'hsl(var(--primary))',
   success: 'hsl(var(--primary))',
@@ -69,33 +67,10 @@ export default function EntityCard({
   tags,
   actions,
   primaryAction,
-  accentColor: _accentColor,
-  isHighlighted: _isHighlighted,
 }: EntityCardProps) {
-  const { effectiveMode } = useTheme()
-  const isDark = effectiveMode === 'dark'
-
-  const borderBase = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)'
-  const innerBg = isDark ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.018)'
-
   return (
     <div
-      className="relative rounded-lg bg-background overflow-hidden max-w-full min-w-0 transition-all duration-200 hover:-translate-y-0.5"
-      style={{
-        boxShadow: isDark
-          ? `0 0 0 1px rgba(255,255,255,0.08), 0 4px 16px rgba(0,0,0,0.25)`
-          : `0 0 0 1px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.07)`,
-      }}
-      onMouseEnter={(e) => {
-        ;(e.currentTarget as HTMLDivElement).style.boxShadow = isDark
-          ? `0 0 0 1px rgba(255,255,255,0.12), 0 8px 24px rgba(0,0,0,0.3)`
-          : `0 0 0 1px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.12)`
-      }}
-      onMouseLeave={(e) => {
-        ;(e.currentTarget as HTMLDivElement).style.boxShadow = isDark
-          ? `0 0 0 1px rgba(255,255,255,0.08), 0 4px 16px rgba(0,0,0,0.25)`
-          : `0 0 0 1px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.07)`
-      }}
+      className="relative rounded-lg border border-border bg-card text-card-foreground overflow-hidden max-w-full min-w-0 transition-shadow duration-200 hover:shadow-md shadow-sm"
     >
       <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3.5 sm:pb-4">
         {/* Header */}
@@ -113,11 +88,9 @@ export default function EntityCard({
 
         {/* Stats grid */}
         <div
-          className="grid rounded-md overflow-hidden mb-3 border"
+          className="grid rounded-md overflow-hidden mb-3 border border-border bg-muted/30"
           style={{
             gridTemplateColumns: `repeat(${Math.min(stats.length, 4)}, 1fr)`,
-            borderColor: borderBase,
-            background: innerBg,
           }}
         >
           {stats.map((stat, i) => {
@@ -128,10 +101,11 @@ export default function EntityCard({
               <Tooltip key={stat.label}>
                 <TooltipTrigger asChild>
                   <div
-                    className={cn('px-3 py-2.5', stat.tooltip ? 'cursor-help' : 'cursor-default')}
-                    style={{
-                      borderRight: isLast ? 'none' : `1px solid ${borderBase}`,
-                    }}
+                    className={cn(
+                      'px-3 py-2.5',
+                      stat.tooltip ? 'cursor-help' : 'cursor-default',
+                      !isLast && 'border-r border-border'
+                    )}
                   >
                     <div className="flex items-center gap-1 mb-1">
                       <span className="flex items-center text-muted-foreground/60" style={statColor ? { color: statColor } : undefined}>
@@ -179,8 +153,7 @@ export default function EntityCard({
 
         {/* Footer actions */}
         <div
-          className="flex items-center gap-1 pt-3 border-t"
-          style={{ borderColor: borderBase }}
+          className="flex items-center gap-1 pt-3 border-t border-border"
         >
           <div className="flex items-center gap-0.5">
             {actions

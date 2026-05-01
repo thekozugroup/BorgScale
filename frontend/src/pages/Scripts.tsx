@@ -5,6 +5,16 @@ import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../components/ui/alert-dialog'
 import { Loader2, Plus, Edit, Trash2, Play, FileCode, Clock, CheckCircle, XCircle } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import api from '../services/api'
@@ -70,6 +80,7 @@ export default function Scripts() {
   const [testingScriptData, setTestingScriptData] = useState<Script | null>(null)
   const [testParameterValues, setTestParameterValues] = useState<Record<string, string>>({})
   const [detectedParameters, setDetectedParameters] = useState<ScriptParameter[]>([])
+  const [pendingDeleteScript, setPendingDeleteScript] = useState<Script | null>(null)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -228,10 +239,14 @@ export default function Scripts() {
     }
   }
 
-  const handleDelete = async (script: Script) => {
-    if (!confirm(t('scripts.confirmDelete', { name: script.name }))) {
-      return
-    }
+  const handleDelete = (script: Script) => {
+    setPendingDeleteScript(script)
+  }
+
+  const confirmDeleteScript = async () => {
+    const script = pendingDeleteScript
+    if (!script) return
+    setPendingDeleteScript(null)
 
     try {
       await api.delete(`/scripts/${script.id}`)
@@ -460,8 +475,9 @@ export default function Scripts() {
             </div>
 
             <div>
-              <Label className="text-xs font-semibold mb-1.5 block">{t('scripts.fields.runOn')}</Label>
+              <Label htmlFor="scripts-run-on" className="text-xs font-semibold mb-1.5 block">{t('scripts.fields.runOn')}</Label>
               <select
+                id="scripts-run-on"
                 value={formData.run_on}
                 onChange={(e) => setFormData({ ...formData, run_on: e.target.value })}
                 className="w-full rounded-md border border-input bg-background h-9 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
@@ -478,8 +494,9 @@ export default function Scripts() {
             </div>
 
             <div>
-              <Label className="text-xs font-semibold mb-1.5 block">{t('scripts.fields.timeout')}</Label>
+              <Label htmlFor="scripts-timeout" className="text-xs font-semibold mb-1.5 block">{t('scripts.fields.timeout')}</Label>
               <Input
+                id="scripts-timeout"
                 type="number"
                 value={formData.timeout}
                 onChange={(e) => setFormData({ ...formData, timeout: parseInt(e.target.value) })}
@@ -620,8 +637,8 @@ export default function Scripts() {
               {testResult.stdout && (
                 <div>
                   <p className="text-sm font-semibold mb-1">{t('scripts.testDialog.stdout')}</p>
-                  <div className="p-3 rounded-xl overflow-auto max-h-48 bg-neutral-900">
-                    <pre className="text-sm font-mono whitespace-pre-wrap m-0 text-neutral-200">{testResult.stdout}</pre>
+                  <div className="p-3 rounded-xl overflow-auto max-h-48 bg-foreground">
+                    <pre className="text-sm font-mono whitespace-pre-wrap m-0 text-background">{testResult.stdout}</pre>
                   </div>
                 </div>
               )}
@@ -630,7 +647,7 @@ export default function Scripts() {
               {testResult.stderr && (
                 <div>
                   <p className="text-sm font-semibold mb-1 text-destructive">{t('scripts.testDialog.stderr')}</p>
-                  <div className="p-3 rounded-xl overflow-auto max-h-48 bg-neutral-900">
+                  <div className="p-3 rounded-xl overflow-auto max-h-48 bg-foreground">
                     <pre className="text-sm font-mono whitespace-pre-wrap m-0 text-destructive">{testResult.stderr}</pre>
                   </div>
                 </div>
@@ -648,6 +665,24 @@ export default function Scripts() {
           ) : null}
         </DialogContent>
       </Dialog>
+
+      {/* Delete-script confirmation */}
+      <AlertDialog open={!!pendingDeleteScript} onOpenChange={(open) => { if (!open) setPendingDeleteScript(null) }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('scripts.confirmDeleteTitle', { defaultValue: 'Delete script?' })}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingDeleteScript
+                ? t('scripts.confirmDelete', { name: pendingDeleteScript.name })
+                : ''}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.buttons.cancel')}</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={confirmDeleteScript}>{t('common.buttons.delete', { defaultValue: 'Delete' })}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

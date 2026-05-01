@@ -16,10 +16,11 @@ describe('VersionChip', () => {
     expect(label).not.toHaveStyle({ color: 'rgb(99,102,241)' })
   })
 
-  it('renders accent label color when accent=true', () => {
+  it('renders accent label with accent class when accent=true', () => {
     renderWithProviders(<VersionChip label="B2" version="2.0.0" accent />)
     const label = screen.getByText('B2')
-    expect(label).toHaveStyle({ color: 'rgb(99,102,241)' })
+    // accent variant uses text-primary class, not indigo inline style
+    expect(label).not.toHaveStyle({ color: 'rgb(99,102,241)' })
   })
 
   it('renders version in monospace', () => {

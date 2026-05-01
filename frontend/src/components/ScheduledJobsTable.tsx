@@ -74,11 +74,8 @@ const ScheduledJobsTable = ({
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="rounded-lg bg-background overflow-hidden"
-              style={{
-                boxShadow: '0 0 0 1px rgba(255,255,255,0.08), 0 4px 16px rgba(0,0,0,0.25)',
-                opacity: Math.max(0.4, 1 - i * 0.2),
-              }}
+              className="rounded-lg bg-card border border-border overflow-hidden shadow-sm"
+              style={{ opacity: Math.max(0.4, 1 - i * 0.2) }}
             >
               <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3.5 sm:pb-4">
                 {/* Title row + badge */}

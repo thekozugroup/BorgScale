@@ -31,7 +31,7 @@ interface CommandPreviewProps {
 }
 
 const CommandBox = ({ children }: { children: React.ReactNode }) => (
-  <div className="bg-neutral-900 text-neutral-100 p-3 rounded font-mono text-xs overflow-auto whitespace-pre-wrap break-all">
+  <div className="bg-foreground text-background p-3 rounded font-mono text-xs overflow-auto whitespace-pre-wrap break-all">
     {children}
   </div>
 )

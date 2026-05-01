@@ -95,9 +95,9 @@
   "navigation": {
     "appName": "BorgScale",
     "sections": {
-      "dashboard": "DASHBOARD",
-      "backup": "BACKUP",
-      "settings": "SETTINGS"
+      "dashboard": "Dashboard",
+      "backup": "Backup",
+      "settings": "Settings"
     },
     "items": {
       "dashboard": "Dashboard",
@@ -345,7 +345,7 @@
     "mountTimeout": "Mount timeout: Large repositories may need more time to mount.",
     "mountFailed": "Failed to mount archive: {{error}}",
     "restoreStarted": "Restore job started! Check the Activity tab to monitor progress.",
-    "mountSuccess": "Archive mounted successfully!\n\nMount is inside the container. To access files, run:\n\n{{command}}",
+    "mountSuccess": "Archive mounted. To access files in a terminal:\n\n{{command}}",
     "mountCommandTitle": "Terminal access command",
     "mountCommandDesc": "Open this command in a terminal to browse the mount folder.",
     "toasts": {
@@ -1253,7 +1253,7 @@
       "tip": "Tip: Run compaction after pruning old archives to free up space. Other repositories will remain accessible."
     },
     "mount": {
-      "readOnlyInfo": "The archive will be mounted as a read-only filesystem inside the container. You'll receive a command to access it via terminal.",
+      "readOnlyInfo": "The archive will be mounted as a read-only filesystem.",
       "mountPointPlaceholder": "my-backup-2024",
       "mountPointHint": "Will be mounted at: {{path}}"
     },
@@ -1774,7 +1774,7 @@
   },
   "mountsManagement": {
     "title": "Active Mounts",
-    "subtitle": "Manage mounted Borg archives. Archives are automatically unmounted on container restart.",
+    "subtitle": "Manage mounted Borg archives. Archives unmount automatically on app restart.",
     "empty": "No Active Mounts",
     "unmount": "Unmount",
     "unmounting": "Unmounting...",
@@ -2207,7 +2207,7 @@
     "review": {
       "readyToInitialize": "Ready to Initialize",
       "configurationSummary": "Configuration Summary",
-      "repository": "REPOSITORY",
+      "repository": "Repository",
       "name": "Name",
       "mode": "Mode",
       "full": "Full",
@@ -2217,13 +2217,13 @@
       "notSet": "(not set)",
       "borgUiServer": "BorgScale Server",
       "sshRemote": "SSH Remote",
-      "dataSource": "DATA SOURCE",
+      "dataSource": "Data source",
       "source": "Source",
       "remoteClient": "Remote Client",
       "directories": "Directories",
       "directoriesCount": "{{count}} configured",
       "excludePatterns": "Exclude Patterns",
-      "security": "SECURITY",
+      "security": "Security",
       "encryption": "Encryption",
       "encryptionRepokey": "Repokey",
       "encryptionKeyfile": "Keyfile",
@@ -2231,7 +2231,7 @@
       "passphrase": "Passphrase",
       "passphraseSet": "••••••••",
       "passphraseNotSet": "(not set)",
-      "backupConfiguration": "BACKUP CONFIGURATION",
+      "backupConfiguration": "Backup configuration",
       "compression": "Compression",
       "customFlags": "Custom Flags",
       "repositoryInitialized": "Repository will be initialized",
@@ -2814,7 +2814,7 @@
       "forceUnmountTooltip": "Force unmount (use if busy)"
     },
     "copiedToClipboard": "{{label}} copied to clipboard",
-    "infoAlert": "Note: Mounted archives appear as read-only filesystems in your file manager. Access them at the mount point path. Mounts are automatically cleaned up on container restart.",
+    "infoAlert": "Note: Mounted archives appear as read-only filesystems in your file manager. Access them at the mount point path. Mounts are cleaned up automatically on app restart.",
     "emptyDescription": "Mount archives from the Archives page to browse their contents directly in your file manager.",
     "activeMounts": "Active Mounts"
   },

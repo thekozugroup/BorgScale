@@ -59,7 +59,7 @@ export default function CodeEditor({
               strings: true,
             },
           }}
-          loading={<div className="p-4 bg-neutral-900 text-neutral-400">{t('codeEditor.loading')}</div>}
+          loading={<div className="p-4 bg-foreground text-background/60">{t('codeEditor.loading')}</div>}
         />
       </div>
       {helperText && (

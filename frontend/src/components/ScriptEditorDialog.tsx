@@ -189,8 +189,8 @@ export default function ScriptEditorDialog({
               {testResult.stdout && (
                 <div className="mb-3">
                   <p className="text-xs text-muted-foreground mb-1">{t('scriptEditor.stdout')}</p>
-                  <div className="p-3 rounded-xl overflow-auto max-h-48 bg-neutral-900">
-                    <pre className="text-sm whitespace-pre-wrap break-words m-0 text-neutral-200 font-mono">
+                  <div className="p-3 rounded-xl overflow-auto max-h-48 bg-foreground">
+                    <pre className="text-sm whitespace-pre-wrap break-words m-0 text-background font-mono">
                       {testResult.stdout}
                     </pre>
                   </div>
@@ -200,7 +200,7 @@ export default function ScriptEditorDialog({
               {testResult.stderr && (
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">{t('scriptEditor.stderr')}</p>
-                  <div className="p-3 rounded-xl overflow-auto max-h-48 bg-neutral-900">
+                  <div className="p-3 rounded-xl overflow-auto max-h-48 bg-foreground">
                     <pre className="text-sm whitespace-pre-wrap break-words m-0 text-destructive font-mono">
                       {testResult.stderr}
                     </pre>

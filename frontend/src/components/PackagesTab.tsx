@@ -557,8 +557,8 @@ export default function PackagesTab() {
             {jobStatus?.stdout && (
               <div>
                 <p className="text-xs text-muted-foreground mb-1.5">{t('packages.resultDialog.stdout')}</p>
-                <div className="p-3 rounded-xl overflow-auto max-h-72 bg-neutral-900">
-                  <pre className="text-sm whitespace-pre-wrap break-words m-0 text-neutral-200 font-mono">
+                <div className="p-3 rounded-xl overflow-auto max-h-72 bg-foreground">
+                  <pre className="text-sm whitespace-pre-wrap break-words m-0 text-background font-mono">
                     {jobStatus.stdout}
                   </pre>
                 </div>
@@ -568,7 +568,7 @@ export default function PackagesTab() {
             {jobStatus?.stderr && (
               <div>
                 <p className="text-xs text-muted-foreground mb-1.5">{t('packages.resultDialog.stderr')}</p>
-                <div className="p-3 rounded-xl overflow-auto max-h-72 bg-neutral-900">
+                <div className="p-3 rounded-xl overflow-auto max-h-72 bg-foreground">
                   <pre className="text-sm whitespace-pre-wrap break-words m-0 text-destructive font-mono">
                     {jobStatus.stderr}
                   </pre>

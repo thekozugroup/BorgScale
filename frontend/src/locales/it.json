@@ -95,9 +95,9 @@
   "navigation": {
     "appName": "BorgScale",
     "sections": {
-      "dashboard": "DASHBOARD",
-      "backup": "BACKUP",
-      "settings": "IMPOSTAZIONI"
+      "dashboard": "Dashboard",
+      "backup": "Backup",
+      "settings": "Impostazioni"
     },
     "items": {
       "dashboard": "Dashboard",
@@ -345,7 +345,7 @@
     "mountTimeout": "Timeout mount: I repository di grandi dimensioni potrebbero richiedere più tempo per il mount.",
     "mountFailed": "Impossibile montare l'archivio: {{error}}",
     "restoreStarted": "Job di ripristino avviato! Controlla la scheda Attività per monitorare i progressi.",
-    "mountSuccess": "Archivio montato con successo!\n\nIl mount è all'interno del container. Per accedere ai file, esegui:\n\n{{command}}",
+    "mountSuccess": "Archivio montato. Per accedere ai file in un terminale:\n\n{{command}}",
     "mountCommandTitle": "Comando di accesso al terminale",
     "mountCommandDesc": "Apri questo comando in un terminale per sfogliare la cartella montata.",
     "toasts": {
@@ -1253,7 +1253,7 @@
       "tip": "Suggerimento: Esegui la compattazione dopo la pulizia degli archivi vecchi per liberare spazio. Altri repository rimarranno accessibili."
     },
     "mount": {
-      "readOnlyInfo": "L'archivio verrà montato come filesystem di sola lettura all'interno del container. Riceverai un comando per accedervi tramite terminale.",
+      "readOnlyInfo": "L'archivio verrà montato come filesystem di sola lettura.",
       "mountPointPlaceholder": "mio-backup-2024",
       "mountPointHint": "Verrà montato in: {{path}}"
     },
@@ -1774,7 +1774,7 @@
   },
   "mountsManagement": {
     "title": "Mount Attivi",
-    "subtitle": "Gestisci gli archivi Borg montati. Gli archivi vengono smontati automaticamente al riavvio del container.",
+    "subtitle": "Gestisci gli archivi Borg montati. Gli archivi vengono smontati automaticamente al riavvio dell'app.",
     "empty": "Nessun Mount Attivo",
     "unmount": "Smonta",
     "unmounting": "Smontaggio in corso...",
@@ -2207,7 +2207,7 @@
     "review": {
       "readyToInitialize": "Pronto per l'inizializzazione",
       "configurationSummary": "Riepilogo Configurazione",
-      "repository": "REPOSITORY",
+      "repository": "Repository",
       "name": "Nome",
       "mode": "Modalità",
       "full": "Completo",
@@ -2217,13 +2217,13 @@
       "notSet": "(non impostato)",
       "borgUiServer": "Server BorgScale",
       "sshRemote": "SSH Remoto",
-      "dataSource": "SORGENTE DATI",
+      "dataSource": "Sorgente dati",
       "source": "Sorgente",
       "remoteClient": "Client Remoto",
       "directories": "Directory",
       "directoriesCount": "{{count}} configurate",
       "excludePatterns": "Pattern di Esclusione",
-      "security": "SICUREZZA",
+      "security": "Sicurezza",
       "encryption": "Crittografia",
       "encryptionRepokey": "Chiave Repository",
       "encryptionKeyfile": "File Chiave",
@@ -2231,7 +2231,7 @@
       "passphrase": "Passphrase",
       "passphraseSet": "••••••••",
       "passphraseNotSet": "(non impostata)",
-      "backupConfiguration": "CONFIGURAZIONE BACKUP",
+      "backupConfiguration": "Configurazione backup",
       "compression": "Compressione",
       "customFlags": "Flag Personalizzati",
       "repositoryInitialized": "Il repository verrà inizializzato",
@@ -2814,7 +2814,7 @@
       "forceUnmountTooltip": "Forza smontaggio (usa se occupato)"
     },
     "copiedToClipboard": "{{label}} copiato negli appunti",
-    "infoAlert": "Nota: Gli archivi montati appaiono come filesystem di sola lettura nel tuo file manager. Accedili al percorso del punto di mount. I mount vengono puliti automaticamente al riavvio del container.",
+    "infoAlert": "Nota: Gli archivi montati appaiono come filesystem di sola lettura nel tuo file manager. Accedili al percorso del punto di mount. I mount vengono puliti automaticamente al riavvio dell'app.",
     "emptyDescription": "Monta archivi dalla pagina Archivi per sfogliare il loro contenuto direttamente nel tuo file manager.",
     "activeMounts": "Mount Attivi"
   },

@@ -24,13 +24,7 @@ export function Footer() {
   if (!info) return null
   return (
     <footer
-      style={{
-        textAlign: 'center',
-        padding: '8px 12px',
-        fontSize: 12,
-        opacity: 0.7,
-        borderTop: '1px solid var(--border, rgba(0,0,0,0.08))',
-      }}
+      className="border-t border-border text-center px-3 py-2 text-xs opacity-70"
     >
       {info.name} v{info.version} ·{' '}
       <a href={info.source} target="_blank" rel="noreferrer">Source (AGPL)</a>

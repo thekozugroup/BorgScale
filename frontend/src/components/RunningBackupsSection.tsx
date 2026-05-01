@@ -10,7 +10,6 @@ import {
   formatTimeRange,
 } from '../utils/dateUtils'
 import { Button } from '@/components/ui/button'
-import { useTheme } from '../context/ThemeContext'
 
 // ACCENT_BACKUP replaced with semantic token classes below
 
@@ -40,8 +39,6 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
   onViewLogs,
 }) => {
   const { t } = useTranslation()
-  const { effectiveMode } = useTheme()
-  const isDark = effectiveMode === 'dark'
 
   const getVisibleStats = (job: BackupJob) =>
     [
@@ -58,12 +55,7 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
 
   return (
     <div
-      className="mb-6 rounded-lg overflow-hidden"
-      style={{
-        boxShadow: isDark
-          ? '0 0 0 1px rgba(255,255,255,0.08), 0 4px 16px rgba(0,0,0,0.25)'
-          : '0 0 0 1px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.07)',
-      }}
+      className="mb-6 rounded-lg overflow-hidden border border-border shadow-sm"
     >
       <div className="px-4 sm:px-6 pt-4 pb-5 bg-background">
         {/* Section Header */}
@@ -111,8 +103,6 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                   }}
                 />
 
-                <style>{`@keyframes blobPulseJob { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } } @keyframes liveDot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.45; transform: scale(0.82); } }`}</style>
-
                 <div className="px-4 sm:px-5 pt-4 pb-4">
                   {/* Header row */}
                   <div className="flex justify-between items-start gap-4 mb-4 flex-wrap sm:flex-nowrap">
@@ -130,7 +120,7 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                           </div>
                         )}
                       </div>
-                      <p className="text-[0.69rem] truncate" style={{ fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace', color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.35)' }}>
+                      <p className="text-[0.69rem] truncate text-foreground/30" style={{ fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace' }}>
                         {job.repository}
                       </p>
                     </div>
@@ -171,7 +161,7 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                         <span className="text-[0.68rem] font-semibold text-primary">{pct.toFixed(1)}%</span>
                         <span className="text-[0.65rem] text-muted-foreground">{t('backup.runningJobs.progress.totalSourceSize')}</span>
                       </div>
-                      <div className="h-1 rounded-full overflow-hidden" style={{ background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)' }}>
+                      <div className="h-1 rounded-full overflow-hidden bg-muted">
                         <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
                       </div>
                     </div>
@@ -180,11 +170,9 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                   {/* Stats grid */}
                   {visibleStats.length > 0 && (
                     <div
-                      className="grid rounded-md overflow-hidden mb-3"
+                      className="grid rounded-md overflow-hidden mb-3 border border-border"
                       style={{
                         gridTemplateColumns: `repeat(${Math.min(visibleStats.length, 4)}, 1fr)`,
-                        gap: '1px',
-                        background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)',
                       }}
                     >
                       {visibleStats.map((stat, i) => (
@@ -205,11 +193,7 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                   {/* Current file */}
                   {job.progress_details?.current_file && (
                     <div
-                      className="flex items-center gap-2 px-3 py-2 rounded overflow-hidden"
-                      style={{
-                        background: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.03)',
-                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)'}`,
-                      }}
+                      className="flex items-center gap-2 px-3 py-2 rounded overflow-hidden bg-muted/50 border border-border"
                     >
                       <span className="text-primary/60 flex shrink-0"><FileText size={13} /></span>
                       <p className="text-[0.72rem] text-muted-foreground truncate flex-1 min-w-0" style={{ fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace' }}>
