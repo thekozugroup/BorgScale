@@ -1265,7 +1265,7 @@
       "noBackupsYet": "No backups yet",
       "noBackupsDesc": "This repository has been initialized but contains no archives. Storage statistics will appear here after you create your first backup.",
       "loadFailed": "Failed to load repository information. Make sure the repository is accessible and properly initialized.",
-      "v2PlanRequired": "This repository uses Borg 2. Your data is safe. Upgrade to Pro to view its details.",
+      "v2PlanRequired": "This repository uses Borg 2.",
       "exportKeyfileTooltip": "Export keyfile. Keep this safe!"
     },
     "mountArchive": {
@@ -3282,12 +3282,6 @@
         "repositoryLocked": "Repository is locked by another process or has a stale lock"
       }
     }
-  },
-  "upgradePrompt": {
-    "featureLabel": "{{plan}} feature",
-    "defaultMessage": "This feature requires the {{plan}} plan.",
-    "requiresPlan": "Requires {{plan}} plan",
-    "learnMore": "See what's included →"
   },
   "announcements": {
     "highlights": "What's new",

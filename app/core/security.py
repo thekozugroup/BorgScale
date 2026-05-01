@@ -637,7 +637,7 @@ async def create_first_user():
             admin_user = User(
                 username="admin",
                 password_hash=hashed_password,
-                email="admin@borg.local",
+                email="admin@borgscale.local",
                 is_active=True,
                 role="admin",
                 must_change_password=True,  # Force password change on first login

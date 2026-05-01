@@ -49,9 +49,6 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
       ? user.enterprise_name?.trim() || 'Enterprise deployment'
       : ''
 
-  const planLabel = t('plan.fullAccessLabel', 'Full Access')
-  const planDescription = t('plan.descriptionEnterprise', 'All Enterprise features unlocked')
-
   const initials = displayName
     .split(/\s+/)
     .slice(0, 2)
@@ -158,7 +155,7 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
             </div>
           </div>
 
-          {/* ── 2. Plan card ── */}
+          {/* ── 2. Instance badge ── */}
           <div className="px-2.5 py-2">
             <div className="flex items-center gap-3 rounded-xl border border-border/30 bg-muted/40 p-2.5">
               <div className="flex size-[30px] shrink-0 items-center justify-center rounded-lg border border-border/40 bg-muted">
@@ -167,13 +164,15 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
               <div className="flex-1 text-left">
                 <div className="flex items-center gap-1.5">
                   <span className="text-xs font-bold text-foreground">
-                    {planLabel} {t('plan.planSuffix', 'Plan')}
+                    BorgScale
                   </span>
                   <span className="inline-flex items-center gap-1 rounded border border-border/30 bg-muted px-1.5 py-0.5 text-3xs font-bold uppercase tracking-wide text-muted-foreground">
                     {t('plan.activeStatus', 'Active')}
                   </span>
                 </div>
-                <p className="mt-0.5 text-2xs text-muted-foreground">{planDescription}</p>
+                <p className="mt-0.5 text-2xs text-muted-foreground">
+                  {t('plan.openSourceDesc', 'Free and open source (AGPL-3.0)')}
+                </p>
               </div>
             </div>
           </div>
