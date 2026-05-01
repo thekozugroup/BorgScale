@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useLocation, useSearchParams } from 'react-router-dom'
+import { useLocation, useSearchParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Folder } from 'lucide-react'
 import { repositoriesAPI, mountsAPI, restoreAPI } from '../services/api'
@@ -442,13 +442,18 @@ const Archives: React.FC = () => {
 
       {/* No repository selected */}
       {!selectedRepositoryId && !loadingRepositories && (
-        <div className="flex flex-col items-center py-16 text-muted-foreground">
-          <Folder size={48} className="mb-4" />
+        <div className="flex flex-col items-center py-16 text-muted-foreground gap-4">
+          <Folder size={48} />
           <p className="text-sm">
             {repositories.length === 0
               ? t('archives.noRepositories')
               : t('archives.selectRepository')}
           </p>
+          {repositories.length === 0 && (
+            <Button asChild size="lg">
+              <Link to="/repositories?action=create">{t('repositories.createRepository')}</Link>
+            </Button>
+          )}
         </div>
       )}
 

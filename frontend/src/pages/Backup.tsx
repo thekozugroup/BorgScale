@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useLocation } from 'react-router-dom'
+import { useLocation, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '../components/ui/button'
 import { Loader2, Clock, Info, Play, ChevronDown, ChevronUp } from 'lucide-react'
@@ -213,6 +213,7 @@ const Backup: React.FC = () => {
           <Button
             onClick={handleStartBackup}
             disabled={startBackupMutation.isPending || !selectedRepository || !canStartBackup}
+            size="lg"
             className="w-full sm:w-auto flex-shrink-0 gap-1.5 font-semibold"
           >
             {startBackupMutation.isPending ? (
@@ -227,11 +228,14 @@ const Backup: React.FC = () => {
         </div>
 
         {repositoriesData?.data?.repositories?.length === 0 && !loadingRepositories && (
-          <div className="flex items-start gap-2 p-3 rounded-xl text-sm mt-3 border border-border bg-muted/40 text-muted-foreground">
+          <div className="flex flex-col items-start gap-3 p-3 rounded-xl text-sm mt-3 border border-border bg-muted/40 text-muted-foreground">
             <div>
               <p className="font-semibold">{t('backup.manualBackup.noRepositories.title')}</p>
               <p className="mt-0.5">{t('backup.manualBackup.noRepositories.subtitle')}</p>
             </div>
+            <Button asChild size="lg">
+              <Link to="/repositories?action=create">{t('repositories.createRepository')}</Link>
+            </Button>
           </div>
         )}
       </div>

@@ -29,7 +29,11 @@ const ArchiveNode = ({ x, y, delay, duration, size, opacity }: NodeProps) => {
         top: y,
         width: size,
         height: size,
-        animation: `borgPulse ${duration} ease-in-out ${delay} infinite`,
+        animationName: 'borgPulse',
+        animationDuration: duration,
+        animationTimingFunction: 'ease-in-out',
+        animationDelay: delay,
+        animationIterationCount: 'infinite',
       }}
     />
   )
@@ -52,41 +56,14 @@ const FloatingDot = ({
     style={{
       left: x,
       top: y,
-      animation: `borgFloat ${duration} ease-in-out ${delay} infinite`,
+      animationName: 'borgFloat',
+      animationDuration: duration,
+      animationTimingFunction: 'ease-in-out',
+      animationDelay: delay,
+      animationIterationCount: 'infinite',
     }}
   />
 )
-
-// ─── Shared auth styles (keyframes + input classes) ─────────────────────────
-
-export const AUTH_STYLES = `
-  @keyframes borgPulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.18); opacity: 0.4; }
-  }
-  @keyframes borgFloat {
-    0%, 100% { transform: translateY(0px); opacity: 0.5; }
-    50% { transform: translateY(-12px); opacity: 1; }
-  }
-  @keyframes borgFadeIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes borgScan {
-    0% { background-position: 0 0; }
-    100% { background-position: 0 40px; }
-  }
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    @keyframes borgPulse { 0%, 100% { opacity: 1; } }
-    @keyframes borgFloat { 0%, 100% { opacity: 0.5; } }
-    @keyframes borgFadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes borgScan { 0%, 100% {} }
-  }
-`
 
 // ─── Layout component ───────────────────────────────────────────────────────
 
@@ -98,116 +75,57 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
   const { t } = useTranslation()
 
   return (
-    <>
-      <div
-        className="flex flex-col lg:flex-row lg:h-screen bg-background min-h-screen overflow-hidden"
-      >
-        {/* ── LEFT: Brand panel ──────────────────────────────────────────────── */}
-        <div
-          className="flex lg:w-[52%] xl:w-[55%] bg-muted"
-          style={{
-            position: 'relative',
-            overflow: 'hidden',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '24px 32px',
-          }}
-        >
+    <div className="flex flex-col lg:flex-row lg:h-screen bg-background min-h-screen overflow-hidden">
+      {/* ── LEFT: Brand panel ──────────────────────────────────────────────── */}
+      <div className="relative flex lg:w-[52%] xl:w-[55%] flex-col items-center justify-center overflow-hidden bg-muted p-6 lg:p-8">
 
-          {/* Floating archive nodes */}
-          <ArchiveNode x="8%" y="12%" delay="0s" duration="4.2s" size={48} opacity={0.7} />
-          <ArchiveNode x="78%" y="8%" delay="1.1s" duration="5.5s" size={32} opacity={0.5} />
-          <ArchiveNode x="85%" y="72%" delay="0.5s" duration="3.8s" size={56} opacity={0.6} />
-          <ArchiveNode x="6%" y="78%" delay="2s" duration="6s" size={40} opacity={0.4} />
-          <ArchiveNode x="55%" y="88%" delay="0.8s" duration="4.7s" size={28} opacity={0.5} />
-          <ArchiveNode x="22%" y="45%" delay="1.5s" duration="5s" size={20} opacity={0.3} />
-          <FloatingDot x="35%" y="18%" delay="0s" duration="3.5s" />
-          <FloatingDot x="65%" y="30%" delay="0.8s" duration="4.2s" />
-          <FloatingDot x="15%" y="60%" delay="1.4s" duration="3.8s" />
-          <FloatingDot x="80%" y="45%" delay="0.3s" duration="5s" />
-          <FloatingDot x="45%" y="72%" delay="1.8s" duration="4.6s" />
+        {/* Floating archive nodes */}
+        <ArchiveNode x="8%" y="12%" delay="0s" duration="4.2s" size={48} opacity={0.7} />
+        <ArchiveNode x="78%" y="8%" delay="1.1s" duration="5.5s" size={32} opacity={0.5} />
+        <ArchiveNode x="85%" y="72%" delay="0.5s" duration="3.8s" size={56} opacity={0.6} />
+        <ArchiveNode x="6%" y="78%" delay="2s" duration="6s" size={40} opacity={0.4} />
+        <ArchiveNode x="55%" y="88%" delay="0.8s" duration="4.7s" size={28} opacity={0.5} />
+        <ArchiveNode x="22%" y="45%" delay="1.5s" duration="5s" size={20} opacity={0.3} />
+        <FloatingDot x="35%" y="18%" delay="0s" duration="3.5s" />
+        <FloatingDot x="65%" y="30%" delay="0.8s" duration="4.2s" />
+        <FloatingDot x="15%" y="60%" delay="1.4s" duration="3.8s" />
+        <FloatingDot x="80%" y="45%" delay="0.3s" duration="5s" />
+        <FloatingDot x="45%" y="72%" delay="1.8s" duration="4.6s" />
 
-          {/* Center brand content */}
-          <div
-            style={{
-              position: 'relative',
-              zIndex: 10,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              textAlign: 'center',
-              animation: 'borgFadeIn 0.6s ease-out both',
-            }}
-          >
-            {/* Logo + wordmark */}
-            <div className="flex items-center gap-3" style={{ marginBottom: 20, marginTop: 8 }}>
-              <Boxes className="h-10 w-10" />
-              <span
-                className="text-foreground"
-                style={{
-                  fontSize: '2rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  lineHeight: 1.1,
-                }}
-              >
-                BorgScale
-              </span>
-            </div>
-
-            {/* Tagline — desktop only */}
-            <p
-              className="hidden lg:block text-muted-foreground"
-              style={{
-                fontSize: '1.05rem',
-                maxWidth: 340,
-                lineHeight: 1.6,
-                margin: '0 0 40px',
-              }}
-            >
-              {t('login.tagline')}
-            </p>
+        {/* Center brand content */}
+        <div className="relative z-10 flex flex-col items-center text-center animate-fade-in-up">
+          {/* Logo + wordmark */}
+          <div className="flex items-center gap-3 mb-5 mt-2">
+            <Boxes className="h-10 w-10" />
+            <span className="text-foreground text-4xl font-bold tracking-[0.1em] uppercase leading-tight">
+              BorgScale
+            </span>
           </div>
 
-          {/* Bottom decoration — desktop only */}
-          <div
-            aria-hidden="true"
-            className="hidden lg:block absolute bottom-6 left-1/2 -translate-x-1/2 text-[11px] font-mono tracking-[0.08em] whitespace-nowrap text-muted-foreground/35"
-          >
-            Encrypted · Deduplicated · Open source
-          </div>
+          {/* Tagline — desktop only */}
+          <p className="hidden lg:block text-muted-foreground text-base max-w-[340px] leading-relaxed mb-10">
+            {t('login.tagline')}
+          </p>
         </div>
 
-        {/* ── RIGHT: Form panel ──────────────────────────────────────────────── */}
+        {/* Bottom decoration — desktop only */}
         <div
-          className="px-5 lg:px-12 xl:px-16 justify-start lg:justify-center pt-3 lg:pt-6"
-          style={{
-            flex: 1,
-            minWidth: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            paddingBottom: 24,
-            position: 'relative',
-          }}
+          aria-hidden="true"
+          className="hidden lg:block absolute bottom-6 left-1/2 -translate-x-1/2 text-[11px] font-mono tracking-[0.08em] whitespace-nowrap text-muted-foreground/35"
         >
+          Encrypted · Deduplicated · Open source
+        </div>
+      </div>
 
-          <div
-            style={{
-              width: '100%',
-              maxWidth: 400,
-              animation: 'borgFadeIn 0.5s ease-out 0.1s both',
-            }}
-          >
-            {/* Card */}
-            <div className="bg-card/30 border border-foreground/[0.08] backdrop-blur rounded-2xl px-7 py-9">
-              {children}
-            </div>
+      {/* ── RIGHT: Form panel ──────────────────────────────────────────────── */}
+      <div className="relative flex flex-1 min-w-0 flex-col items-center justify-start lg:justify-center px-5 lg:px-12 xl:px-16 pb-6 pt-3 lg:pt-6">
+        <div className="w-full max-w-[400px] animate-fade-in-up [animation-delay:0.1s]">
+          {/* Card */}
+          <div className="bg-card/30 border border-foreground/[0.08] backdrop-blur rounded-2xl px-7 py-9">
+            {children}
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }

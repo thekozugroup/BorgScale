@@ -591,7 +591,7 @@ export default function Repositories() {
           </div>
           {canManageRepositoriesGlobally && (
             <div className="flex flex-col gap-2 md:flex-row">
-              <Button onClick={() => openWizard('create')} className="w-full md:w-auto">
+              <Button onClick={() => openWizard('create')} size="lg" className="w-full md:w-auto">
                 <Plus size={16} />
                 {t('repositories.createRepository')}
               </Button>

@@ -25,7 +25,7 @@ const CronExpressionInput: React.FC<CronExpressionInputProps> = ({
 }) => {
   const { t } = useTranslation()
   const effectiveLabel = label ?? t('cronExpressionInput.label')
-  const fontSize = size === 'medium' ? '1.1rem' : '0.875rem'
+  const fontSizeCls = size === 'medium' ? 'text-lg' : 'text-sm'
   const inputId = 'cron-expression-input'
 
   return (
@@ -43,8 +43,7 @@ const CronExpressionInput: React.FC<CronExpressionInputProps> = ({
           required={required}
           disabled={disabled}
           placeholder="0 2 * * *"
-          className="pr-10 font-mono tracking-[0.1em]"
-          style={{ fontSize }}
+          className={`pr-10 font-mono tracking-[0.1em] ${fontSizeCls}`}
         />
         <div className="absolute right-2 top-1/2 -translate-y-1/2">
           <CronBuilderDialog

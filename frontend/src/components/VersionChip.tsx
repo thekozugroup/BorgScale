@@ -16,10 +16,9 @@ export default function VersionChip({ label, version, accent = false }: VersionC
       <span
         className={
           accent
-            ? 'text-primary'
-            : 'text-muted-foreground'
+            ? 'text-primary text-3xs font-bold tracking-[0.04em] leading-none'
+            : 'text-muted-foreground text-3xs font-bold tracking-[0.04em] leading-none'
         }
-        style={{ fontSize: '0.6rem', fontWeight: 700, letterSpacing: '0.04em', lineHeight: 1 }}
       >
         {label}
       </span>

@@ -48,13 +48,13 @@ export interface EntityCardProps {
   isHighlighted?: boolean
 }
 
-// Stat colours map to semantic tokens
-const STAT_COLORS: Record<string, string> = {
-  primary: 'hsl(var(--primary))',
-  success: 'hsl(var(--primary))',
-  warning: 'hsl(var(--muted-foreground))',
-  info: 'hsl(var(--secondary-foreground))',
-  secondary: 'hsl(var(--muted-foreground))',
+// Stat colour → Tailwind class map
+const STAT_TEXT: Record<string, string> = {
+  primary: 'text-primary',
+  success: 'text-primary',
+  warning: 'text-muted-foreground',
+  info: 'text-muted-foreground',
+  secondary: 'text-muted-foreground',
 }
 
 
@@ -94,7 +94,7 @@ export default function EntityCard({
           }}
         >
           {stats.map((stat, i) => {
-            const statColor = stat.color ? STAT_COLORS[stat.color] : undefined
+            const statColorCls = stat.color ? STAT_TEXT[stat.color] : undefined
             const isLast = i === stats.length - 1
 
             return (
@@ -108,12 +108,11 @@ export default function EntityCard({
                     )}
                   >
                     <div className="flex items-center gap-1 mb-1">
-                      <span className="flex items-center text-muted-foreground/60" style={statColor ? { color: statColor } : undefined}>
+                      <span className={cn('flex items-center text-muted-foreground/60', statColorCls)}>
                         {stat.icon}
                       </span>
                       <span
-                        className="text-3xs font-bold uppercase tracking-widest leading-none text-muted-foreground/60"
-                        style={statColor ? { color: statColor } : undefined}
+                        className={cn('text-3xs font-bold uppercase tracking-widest leading-none text-muted-foreground/60', statColorCls)}
                       >
                         {stat.label}
                       </span>

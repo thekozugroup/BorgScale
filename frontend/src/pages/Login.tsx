@@ -37,7 +37,7 @@ export default function Login() {
   const { login, verifyTotpLogin, loginWithPasskey, mustChangePassword } = useAuth()
   const navigate = useNavigate()
   const { t } = useTranslation()
-  usePageTitle(t('login.submit'))
+  usePageTitle(t('auth.signIn', 'Sign in'))
   const { trackAuth, EventAction } = useAnalytics()
 
   const {
@@ -184,7 +184,7 @@ export default function Login() {
     <>
       {/* Heading */}
       <div className="mb-7">
-        <h2 className="text-[1.375rem] font-semibold tracking-tight text-foreground mb-1.5">
+        <h2 className="text-2xl font-semibold tracking-tight text-foreground mb-1.5">
           {t('login.submit')}
         </h2>
         <p className="text-sm text-muted-foreground">{t('login.subtitle')}</p>

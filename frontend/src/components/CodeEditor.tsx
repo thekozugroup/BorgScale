@@ -1,5 +1,6 @@
 import Editor from '@monaco-editor/react'
 import { useTranslation } from 'react-i18next'
+import { useTheme } from '@/context/ThemeContext'
 
 interface CodeEditorProps {
   value: string
@@ -21,6 +22,7 @@ export default function CodeEditor({
   language = 'shell',
 }: CodeEditorProps) {
   const { t } = useTranslation()
+  const { effectiveMode } = useTheme()
   return (
     <div className="mb-4">
       {label && (
@@ -32,10 +34,9 @@ export default function CodeEditor({
           language={language}
           value={value || ''}
           onChange={(val) => onChange(val || '')}
-          theme="vs-dark"
+          theme={effectiveMode === 'dark' ? 'vs-dark' : 'vs'}
           options={{
             minimap: { enabled: false },
-            fontSize: 13,
             lineNumbers: 'on',
             lineNumbersMinChars: 3,
             glyphMargin: false,

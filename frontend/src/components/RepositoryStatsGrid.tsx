@@ -39,7 +39,7 @@ function StatCard({ label, value, icon, bgOpacity = '10', tooltip }: StatCardPro
           <p className="text-2xs font-bold uppercase tracking-[0.06em] block mb-1.5 text-primary">
             {label}
           </p>
-          <p className="font-bold leading-tight text-[1.4rem] lg:text-[1.5rem] text-primary">
+          <p className="font-bold leading-tight text-xl lg:text-2xl text-primary">
             {value}
           </p>
         </div>
