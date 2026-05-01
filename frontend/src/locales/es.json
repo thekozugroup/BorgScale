@@ -345,9 +345,9 @@
     "mountTimeout": "Tiempo de espera de montaje: Los repositorios grandes pueden necesitar más tiempo para montarse.",
     "mountFailed": "Error al montar el archivo: {{error}}",
     "restoreStarted": "¡Trabajo de restauración iniciado! Comprueba la pestaña de Actividad para monitorizar el progreso.",
-    "mountSuccess": "Archivo montado. Para acceder a los archivos en una terminal:\n\n{{command}}",
+    "mountSuccess": "Archivo montado. Usa la pestaña Archivos para explorar o abre una terminal para acceso por shell.",
     "mountCommandTitle": "Comando de acceso al terminal",
-    "mountCommandDesc": "Abre este comando en un terminal para explorar la carpeta montada.",
+    "mountCommandDesc": "El archivo está montado en {{path}}. Usa la pestaña Archivos para explorar, o ejecuta este comando en una terminal para acceso por shell:",
     "toasts": {
       "deleteFailed": "Error al eliminar el archivo",
       "restoreFailed": "Error al iniciar la restauración",
@@ -980,6 +980,38 @@
       "warning1": "Eliminar la clave SSH de la base de datos y el sistema de archivos",
       "warning2": "Los registros de conexión se conservarán."
     },
+    "heading": {
+      "remoteMachines": "Máquinas remotas"
+    },
+    "empty": {
+      "title": "Aún no hay máquinas remotas",
+      "description": "Despliega tu clave SSH en un servidor remoto para comenzar.",
+      "descriptionNoKey": "Genera o importa una clave SSH primero, luego despliégala en servidores remotos."
+    },
+    "actions": {
+      "testing": "Probando...",
+      "updating": "Actualizando...",
+      "deploying": "Desplegando...",
+      "deleting": "Eliminando..."
+    },
+    "confirmations": {
+      "deleteConnection": "¿Estás seguro de que deseas eliminar esta conexión?"
+    },
+    "dialogs": {
+      "deployTitle": "Desplegar clave SSH en esta conexión",
+      "deployButton": "Desplegar clave",
+      "deleteKeyTitle": "Eliminar clave SSH",
+      "deleteKeyButton": "Eliminar clave SSH"
+    },
+    "fields": {
+      "keyName": "Nombre de la clave",
+      "activeConnections": "Conexiones activas"
+    },
+    "helpers": {
+      "privateKeyPath": "La ruta completa al archivo de clave privada",
+      "publicKeyPath": "Si se deja en blanco, BorgScale buscará la clave pública correspondiente automáticamente",
+      "passwordDeploy": "BorgScale usa esta contraseña una vez para instalar la clave pública en la máquina remota"
+    },
     "toasts": {
       "keyGenerated": "¡Clave SSH del sistema generada correctamente!",
       "keyGenerateFailed": "Error al generar la clave SSH",
@@ -1037,6 +1069,8 @@
     "editDialog": {
       "title": "Editar script"
     },
+    "paramCount_one": "{{count}} parámetro",
+    "paramCount_other": "{{count}} parámetros",
     "fields": {
       "name": "Nombre",
       "description": "Descripción",
@@ -1049,7 +1083,9 @@
       "parametersHint": "Marca la casilla para los parámetros que contienen datos sensibles.",
       "treatAsSecret": "Tratar como secreto",
       "nameHelperText": "Un nombre único para este script",
-      "descriptionHelperText": "Descripción opcional de lo que hace este script"
+      "descriptionHelperText": "Descripción opcional de lo que hace este script",
+      "default": "Predeterminado",
+      "required": "Obligatorio"
     },
     "usedInPlaces": "Este script se usa en {{count}} lugar(es). Los cambios afectarán a todas las asignaciones.",
     "buttons": {

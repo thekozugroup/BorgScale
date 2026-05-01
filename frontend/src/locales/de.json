@@ -345,9 +345,9 @@
     "mountTimeout": "Einhänge-Timeout: Große Repositories benötigen möglicherweise mehr Zeit zum Einhängen.",
     "mountFailed": "Fehler beim Einhängen des Archivs: {{error}}",
     "restoreStarted": "Wiederherstellungsaufgabe gestartet! Überprüfe den Aktivitäts-Tab, um den Fortschritt zu überwachen.",
-    "mountSuccess": "Archiv eingehängt. So greifen Sie in einem Terminal auf Dateien zu:\n\n{{command}}",
+    "mountSuccess": "Archiv eingehängt. Verwende den Dateien-Tab zum Durchsuchen oder öffne ein Terminal für Shell-Zugriff.",
     "mountCommandTitle": "Terminal-Zugriffsbefehl",
-    "mountCommandDesc": "Öffne diesen Befehl in einem Terminal, um den Einhängeordner zu durchsuchen.",
+    "mountCommandDesc": "Das Archiv ist unter {{path}} eingehängt. Verwende den Dateien-Tab zum Durchsuchen oder führe diesen Befehl in einem Terminal für Shell-Zugriff aus:",
     "toasts": {
       "deleteFailed": "Archiv konnte nicht gelöscht werden",
       "restoreFailed": "Wiederherstellung konnte nicht gestartet werden",
@@ -980,6 +980,38 @@
       "warning1": "SSH-Schlüssel aus Datenbank und Dateisystem entfernen",
       "warning2": "Verbindungsaufzeichnungen bleiben erhalten."
     },
+    "heading": {
+      "remoteMachines": "Remote-Maschinen"
+    },
+    "empty": {
+      "title": "Noch keine Remote-Maschinen",
+      "description": "Stelle deinen SSH-Schlüssel auf einem Remote-Server bereit, um zu beginnen.",
+      "descriptionNoKey": "Generiere oder importiere zuerst einen SSH-Schlüssel, dann stelle ihn auf Remote-Servern bereit."
+    },
+    "actions": {
+      "testing": "Teste...",
+      "updating": "Aktualisiere...",
+      "deploying": "Stelle bereit...",
+      "deleting": "Lösche..."
+    },
+    "confirmations": {
+      "deleteConnection": "Bist du sicher, dass du diese Verbindung löschen möchtest?"
+    },
+    "dialogs": {
+      "deployTitle": "SSH-Schlüssel für diese Verbindung bereitstellen",
+      "deployButton": "Schlüssel bereitstellen",
+      "deleteKeyTitle": "SSH-Schlüssel löschen",
+      "deleteKeyButton": "SSH-Schlüssel löschen"
+    },
+    "fields": {
+      "keyName": "Schlüsselname",
+      "activeConnections": "Aktive Verbindungen"
+    },
+    "helpers": {
+      "privateKeyPath": "Der vollständige Pfad zur privaten Schlüsseldatei",
+      "publicKeyPath": "Wenn leer gelassen, sucht BorgScale automatisch nach dem passenden öffentlichen Schlüssel",
+      "passwordDeploy": "BorgScale verwendet dieses Passwort einmalig, um den öffentlichen Schlüssel auf dem Remote-Gerät zu installieren"
+    },
     "toasts": {
       "keyGenerated": "System-SSH-Schlüssel erfolgreich generiert!",
       "keyGenerateFailed": "SSH-Schlüssel konnte nicht generiert werden",
@@ -1037,6 +1069,8 @@
     "editDialog": {
       "title": "Skript bearbeiten"
     },
+    "paramCount_one": "{{count}} Parameter",
+    "paramCount_other": "{{count}} Parameter",
     "fields": {
       "name": "Name",
       "description": "Beschreibung",
@@ -1049,7 +1083,9 @@
       "parametersHint": "Markiere Parameter, die sensible Daten enthalten.",
       "treatAsSecret": "Als Geheimnis behandeln",
       "nameHelperText": "Ein eindeutiger Name für dieses Skript",
-      "descriptionHelperText": "Optionale Beschreibung, was dieses Skript macht"
+      "descriptionHelperText": "Optionale Beschreibung, was dieses Skript macht",
+      "default": "Standard",
+      "required": "Pflichtfeld"
     },
     "usedInPlaces": "Dieses Skript wird an {{count}} Stelle(n) verwendet. Änderungen betreffen alle Zuweisungen.",
     "buttons": {
