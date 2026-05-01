@@ -68,7 +68,7 @@ const Archives: React.FC = () => {
   } | null>(null)
   const [mountDialogArchive, setMountDialogArchive] = useState<Archive | null>(null)
   const [customMountPoint, setCustomMountPoint] = useState<string>('')
-  const [showMountCommand, setShowMountCommand] = useState<{ command: string; archiveName: string } | null>(null)
+  const [showMountCommand, setShowMountCommand] = useState<{ command: string; archiveName: string; mountPoint: string } | null>(null)
 
   // Restore functionality
   const [restoreArchive, setRestoreArchive] = useState<Archive | null>(null)
@@ -194,9 +194,9 @@ const Archives: React.FC = () => {
       const accessCommand = `docker exec -it ${containerName} bash -c "cd ${mountPoint} && bash"`
       const archiveName = variables.archive_name
 
-      setShowMountCommand({ command: accessCommand, archiveName })
+      setShowMountCommand({ command: accessCommand, archiveName, mountPoint })
       toast.success(
-        `Archive mounted at ${mountPoint}. Open Files tab to browse or use Show command for terminal access.`
+        t('archives.mountSuccess', { command: accessCommand })
       )
       trackArchive(EventAction.MOUNT, selectedRepository || undefined, {
         operation: 'mount_archive',
@@ -568,18 +568,18 @@ const Archives: React.FC = () => {
             <DialogHeader>
               <DialogTitle>{t('archives.mountCommandTitle', 'Terminal access command')}</DialogTitle>
               <DialogDescription>
-                {t('archives.mountCommandDesc', 'Run this command inside the BorgScale container to open a shell at the mount point.')}
+                {t('archives.mountCommandDesc', { path: showMountCommand.mountPoint })}
               </DialogDescription>
             </DialogHeader>
-            <div className="rounded-lg bg-muted p-3 font-mono text-xs break-all border border-border">
-              {showMountCommand.command}
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" size="sm" onClick={() => {
+            <div className="rounded-lg bg-muted p-3 border border-border flex items-start gap-2">
+              <code className="font-mono text-xs break-all flex-1">{showMountCommand.command}</code>
+              <Button variant="ghost" size="sm" className="flex-shrink-0 h-6 px-2" onClick={() => {
                 navigator.clipboard.writeText(showMountCommand.command)
               }}>
                 {t('common.copy', 'Copy')}
               </Button>
+            </div>
+            <div className="flex justify-end gap-2">
               <Button size="sm" onClick={() => setShowMountCommand(null)}>
                 {t('common.buttons.close', 'Close')}
               </Button>

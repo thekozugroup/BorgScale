@@ -345,9 +345,9 @@
     "mountTimeout": "Mount timeout: Large repositories may need more time to mount.",
     "mountFailed": "Failed to mount archive: {{error}}",
     "restoreStarted": "Restore job started! Check the Activity tab to monitor progress.",
-    "mountSuccess": "Archive mounted. To access files in a terminal:\n\n{{command}}",
+    "mountSuccess": "Archive mounted. Use the Files tab to browse, or open a terminal for shell access.",
     "mountCommandTitle": "Terminal access command",
-    "mountCommandDesc": "Open this command in a terminal to browse the mount folder.",
+    "mountCommandDesc": "The archive is mounted at {{path}}. Use the Files tab to browse, or run this command in a terminal for shell access:",
     "toasts": {
       "deleteFailed": "Failed to delete archive",
       "restoreFailed": "Failed to start restore",
@@ -980,6 +980,38 @@
       "warning1": "Remove the SSH key from database and filesystem",
       "warning2": "Connection records will be preserved."
     },
+    "heading": {
+      "remoteMachines": "Remote machines"
+    },
+    "empty": {
+      "title": "No remote machines yet",
+      "description": "Deploy your SSH key to a remote server to get started.",
+      "descriptionNoKey": "Generate or import an SSH key first, then deploy it to remote servers."
+    },
+    "actions": {
+      "testing": "Testing...",
+      "updating": "Updating...",
+      "deploying": "Deploying...",
+      "deleting": "Deleting..."
+    },
+    "confirmations": {
+      "deleteConnection": "Are you sure you want to delete this connection?"
+    },
+    "dialogs": {
+      "deployTitle": "Deploy SSH key to this connection",
+      "deployButton": "Deploy key",
+      "deleteKeyTitle": "Delete SSH key",
+      "deleteKeyButton": "Delete SSH key"
+    },
+    "fields": {
+      "keyName": "Key Name",
+      "activeConnections": "Active Connections"
+    },
+    "helpers": {
+      "privateKeyPath": "The full path to the private key file",
+      "publicKeyPath": "If left blank, BorgScale will look for the matching public key automatically",
+      "passwordDeploy": "BorgScale uses this password once to install the public key on the remote machine"
+    },
     "toasts": {
       "keyGenerated": "System SSH key generated successfully!",
       "keyGenerateFailed": "Failed to generate SSH key",
@@ -1037,6 +1069,8 @@
     "editDialog": {
       "title": "Edit Script"
     },
+    "paramCount_one": "{{count}} param",
+    "paramCount_other": "{{count}} params",
     "fields": {
       "name": "Name",
       "description": "Description",
@@ -1049,7 +1083,9 @@
       "parametersHint": "Check the box for parameters that contain sensitive data.",
       "treatAsSecret": "Treat as secret",
       "nameHelperText": "A unique name for this script",
-      "descriptionHelperText": "Optional description of what this script does"
+      "descriptionHelperText": "Optional description of what this script does",
+      "default": "Default",
+      "required": "Required"
     },
     "usedInPlaces": "This script is used in {{count}} place(s). Changes will affect all assignments.",
     "buttons": {

@@ -335,7 +335,7 @@ export default function Scripts() {
           </div>
           {script.parameters && script.parameters.length > 0 && (
             <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-semibold border border-border bg-muted text-muted-foreground flex-shrink-0">
-              {script.parameters.length} param{script.parameters.length > 1 ? 's' : ''}
+              {t('scripts.paramCount', { count: script.parameters.length })}
             </span>
           )}
         </div>
@@ -362,7 +362,7 @@ export default function Scripts() {
       label: t('scripts.table.runOn'),
       render: (script) => (
         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border ${RUN_ON_BADGE[script.run_on] ?? 'border-border text-muted-foreground'}`}>
-          {script.run_on}
+          {t(`scripts.runOn.${script.run_on}`)}
         </span>
       ),
     },
@@ -422,7 +422,7 @@ export default function Scripts() {
           <p className="text-2xl font-bold">{t('scripts.title')}</p>
           <p className="text-sm text-muted-foreground mt-0.5">{t('scripts.subtitle')}</p>
         </div>
-        <Button onClick={handleCreate} className="w-full sm:w-auto gap-1.5">
+        <Button size="lg" onClick={handleCreate} className="w-full sm:w-auto gap-1.5">
           <Plus size={20} />
           {t('scripts.newScript')}
         </Button>
@@ -438,6 +438,7 @@ export default function Scripts() {
         emptyState={{
           icon: <FileCode size={48} />,
           title: t('scripts.empty'),
+          action: <Button size="sm" onClick={handleCreate}>{t('scripts.newScript')}</Button>,
         }}
       />
 
@@ -533,11 +534,11 @@ export default function Scripts() {
                         <p className="text-sm font-semibold font-mono">{param.name}</p>
                         <div className="flex gap-2 mt-0.5">
                           {param.default && (
-                            <span className="text-xs text-muted-foreground">Default: {param.default}</span>
+                            <span className="text-xs text-muted-foreground">{t('scripts.fields.default')}: {param.default}</span>
                           )}
                           {param.required && (
                             <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-semibold border border-destructive/20 bg-destructive/10 text-destructive">
-                              Required
+                              {t('scripts.fields.required')}
                             </span>
                           )}
                         </div>
