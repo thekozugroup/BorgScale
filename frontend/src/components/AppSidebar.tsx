@@ -36,7 +36,6 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
-  SidebarProvider,
 } from '@/components/ui/sidebar'
 import { Sheet, SheetContent, SheetTitle, SheetDescription, SheetHeader as SheetHdr } from '@/components/ui/sheet'
 import { Separator } from '@/components/ui/separator'
@@ -472,30 +471,28 @@ export default function AppSidebar({ mobileOpen, onClose }: AppSidebarProps) {
   }
 
   return (
-    <SidebarProvider defaultOpen>
-      <nav aria-label="Application navigation">
-        {/* Desktop permanent sidebar */}
-        <div className="hidden w-60 shrink-0 sm:block">
-          <div className="fixed inset-y-0 left-0 z-10 flex w-60 flex-col border-r border-sidebar-border bg-sidebar">
-            <SidebarNavInner {...navProps} />
-          </div>
+    <nav aria-label="Application navigation">
+      {/* Desktop permanent sidebar */}
+      <div className="hidden w-60 shrink-0 sm:block">
+        <div className="fixed inset-y-0 left-0 z-10 flex w-60 flex-col border-r border-sidebar-border bg-sidebar">
+          <SidebarNavInner {...navProps} />
         </div>
+      </div>
 
-        {/* Mobile overlay via Sheet */}
-        <Sheet open={mobileOpen} onOpenChange={(open) => { if (!open) onClose() }}>
-          <SheetContent
-            side="left"
-            className="w-60 p-0 bg-sidebar text-sidebar-foreground"
-            showCloseButton={false}
-          >
-            <SheetHdr className="sr-only">
-              <SheetTitle>Navigation</SheetTitle>
-              <SheetDescription>Application navigation sidebar</SheetDescription>
-            </SheetHdr>
-            <SidebarNavInner {...navProps} />
-          </SheetContent>
-        </Sheet>
-      </nav>
-    </SidebarProvider>
+      {/* Mobile overlay via Sheet */}
+      <Sheet open={mobileOpen} onOpenChange={(open) => { if (!open) onClose() }}>
+        <SheetContent
+          side="left"
+          className="w-60 p-0 bg-sidebar text-sidebar-foreground"
+          showCloseButton={false}
+        >
+          <SheetHdr className="sr-only">
+            <SheetTitle>Navigation</SheetTitle>
+            <SheetDescription>Application navigation sidebar</SheetDescription>
+          </SheetHdr>
+          <SidebarNavInner {...navProps} />
+        </SheetContent>
+      </Sheet>
+    </nav>
   )
 }

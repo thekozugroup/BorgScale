@@ -3,6 +3,7 @@ import AnnouncementModal from './AnnouncementModal'
 import AppHeader from './AppHeader'
 import AppSidebar from './AppSidebar'
 import { Footer } from './Footer'
+import { SidebarProvider } from '@/components/ui/sidebar'
 import { useAuth } from '../hooks/useAuth'
 import { useAnnouncementSurface } from '../hooks/useAnnouncementSurface'
 import PasskeyEnrollmentPrompt from './PasskeyEnrollmentPrompt'
@@ -85,7 +86,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       : null
 
   return (
-    <div className="flex min-h-screen">
+    <SidebarProvider defaultOpen>
       <AppSidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
 
       <div className="flex flex-1 flex-col min-w-0">
@@ -112,6 +113,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         onIgnore={handlePasskeyPromptIgnore}
         onSuccess={handlePasskeyPromptSuccess}
       />
-    </div>
+    </SidebarProvider>
   )
 }
