@@ -132,12 +132,12 @@ export interface DataTableProps<T> {
   mobileBreakpoint?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 }
 
-const ACTION_COLORS: Record<string, string> = {
-  primary: '#3b82f6',
-  error: '#ef4444',
-  warning: '#f97316',
-  success: '#22c55e',
-  info: '#0ea5e9',
+const ACTION_CLASSES: Record<string, { text: string; hover: string }> = {
+  primary: { text: 'text-primary', hover: 'hover:bg-primary/10' },
+  error: { text: 'text-destructive', hover: 'hover:bg-destructive/10' },
+  warning: { text: 'text-foreground', hover: 'hover:bg-muted' },
+  success: { text: 'text-primary', hover: 'hover:bg-primary/10' },
+  info: { text: 'text-muted-foreground', hover: 'hover:bg-muted' },
 }
 
 const BREAKPOINT_PX: Record<string, number> = {
@@ -318,7 +318,7 @@ export default function DataTable<T>({
         const isDisabled = action.disabled ? action.disabled(row) : false
         const tooltipText =
           typeof action.tooltip === 'function' ? action.tooltip(row) : action.tooltip || action.label
-        const actionColor = action.color && action.color !== 'default' ? ACTION_COLORS[action.color] : undefined
+        const actionClass = action.color && action.color !== 'default' ? ACTION_CLASSES[action.color] : undefined
 
         return (
           <Tooltip key={idx}>
@@ -331,21 +331,8 @@ export default function DataTable<T>({
                     e.stopPropagation()
                     action.onClick(row)
                   }}
-                  className="w-7 h-7 rounded flex items-center justify-center transition-all duration-150 disabled:opacity-20 disabled:cursor-not-allowed"
-                  style={{ opacity: isDisabled ? 0.2 : iconOpacity, color: actionColor }}
-                  onMouseEnter={(e) => {
-                    if (!isDisabled) {
-                      ;(e.currentTarget as HTMLButtonElement).style.opacity = '1'
-                      if (actionColor) (e.currentTarget as HTMLButtonElement).style.background = actionColor + '1f'
-                      else (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)'
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isDisabled) {
-                      ;(e.currentTarget as HTMLButtonElement).style.opacity = String(iconOpacity)
-                      ;(e.currentTarget as HTMLButtonElement).style.background = ''
-                    }
-                  }}
+                  className={`w-7 h-7 rounded flex items-center justify-center transition-all duration-150 disabled:opacity-20 disabled:cursor-not-allowed hover:opacity-100 ${actionClass ? `${actionClass.text} ${actionClass.hover}` : 'text-muted-foreground hover:bg-foreground/[0.06]'}`}
+                  style={{ opacity: isDisabled ? 0.2 : iconOpacity }}
                 >
                   {action.icon}
                 </button>

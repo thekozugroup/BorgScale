@@ -17,7 +17,6 @@ import { useTranslation } from 'react-i18next'
 import EntityCard, { ActionItem, StatItem } from './EntityCard'
 import { Loader2 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { useTheme } from '../context/ThemeContext'
 import { formatDateShort } from '../utils/dateUtils'
 
 interface NotificationSetting {
@@ -83,8 +82,6 @@ export default function NotificationCard({
   isTesting = false,
 }: NotificationCardProps) {
   const { t } = useTranslation()
-  const { effectiveMode } = useTheme()
-  const isDark = effectiveMode === 'dark'
 
   const eventCount = [
     notification.notify_on_backup_start,
@@ -132,16 +129,7 @@ export default function NotificationCard({
 
   // Badge: plain icon only, no text, no border
   const badge = (
-    <div
-      style={{
-        display: 'flex',
-        color: notification.enabled
-          ? '#059669'
-          : isDark
-            ? 'rgba(255,255,255,0.2)'
-            : 'rgba(0,0,0,0.2)',
-      }}
-    >
+    <div className={notification.enabled ? 'flex text-primary' : 'flex text-foreground/20'}>
       {notification.enabled ? <Bell size={16} /> : <BellOff size={16} />}
     </div>
   )
@@ -200,24 +188,13 @@ export default function NotificationCard({
     },
   ]
 
-  const ACTIVE_COLOR = '#059669'
-
   const eventTags = (
     <div className="flex gap-1.5 flex-wrap">
       {categories.map((cat) => (
         <Tooltip key={cat.label}>
           <TooltipTrigger asChild>
             <div
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border cursor-default transition-all duration-150"
-              style={cat.active ? {
-                borderColor: isDark ? `${ACTIVE_COLOR}66` : `${ACTIVE_COLOR}59`,
-                background: isDark ? `${ACTIVE_COLOR}1f` : `${ACTIVE_COLOR}12`,
-                color: ACTIVE_COLOR,
-              } : {
-                borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-                background: 'transparent',
-                color: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
-              }}
+              className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border cursor-default transition-all duration-150 ${cat.active ? 'border-primary/50 bg-primary/10 text-primary' : 'border-foreground/[0.08] bg-transparent text-foreground/20'}`}
             >
               {cat.icon}
               <span className="text-[0.62rem] font-semibold tracking-[0.04em] leading-none uppercase">

@@ -346,6 +346,8 @@
     "mountFailed": "Failed to mount archive: {{error}}",
     "restoreStarted": "Restore job started! Check the Activity tab to monitor progress.",
     "mountSuccess": "Archive mounted successfully!\n\nMount is inside the container. To access files, run:\n\n{{command}}",
+    "mountCommandTitle": "Terminal access command",
+    "mountCommandDesc": "Open this command in a terminal to browse the mount folder.",
     "toasts": {
       "deleteFailed": "Failed to delete archive",
       "restoreFailed": "Failed to start restore",
