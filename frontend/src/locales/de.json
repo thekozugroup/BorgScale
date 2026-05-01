@@ -152,6 +152,7 @@
     "cancelled": "Abgebrochen"
   },
   "dashboard": {
+    "pageTitle": "Übersicht",
     "title": "Dashboard",
     "subtitle": "Umfassende Übersicht deiner Backup-Infrastruktur",
     "stats": {
@@ -180,11 +181,11 @@
       "neverChecked": "Nie überprüft",
       "neverCompacted": "Nie komprimiert",
       "dimensionLabels": {
-        "backup": "BACKUP",
-        "check": "CHECK",
-        "compact": "COMPACT",
-        "freshness": "AKTUELL",
-        "archives": "ARCHIVE"
+        "backup": "Gesichert",
+        "check": "Geprüft",
+        "compact": "Komprimiert",
+        "freshness": "Aktuell",
+        "archives": "Archive"
       },
       "archiveCountShort": "{{count}} Arx"
     },
@@ -2104,6 +2105,7 @@
       "remoteSshNote": "Der Borg-UI-Server stellt eine SSH-Verbindung zur Remote-Maschine her, um die ausgewählten Verzeichnisse zu durchsuchen und zu sichern. Stelle sicher, dass die SSH-Verbindung mit den erforderlichen Berechtigungen ordnungsgemäß konfiguriert ist."
     },
     "location": {
+      "borgVersionLabel": "Borg-Version",
       "repositoryNameLabel": "Repository-Name",
       "repositoryNameHelper": "Ein aussagekräftiger Name zur Identifizierung dieses Repositorys",
       "repositoryModeLabel": "Repository-Modus",
@@ -2201,6 +2203,7 @@
       "everythingLooksGood": "Alles sieht gut aus! Klicke auf \"Dateien wiederherstellen\", um den Wiederherstellungsvorgang zu starten."
     },
     "review": {
+      "readyToInitialize": "Bereit zur Initialisierung",
       "configurationSummary": "Konfigurationsübersicht",
       "repository": "REPOSITORY",
       "name": "Name",

@@ -195,7 +195,7 @@ export default function RepositoryCard({
   })()
 
   const iconBtnBase =
-    'inline-flex size-8 items-center justify-center rounded-md border-0 bg-transparent text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-30'
+    'inline-flex size-11 items-center justify-center rounded-md border-0 bg-transparent text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-30'
 
   return (
     <div
@@ -261,7 +261,7 @@ export default function RepositoryCard({
                       type="button"
                       onClick={onEdit}
                       aria-label={t('repositoryCard.edit')}
-                      className="inline-flex size-7 shrink-0 items-center justify-center rounded border-0 bg-transparent text-muted-foreground/50 transition-colors hover:bg-accent hover:text-foreground"
+                      className="inline-flex size-10 shrink-0 items-center justify-center rounded border-0 bg-transparent text-muted-foreground/50 transition-colors hover:bg-accent hover:text-foreground"
                     >
                       <Pencil size={14} />
                     </button>

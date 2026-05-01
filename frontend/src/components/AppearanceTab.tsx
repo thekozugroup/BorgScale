@@ -107,7 +107,9 @@ export default function AppearanceTab() {
                     </div>
                   </div>
 
-                  {/* Mini UI preview */}
+                  {/* Mini UI preview — intentional thumbnail of light/dark appearance.
+                      Hex values are required here to render a static preview that is
+                      independent of the currently-active theme token values. */}
                   <div
                     className="p-2 rounded-xl"
                     style={{

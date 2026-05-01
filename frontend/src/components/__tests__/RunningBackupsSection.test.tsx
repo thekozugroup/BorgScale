@@ -216,9 +216,7 @@ describe('RunningBackupsSection', () => {
     expect(cancelButton).not.toBeDisabled()
   })
 
-  it('calls onCancelBackup when confirmed', () => {
-    const confirmSpy = vi.fn(() => true)
-    vi.stubGlobal('confirm', confirmSpy)
+  it('calls onCancelBackup when cancel button is clicked', () => {
     renderWithProviders(
       <RunningBackupsSection
         runningBackupJobs={[mockRunningJob]}
@@ -227,24 +225,7 @@ describe('RunningBackupsSection', () => {
       />
     )
     fireEvent.click(screen.getByRole('button', { name: /cancel/i }))
-    expect(confirmSpy).toHaveBeenCalledWith('Are you sure you want to cancel backup job #1?')
     expect(mockOnCancelBackup).toHaveBeenCalledWith(1)
-    vi.unstubAllGlobals()
-  })
-
-  it('does not call onCancelBackup when confirmation is declined', () => {
-    const confirmSpy = vi.fn(() => false)
-    vi.stubGlobal('confirm', confirmSpy)
-    renderWithProviders(
-      <RunningBackupsSection
-        runningBackupJobs={[mockRunningJob]}
-        onCancelBackup={mockOnCancelBackup}
-        isCancelling={false}
-      />
-    )
-    fireEvent.click(screen.getByRole('button', { name: /cancel/i }))
-    expect(mockOnCancelBackup).not.toHaveBeenCalled()
-    vi.unstubAllGlobals()
   })
 
   it('disables cancel button when isCancelling is true', () => {

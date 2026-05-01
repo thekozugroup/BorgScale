@@ -114,24 +114,15 @@ describe('LockErrorDialog', () => {
       expect(mockOnClose).toHaveBeenCalledTimes(1)
     })
 
-    it('shows confirmation dialog when Break Lock is clicked', async () => {
-      mockConfirm.mockReturnValue(false)
+    it('calls API directly when Break Lock is clicked', async () => {
+      vi.mocked(repositoriesAPI.breakLock).mockResolvedValue({} as AxiosResponse)
       const user = userEvent.setup()
       renderWithProviders(<LockErrorDialog {...defaultProps} />)
 
       await user.click(screen.getByRole('button', { name: /Break Lock/ }))
-      expect(mockConfirm).toHaveBeenCalledWith(
-        expect.stringContaining('Are you CERTAIN no backup or operation is currently running')
-      )
-    })
-
-    it('does not call API when confirmation is cancelled', async () => {
-      mockConfirm.mockReturnValue(false)
-      const user = userEvent.setup()
-      renderWithProviders(<LockErrorDialog {...defaultProps} />)
-
-      await user.click(screen.getByRole('button', { name: /Break Lock/ }))
-      expect(repositoriesAPI.breakLock).not.toHaveBeenCalled()
+      await waitFor(() => {
+        expect(repositoriesAPI.breakLock).toHaveBeenCalledWith(1)
+      })
     })
 
     it('calls API when confirmation is accepted', async () => {

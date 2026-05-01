@@ -152,6 +152,7 @@
     "cancelled": "Cancelado"
   },
   "dashboard": {
+    "pageTitle": "Resumen",
     "title": "Panel",
     "subtitle": "Visión general completa de tu infraestructura de copias de seguridad",
     "stats": {
@@ -180,11 +181,11 @@
       "neverChecked": "Nunca comprobado",
       "neverCompacted": "Nunca compactado",
       "dimensionLabels": {
-        "backup": "BACKUP",
-        "check": "CHECK",
-        "compact": "COMPACT",
-        "freshness": "VIGENCIA",
-        "archives": "ARCHIVOS"
+        "backup": "Respaldado",
+        "check": "Verificado",
+        "compact": "Compactado",
+        "freshness": "Vigencia",
+        "archives": "Archivos"
       },
       "archiveCountShort": "{{count}} arx"
     },
@@ -2104,6 +2105,7 @@
       "remoteSshNote": "El servidor BorgScale se conectará por SSH a la máquina remota para explorar y respaldar los directorios seleccionados. Asegúrate de que la conexión SSH esté correctamente configurada con los permisos necesarios."
     },
     "location": {
+      "borgVersionLabel": "Versión de Borg",
       "repositoryNameLabel": "Nombre del repositorio",
       "repositoryNameHelper": "Un nombre descriptivo para identificar este repositorio",
       "repositoryModeLabel": "Modo del repositorio",
@@ -2201,6 +2203,7 @@
       "everythingLooksGood": "¡Todo parece correcto! Haz clic en \"Restaurar archivos\" para comenzar la operación de restauración."
     },
     "review": {
+      "readyToInitialize": "Listo para inicializar",
       "configurationSummary": "Resumen de configuración",
       "repository": "REPOSITORIO",
       "name": "Nombre",

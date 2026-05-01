@@ -82,7 +82,7 @@ export default function WizardStepLocation({
       {/* Borg Version Selector — only shown on create/import, not edit */}
       {mode !== 'edit' && (
         <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground shrink-0">Borg Version</span>
+          <span className="text-sm text-muted-foreground shrink-0">{t('wizard.location.borgVersionLabel')}</span>
           <div className="flex p-0.5 bg-muted rounded-lg gap-0.5">
             {([1, 2] as const).map((v) => {
               const selected = (data.borgVersion ?? 1) === v

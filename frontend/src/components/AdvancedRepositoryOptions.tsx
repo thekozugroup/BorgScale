@@ -61,8 +61,9 @@ export default function AdvancedRepositoryOptions({
 
       {/* Remote Path */}
       <div className="flex flex-col gap-1">
-        <Label>{t('advancedRepositoryOptions.remoteBorgPath')}</Label>
+        <Label htmlFor="adv-remote-path">{t('advancedRepositoryOptions.remoteBorgPath')}</Label>
         <Input
+          id="adv-remote-path"
           value={remotePath}
           onChange={(e) => onRemotePathChange(e.target.value)}
           placeholder="/usr/local/bin/borg"
@@ -73,8 +74,9 @@ export default function AdvancedRepositoryOptions({
       {/* Custom Flags - Only show for full repositories */}
       {mode === 'full' && (
         <div className="flex flex-col gap-1 mt-3">
-          <Label>{t('advancedRepositoryOptions.customFlags')}</Label>
+          <Label htmlFor="adv-custom-flags">{t('advancedRepositoryOptions.customFlags')}</Label>
           <Input
+            id="adv-custom-flags"
             value={customFlags}
             onChange={(e) => onCustomFlagsChange(e.target.value)}
             placeholder="--stats --list --filter AME"

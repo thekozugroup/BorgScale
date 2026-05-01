@@ -141,13 +141,7 @@ const LogManagementTab: React.FC = () => {
   }
 
   const handleCleanup = () => {
-    if (
-      window.confirm(
-        'Are you sure you want to run log cleanup? This will delete old log files according to your settings.'
-      )
-    ) {
-      cleanupMutation.mutate()
-    }
+    cleanupMutation.mutate()
   }
 
   const formatDate = (dateStr: string | null) => {
@@ -169,7 +163,6 @@ const LogManagementTab: React.FC = () => {
 
   const usagePercent = logStorage?.usage_percent || 0
   const isHighUsage = usagePercent >= 80
-  const usageBarColor = isHighUsage ? '#f59e0b' : '#6366f1'
 
   const radioOptions = [
     {
@@ -276,25 +269,15 @@ const LogManagementTab: React.FC = () => {
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
                     <div
-                      className="h-full rounded-full transition-all duration-300"
-                      style={{
-                        width: `${Math.min(usagePercent, 100)}%`,
-                        background: usageBarColor,
-                      }}
+                      className={`h-full rounded-full transition-all duration-300 ${isHighUsage ? 'bg-destructive' : 'bg-primary'}`}
+                      style={{ width: `${Math.min(usagePercent, 100)}%` }}
                     />
                   </div>
                 </div>
 
                 {isHighUsage && (
-                  <div
-                    className="flex items-start gap-2 p-3 rounded-xl text-sm"
-                    style={{
-                      background: 'rgba(245,158,11,0.1)',
-                      border: '1px solid rgba(245,158,11,0.25)',
-                      color: '#b45309',
-                    }}
-                  >
-                    <AlertTriangle size={16} className="flex-shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-2 p-3 rounded-xl text-sm border border-border bg-muted/40 text-muted-foreground">
+                    <AlertTriangle size={16} className="flex-shrink-0 mt-0.5 text-destructive" />
                     <span>
                       Log storage usage is at {usagePercent}%. Consider running cleanup or
                       increasing the size limit.

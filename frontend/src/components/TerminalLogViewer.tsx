@@ -26,7 +26,9 @@ interface TerminalLogViewerProps {
   }>
 }
 
-// JSON syntax highlighting (VS Code Dark+ colour scheme)
+// JSON syntax highlighting — intentional terminal/code-viewer colours matching VS Code Dark+.
+// These hex values must remain as-is to reproduce the canonical Dark+ palette;
+// they are not subject to the semantic-token constraint that applies to UI chrome.
 const JSON_TOKEN_REGEX =
   /("(?:[^"\\]|\\.)*")\s*(?=:)|("(?:[^"\\]|\\.)*")|(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)|\b(true|false|null)\b|([{}[\],:])/g
 

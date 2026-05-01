@@ -280,6 +280,9 @@ describe('Backup page', () => {
 
     await user.click(await screen.findByRole('button', { name: /choose primary repo/i }))
 
+    // Command preview is collapsed by default — expand it first
+    await user.click(await screen.findByRole('button', { name: /show command/i }))
+
     expect(await screen.findByText(/borg create/i)).toBeInTheDocument()
     expect(screen.getByText(/\/repos\/primary::manual-backup-\{now\}/i)).toBeInTheDocument()
     expect(screen.getByText(/--exclude '\*\.tmp'/i)).toBeInTheDocument()

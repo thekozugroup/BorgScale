@@ -17,6 +17,7 @@ import {
   HardDrive,
   Activity,
   Cpu,
+  Calendar,
   ArrowRight,
   Server,
   CheckCircle2,
@@ -30,6 +31,7 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
+  ChevronRight,
 } from 'lucide-react'
 import {
   AreaChart,
@@ -144,28 +146,28 @@ function dimSince(dt: string | null, t: (key: string) => string): string {
 
 const STATUS_CLASSES = {
   healthy: {
-    badge: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800',
-    dot: 'bg-green-500',
-    border: 'border-green-200 dark:border-green-800',
-    card: 'bg-green-50/50 dark:bg-green-900/10',
+    badge: 'bg-primary/10 text-primary border-primary/20',
+    dot: 'bg-primary',
+    border: 'border-primary/20',
+    card: 'bg-primary/5',
   },
   warning: {
-    badge: 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800',
-    dot: 'bg-yellow-500',
-    border: 'border-yellow-200 dark:border-yellow-800',
-    card: 'bg-yellow-50/50 dark:bg-yellow-900/10',
+    badge: 'bg-secondary text-secondary-foreground border-border',
+    dot: 'bg-secondary-foreground',
+    border: 'border-border',
+    card: 'bg-secondary/30',
   },
   critical: {
-    badge: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800',
-    dot: 'bg-red-500',
-    border: 'border-red-200 dark:border-red-800',
-    card: 'bg-red-50/50 dark:bg-red-900/10',
+    badge: 'bg-destructive/10 text-destructive border-destructive/20',
+    dot: 'bg-destructive',
+    border: 'border-destructive/20',
+    card: 'bg-destructive/5',
   },
   unknown: {
-    badge: 'bg-neutral-100 text-neutral-600 border-neutral-200 dark:bg-neutral-800 dark:text-neutral-400 dark:border-neutral-700',
-    dot: 'bg-neutral-400',
-    border: 'border-neutral-200 dark:border-neutral-700',
-    card: 'bg-neutral-50/50 dark:bg-neutral-900/10',
+    badge: 'bg-muted text-muted-foreground border-border',
+    dot: 'bg-muted-foreground',
+    border: 'border-border',
+    card: 'bg-muted/30',
   },
 }
 
@@ -262,7 +264,7 @@ function ScheduleBadge({
   return (
     <Badge
       variant="outline"
-      className="gap-1 font-mono text-[0.6rem] border-neutral-300 text-neutral-700 bg-neutral-50 dark:border-neutral-700 dark:text-neutral-300 dark:bg-neutral-800/50"
+      className="gap-1 font-mono text-[0.6rem] border-border text-muted-foreground bg-muted/50"
       title={
         scheduleName
           ? t('dashboard.scheduleBadge.nextRunTitle', { name: scheduleName, label })
@@ -350,7 +352,7 @@ function DimStatusGrid({
         >
           <div className="flex items-center gap-0.5">
             <DimIcon status={item.status} />
-            <span className="text-[0.52rem] font-semibold text-muted-foreground tracking-wide uppercase">
+            <span className="text-[0.52rem] font-semibold text-muted-foreground tracking-wide">
               {item.label}
             </span>
           </div>
@@ -487,9 +489,9 @@ function StatCard({
             <div
               className={cn(
                 'flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-xs font-medium',
-                trend === 'up' && 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-                trend === 'down' && 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-                trend === 'neutral' && 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400'
+                trend === 'up' && 'bg-primary/10 text-primary',
+                trend === 'down' && 'bg-destructive/10 text-destructive',
+                trend === 'neutral' && 'bg-muted text-muted-foreground'
               )}
             >
               {trend === 'up' && <TrendingUp className="h-3 w-3" />}
@@ -646,7 +648,7 @@ export default function DashboardV3() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2">
           <Boxes className="h-5 w-5" />
-          <h1 className="text-lg font-semibold">BorgScale</h1>
+          <h1 className="text-lg font-semibold">{t('dashboard.pageTitle')}</h1>
         </div>
         <div className="flex items-center gap-3">
           {/* System status badge */}
@@ -716,7 +718,7 @@ export default function DashboardV3() {
                   className={cn(
                     'font-mono text-sm font-semibold',
                     summary.failed_jobs_30d > 0
-                      ? 'text-red-600 dark:text-red-400'
+                      ? 'text-destructive'
                       : 'text-muted-foreground'
                   )}
                 >
@@ -732,7 +734,7 @@ export default function DashboardV3() {
         <StatCard
           title={t('dashboard.banner.stats.storage')}
           value={storage.total_size}
-          sub={`${storage.total_archives} archives${storage.average_dedup_ratio != null ? ` · ${storage.average_dedup_ratio.toFixed(2)}× dedup` : ''}`}
+          sub={`${storage.total_archives} archives${storage.average_dedup_ratio != null ? ` · ${storage.average_dedup_ratio.toFixed(2)}× space saved` : ''}`}
           icon={HardDrive}
           trend="neutral"
         />
@@ -744,7 +746,7 @@ export default function DashboardV3() {
               ? `${t('dashboard.banner.stats.lastBackup')}: ${formatDistanceToNow(lastBackupDate, { addSuffix: true })}`
               : `${t('dashboard.banner.stats.lastBackup')}: ${t('common.never')}`
           }
-          icon={Cpu}
+          icon={Calendar}
           trend={
             summary.active_schedules === summary.total_schedules && summary.total_schedules > 0
               ? 'up'
@@ -824,9 +826,16 @@ export default function DashboardV3() {
         </CardHeader>
         <CardContent>
           {repos.length === 0 ? (
-            <p className="py-10 text-center text-sm text-muted-foreground">
-              {t('dashboard.noRepositoriesShort')}
-            </p>
+            <div className="py-10 text-center">
+              <p className="mb-4 text-sm text-muted-foreground">{t('dashboard.noRepositoriesShort')}</p>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => navigate('/repositories?action=create')}
+              >
+                {t('repositories.createRepository')}
+              </Button>
+            </div>
           ) : (
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {repos.map((repo) => {
@@ -868,7 +877,7 @@ export default function DashboardV3() {
                         {repo.mode === 'observe' && (
                           <Badge
                             variant="outline"
-                            className="font-mono text-[0.55rem] h-4 border-neutral-300 text-neutral-600 dark:border-neutral-600 dark:text-neutral-400"
+                            className="font-mono text-[0.55rem] h-4 border-border text-muted-foreground"
                           >
                             {t('repositories.observeOnly')}
                           </Badge>
@@ -884,7 +893,10 @@ export default function DashboardV3() {
                     </div>
 
                     {/* Name */}
-                    <p className="mb-1 truncate text-sm font-semibold">{repo.name}</p>
+                    <div className="mb-1 flex items-center justify-between gap-1">
+                      <p className="truncate text-sm font-semibold">{repo.name}</p>
+                      <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-60" />
+                    </div>
 
                     {/* Stats */}
                     <div className="mb-2 flex items-center gap-3 font-mono text-[0.62rem] text-muted-foreground">

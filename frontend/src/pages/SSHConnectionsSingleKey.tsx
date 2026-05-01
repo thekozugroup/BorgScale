@@ -8,6 +8,7 @@ import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
 import { Skeleton } from '../components/ui/skeleton'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog'
+import { Alert, AlertDescription } from '../components/ui/alert'
 import {
   Key,
   Copy,
@@ -609,9 +610,7 @@ export default function SSHConnectionsSingleKey() {
     )
   }
 
-  const infoAlertStyle = { background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }
-  const warningAlertStyle = { background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', color: '#b45309' }
-  const successAlertStyle = { background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#15803d' }
+  // Alert style helpers removed — replaced by shadcn Alert component variants below
 
   const FormField = ({ label, children, helper, fieldId }: { label: string; children: React.ReactNode; helper?: string; fieldId?: string }) => (
     <div>
@@ -638,14 +637,14 @@ export default function SSHConnectionsSingleKey() {
       {keyExists && (
         <div className="grid grid-cols-3 rounded-xl border border-border overflow-hidden mb-6">
           {[
-            { label: t('sshConnections.stats.totalConnections'), value: stats.totalConnections, icon: <Wifi size={13} />, color: '#2563eb' },
-            { label: t('sshConnections.stats.active'), value: stats.activeConnections, icon: <CheckCircle size={13} />, color: '#16a34a' },
-            { label: t('sshConnections.stats.failed'), value: stats.failedConnections, icon: <XCircle size={13} />, color: '#dc2626' },
+            { label: t('sshConnections.stats.totalConnections'), value: stats.totalConnections, icon: <Wifi size={13} />, cls: 'text-foreground' },
+            { label: t('sshConnections.stats.active'), value: stats.activeConnections, icon: <CheckCircle size={13} />, cls: 'text-primary' },
+            { label: t('sshConnections.stats.failed'), value: stats.failedConnections, icon: <XCircle size={13} />, cls: 'text-destructive' },
           ].map((stat, i) => (
             <div key={stat.label} className={`px-3 sm:px-4 py-3 sm:py-4 ${i < 2 ? 'border-r border-border' : ''}`}>
               <div className="flex items-center gap-1 mb-1 sm:mb-1.5">
-                <span style={{ color: stat.color, opacity: 0.75 }}>{stat.icon}</span>
-                <span className="text-[0.6rem] font-bold uppercase tracking-wider whitespace-nowrap" style={{ color: stat.color, opacity: 0.75 }}>{stat.label}</span>
+                <span className={`${stat.cls} opacity-75`}>{stat.icon}</span>
+                <span className={`text-[0.6rem] font-bold uppercase tracking-wider whitespace-nowrap ${stat.cls} opacity-75`}>{stat.label}</span>
               </div>
               <p className="text-2xl sm:text-3xl font-bold tabular-nums leading-none">{stat.value}</p>
             </div>
@@ -669,9 +668,9 @@ export default function SSHConnectionsSingleKey() {
 
         {!keyExists ? (
           <div>
-            <div className="flex items-start gap-2 p-3 rounded-xl text-sm mb-4" style={warningAlertStyle}>
-              {t('sshConnections.systemKey.noKey')}
-            </div>
+            <Alert variant="destructive" className="mb-4">
+              <AlertDescription>{t('sshConnections.systemKey.noKey')}</AlertDescription>
+            </Alert>
             <div className="flex flex-wrap gap-3">
               <Button onClick={() => setGenerateDialogOpen(true)} className="gap-1.5">
                 <Plus size={18} />
@@ -805,9 +804,11 @@ export default function SSHConnectionsSingleKey() {
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>{t('sshConnections.generateDialog.title')}</DialogTitle></DialogHeader>
           <div className="flex flex-col gap-4 pt-1">
-            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={infoAlertStyle}>
-              This will generate a new SSH key pair for your system. You can only have one system key at a time.
-            </div>
+            <Alert className="mb-0">
+              <AlertDescription>
+                This will generate a new SSH key pair for your system. You can only have one system key at a time.
+              </AlertDescription>
+            </Alert>
             <FormField label={t('sshConnections.generateDialog.keyType')}>
               <select value={keyType} onChange={(e) => setKeyType(e.target.value)} className="w-full rounded-md border border-input bg-background h-9 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring">
                 <option value="ed25519">{t('sshConnections.generateDialog.ed25519')}</option>
@@ -830,9 +831,11 @@ export default function SSHConnectionsSingleKey() {
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>{t('sshConnections.importDialog.title')}</DialogTitle></DialogHeader>
           <div className="flex flex-col gap-4 pt-1">
-            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={infoAlertStyle}>
-              Import an existing SSH key from your filesystem (e.g., mounted volume). The key will be read from the specified paths and stored in the database.
-            </div>
+            <Alert className="mb-0">
+              <AlertDescription>
+                Import an existing SSH key from your filesystem (e.g., mounted volume). The key will be read from the specified paths and stored in the database.
+              </AlertDescription>
+            </Alert>
             <FormField label={t('sshConnections.importDialog.keyName')}>
               <Input value={importForm.name} onChange={(e) => setImportForm({ ...importForm, name: e.target.value })} placeholder="System SSH Key" className="h-9 text-sm" />
             </FormField>
@@ -905,12 +908,14 @@ export default function SSHConnectionsSingleKey() {
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>{t('sshConnections.manualConnectionDialog.title')}</DialogTitle></DialogHeader>
           <div className="flex flex-col gap-4 pt-1">
-            <div className="p-3 rounded-xl text-sm" style={infoAlertStyle}>
-              <p className="font-semibold mb-1">{t('sshConnections.manualConnectionDialog.instructions.title')}</p>
-              <p className="text-xs mb-0.5">1. {t('sshConnections.manualConnectionDialog.instructions.step1')}</p>
-              <p className="text-xs mb-0.5">2. {t('sshConnections.manualConnectionDialog.instructions.step2')}</p>
-              <p className="text-xs">3. {t('sshConnections.manualConnectionDialog.instructions.step3')}</p>
-            </div>
+            <Alert className="mb-0">
+              <AlertDescription>
+                <p className="font-semibold mb-1">{t('sshConnections.manualConnectionDialog.instructions.title')}</p>
+                <p className="text-xs mb-0.5">1. {t('sshConnections.manualConnectionDialog.instructions.step1')}</p>
+                <p className="text-xs mb-0.5">2. {t('sshConnections.manualConnectionDialog.instructions.step2')}</p>
+                <p className="text-xs">3. {t('sshConnections.manualConnectionDialog.instructions.step3')}</p>
+              </AlertDescription>
+            </Alert>
             <FormField label={t('sshConnections.deployDialog.host')} fieldId="test-conn-host">
               <Input id="test-conn-host" value={testConnectionForm.host} onChange={(e) => setTestConnectionForm({ ...testConnectionForm, host: e.target.value })} placeholder="192.168.1.100 or example.com" className="h-9 text-sm" />
             </FormField>
@@ -920,9 +925,11 @@ export default function SSHConnectionsSingleKey() {
             <FormField label={t('sshConnections.deployDialog.port')} fieldId="test-conn-port">
               <Input id="test-conn-port" type="number" value={testConnectionForm.port} onChange={(e) => setTestConnectionForm({ ...testConnectionForm, port: parseInt(e.target.value) })} className="h-9 text-sm" />
             </FormField>
-            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={successAlertStyle}>
-              This will test the connection and add it to your connections list if successful.
-            </div>
+            <Alert className="mb-0">
+              <AlertDescription>
+                This will test the connection and add it to your connections list if successful.
+              </AlertDescription>
+            </Alert>
             <div className="flex justify-end gap-2 pt-1">
               <Button variant="outline" onClick={() => setTestConnectionDialogOpen(false)}>Cancel</Button>
               <Button onClick={handleTestManualConnection} disabled={testConnectionMutation.isPending || !testConnectionForm.host || !testConnectionForm.username}>
@@ -967,9 +974,11 @@ export default function SSHConnectionsSingleKey() {
             <FormField label={t('sshConnections.deployDialog.mountPoint')} helper="Friendly name for this remote machine (e.g., hetzner, backup-server)" fieldId="edit-conn-mount-point">
               <Input id="edit-conn-mount-point" value={editConnectionForm.mount_point} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, mount_point: e.target.value })} placeholder="hetzner or homeserver" className="h-9 text-sm" />
             </FormField>
-            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={infoAlertStyle}>
-              Update the connection details. You may want to test the connection after updating.
-            </div>
+            <Alert className="mb-0">
+              <AlertDescription>
+                Update the connection details. You may want to test the connection after updating.
+              </AlertDescription>
+            </Alert>
             <div className="flex justify-end gap-2 pt-1">
               <Button variant="outline" onClick={() => { setEditConnectionDialogOpen(false); setSelectedConnection(null) }}>Cancel</Button>
               <Button onClick={handleUpdateConnection} disabled={updateConnectionMutation.isPending || !editConnectionForm.host || !editConnectionForm.username}>
@@ -985,9 +994,9 @@ export default function SSHConnectionsSingleKey() {
         <DialogContent className="max-w-xs">
           <DialogHeader><DialogTitle>{t('sshConnections.deleteConnectionDialog.title')}</DialogTitle></DialogHeader>
           <div className="flex flex-col gap-4 pt-1">
-            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={warningAlertStyle}>
-              Are you sure you want to delete this connection?
-            </div>
+            <Alert variant="destructive" className="mb-0">
+              <AlertDescription>Are you sure you want to delete this connection?</AlertDescription>
+            </Alert>
             {selectedConnection && (
               <div className="flex flex-col gap-1.5 text-sm">
                 <p><strong>Host:</strong> {selectedConnection.host}</p>
@@ -1010,9 +1019,11 @@ export default function SSHConnectionsSingleKey() {
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>Deploy SSH Key to Connection</DialogTitle></DialogHeader>
           <div className="flex flex-col gap-4 pt-1">
-            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={infoAlertStyle}>
-              This will deploy your current system SSH key to this connection. You'll need to provide the password to authenticate.
-            </div>
+            <Alert className="mb-0">
+              <AlertDescription>
+                This will deploy your current system SSH key to this connection. You'll need to provide the password to authenticate.
+              </AlertDescription>
+            </Alert>
             {selectedConnection && (
               <div className="p-3 rounded-xl bg-muted/30 text-sm flex flex-col gap-1">
                 <p><strong>Host:</strong> {selectedConnection.host}</p>
@@ -1038,9 +1049,11 @@ export default function SSHConnectionsSingleKey() {
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>{t('sshConnections.deleteKeyDialog.title')}</DialogTitle></DialogHeader>
           <div className="flex flex-col gap-4 pt-1">
-            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={warningAlertStyle}>
-              <p className="font-semibold">{t('sshConnections.deleteKeyDialog.confirm')}</p>
-            </div>
+            <Alert variant="destructive" className="mb-0">
+              <AlertDescription>
+                <p className="font-semibold">{t('sshConnections.deleteKeyDialog.confirm')}</p>
+              </AlertDescription>
+            </Alert>
             {systemKey && (
               <div className="p-3 rounded-xl border border-border bg-muted/10 flex flex-col gap-1.5 text-sm">
                 <p><strong>Key Name:</strong> {systemKey.name}</p>
@@ -1057,9 +1070,9 @@ export default function SSHConnectionsSingleKey() {
               <li>Mark {connections.length} connection(s) as failed</li>
               <li>Clear SSH key from any repositories using it</li>
             </ul>
-            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={infoAlertStyle}>
-              {t('sshConnections.deleteKeyDialog.warning2')}
-            </div>
+            <Alert className="mb-0">
+              <AlertDescription>{t('sshConnections.deleteKeyDialog.warning2')}</AlertDescription>
+            </Alert>
             <div className="flex justify-end gap-2 pt-1">
               <Button variant="outline" onClick={() => setDeleteKeyDialogOpen(false)}>Cancel</Button>
               <Button onClick={handleDeleteKey} disabled={deleteKeyMutation.isPending} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
