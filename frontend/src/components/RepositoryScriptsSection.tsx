@@ -1,23 +1,115 @@
-import { Box, Button, Typography, Chip, Tooltip } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { FileCode } from 'lucide-react'
 import RepositoryScriptsTab from './RepositoryScriptsTab'
+import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
 
 interface RepositoryScriptsSectionProps {
   repositoryId?: number | null
-  // Inline scripts
   preBackupScript: string
   postBackupScript: string
   onPreBackupScriptChange: (value: string) => void
   onPostBackupScriptChange: (value: string) => void
-  // Dialogs
   onOpenPreScriptDialog: () => void
   onOpenPostScriptDialog: () => void
-  // Library script state
   hasPreLibraryScripts?: boolean
   hasPostLibraryScripts?: boolean
   onPreLibraryScriptsChange?: (hasScripts: boolean) => void
   onPostLibraryScriptsChange?: (hasScripts: boolean) => void
+}
+
+interface ScriptSectionProps {
+  label: string
+  hookType: 'pre-backup' | 'post-backup'
+  hasLibraryScripts: boolean
+  inlineScript: string
+  onOpenDialog: () => void
+  onClearInline: () => void
+  onLibraryScriptsChange?: (hasScripts: boolean) => void
+  repositoryId?: number | null
+  addLabel: string
+  createFirstLabel: string
+  addFromLibraryLabel: string
+  inlineScriptLabel: string
+  configuredLabel: string
+}
+
+function ScriptSection({
+  label,
+  hookType,
+  hasLibraryScripts,
+  inlineScript,
+  onOpenDialog,
+  onClearInline,
+  onLibraryScriptsChange,
+  repositoryId,
+  addLabel,
+  createFirstLabel,
+  addFromLibraryLabel,
+  inlineScriptLabel,
+  configuredLabel,
+}: ScriptSectionProps) {
+  return (
+    <div className="mb-4 last:mb-0">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-2">
+        <p className="text-sm font-semibold">{label}</p>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (repositoryId) {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const openFn = (window as any)[`openScriptDialog_${repositoryId}_${hookType}`]
+                    if (openFn) openFn()
+                  }
+                }}
+                disabled={!repositoryId}
+                className="w-full sm:w-auto gap-1.5 text-xs h-7 px-2"
+              >
+                <FileCode size={13} />
+                {addLabel}
+              </Button>
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>
+            {!repositoryId ? createFirstLabel : addFromLibraryLabel}
+          </TooltipContent>
+        </Tooltip>
+      </div>
+
+      {!hasLibraryScripts && (
+        <div className={cn('mb-2', repositoryId ? '' : '')}>
+          <button
+            type="button"
+            onClick={onOpenDialog}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-sm text-left hover:bg-muted/40 transition-colors duration-150"
+          >
+            <FileCode size={16} className="flex-shrink-0 text-muted-foreground" />
+            <span>{inlineScriptLabel}</span>
+            {inlineScript && (
+              <span className="ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-500/10 text-green-700 dark:text-green-400 border border-green-500/30">
+                {configuredLabel}
+              </span>
+            )}
+          </button>
+        </div>
+      )}
+
+      {repositoryId && (
+        <RepositoryScriptsTab
+          repositoryId={repositoryId}
+          hookType={hookType}
+          onScriptsChange={onLibraryScriptsChange}
+          hasInlineScript={!!inlineScript}
+          onClearInlineScript={onClearInline}
+        />
+      )}
+    </div>
+  )
 }
 
 export default function RepositoryScriptsSection({
@@ -35,181 +127,37 @@ export default function RepositoryScriptsSection({
 }: RepositoryScriptsSectionProps) {
   const { t } = useTranslation()
 
+  const commonLabels = {
+    addLabel: t('repositoryScriptsSection.add'),
+    createFirstLabel: t('repositoryScriptsSection.createFirst'),
+    addFromLibraryLabel: t('repositoryScriptsSection.addFromLibrary'),
+    inlineScriptLabel: t('repositoryScriptsSection.inlineScript'),
+    configuredLabel: t('repositoryScriptsSection.configured'),
+    repositoryId,
+  }
+
   return (
     <>
-      {/* Pre-Backup Scripts */}
-      <Box sx={{ mb: 1.5 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            justifyContent: 'space-between',
-            alignItems: { xs: 'stretch', sm: 'center' },
-            gap: 1,
-            mb: 0.75,
-          }}
-        >
-          <Typography variant="body2" fontWeight={600}>
-            {t('repositoryScriptsSection.preBackup')}
-          </Typography>
-          <Tooltip
-            title={
-              !repositoryId
-                ? t('repositoryScriptsSection.createFirst')
-                : t('repositoryScriptsSection.addFromLibrary')
-            }
-            arrow
-          >
-            <span>
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<FileCode size={14} />}
-                onClick={() => {
-                  if (repositoryId) {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    const openFn = (window as any)[`openScriptDialog_${repositoryId}_pre-backup`]
-                    if (openFn) openFn()
-                  }
-                }}
-                disabled={!repositoryId}
-                sx={{
-                  py: 0.25,
-                  px: 1,
-                  minHeight: 'auto',
-                  fontSize: '0.8rem',
-                  width: { xs: '100%', sm: 'auto' },
-                }}
-              >
-                {t('repositoryScriptsSection.add')}
-              </Button>
-            </span>
-          </Tooltip>
-        </Box>
-
-        {/* Inline Pre-Backup Script - hidden when library scripts exist */}
-        {!hasPreLibraryScripts && (
-          <Box sx={{ mb: repositoryId ? 1 : 0 }}>
-            <Button
-              variant="outlined"
-              startIcon={<FileCode size={18} />}
-              onClick={onOpenPreScriptDialog}
-              fullWidth
-              sx={{ justifyContent: 'flex-start', textTransform: 'none' }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
-                <Typography>{t('repositoryScriptsSection.inlineScript')}</Typography>
-                {preBackupScript && (
-                  <Chip
-                    label={t('repositoryScriptsSection.configured')}
-                    size="small"
-                    color="success"
-                    sx={{ ml: 'auto' }}
-                  />
-                )}
-              </Box>
-            </Button>
-          </Box>
-        )}
-
-        {/* Library Pre-Backup Scripts */}
-        {repositoryId && (
-          <RepositoryScriptsTab
-            repositoryId={repositoryId}
-            hookType="pre-backup"
-            onScriptsChange={onPreLibraryScriptsChange}
-            hasInlineScript={!!preBackupScript}
-            onClearInlineScript={() => onPreBackupScriptChange('')}
-          />
-        )}
-      </Box>
-
-      {/* Post-Backup Scripts */}
-      <Box>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            justifyContent: 'space-between',
-            alignItems: { xs: 'stretch', sm: 'center' },
-            gap: 1,
-            mb: 0.75,
-          }}
-        >
-          <Typography variant="body2" fontWeight={600}>
-            {t('repositoryScriptsSection.postBackup')}
-          </Typography>
-          <Tooltip
-            title={
-              !repositoryId
-                ? t('repositoryScriptsSection.createFirst')
-                : t('repositoryScriptsSection.addFromLibrary')
-            }
-            arrow
-          >
-            <span>
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<FileCode size={14} />}
-                onClick={() => {
-                  if (repositoryId) {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    const openFn = (window as any)[`openScriptDialog_${repositoryId}_post-backup`]
-                    if (openFn) openFn()
-                  }
-                }}
-                disabled={!repositoryId}
-                sx={{
-                  py: 0.25,
-                  px: 1,
-                  minHeight: 'auto',
-                  fontSize: '0.8rem',
-                  width: { xs: '100%', sm: 'auto' },
-                }}
-              >
-                {t('repositoryScriptsSection.add')}
-              </Button>
-            </span>
-          </Tooltip>
-        </Box>
-
-        {/* Inline Post-Backup Script - hidden when library scripts exist */}
-        {!hasPostLibraryScripts && (
-          <Box sx={{ mb: repositoryId ? 1 : 0 }}>
-            <Button
-              variant="outlined"
-              startIcon={<FileCode size={18} />}
-              onClick={onOpenPostScriptDialog}
-              fullWidth
-              sx={{ justifyContent: 'flex-start', textTransform: 'none' }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
-                <Typography>{t('repositoryScriptsSection.inlineScript')}</Typography>
-                {postBackupScript && (
-                  <Chip
-                    label={t('repositoryScriptsSection.configured')}
-                    size="small"
-                    color="success"
-                    sx={{ ml: 'auto' }}
-                  />
-                )}
-              </Box>
-            </Button>
-          </Box>
-        )}
-
-        {/* Library Post-Backup Scripts */}
-        {repositoryId && (
-          <RepositoryScriptsTab
-            repositoryId={repositoryId}
-            hookType="post-backup"
-            onScriptsChange={onPostLibraryScriptsChange}
-            hasInlineScript={!!postBackupScript}
-            onClearInlineScript={() => onPostBackupScriptChange('')}
-          />
-        )}
-      </Box>
+      <ScriptSection
+        label={t('repositoryScriptsSection.preBackup')}
+        hookType="pre-backup"
+        hasLibraryScripts={hasPreLibraryScripts}
+        inlineScript={preBackupScript}
+        onOpenDialog={onOpenPreScriptDialog}
+        onClearInline={() => onPreBackupScriptChange('')}
+        onLibraryScriptsChange={onPreLibraryScriptsChange}
+        {...commonLabels}
+      />
+      <ScriptSection
+        label={t('repositoryScriptsSection.postBackup')}
+        hookType="post-backup"
+        hasLibraryScripts={hasPostLibraryScripts}
+        inlineScript={postBackupScript}
+        onOpenDialog={onOpenPostScriptDialog}
+        onClearInline={() => onPostBackupScriptChange('')}
+        onLibraryScriptsChange={onPostLibraryScriptsChange}
+        {...commonLabels}
+      />
     </>
   )
 }

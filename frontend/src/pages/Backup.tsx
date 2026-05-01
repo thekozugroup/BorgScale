@@ -2,19 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CircularProgress,
-  IconButton,
-  Stack,
-  Tooltip,
-  Typography,
-} from '@mui/material'
-import { Clock, Info, Play } from 'lucide-react'
+import { Button } from '../components/ui/button'
+import { Loader2, Clock, Info, Play } from 'lucide-react'
 import { backupAPI, repositoriesAPI } from '../services/api'
 import { BorgApiClient } from '../services/borgApi'
 import { toast } from 'react-hot-toast'
@@ -172,59 +161,31 @@ const Backup: React.FC = () => {
   })
 
   return (
-    <Box>
+    <div>
       {/* Header */}
-      <Box
-        sx={{
-          mb: 4,
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          justifyContent: 'space-between',
-          alignItems: { xs: 'flex-start', sm: 'flex-start' },
-          gap: 2,
-        }}
-      >
-        <Box>
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-            <Typography variant="h4" fontWeight={600}>
-              {t('backup.title')}
-            </Typography>
+      <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4 mb-8">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <p className="text-2xl font-bold">{t('backup.title')}</p>
             {repositoriesData?.data?.repositories?.some(
               (repo: Repository) => !getRepoCapabilities(repo).canBackup
-            ) &&
-              !loadingRepositories && (
-                <Tooltip
-                  title={t('backup.manualBackup.observeOnlyHidden')}
-                  arrow
-                  enterTouchDelay={0}
-                  leaveTouchDelay={4000}
-                >
-                  <IconButton
-                    size="small"
-                    aria-label={t('backup.manualBackup.observeOnlyHidden')}
-                    sx={{
-                      color: 'text.disabled',
-                      '&:hover': { color: 'text.secondary' },
-                      p: 0,
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Info size={16} />
-                  </IconButton>
-                </Tooltip>
-              )}
-          </Stack>
-          <Typography variant="body2" color="text.secondary">
-            {t('backup.subtitle')}
-          </Typography>
-        </Box>
-        <Stack direction="row" spacing={2} alignItems="center"></Stack>
-      </Box>
+            ) && !loadingRepositories && (
+              <button
+                type="button"
+                title={t('backup.manualBackup.observeOnlyHidden')}
+                className="text-muted-foreground hover:text-foreground transition-colors p-0"
+              >
+                <Info size={16} />
+              </button>
+            )}
+          </div>
+          <p className="text-sm text-muted-foreground">{t('backup.subtitle')}</p>
+        </div>
+      </div>
 
       {/* Manual Backup Control */}
-      <Box sx={{ mb: 4 }}>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="stretch">
+      <div className="mb-8">
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch">
           <RepoSelect
             repositories={(repositoriesData?.data?.repositories ?? []).filter(
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -242,41 +203,30 @@ const Backup: React.FC = () => {
           />
 
           <Button
-            variant="contained"
-            color="success"
-            size="medium"
-            startIcon={
-              startBackupMutation.isPending ? (
-                <CircularProgress size={16} color="inherit" />
-              ) : (
-                <Play size={18} />
-              )
-            }
             onClick={handleStartBackup}
             disabled={startBackupMutation.isPending || !selectedRepository || !canStartBackup}
-            sx={{
-              minWidth: { xs: '100%', sm: 160 },
-              fontWeight: 600,
-              flexShrink: 0,
-            }}
+            className="w-full sm:w-auto flex-shrink-0 gap-1.5 font-semibold bg-emerald-600 hover:bg-emerald-700 text-white"
           >
+            {startBackupMutation.isPending ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Play size={18} />
+            )}
             {startBackupMutation.isPending
               ? t('backup.manualBackup.starting')
               : t('backup.manualBackup.startBackup')}
           </Button>
-        </Stack>
+        </div>
 
         {repositoriesData?.data?.repositories?.length === 0 && !loadingRepositories && (
-          <Alert severity="warning" sx={{ mt: 2 }}>
-            <Typography variant="body2" fontWeight={500} gutterBottom>
-              {t('backup.manualBackup.noRepositories.title')}
-            </Typography>
-            <Typography variant="body2">
-              {t('backup.manualBackup.noRepositories.subtitle')}
-            </Typography>
-          </Alert>
+          <div className="flex items-start gap-2 p-3 rounded-xl text-sm mt-3" style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', color: '#b45309' }}>
+            <div>
+              <p className="font-semibold">{t('backup.manualBackup.noRepositories.title')}</p>
+              <p className="mt-0.5">{t('backup.manualBackup.noRepositories.subtitle')}</p>
+            </div>
+          </div>
         )}
-      </Box>
+      </div>
 
       {/* Command Preview Card */}
       {selectedRepoData && (
@@ -305,56 +255,41 @@ const Backup: React.FC = () => {
       />
 
       {/* Recent Jobs */}
-      <Card>
-        <CardContent>
-          <Stack
-            direction="row"
-            spacing={1.5}
-            alignItems="center"
-            sx={{ mb: 1, color: 'text.secondary' }}
-          >
-            <Clock size={20} />
-            <Typography variant="h6" fontWeight={600}>
-              {t('backup.recentJobs.title')}
-            </Typography>
-          </Stack>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            {t('backup.recentJobs.subtitle')}
-          </Typography>
+      <div className="rounded-xl border border-border p-5">
+        <div className="flex items-center gap-2 mb-1 text-muted-foreground">
+          <Clock size={20} />
+          <p className="text-base font-semibold text-foreground">{t('backup.recentJobs.title')}</p>
+        </div>
+        <p className="text-sm text-muted-foreground mb-4">{t('backup.recentJobs.subtitle')}</p>
 
-          <BackupJobsTable
-            jobs={recentJobs}
-            repositories={repositoriesData?.data?.repositories || []}
-            loading={loadingStatus}
-            actions={{
-              viewLogs: true,
-              cancel: true,
-              breakLock: true,
-              downloadLogs: true,
-              errorInfo: true,
-              delete: true,
-            }}
-            canBreakLocks={canManageRepositoryOperations}
-            canDeleteJobs={canManageRepositoryOperations}
-            getRowKey={(job) => String(job.id)}
-            headerBgColor="background.default"
-            enableHover={true}
-            tableId="backup"
-            emptyState={{
-              icon: (
-                <Box sx={{ color: 'text.disabled' }}>
-                  <Clock size={48} />
-                </Box>
-              ),
-              title: t('backup.recentJobs.empty'),
-            }}
-          />
-        </CardContent>
-      </Card>
+        <BackupJobsTable
+          jobs={recentJobs}
+          repositories={repositoriesData?.data?.repositories || []}
+          loading={loadingStatus}
+          actions={{
+            viewLogs: true,
+            cancel: true,
+            breakLock: true,
+            downloadLogs: true,
+            errorInfo: true,
+            delete: true,
+          }}
+          canBreakLocks={canManageRepositoryOperations}
+          canDeleteJobs={canManageRepositoryOperations}
+          getRowKey={(job) => String(job.id)}
+          headerBgColor="background.default"
+          enableHover={true}
+          tableId="backup"
+          emptyState={{
+            icon: <Clock size={48} />,
+            title: t('backup.recentJobs.empty'),
+          }}
+        />
+      </div>
 
       {/* Log Viewer Dialog */}
       <LogViewerDialog job={logJob} open={Boolean(logJob)} onClose={handleCloseLogs} />
-    </Box>
+    </div>
   )
 }
 

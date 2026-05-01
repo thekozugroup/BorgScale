@@ -1,12 +1,7 @@
-import {
-  Button,
-  CircularProgress,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Stack,
-  TextField,
-} from '@mui/material'
+import { Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import ResponsiveDialog from './ResponsiveDialog'
 
 interface AccountPasswordDialogProps {
@@ -40,58 +35,58 @@ export default function AccountPasswordDialog({
 
   return (
     <ResponsiveDialog open={open} onClose={(_, reason) => onClose(reason)} maxWidth="sm" fullWidth>
-      <DialogTitle>Change password</DialogTitle>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          onSubmit()
-        }}
-      >
-        <DialogContent>
-          <Stack spacing={2}>
-            <TextField
-              label="Current password"
-              type="password"
-              value={currentPassword}
-              onChange={(e) => onFormChange({ current_password: e.target.value })}
-              required
-              fullWidth
-              size="small"
-            />
-            <TextField
-              label="New password"
-              type="password"
-              value={newPassword}
-              onChange={(e) => onFormChange({ new_password: e.target.value })}
-              required
-              fullWidth
-              size="small"
-            />
-            <TextField
-              label="Confirm password"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => onFormChange({ confirm_password: e.target.value })}
-              required
-              fullWidth
-              size="small"
-              error={passwordsMismatch}
-              helperText={passwordsMismatch ? 'Passwords do not match' : ''}
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => onClose('closeButton')}>Cancel</Button>
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={isSubmitting}
-            startIcon={isSubmitting ? <CircularProgress size={14} /> : null}
-          >
-            {isSubmitting ? 'Saving' : 'Update password'}
-          </Button>
-        </DialogActions>
-      </form>
+      <div className="p-6">
+        <h2 className="text-lg font-semibold mb-4">Change password</h2>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            onSubmit()
+          }}
+        >
+          <div className="flex flex-col gap-4 mb-4">
+            <div className="flex flex-col gap-1">
+              <Label>Current password</Label>
+              <Input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => onFormChange({ current_password: e.target.value })}
+                required
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label>New password</Label>
+              <Input
+                type="password"
+                value={newPassword}
+                onChange={(e) => onFormChange({ new_password: e.target.value })}
+                required
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label>Confirm password</Label>
+              <Input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => onFormChange({ confirm_password: e.target.value })}
+                required
+                aria-invalid={passwordsMismatch}
+              />
+              {passwordsMismatch && (
+                <p className="text-xs text-destructive">Passwords do not match</p>
+              )}
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="ghost" onClick={() => onClose('closeButton')}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isSubmitting ? 'Saving' : 'Update password'}
+            </Button>
+          </div>
+        </form>
+      </div>
     </ResponsiveDialog>
   )
 }

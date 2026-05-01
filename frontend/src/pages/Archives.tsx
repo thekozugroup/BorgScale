@@ -429,7 +429,6 @@ const Archives: React.FC = () => {
             value={selectedRepositoryId}
             onChange={(v) => handleRepositoryChange(v as number)}
             loading={loadingRepositories}
-            sx={{ mb: 0 }}
           />
         </div>
       </div>

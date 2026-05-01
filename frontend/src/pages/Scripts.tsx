@@ -1,25 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { translateBackendKey } from '../utils/translateBackendKey'
-import {
-  Box,
-  Button,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Paper,
-  TextField,
-  Typography,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Alert,
-  CircularProgress,
-} from '@mui/material'
-import { Plus, Edit, Trash2, Play, FileCode, Clock, CheckCircle, XCircle } from 'lucide-react'
+import { Button } from '../components/ui/button'
+import { Input } from '../components/ui/input'
+import { Label } from '../components/ui/label'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog'
+import { Loader2, Plus, Edit, Trash2, Play, FileCode, Clock, CheckCircle, XCircle } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import api from '../services/api'
 import CodeEditor from '../components/CodeEditor'
@@ -308,23 +294,11 @@ export default function Scripts() {
     }
   }
 
-  const getRunOnColor = (runOn: string) => {
-    switch (runOn) {
-      case 'success':
-        return 'success'
-      case 'failure':
-        return 'error'
-      case 'warning':
-        return 'warning'
-      case 'always':
-        return 'info'
-      default:
-        return 'default'
-    }
-  }
-
-  const getCategoryColor = (category: string) => {
-    return category === 'template' ? 'secondary' : 'default'
+  const RUN_ON_BADGE: Record<string, string> = {
+    success: 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30',
+    failure: 'bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/30',
+    warning: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30',
+    always: 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/30',
   }
 
   if (!canManageScripts) {
@@ -336,84 +310,62 @@ export default function Scripts() {
       id: 'name',
       label: t('scripts.table.name'),
       render: (script) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+        <div className="flex items-center gap-2 min-w-0">
           <FileCode size={18} />
-          <Box sx={{ minWidth: 0 }}>
-            <Typography variant="body2" sx={{ fontWeight: 500 }}>
-              {script.name}
-            </Typography>
+          <div className="min-w-0">
+            <p className="text-sm font-medium">{script.name}</p>
             {script.description && (
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ display: { xs: 'block', md: 'none' } }}
-              >
-                {script.description}
-              </Typography>
+              <p className="text-xs text-muted-foreground md:hidden">{script.description}</p>
             )}
-          </Box>
+          </div>
           {script.parameters && script.parameters.length > 0 && (
-            <Chip
-              label={`${script.parameters.length} param${script.parameters.length > 1 ? 's' : ''}`}
-              size="small"
-              color="info"
-              variant="outlined"
-              sx={{ fontSize: '0.7rem', flexShrink: 0 }}
-            />
+            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-semibold border border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400 flex-shrink-0">
+              {script.parameters.length} param{script.parameters.length > 1 ? 's' : ''}
+            </span>
           )}
-        </Box>
+        </div>
       ),
     },
     {
       id: 'description',
       label: t('scripts.table.description'),
       render: (script) => (
-        <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 300 }}>
-          {script.description || '-'}
-        </Typography>
+        <p className="text-sm text-muted-foreground max-w-xs">{script.description || '-'}</p>
       ),
     },
     {
       id: 'category',
       label: t('scripts.table.category'),
       render: (script) => (
-        <Chip
-          label={script.category}
-          size="small"
-          color={getCategoryColor(script.category) as 'default' | 'secondary'}
-        />
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border border-border text-muted-foreground">
+          {script.category}
+        </span>
       ),
     },
     {
       id: 'run_on',
       label: t('scripts.table.runOn'),
       render: (script) => (
-        <Chip
-          label={script.run_on}
-          size="small"
-          color={
-            getRunOnColor(script.run_on) as 'default' | 'success' | 'error' | 'warning' | 'info'
-          }
-        />
+        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border ${RUN_ON_BADGE[script.run_on] ?? 'border-border text-muted-foreground'}`}>
+          {script.run_on}
+        </span>
       ),
     },
     {
       id: 'timeout',
       label: t('scripts.table.timeout'),
       render: (script) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+        <div className="flex items-center gap-1">
           <Clock size={14} />
-          <Typography variant="body2">{script.timeout}s</Typography>
-        </Box>
+          <span className="text-sm">{script.timeout}s</span>
+        </div>
       ),
     },
     {
       id: 'usage_count',
       label: t('scripts.table.usage'),
       render: (script) => (
-        <Typography variant="body2">
-          {t('scripts.usedInCount', { count: script.usage_count })}
-        </Typography>
+        <span className="text-sm">{t('scripts.usedInCount', { count: script.usage_count })}</span>
       ),
     },
   ]
@@ -448,42 +400,18 @@ export default function Scripts() {
   ]
 
   return (
-    <Box>
+    <div>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          justifyContent: 'space-between',
-          alignItems: { xs: 'stretch', sm: 'center' },
-          gap: 1.5,
-          mb: 3,
-        }}
-      >
-        <Box>
-          <Typography variant="h4" sx={{ fontWeight: 600 }}>
-            {t('scripts.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            {t('scripts.subtitle')}
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<Plus size={20} />}
-          onClick={handleCreate}
-          sx={{ width: { xs: '100%', sm: 'auto' }, minWidth: 140 }}
-        >
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+        <div>
+          <p className="text-2xl font-bold">{t('scripts.title')}</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{t('scripts.subtitle')}</p>
+        </div>
+        <Button onClick={handleCreate} className="w-full sm:w-auto gap-1.5">
+          <Plus size={20} />
           {t('scripts.newScript')}
         </Button>
-      </Box>
-
-      {/* Info Alert */}
-      {scripts.length === 0 && (
-        <Alert severity="info" sx={{ mb: 3 }}>
-          <Typography variant="body2">{t('scripts.empty')}</Typography>
-        </Alert>
-      )}
+      </div>
 
       <DataTable
         data={scripts}
@@ -499,56 +427,66 @@ export default function Scripts() {
       />
 
       {/* Create/Edit Dialog */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="md" fullWidth>
-        <DialogTitle>
-          {editingScript ? t('scripts.editDialog.title') : t('scripts.createDialog.title')}
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-            <TextField
-              label={t('scripts.fields.name')}
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              fullWidth
-              required
-              helperText={t('scripts.fields.nameHelperText')}
-            />
+      <Dialog open={dialogOpen} onOpenChange={(open) => !open && setDialogOpen(false)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {editingScript ? t('scripts.editDialog.title') : t('scripts.createDialog.title')}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 pt-1">
+            <div>
+              <Label className="text-xs font-semibold mb-1.5 block">{t('scripts.fields.name')} *</Label>
+              <Input
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+                className="h-9 text-sm"
+              />
+              <p className="text-xs text-muted-foreground mt-1">{t('scripts.fields.nameHelperText')}</p>
+            </div>
 
-            <TextField
-              label={t('scripts.fields.description')}
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              fullWidth
-              multiline
-              rows={2}
-              helperText={t('scripts.fields.descriptionHelperText')}
-            />
+            <div>
+              <Label className="text-xs font-semibold mb-1.5 block">{t('scripts.fields.description')}</Label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={2}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+              />
+              <p className="text-xs text-muted-foreground mt-1">{t('scripts.fields.descriptionHelperText')}</p>
+            </div>
 
-            <FormControl fullWidth>
-              <InputLabel>{t('scripts.fields.runOn')}</InputLabel>
-              <Select
+            <div>
+              <Label className="text-xs font-semibold mb-1.5 block">{t('scripts.fields.runOn')}</Label>
+              <select
                 value={formData.run_on}
-                label={t('scripts.fields.runOn')}
                 onChange={(e) => setFormData({ ...formData, run_on: e.target.value })}
+                className="w-full rounded-md border border-input bg-background h-9 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               >
-                <MenuItem value="success">{t('scripts.runOn.success')}</MenuItem>
-                <MenuItem value="failure">{t('scripts.runOn.failure')}</MenuItem>
-                <MenuItem value="warning">{t('scripts.runOn.warning')}</MenuItem>
-                <MenuItem value="always">{t('scripts.runOn.always')}</MenuItem>
-              </Select>
-            </FormControl>
+                <option value="success">{t('scripts.runOn.success')}</option>
+                <option value="failure">{t('scripts.runOn.failure')}</option>
+                <option value="warning">{t('scripts.runOn.warning')}</option>
+                <option value="always">{t('scripts.runOn.always')}</option>
+              </select>
+            </div>
 
-            <Alert severity="info">{t('scripts.runOn.note')}</Alert>
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}>
+              {t('scripts.runOn.note')}
+            </div>
 
-            <TextField
-              label={t('scripts.fields.timeout')}
-              type="number"
-              value={formData.timeout}
-              onChange={(e) => setFormData({ ...formData, timeout: parseInt(e.target.value) })}
-              fullWidth
-              inputProps={{ min: 30, max: 3600 }}
-              helperText={t('scripts.fields.timeoutHint')}
-            />
+            <div>
+              <Label className="text-xs font-semibold mb-1.5 block">{t('scripts.fields.timeout')}</Label>
+              <Input
+                type="number"
+                value={formData.timeout}
+                onChange={(e) => setFormData({ ...formData, timeout: parseInt(e.target.value) })}
+                min={30}
+                max={3600}
+                className="h-9 text-sm"
+              />
+              <p className="text-xs text-muted-foreground mt-1">{t('scripts.fields.timeoutHint')}</p>
+            </div>
 
             <CodeEditor
               label={t('scripts.fields.content')}
@@ -561,107 +499,83 @@ export default function Scripts() {
 
             {/* Parameter Configuration */}
             {detectedParameters.length > 0 && (
-              <Box>
-                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                  {t('scripts.fields.parameters')}
-                </Typography>
-                <Alert severity="info" sx={{ mb: 2 }}>
+              <div>
+                <p className="text-sm font-semibold mb-2">{t('scripts.fields.parameters')}</p>
+                <div className="flex items-start gap-2 p-3 rounded-xl text-sm mb-3" style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}>
                   {t('scripts.fields.parametersHint')}
-                </Alert>
-                <Paper variant="outlined" sx={{ p: 2 }}>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                    {detectedParameters.map((param) => (
-                      <Box
-                        key={param.name}
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          p: 1.5,
-                          borderRadius: 1,
-                          backgroundColor:
-                            param.type === 'password' ? 'rgba(255, 152, 0, 0.08)' : 'transparent',
-                          border: '1px solid',
-                          borderColor: param.type === 'password' ? 'warning.light' : 'divider',
-                        }}
-                      >
-                        <Box sx={{ flex: 1 }}>
-                          <Typography
-                            variant="body2"
-                            sx={{ fontWeight: 600, fontFamily: 'monospace' }}
-                          >
-                            {param.name}
-                          </Typography>
-                          <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
-                            {param.default && (
-                              <Typography variant="caption" color="text.secondary">
-                                Default: {param.default}
-                              </Typography>
-                            )}
-                            {param.required && (
-                              <Chip
-                                label="Required"
-                                size="small"
-                                color="error"
-                                variant="outlined"
-                                sx={{ height: 18, fontSize: '0.65rem' }}
-                              />
-                            )}
-                          </Box>
-                        </Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
-                            {t('scripts.fields.treatAsSecret')}
-                          </Typography>
-                          <input
-                            type="checkbox"
-                            checked={param.type === 'password'}
-                            onChange={() => handleParameterTypeToggle(param.name)}
-                            style={{ width: 18, height: 18, cursor: 'pointer' }}
-                          />
-                        </Box>
-                      </Box>
-                    ))}
-                  </Box>
-                </Paper>
-              </Box>
+                </div>
+                <div className="rounded-xl border border-border p-3 flex flex-col gap-3">
+                  {detectedParameters.map((param) => (
+                    <div
+                      key={param.name}
+                      className="flex items-center justify-between p-3 rounded-lg border"
+                      style={{
+                        backgroundColor: param.type === 'password' ? 'rgba(255,152,0,0.08)' : 'transparent',
+                        borderColor: param.type === 'password' ? 'rgba(245,158,11,0.4)' : 'var(--border)',
+                      }}
+                    >
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold font-mono">{param.name}</p>
+                        <div className="flex gap-2 mt-0.5">
+                          {param.default && (
+                            <span className="text-xs text-muted-foreground">Default: {param.default}</span>
+                          )}
+                          {param.required && (
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-semibold border border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-400">
+                              Required
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">{t('scripts.fields.treatAsSecret')}</span>
+                        <input
+                          type="checkbox"
+                          checked={param.type === 'password'}
+                          onChange={() => handleParameterTypeToggle(param.name)}
+                          style={{ width: 18, height: 18, cursor: 'pointer' }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
 
             {editingScript && editingScript.usage_count > 0 && (
-              <Alert severity="info">
+              <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}>
                 {t('scripts.usedInPlaces', { count: editingScript.usage_count })}
-              </Alert>
+              </div>
             )}
-          </Box>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={() => setDialogOpen(false)}>{t('scripts.buttons.cancel')}</Button>
+              <Button onClick={handleSave} disabled={!formData.name.trim()}>
+                {editingScript ? t('scripts.buttons.update') : t('scripts.buttons.create')}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>{t('scripts.buttons.cancel')}</Button>
-          <Button onClick={handleSave} variant="contained" disabled={!formData.name.trim()}>
-            {editingScript ? t('scripts.buttons.update') : t('scripts.buttons.create')}
-          </Button>
-        </DialogActions>
       </Dialog>
 
       {/* Test Result Dialog */}
-      <Dialog
-        open={testDialogOpen}
-        onClose={() => setTestDialogOpen(false)}
-        maxWidth="lg"
-        fullWidth
-      >
-        <DialogTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Play size={20} />
-            {t('scripts.testDialog.title')}: {testingScriptData?.name}
-          </Box>
-        </DialogTitle>
-        <DialogContent>
+      <Dialog open={testDialogOpen} onOpenChange={(open) => !open && setTestDialogOpen(false)}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>
+              <div className="flex items-center gap-2">
+                <Play size={20} />
+                {t('scripts.testDialog.title')}: {testingScriptData?.name}
+              </div>
+            </DialogTitle>
+          </DialogHeader>
           {!testResult ? (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
-              {/* Show parameters if script has them */}
+            <div className="flex flex-col gap-4 pt-1">
               {testingScriptData?.parameters && testingScriptData.parameters.length > 0 ? (
                 <>
-                  <Alert severity="info">{t('scripts.testDialog.hasParams')}</Alert>
+                  <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}>
+                    {t('scripts.testDialog.hasParams')}
+                  </div>
                   <ScriptParameterInputs
                     parameters={testingScriptData.parameters}
                     values={testParameterValues}
@@ -669,113 +583,79 @@ export default function Scripts() {
                   />
                 </>
               ) : (
-                <Alert severity="info">{t('scripts.testDialog.noParams')}</Alert>
+                <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}>
+                  {t('scripts.testDialog.noParams')}
+                </div>
               )}
 
-              {/* Test button */}
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, pt: 2 }}>
-                <Button onClick={() => setTestDialogOpen(false)}>
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="outline" onClick={() => setTestDialogOpen(false)}>
                   {t('scripts.buttons.cancel')}
                 </Button>
-                <Button
-                  onClick={executeTest}
-                  variant="contained"
-                  startIcon={testingScript ? <CircularProgress size={16} /> : <Play size={16} />}
-                  disabled={testingScript}
-                >
-                  {testingScript
-                    ? t('scripts.testDialog.running')
-                    : t('scripts.testDialog.runTest')}
+                <Button onClick={executeTest} disabled={testingScript} className="gap-1.5">
+                  {testingScript ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} />}
+                  {testingScript ? t('scripts.testDialog.running') : t('scripts.testDialog.runTest')}
                 </Button>
-              </Box>
-            </Box>
+              </div>
+            </div>
           ) : testingScript ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 4 }}>
-              <CircularProgress />
-              <Typography sx={{ ml: 2 }}>{t('scripts.testDialog.runningScript')}</Typography>
-            </Box>
+            <div className="flex justify-center items-center gap-3 py-8">
+              <Loader2 size={28} className="animate-spin text-muted-foreground" />
+              <span>{t('scripts.testDialog.runningScript')}</span>
+            </div>
           ) : testResult ? (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <div className="flex flex-col gap-3">
               {/* Status */}
-              <Alert
-                severity={testResult.success ? 'success' : 'error'}
-                icon={testResult.success ? <CheckCircle /> : <XCircle />}
+              <div
+                className="flex items-start gap-2 p-3 rounded-xl text-sm"
+                style={testResult.success
+                  ? { background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#15803d' }
+                  : { background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', color: '#b91c1c' }
+                }
               >
-                <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                  {testResult.success
-                    ? t('scripts.testDialog.success')
-                    : t('scripts.testDialog.failed')}
-                </Typography>
-                <Typography variant="caption">
-                  {t('scripts.testDialog.exitCode', {
-                    code: testResult.exit_code,
-                    time: testResult.execution_time.toFixed(2),
-                  })}
-                </Typography>
-              </Alert>
+                {testResult.success ? <CheckCircle size={18} className="flex-shrink-0 mt-0.5" /> : <XCircle size={18} className="flex-shrink-0 mt-0.5" />}
+                <div>
+                  <p className="font-semibold">
+                    {testResult.success ? t('scripts.testDialog.success') : t('scripts.testDialog.failed')}
+                  </p>
+                  <p className="text-xs mt-0.5">
+                    {t('scripts.testDialog.exitCode', { code: testResult.exit_code, time: testResult.execution_time.toFixed(2) })}
+                  </p>
+                </div>
+              </div>
 
               {/* Stdout */}
               {testResult.stdout && (
-                <Box>
-                  <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                    {t('scripts.testDialog.stdout')}
-                  </Typography>
-                  <Paper
-                    sx={{
-                      p: 2,
-                      backgroundColor: '#1e1e1e',
-                      color: '#d4d4d4',
-                      fontFamily: 'monospace',
-                      fontSize: '0.875rem',
-                      overflow: 'auto',
-                      maxHeight: 200,
-                    }}
-                  >
-                    <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{testResult.stdout}</pre>
-                  </Paper>
-                </Box>
+                <div>
+                  <p className="text-sm font-semibold mb-1">{t('scripts.testDialog.stdout')}</p>
+                  <div className="p-3 rounded-xl overflow-auto max-h-48" style={{ background: '#1e1e1e', color: '#d4d4d4' }}>
+                    <pre className="text-sm font-mono whitespace-pre-wrap m-0">{testResult.stdout}</pre>
+                  </div>
+                </div>
               )}
 
               {/* Stderr */}
               {testResult.stderr && (
-                <Box>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{ mb: 1, fontWeight: 600, color: 'error.main' }}
-                  >
-                    {t('scripts.testDialog.stderr')}
-                  </Typography>
-                  <Paper
-                    sx={{
-                      p: 2,
-                      backgroundColor: '#1e1e1e',
-                      color: '#f48771',
-                      fontFamily: 'monospace',
-                      fontSize: '0.875rem',
-                      overflow: 'auto',
-                      maxHeight: 200,
-                    }}
-                  >
-                    <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{testResult.stderr}</pre>
-                  </Paper>
-                </Box>
+                <div>
+                  <p className="text-sm font-semibold mb-1 text-red-600 dark:text-red-400">{t('scripts.testDialog.stderr')}</p>
+                  <div className="p-3 rounded-xl overflow-auto max-h-48" style={{ background: '#1e1e1e', color: '#f48771' }}>
+                    <pre className="text-sm font-mono whitespace-pre-wrap m-0">{testResult.stderr}</pre>
+                  </div>
+                </div>
               )}
-            </Box>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="outline" onClick={() => setTestResult(null)}>
+                  {t('scripts.testDialog.testAgain')}
+                </Button>
+                <Button variant="outline" onClick={() => setTestDialogOpen(false)}>
+                  {t('scripts.testDialog.close')}
+                </Button>
+              </div>
+            </div>
           ) : null}
         </DialogContent>
-        <DialogActions>
-          {testResult ? (
-            <>
-              <Button onClick={() => setTestResult(null)} variant="outlined">
-                {t('scripts.testDialog.testAgain')}
-              </Button>
-              <Button onClick={() => setTestDialogOpen(false)}>
-                {t('scripts.testDialog.close')}
-              </Button>
-            </>
-          ) : null}
-        </DialogActions>
       </Dialog>
-    </Box>
+    </div>
   )
 }

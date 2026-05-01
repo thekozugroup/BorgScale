@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Box, Typography, IconButton, Tooltip, Skeleton, alpha, useTheme } from '@mui/material'
 import { HardDrive, XCircle, Trash2, FolderOpen, Copy, Info } from 'lucide-react'
 import { mountsAPI } from '../services/api'
 import { toast } from 'react-hot-toast'
@@ -9,6 +8,9 @@ import { translateBackendKey } from '../utils/translateBackendKey'
 import { formatDate } from '../utils/dateUtils'
 import { useAnalytics } from '../hooks/useAnalytics'
 import { useAuth } from '../hooks/useAuth'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Skeleton } from '@/components/ui/skeleton'
+import { useTheme } from '../context/ThemeContext'
 
 interface Mount {
   mount_id: string
@@ -21,60 +23,26 @@ interface Mount {
   connection_id: number | null
 }
 
-function MountCardSkeleton({ index = 0 }: { index?: number }) {
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
-  const desktopGridTemplate = 'minmax(0, 1.2fr) minmax(0, 1fr) 180px 100px'
+const desktopGridTemplate = 'minmax(0, 1.2fr) minmax(0, 1fr) 180px 100px'
 
+function MountCardSkeleton({ index = 0 }: { index?: number }) {
   return (
-    <Box
-      sx={{
-        display: 'grid',
-        gridTemplateColumns: desktopGridTemplate,
-        alignItems: 'center',
-        gap: 1,
-        px: 2,
-        py: 1.125,
-        borderBottom: '1px solid',
-        borderBottomColor: isDark ? alpha('#fff', 0.04) : alpha('#000', 0.04),
-        opacity: 0,
-        animation: 'mountSkeletonFadeIn 0.35s ease forwards',
-        animationDelay: `${index * 40}ms`,
-        '@keyframes mountSkeletonFadeIn': {
-          from: { opacity: 0 },
-          to: { opacity: 1 },
-        },
-        '@media (max-width: 767px)': {
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 0.75,
-          px: 1.75,
-          py: 1.25,
-        },
-      }}
+    <div
+      className="hidden md:grid items-center gap-2 px-4 py-[0.9rem] border-b border-border last:border-b-0"
+      style={{ gridTemplateColumns: desktopGridTemplate }}
     >
-      <Box>
-        <Skeleton
-          variant="text"
-          width={[160, 200, 140, 180, 152][index % 5]}
-          height={16}
-          sx={{ borderRadius: 0.5, transform: 'none' }}
-        />
-        <Skeleton
-          variant="text"
-          width={[80, 100, 70, 90, 85][index % 5]}
-          height={12}
-          sx={{ borderRadius: 0.5, transform: 'none', mt: 0.5 }}
-        />
-      </Box>
-      <Skeleton variant="text" width={120} height={14} sx={{ transform: 'none' }} />
-      <Skeleton variant="text" width={90} height={14} sx={{ transform: 'none' }} />
-      <Box sx={{ display: 'flex', gap: 0.25, justifyContent: 'flex-end' }}>
-        <Skeleton variant="rounded" width={28} height={28} sx={{ borderRadius: 1.5 }} />
-        <Skeleton variant="rounded" width={28} height={28} sx={{ borderRadius: 1.5 }} />
-        <Skeleton variant="rounded" width={28} height={28} sx={{ borderRadius: 1.5 }} />
-      </Box>
-    </Box>
+      <div>
+        <Skeleton className="h-3.5 rounded mb-1.5" style={{ width: [160, 200, 140, 180, 152][index % 5] }} />
+        <Skeleton className="h-3 rounded" style={{ width: [80, 100, 70, 90, 85][index % 5] }} />
+      </div>
+      <Skeleton className="h-3.5 rounded w-28" />
+      <Skeleton className="h-3.5 rounded w-20" />
+      <div className="flex gap-1 justify-end">
+        <Skeleton className="h-7 w-7 rounded-lg" />
+        <Skeleton className="h-7 w-7 rounded-lg" />
+        <Skeleton className="h-7 w-7 rounded-lg" />
+      </div>
+    </div>
   )
 }
 
@@ -90,202 +58,149 @@ function MountCard({
   onForceUnmount: (mount: Mount) => void
 }) {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
-  const desktopGridTemplate = 'minmax(0, 1.2fr) minmax(0, 1fr) 180px 100px'
+  const { effectiveMode } = useTheme()
+  const isDark = effectiveMode === 'dark'
 
   const parts = mount.source.split('::')
   const archiveName = parts.length > 1 ? parts[1] : parts[0]
   const repoName = parts.length > 1 ? parts[0] : ''
 
-  const iconBtnSx = (color: string) => ({
-    width: 28,
-    height: 28,
-    borderRadius: 1.5,
-    color: alpha(color, isDark ? 0.6 : 0.5),
-    '&:hover': {
-      bgcolor: alpha(color, isDark ? 0.12 : 0.09),
-      color: color,
-    },
-    '&.Mui-disabled': { opacity: 0.28 },
-  })
+  const iconBtn = () =>
+    `flex items-center justify-center w-7 h-7 rounded-lg transition-colors duration-150 flex-shrink-0`
 
   return (
-    <Box
-      sx={{
+    <div
+      className="border-b border-border last:border-b-0 transition-colors duration-150 hover:bg-muted/30"
+      style={{
         display: 'grid',
         gridTemplateColumns: desktopGridTemplate,
         alignItems: 'center',
-        gap: 1,
-        px: 2,
-        py: 1.125,
-        borderBottom: '1px solid',
-        borderBottomColor: isDark ? alpha('#fff', 0.04) : alpha('#000', 0.04),
-        transition: 'all 150ms ease',
-        '&:hover': {
-          bgcolor: alpha(theme.palette.primary.main, isDark ? 0.04 : 0.03),
-        },
-        '@media (max-width: 767px)': {
-          display: 'grid',
-          gridTemplateColumns: '1fr auto',
-          gridTemplateRows: 'auto auto auto',
-          gap: 0.5,
-          px: 1.75,
-          py: 1.25,
-        },
+        gap: '0.25rem',
+        padding: '0.5625rem 1rem',
       }}
     >
       {/* Archive name + repo */}
-      <Box
-        sx={{
-          minWidth: 0,
-          '@media (max-width: 767px)': {
-            gridColumn: 1,
-            gridRow: 1,
-          },
-        }}
-      >
-        <Box
+      <div className="min-w-0">
+        <div
           title={mount.source}
-          sx={{
-            fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace',
-            fontSize: '0.78rem',
-            fontWeight: 600,
-            color: 'text.primary',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}
+          className="text-xs font-semibold overflow-hidden text-ellipsis whitespace-nowrap"
+          style={{ fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace' }}
         >
           {archiveName}
-        </Box>
+        </div>
         {repoName && (
-          <Box
-            component="span"
-            sx={{
-              fontSize: '0.68rem',
-              color: 'text.secondary',
-              opacity: 0.7,
-              display: 'block',
-              mt: 0.25,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
+          <span
+            className="text-[0.68rem] text-muted-foreground opacity-70 block mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap"
           >
             {repoName}
-          </Box>
+          </span>
         )}
-      </Box>
+      </div>
 
       {/* Mount point */}
-      <Box
-        sx={{
-          display: 'contents',
-          '@media (max-width: 767px)': {
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.75,
-            gridColumn: 1,
-            gridRow: 2,
-            minWidth: 0,
-          },
-        }}
+      <span
+        title={mount.mount_point}
+        className="text-[0.72rem] text-muted-foreground overflow-hidden text-ellipsis whitespace-nowrap min-w-0"
+        style={{ fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace' }}
       >
-        <Box
-          component="span"
-          title={mount.mount_point}
-          sx={{
-            fontFamily: '"JetBrains Mono","Fira Code",ui-monospace,monospace',
-            fontSize: '0.72rem',
-            color: 'text.secondary',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            minWidth: 0,
-          }}
-        >
-          {mount.mount_point}
-        </Box>
+        {mount.mount_point}
+      </span>
 
-        {/* Mounted date */}
-        <Box
-          component="span"
-          sx={{
-            fontSize: '0.72rem',
-            color: 'text.secondary',
-            whiteSpace: 'nowrap',
-            minWidth: 0,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {formatDate(mount.created_at)}
-        </Box>
-      </Box>
+      {/* Mounted date */}
+      <span className="text-[0.72rem] text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis min-w-0">
+        {formatDate(mount.created_at)}
+      </span>
 
       {/* Actions */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 0.25,
-          minWidth: 0,
-          justifyContent: 'flex-end',
-          '@media (max-width: 767px)': {
-            gridColumn: 2,
-            gridRow: '1 / 4',
-            alignSelf: 'center',
-          },
-        }}
-      >
-        <Tooltip title={t('mounts.actions.copyAccessCommand')} arrow>
-          <IconButton
-            size="small"
-            onClick={() => onCopy(mount)}
-            aria-label={t('mounts.actions.copyAccessCommand')}
-            sx={iconBtnSx(theme.palette.primary.main)}
-          >
-            <Copy size={15} />
-          </IconButton>
+      <div className="flex items-center gap-0.5 justify-end">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              onClick={() => onCopy(mount)}
+              aria-label={t('mounts.actions.copyAccessCommand')}
+              className={iconBtn()}
+              style={{
+                color: isDark ? 'rgba(96,165,250,0.6)' : 'rgba(37,99,235,0.5)',
+              }}
+              onMouseEnter={e => {
+                ;(e.currentTarget as HTMLButtonElement).style.color = isDark ? '#60a5fa' : '#2563eb'
+                ;(e.currentTarget as HTMLButtonElement).style.background = isDark ? 'rgba(96,165,250,0.12)' : 'rgba(37,99,235,0.09)'
+              }}
+              onMouseLeave={e => {
+                ;(e.currentTarget as HTMLButtonElement).style.color = isDark ? 'rgba(96,165,250,0.6)' : 'rgba(37,99,235,0.5)'
+                ;(e.currentTarget as HTMLButtonElement).style.background = ''
+              }}
+            >
+              <Copy size={15} />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>{t('mounts.actions.copyAccessCommand')}</TooltipContent>
         </Tooltip>
 
-        <Tooltip title={t('mounts.actions.unmountArchive')} arrow>
-          <IconButton
-            size="small"
-            onClick={() => onUnmount(mount)}
-            aria-label={t('mounts.actions.unmountArchive')}
-            sx={iconBtnSx(theme.palette.warning.main)}
-          >
-            <Trash2 size={15} />
-          </IconButton>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              onClick={() => onUnmount(mount)}
+              aria-label={t('mounts.actions.unmountArchive')}
+              className={iconBtn()}
+              style={{
+                color: isDark ? 'rgba(251,191,36,0.6)' : 'rgba(217,119,6,0.5)',
+              }}
+              onMouseEnter={e => {
+                ;(e.currentTarget as HTMLButtonElement).style.color = isDark ? '#fbbf24' : '#d97706'
+                ;(e.currentTarget as HTMLButtonElement).style.background = isDark ? 'rgba(251,191,36,0.12)' : 'rgba(217,119,6,0.09)'
+              }}
+              onMouseLeave={e => {
+                ;(e.currentTarget as HTMLButtonElement).style.color = isDark ? 'rgba(251,191,36,0.6)' : 'rgba(217,119,6,0.5)'
+                ;(e.currentTarget as HTMLButtonElement).style.background = ''
+              }}
+            >
+              <Trash2 size={15} />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>{t('mounts.actions.unmountArchive')}</TooltipContent>
         </Tooltip>
 
-        <Tooltip title={t('mounts.actions.forceUnmountTooltip')} arrow>
-          <IconButton
-            size="small"
-            onClick={() => onForceUnmount(mount)}
-            aria-label={t('mounts.actions.forceUnmountTooltip')}
-            sx={iconBtnSx(theme.palette.error.main)}
-          >
-            <XCircle size={15} />
-          </IconButton>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              onClick={() => onForceUnmount(mount)}
+              aria-label={t('mounts.actions.forceUnmountTooltip')}
+              className={iconBtn()}
+              style={{
+                color: isDark ? 'rgba(248,113,113,0.6)' : 'rgba(220,38,38,0.5)',
+              }}
+              onMouseEnter={e => {
+                ;(e.currentTarget as HTMLButtonElement).style.color = isDark ? '#f87171' : '#dc2626'
+                ;(e.currentTarget as HTMLButtonElement).style.background = isDark ? 'rgba(248,113,113,0.12)' : 'rgba(220,38,38,0.09)'
+              }}
+              onMouseLeave={e => {
+                ;(e.currentTarget as HTMLButtonElement).style.color = isDark ? 'rgba(248,113,113,0.6)' : 'rgba(220,38,38,0.5)'
+                ;(e.currentTarget as HTMLButtonElement).style.background = ''
+              }}
+            >
+              <XCircle size={15} />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>{t('mounts.actions.forceUnmountTooltip')}</TooltipContent>
         </Tooltip>
-      </Box>
-    </Box>
+      </div>
+    </div>
   )
 }
 
 export default function MountsManagementTab() {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
+  const { effectiveMode } = useTheme()
+  const isDark = effectiveMode === 'dark'
   const queryClient = useQueryClient()
   const { track, EventCategory, EventAction } = useAnalytics()
   const { hasGlobalPermission } = useAuth()
   const canManageMounts = hasGlobalPermission('settings.mounts.manage')
 
-  // Fetch active mounts
   const { data: mountsData, isLoading } = useQuery({
     queryKey: ['mounts'],
     queryFn: async () => {
@@ -296,7 +211,6 @@ export default function MountsManagementTab() {
     refetchInterval: 10000,
   })
 
-  // Unmount mutation
   const unmountMutation = useMutation({
     mutationFn: ({ mountId, force }: { mountId: string; force: boolean }) =>
       mountsAPI.unmountBorgArchive(mountId, force),
@@ -328,188 +242,103 @@ export default function MountsManagementTab() {
     track(EventCategory.MOUNT, EventAction.VIEW, { operation: 'copy_access_command' })
   }
 
-  const desktopGridTemplate = 'minmax(0, 1.2fr) minmax(0, 1fr) 180px 100px'
-
   if (!canManageMounts) {
     return null
   }
 
+  const infoBarBg = isDark ? 'rgba(14,165,233,0.1)' : 'rgba(14,165,233,0.06)'
+  const infoBarBorder = isDark ? 'rgba(14,165,233,0.2)' : 'rgba(14,165,233,0.15)'
+  const tableBorder = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)'
+  const tableHeaderBg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'
+  const tableHeaderBorder = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'
+  const countBadgeBg = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'
+
   const tableHeader = (
-    <Box
-      sx={{
-        display: { xs: 'none', md: 'grid' },
+    <div
+      className="hidden md:grid items-center gap-2 px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-widest"
+      style={{
         gridTemplateColumns: desktopGridTemplate,
-        alignItems: 'center',
-        gap: 1,
-        px: 2,
-        py: 1,
-        bgcolor: isDark ? alpha('#fff', 0.03) : alpha('#000', 0.02),
-        borderBottom: '1px solid',
-        borderBottomColor: isDark ? alpha('#fff', 0.08) : alpha('#000', 0.08),
-        fontSize: '0.65rem',
-        fontWeight: 600,
-        textTransform: 'uppercase',
-        letterSpacing: '0.06em',
-        color: 'text.disabled',
+        background: tableHeaderBg,
+        borderBottom: `1px solid ${tableHeaderBorder}`,
+        color: 'var(--muted-foreground)',
       }}
     >
       <span>{t('mounts.columns.archive')}</span>
       <span>{t('mounts.columns.mountLocation')}</span>
       <span>{t('mounts.columns.mounted')}</span>
-      <Box sx={{ textAlign: 'right' }}>{t('archivesList.columnActions', 'Actions')}</Box>
-    </Box>
+      <span className="text-right">{t('archivesList.columnActions', 'Actions')}</span>
+    </div>
   )
 
-  // Loading state — real header + table header with skeleton rows
+  const panelHeader = (countBadge: React.ReactNode) => (
+    <div
+      className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-2 px-4 py-3 mb-6 rounded-xl"
+      style={{ background: infoBarBg, border: `1px solid ${infoBarBorder}` }}
+    >
+      <div className="flex items-center gap-3 flex-shrink-0">
+        <HardDrive size={16} style={{ opacity: 0.7 }} />
+        <p className="text-[0.95rem] font-bold">{t('mountsManagement.title')}</p>
+        {countBadge}
+      </div>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            className="flex items-center text-muted-foreground opacity-60 hover:opacity-100 transition-opacity duration-150 cursor-help"
+          >
+            <Info size={15} />
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="bottom">{t('mounts.infoAlert')}</TooltipContent>
+      </Tooltip>
+    </div>
+  )
+
   if (isLoading) {
     return (
-      <Box>
-        {/* Real header bar */}
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
-            justifyContent: 'space-between',
-            alignItems: { xs: 'flex-start', sm: 'center' },
-            gap: { xs: 1.5, sm: 1 },
-            px: 2,
-            py: 1.25,
-            mb: 2.5,
-            borderRadius: 2,
-            bgcolor: isDark
-              ? alpha(theme.palette.info.main, 0.1)
-              : alpha(theme.palette.info.main, 0.06),
-            border: '1px solid',
-            borderColor: isDark
-              ? alpha(theme.palette.info.main, 0.2)
-              : alpha(theme.palette.info.main, 0.15),
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, flexShrink: 0 }}>
-            <HardDrive size={16} style={{ opacity: 0.7 }} />
-            <Typography variant="h6" fontWeight={700} sx={{ fontSize: '0.95rem' }}>
-              {t('mountsManagement.title')}
-            </Typography>
-            <Skeleton variant="rounded" width={22} height={20} sx={{ borderRadius: 1 }} />
-          </Box>
-        </Box>
-        {/* Table with real header + skeleton rows */}
-        <Box
-          sx={{
-            borderRadius: 3,
-            border: '1px solid',
-            borderColor: isDark ? alpha('#fff', 0.07) : alpha('#000', 0.07),
-            overflow: 'hidden',
-          }}
+      <div>
+        {panelHeader(
+          <Skeleton className="h-5 w-5 rounded" />
+        )}
+        <div
+          className="rounded-2xl overflow-hidden"
+          style={{ border: `1px solid ${tableBorder}` }}
         >
           {tableHeader}
           {[0, 1, 2, 3, 4].map((i) => (
             <MountCardSkeleton key={i} index={i} />
           ))}
-        </Box>
-      </Box>
+        </div>
+      </div>
     )
   }
 
+  const countBadge = (
+    <span
+      className="text-[0.72rem] font-semibold px-1.5 py-0.5 rounded text-muted-foreground"
+      style={{ background: countBadgeBg, lineHeight: 1.6 }}
+    >
+      {mounts.length}
+    </span>
+  )
+
   return (
-    <Box>
-      {/* Panel header: title + count + info hint */}
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          justifyContent: 'space-between',
-          alignItems: { xs: 'flex-start', sm: 'center' },
-          gap: { xs: 1.5, sm: 1 },
-          px: 2,
-          py: 1.25,
-          mb: 2.5,
-          borderRadius: 2,
-          bgcolor: isDark
-            ? alpha(theme.palette.info.main, 0.1)
-            : alpha(theme.palette.info.main, 0.06),
-          border: '1px solid',
-          borderColor: isDark
-            ? alpha(theme.palette.info.main, 0.2)
-            : alpha(theme.palette.info.main, 0.15),
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, flexShrink: 0 }}>
-          <HardDrive size={16} style={{ opacity: 0.7 }} />
-          <Typography variant="h6" fontWeight={700} sx={{ fontSize: '0.95rem' }}>
-            {t('mountsManagement.title')}
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{
-              fontSize: '0.72rem',
-              fontWeight: 600,
-              px: 0.75,
-              py: 0.2,
-              borderRadius: 1,
-              bgcolor: isDark ? alpha('#fff', 0.08) : alpha('#000', 0.06),
-              color: 'text.secondary',
-              lineHeight: 1.6,
-            }}
-          >
-            {mounts.length}
-          </Typography>
-        </Box>
+    <div>
+      {panelHeader(countBadge)}
 
-        {/* Info tooltip */}
-        <Tooltip title={t('mounts.infoAlert')} arrow placement="bottom-end">
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              color: 'text.secondary',
-              opacity: 0.6,
-              cursor: 'help',
-              '&:hover': { opacity: 1 },
-              transition: 'opacity 150ms ease',
-            }}
-          >
-            <Info size={15} />
-          </Box>
-        </Tooltip>
-      </Box>
-
-      {/* Empty state */}
       {mounts.length === 0 ? (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            textAlign: 'center',
-            py: 8,
-            color: 'text.secondary',
-          }}
-        >
+        <div className="flex flex-col items-center text-center py-16 text-muted-foreground">
           <FolderOpen size={48} style={{ marginBottom: 16, opacity: 0.5 }} />
-          <Typography variant="body1" color="text.secondary" fontWeight={500}>
-            {t('mountsManagement.empty')}
-          </Typography>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ mt: 0.75, opacity: 0.7, maxWidth: 360 }}
-          >
+          <p className="text-sm font-medium">{t('mountsManagement.empty')}</p>
+          <p className="text-sm opacity-70 mt-1.5 max-w-sm">
             {t('mounts.emptyDescription')}
-          </Typography>
-        </Box>
+          </p>
+        </div>
       ) : (
-        <Box
-          sx={{
-            borderRadius: 3,
-            border: '1px solid',
-            borderColor: isDark ? alpha('#fff', 0.07) : alpha('#000', 0.07),
-            overflow: 'hidden',
-          }}
+        <div
+          className="rounded-2xl overflow-hidden"
+          style={{ border: `1px solid ${tableBorder}` }}
         >
           {tableHeader}
-
-          {/* Mount rows */}
           {mounts.map((mount) => (
             <MountCard
               key={mount.mount_id}
@@ -519,8 +348,8 @@ export default function MountsManagementTab() {
               onForceUnmount={(m) => handleUnmount(m.mount_id, true)}
             />
           ))}
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   )
 }

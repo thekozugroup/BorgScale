@@ -1,26 +1,8 @@
-import {
-  Box,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Typography,
-  Alert,
-  Card,
-  CardContent,
-  CardActionArea,
-  alpha,
-  TextField,
-  FormControlLabel,
-  Radio,
-  RadioGroup,
-  Paper,
-  InputAdornment,
-  IconButton,
-} from '@mui/material'
 import { Server, Cloud, FileCheck, FolderOpen } from 'lucide-react'
-import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 import { useTranslation } from 'react-i18next'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { cn } from '@/lib/utils'
 
 interface SSHConnection {
   id: number
@@ -59,375 +41,187 @@ export default function WizardStepRestoreDestination({
   const isSSHRepository = repositoryType === 'ssh'
 
   const handleLocationChange = (location: 'local' | 'ssh') => {
-    // Prevent SSH-to-SSH restore
-    if (isSSHRepository && location === 'ssh') {
-      return
-    }
-
-    onChange({
-      destinationType: location,
-      destinationConnectionId: '',
-    })
+    if (isSSHRepository && location === 'ssh') return
+    onChange({ destinationType: location, destinationConnectionId: '' })
   }
 
-  // Get selected SSH connection for preview
   const selectedSshConnection =
     data.destinationType === 'ssh' && data.destinationConnectionId
       ? sshConnections.find((c) => c.id === data.destinationConnectionId)
       : null
 
-  // Build SSH URL preview
   const getSshUrlPreview = () => {
     if (!selectedSshConnection || !data.customPath) return ''
     const path = data.customPath.startsWith('/') ? data.customPath : `/${data.customPath}`
     return `ssh://${selectedSshConnection.username}@${selectedSshConnection.host}:${selectedSshConnection.port}${path}`
   }
 
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      {/* Header */}
-      <Box>
-        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-          {t('wizard.restoreDestination.title')}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {t('wizard.restoreDestination.subtitle')}
-        </Typography>
-      </Box>
+  const isLocalSelected = data.destinationType === 'local'
+  const isSSHSelected = data.destinationType === 'ssh'
 
-      {/* Destination Selection Cards */}
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-        <Card
-          variant="outlined"
-          sx={{
-            flex: '1 1 200px',
-            border: data.destinationType === 'local' ? 2 : 1,
-            borderColor: data.destinationType === 'local' ? '#1976d2' : 'divider',
-            boxShadow:
-              data.destinationType === 'local' ? `0 4px 12px ${alpha('#1976d2', 0.2)}` : 'none',
-            bgcolor:
-              data.destinationType === 'local'
-                ? (theme) => alpha('#1976d2', theme.palette.mode === 'dark' ? 0.12 : 0.08)
-                : 'background.paper',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            transform: data.destinationType === 'local' ? 'translateY(-2px)' : 'none',
-            '&:hover': {
-              transform: 'translateY(-2px)',
-              boxShadow: (theme) => `0 4px 12px ${alpha(theme.palette.text.primary, 0.08)}`,
-              borderColor: data.destinationType === 'local' ? '#1976d2' : 'text.primary',
-            },
-          }}
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Header */}
+      <div>
+        <p className="text-base font-semibold mb-1">{t('wizard.restoreDestination.title')}</p>
+        <p className="text-sm text-muted-foreground">{t('wizard.restoreDestination.subtitle')}</p>
+      </div>
+
+      {/* Destination Type Cards */}
+      <div className="flex flex-wrap gap-3">
+        <button
+          type="button"
+          onClick={() => handleLocationChange('local')}
+          className={cn(
+            'flex-1 min-w-[200px] flex items-center gap-3 p-4 rounded-xl border text-left transition-all duration-200 cursor-pointer',
+            isLocalSelected
+              ? 'border-2 border-primary bg-primary/8 shadow-md -translate-y-0.5'
+              : 'border border-border hover:-translate-y-0.5 hover:shadow-sm'
+          )}
         >
-          <CardActionArea onClick={() => handleLocationChange('local')} sx={{ p: 1 }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 48,
-                    height: 48,
-                    borderRadius: 3,
-                    bgcolor: data.destinationType === 'local' ? '#1976d2' : 'action.hover',
-                    color: data.destinationType === 'local' ? 'white' : 'text.secondary',
-                    transition: 'all 0.3s ease',
-                    boxShadow:
-                      data.destinationType === 'local'
-                        ? `0 4px 12px ${alpha('#1976d2', 0.4)}`
-                        : 'none',
-                  }}
-                >
-                  <Server size={28} />
-                </Box>
-                <Box>
-                  <Typography variant="h6" sx={{ fontSize: '1rem', fontWeight: 600 }}>
-                    {t('wizard.borgUiServer')}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8125rem' }}>
-                    {t('wizard.restoreDestination.borgUiServerDesc')}
-                  </Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </CardActionArea>
-        </Card>
+          <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all', isLocalSelected ? 'bg-primary text-white shadow-md' : 'bg-muted text-muted-foreground')}>
+            <Server size={24} />
+          </div>
+          <div>
+            <p className="text-sm font-semibold">{t('wizard.borgUiServer')}</p>
+            <p className="text-xs text-muted-foreground">{t('wizard.restoreDestination.borgUiServerDesc')}</p>
+          </div>
+        </button>
 
         {!isSSHRepository && (
-          <Card
-            variant="outlined"
-            sx={{
-              flex: '1 1 200px',
-              border: data.destinationType === 'ssh' ? 2 : 1,
-              borderColor: data.destinationType === 'ssh' ? '#1976d2' : 'divider',
-              boxShadow:
-                data.destinationType === 'ssh' ? `0 4px 12px ${alpha('#1976d2', 0.2)}` : 'none',
-              bgcolor:
-                data.destinationType === 'ssh'
-                  ? (theme) => alpha('#1976d2', theme.palette.mode === 'dark' ? 0.12 : 0.08)
-                  : 'background.paper',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              transform: data.destinationType === 'ssh' ? 'translateY(-2px)' : 'none',
-              '&:hover': {
-                transform: 'translateY(-2px)',
-                boxShadow: (theme) => `0 4px 12px ${alpha(theme.palette.text.primary, 0.08)}`,
-                borderColor: data.destinationType === 'ssh' ? '#1976d2' : 'text.primary',
-              },
-            }}
+          <button
+            type="button"
+            onClick={() => handleLocationChange('ssh')}
+            className={cn(
+              'flex-1 min-w-[200px] flex items-center gap-3 p-4 rounded-xl border text-left transition-all duration-200 cursor-pointer',
+              isSSHSelected
+                ? 'border-2 border-primary bg-primary/8 shadow-md -translate-y-0.5'
+                : 'border border-border hover:-translate-y-0.5 hover:shadow-sm'
+            )}
           >
-            <CardActionArea onClick={() => handleLocationChange('ssh')} sx={{ p: 1 }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: 48,
-                      height: 48,
-                      borderRadius: 3,
-                      bgcolor: data.destinationType === 'ssh' ? '#1976d2' : 'action.hover',
-                      color: data.destinationType === 'ssh' ? 'white' : 'text.secondary',
-                      transition: 'all 0.3s ease',
-                      boxShadow:
-                        data.destinationType === 'ssh'
-                          ? `0 4px 12px ${alpha('#1976d2', 0.4)}`
-                          : 'none',
-                    }}
-                  >
-                    <Cloud size={28} />
-                  </Box>
-                  <Box>
-                    <Typography variant="h6" sx={{ fontSize: '1rem', fontWeight: 600 }}>
-                      {t('wizard.restoreDestination.remoteMachine')}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ fontSize: '0.8125rem' }}
-                    >
-                      {t('wizard.restoreDestination.remoteMachineDesc')}
-                    </Typography>
-                  </Box>
-                </Box>
-              </CardContent>
-            </CardActionArea>
-          </Card>
+            <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all', isSSHSelected ? 'bg-primary text-white shadow-md' : 'bg-muted text-muted-foreground')}>
+              <Cloud size={24} />
+            </div>
+            <div>
+              <p className="text-sm font-semibold">{t('wizard.restoreDestination.remoteMachine')}</p>
+              <p className="text-xs text-muted-foreground">{t('wizard.restoreDestination.remoteMachineDesc')}</p>
+            </div>
+          </button>
         )}
-      </Box>
+      </div>
 
-      {/* SSH Repository Info Alert */}
+      {/* SSH Repository info */}
       {isSSHRepository && (
-        <Alert severity="info">{t('wizard.restoreDestination.sshToSshNotSupported')}</Alert>
+        <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}>
+          {t('wizard.restoreDestination.sshToSshNotSupported')}
+        </div>
       )}
 
-      {/* SSH Connection Selection (shown first so strategy options appear below) */}
+      {/* SSH Connection Selection */}
       {data.destinationType === 'ssh' && (
         <>
           {!Array.isArray(sshConnections) || sshConnections.length === 0 ? (
-            <Alert severity="warning">{t('wizard.noSshConnections')}</Alert>
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', color: '#b45309' }}>
+              {t('wizard.noSshConnections')}
+            </div>
           ) : (
-            <FormControl fullWidth>
-              <InputLabel>{t('wizard.restoreDestination.selectSshConnection')}</InputLabel>
-              <Select
-                value={
-                  data.destinationConnectionId === '' ? '' : String(data.destinationConnectionId)
-                }
-                label={t('wizard.restoreDestination.selectSshConnection')}
-                onChange={(e) => {
-                  const value = e.target.value
-                  if (value) {
-                    onChange({ destinationConnectionId: Number(value) })
-                  }
-                }}
-                sx={{
-                  '& .MuiSelect-select': {
-                    py: '16.5px',
-                    display: 'flex',
-                    alignItems: 'center',
-                  },
-                }}
+            <div>
+              <Label className="text-xs font-semibold mb-1.5 block">{t('wizard.restoreDestination.selectSshConnection')}</Label>
+              <select
+                value={data.destinationConnectionId === '' ? '' : String(data.destinationConnectionId)}
+                onChange={(e) => { if (e.target.value) onChange({ destinationConnectionId: Number(e.target.value) }) }}
+                className="w-full rounded-md border border-input bg-background h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               >
+                <option value="">— {t('wizard.restoreDestination.selectSshConnection')} —</option>
                 {sshConnections.map((conn) => (
-                  <MenuItem key={conn.id} value={String(conn.id)}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: '100%' }}>
-                      <Cloud size={16} />
-                      <Box sx={{ flex: 1 }}>
-                        <Typography variant="body2">
-                          {conn.username}@{conn.host}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          Port {conn.port}
-                          {conn.mount_point && ` • ${conn.mount_point}`}
-                        </Typography>
-                      </Box>
-                      {conn.status === 'connected' && (
-                        <Box
-                          sx={{
-                            width: 8,
-                            height: 8,
-                            borderRadius: '50%',
-                            bgcolor: 'success.main',
-                          }}
-                          title="Connected"
-                        />
-                      )}
-                    </Box>
-                  </MenuItem>
+                  <option key={conn.id} value={String(conn.id)}>
+                    {conn.username}@{conn.host} — Port {conn.port}{conn.mount_point ? ` • ${conn.mount_point}` : ''}{conn.status === 'connected' ? ' ✓' : ''}
+                  </option>
                 ))}
-              </Select>
-            </FormControl>
+              </select>
+            </div>
           )}
         </>
       )}
 
-      {/* Original vs Custom Location (shown for local, or SSH once a connection is selected) */}
-      {(data.destinationType === 'local' ||
-        (data.destinationType === 'ssh' && data.destinationConnectionId)) && (
-        <FormControl>
-          <RadioGroup
-            value={data.restoreStrategy}
-            onChange={(e) => onChange({ restoreStrategy: e.target.value as 'original' | 'custom' })}
-          >
-            <Paper
-              variant="outlined"
-              sx={{
-                p: 2,
-                mb: 2,
-                border: data.restoreStrategy === 'original' ? 2 : 1,
-                borderColor: data.restoreStrategy === 'original' ? '#1976d2' : 'divider',
-                bgcolor:
-                  data.restoreStrategy === 'original'
-                    ? (theme) => alpha('#1976d2', theme.palette.mode === 'dark' ? 0.12 : 0.08)
-                    : 'background.paper',
-                transition: 'all 0.2s',
-                cursor: 'pointer',
-                '&:hover': {
-                  borderColor: data.restoreStrategy === 'original' ? '#1976d2' : 'text.primary',
-                },
-              }}
-              onClick={() => onChange({ restoreStrategy: 'original' })}
-            >
-              <FormControlLabel
-                value="original"
-                control={<Radio />}
-                label={
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <FileCheck size={18} />
-                    <Box>
-                      <Typography variant="body1" fontWeight={600}>
-                        {t('wizard.restoreDestination.restoreToOriginal')}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {data.destinationType === 'ssh'
-                          ? t('wizard.restoreDestination.restoreToOriginalDescRemote')
-                          : t('wizard.restoreDestination.restoreToOriginalDescLocal')}
-                      </Typography>
-                    </Box>
-                  </Box>
-                }
-                sx={{ m: 0, width: '100%' }}
-              />
-            </Paper>
-
-            <Paper
-              variant="outlined"
-              sx={{
-                p: 2,
-                border: data.restoreStrategy === 'custom' ? 2 : 1,
-                borderColor: data.restoreStrategy === 'custom' ? '#1976d2' : 'divider',
-                bgcolor:
-                  data.restoreStrategy === 'custom'
-                    ? (theme) => alpha('#1976d2', theme.palette.mode === 'dark' ? 0.12 : 0.08)
-                    : 'background.paper',
-                transition: 'all 0.2s',
-                cursor: 'pointer',
-                '&:hover': {
-                  borderColor: data.restoreStrategy === 'custom' ? '#1976d2' : 'text.primary',
-                },
-              }}
-              onClick={() => onChange({ restoreStrategy: 'custom' })}
-            >
-              <FormControlLabel
-                value="custom"
-                control={<Radio />}
-                label={
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <FolderOpen size={18} />
-                    <Box>
-                      <Typography variant="body1" fontWeight={600}>
-                        {t('wizard.restoreDestination.restoreToCustom')}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {t('wizard.restoreDestination.restoreToCustomDesc')}
-                      </Typography>
-                    </Box>
-                  </Box>
-                }
-                sx={{ m: 0, width: '100%' }}
-              />
-            </Paper>
-          </RadioGroup>
-        </FormControl>
-      )}
-
-      {/* Custom Path Input (shown for any destination type when custom strategy is selected) */}
-      {data.restoreStrategy === 'custom' && (
-        <>
-          <TextField
-            label={t('wizard.restoreDestination.customPathLabel')}
-            value={data.customPath}
-            onChange={(e) => onChange({ customPath: e.target.value })}
-            placeholder={
-              data.destinationType === 'ssh'
-                ? '/mnt/backup/restored'
-                : '/Users/yourusername/restored'
-            }
-            required
-            fullWidth
-            helperText={
-              data.destinationType === 'ssh'
-                ? t('wizard.restoreDestination.customPathHelperRemote')
-                : t('wizard.restoreDestination.customPathHelperLocal')
-            }
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={onBrowsePath}
-                    edge="end"
-                    size="small"
-                    title={
-                      data.destinationType === 'ssh'
-                        ? t('wizard.restoreDestination.browseRemoteFilesystem')
-                        : t('wizard.restoreDestination.browseFilesystem')
-                    }
-                  >
-                    <FolderOpenIcon fontSize="small" />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-          {data.customPath && (
-            <Alert
-              severity="info"
-              icon={data.destinationType === 'ssh' ? <Cloud size={18} /> : <Server size={18} />}
-              sx={{ mt: 1 }}
-            >
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                {t('wizard.restoreDestination.filesWillBeRestoredTo')}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ fontFamily: 'monospace', fontWeight: 600, color: '#1976d2', mt: 0.5 }}
+      {/* Restore Strategy */}
+      {(data.destinationType === 'local' || (data.destinationType === 'ssh' && data.destinationConnectionId)) && (
+        <div className="flex flex-col gap-3">
+          {(['original', 'custom'] as const).map((value) => {
+            const isSelected = data.restoreStrategy === value
+            const icon = value === 'original' ? <FileCheck size={18} /> : <FolderOpen size={18} />
+            const title = value === 'original' ? t('wizard.restoreDestination.restoreToOriginal') : t('wizard.restoreDestination.restoreToCustom')
+            const description = value === 'original'
+              ? (data.destinationType === 'ssh' ? t('wizard.restoreDestination.restoreToOriginalDescRemote') : t('wizard.restoreDestination.restoreToOriginalDescLocal'))
+              : t('wizard.restoreDestination.restoreToCustomDesc')
+            return (
+              <button
+                key={value}
+                type="button"
+                onClick={() => onChange({ restoreStrategy: value })}
+                className={cn(
+                  'w-full flex items-start gap-3 p-4 rounded-xl border text-left transition-all duration-200',
+                  isSelected ? 'border-2 border-primary bg-primary/8 shadow-sm' : 'border border-border hover:border-foreground/30'
+                )}
               >
-                {data.destinationType === 'ssh' ? getSshUrlPreview() : data.customPath}
-              </Typography>
-            </Alert>
-          )}
-        </>
+                <input type="radio" name="restoreStrategy" checked={isSelected} onChange={() => onChange({ restoreStrategy: value })} className="mt-0.5 flex-shrink-0" />
+                <div className="flex items-start gap-2 min-w-0">
+                  <span className="flex-shrink-0 mt-0.5">{icon}</span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold">{title}</p>
+                    <p className="text-sm text-muted-foreground">{description}</p>
+                  </div>
+                </div>
+              </button>
+            )
+          })}
+        </div>
       )}
-    </Box>
+
+      {/* Custom Path Input */}
+      {data.restoreStrategy === 'custom' && (
+        <div className="flex flex-col gap-3">
+          <div>
+            <Label className="text-xs font-semibold mb-1.5 block">{t('wizard.restoreDestination.customPathLabel')}</Label>
+            <div className="relative">
+              <Input
+                value={data.customPath}
+                onChange={(e) => onChange({ customPath: e.target.value })}
+                placeholder={data.destinationType === 'ssh' ? '/mnt/backup/restored' : '/Users/yourusername/restored'}
+                required
+                className="h-9 text-sm pr-9"
+              />
+              <button
+                type="button"
+                onClick={onBrowsePath}
+                title={data.destinationType === 'ssh' ? t('wizard.restoreDestination.browseRemoteFilesystem') : t('wizard.restoreDestination.browseFilesystem')}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <FolderOpen size={16} />
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {data.destinationType === 'ssh'
+                ? t('wizard.restoreDestination.customPathHelperRemote')
+                : t('wizard.restoreDestination.customPathHelperLocal')}
+            </p>
+          </div>
+
+          {data.customPath && (
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}>
+              <span className="flex-shrink-0 mt-0.5">
+                {data.destinationType === 'ssh' ? <Cloud size={16} /> : <Server size={16} />}
+              </span>
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">{t('wizard.restoreDestination.filesWillBeRestoredTo')}</p>
+                <p className="text-sm font-semibold font-mono" style={{ color: '#1976d2' }}>
+                  {data.destinationType === 'ssh' ? getSshUrlPreview() : data.customPath}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   )
 }

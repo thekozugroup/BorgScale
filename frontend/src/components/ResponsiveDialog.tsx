@@ -1,12 +1,47 @@
-import { useTheme, useMediaQuery, Dialog, SwipeableDrawer, Box, IconButton } from '@mui/material'
-import { Close } from '@mui/icons-material'
-import type { DialogProps } from '@mui/material'
-import type { ReactNode } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
+import { cn } from '@/lib/utils'
+import {
+  Dialog,
+  DialogContent,
+  DialogOverlay,
+  DialogPortal,
+} from '@/components/ui/dialog'
+import { X } from 'lucide-react'
 
-type ResponsiveDialogProps = DialogProps & {
-  /** On mobile: rendered in a sticky bar above the safe-area inset, outside the scroll area.
-   *  On desktop: rendered as a direct child of Dialog (place DialogActions here). */
+type DialogCloseReason = 'backdropClick' | 'escapeKeyDown'
+
+type ResponsiveDialogProps = {
+  open: boolean
+  onClose?: (event: object, reason: DialogCloseReason) => void
+  children?: ReactNode
   footer?: ReactNode
+  maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false
+  fullWidth?: boolean
+  // Unused MUI-only props, accepted for prop compatibility
+  PaperProps?: object
+  TransitionProps?: object
+  disableEnforceFocus?: boolean
+  keepMounted?: boolean
+}
+
+const MAX_WIDTH_CLASSES: Record<string, string> = {
+  xs: 'max-w-xs',
+  sm: 'max-w-sm',
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+  xl: 'max-w-xl',
+}
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)')
+    const update = () => setIsMobile(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
+  return isMobile
 }
 
 export default function ResponsiveDialog({
@@ -14,88 +49,88 @@ export default function ResponsiveDialog({
   onClose,
   children,
   footer,
-  // The following props are desktop-only (spread into <Dialog> via ...rest) — silently ignored on mobile:
-  // maxWidth, fullWidth, PaperProps, TransitionProps, and other DialogProps
-  maxWidth,
-  fullWidth,
-  ...rest
+  maxWidth = 'sm',
+  fullWidth = false,
 }: ResponsiveDialogProps) {
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const isMobile = useIsMobile()
+  const handleClose = () => {
+    onClose?.({}, 'backdropClick')
+  }
 
   if (isMobile) {
+    // Bottom sheet on mobile
     return (
-      <SwipeableDrawer
-        anchor="bottom"
-        open={open}
-        onClose={onClose ? (e) => onClose(e, 'backdropClick') : () => {}}
-        // Note: SwipeableDrawer doesn't expose close reason, so 'backdropClick' is used
-        // for all close events (including swipe-to-dismiss). This means dialogs that
-        // distinguish 'escapeKeyDown' to prevent accidental close will behave incorrectly
-        // on mobile.
-        onOpen={() => {}}
-        disableSwipeToOpen
-        disableDiscovery
-        ModalProps={{ keepMounted: false }}
-        PaperProps={{
-          sx: {
-            borderRadius: '16px 16px 0 0',
-            maxHeight: '90vh',
-            display: 'flex',
-            flexDirection: 'column',
-          },
-        }}
-      >
-        {/* Drag handle row with X close button */}
-        <Box
-          data-testid="drag-handle"
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: 44,
-            flexShrink: 0,
-            position: 'relative',
-          }}
-        >
-          <Box sx={{ width: 32, height: 4, borderRadius: 2, bgcolor: 'divider' }} />
-          {onClose && (
-            <IconButton
-              size="small"
-              onClick={(e) => onClose(e, 'backdropClick')}
-              aria-label="close"
-              sx={{ position: 'absolute', right: 8, color: 'text.secondary' }}
-            >
-              <Close fontSize="small" />
-            </IconButton>
-          )}
-        </Box>
-
-        {/* Scrollable content — overscroll-behavior prevents pull-to-refresh */}
-        <Box sx={{ overflowY: 'auto', flex: 1, overscrollBehavior: 'contain' }}>{children}</Box>
-
-        {/* Sticky footer — always visible above safe area, outside scroll */}
-        {footer && (
-          <Box
-            data-testid="responsive-dialog-footer"
-            sx={{
-              flexShrink: 0,
-              borderTop: 1,
-              borderColor: 'divider',
-              pb: 'env(safe-area-inset-bottom, 0px)',
-            }}
+      <>
+        {open && (
+          <div
+            className="fixed inset-0 z-50 flex items-end"
+            style={{ background: 'rgba(0,0,0,0.5)' }}
+            onClick={handleClose}
           >
-            {footer}
-          </Box>
+            <div
+              className="w-full bg-background rounded-t-2xl max-h-[90vh] flex flex-col"
+              style={{ boxShadow: '0 -4px 32px rgba(0,0,0,0.25)' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Drag handle row */}
+              <div
+                data-testid="drag-handle"
+                className="relative flex items-center justify-center h-11 flex-shrink-0"
+              >
+                <div className="w-8 h-1 rounded-full bg-border" />
+                {onClose && (
+                  <button
+                    onClick={handleClose}
+                    aria-label="close"
+                    className="absolute right-2 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+
+              {/* Scrollable content */}
+              <div className="overflow-y-auto flex-1 overscroll-contain">{children}</div>
+
+              {/* Sticky footer */}
+              {footer && (
+                <div
+                  data-testid="responsive-dialog-footer"
+                  className="flex-shrink-0 border-t border-border"
+                  style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+                >
+                  {footer}
+                </div>
+              )}
+            </div>
+          </div>
         )}
-      </SwipeableDrawer>
+      </>
     )
   }
 
+  // Desktop dialog
+  const mwClass = maxWidth ? (MAX_WIDTH_CLASSES[maxWidth] ?? 'max-w-sm') : ''
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth={maxWidth} fullWidth={fullWidth} {...rest}>
-      {children}
-      {footer}
+    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) handleClose() }}>
+      <DialogPortal>
+        <DialogOverlay />
+        <DialogContent
+          className={cn(
+            mwClass,
+            fullWidth ? 'w-full' : '',
+            'p-0 gap-0 overflow-hidden'
+          )}
+          onEscapeKeyDown={() => onClose?.({}, 'escapeKeyDown')}
+          onInteractOutside={handleClose}
+          // hide the default X button — our dialog contents provide their own close UX
+          showCloseButton={false}
+        >
+          {children}
+          {footer}
+        </DialogContent>
+      </DialogPortal>
     </Dialog>
   )
 }
