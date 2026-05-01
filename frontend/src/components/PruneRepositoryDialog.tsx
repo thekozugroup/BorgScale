@@ -19,7 +19,6 @@ import {
 import { Repository } from '../types'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { useTheme } from '../context/ThemeContext'
 
 interface PruneForm {
   keep_hourly: number
@@ -150,37 +149,21 @@ interface ColorizedOutputProps {
   isFailed?: boolean
 }
 
+// Semantic token CSS classes for colorized prune output line types
+const LINE_CLASS: Record<BorgLineType, string> = {
+  keep: 'text-primary',
+  prune: 'text-destructive',
+  separator: 'text-foreground/20',
+  'stats-deleted': 'text-destructive',
+  'stats-all': 'text-foreground',
+  'stats-chunk': 'text-muted-foreground',
+  'stats-header': 'text-muted-foreground',
+  empty: '',
+  normal: 'text-foreground',
+}
+
 function ColorizedOutput({ text, isFailed = false }: ColorizedOutputProps) {
-  const { effectiveMode } = useTheme()
-  const isDark = effectiveMode === 'dark'
-
   const lines = text.split('\n').map(extractMessage)
-
-  const colorMap: Record<BorgLineType, string | undefined> = {
-    keep: isDark ? '#4ade80' : '#166534',
-    prune: isDark ? '#f87171' : '#991b1b',
-    separator: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.25)',
-    'stats-deleted': isDark ? '#f87171' : '#991b1b',
-    'stats-all': isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.82)',
-    'stats-chunk': isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)',
-    'stats-header': isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)',
-    empty: undefined,
-    normal: isFailed
-      ? isDark ? '#f87171' : '#991b1b'
-      : isDark ? 'rgba(255,255,255,0.82)' : 'rgba(0,0,0,0.78)',
-  }
-
-  const spanColor = {
-    verb: (type: 'keep' | 'prune') =>
-      type === 'keep'
-        ? isDark ? '#4ade80' : '#166534'
-        : isDark ? '#f87171' : '#991b1b',
-    rule: isDark ? '#fde68a' : '#b45309',
-    name: isDark ? 'rgba(255,255,255,0.82)' : 'rgba(0,0,0,0.82)',
-    date: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)',
-    hash: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.28)',
-    plain: isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)',
-  }
 
   return (
     <div
@@ -206,21 +189,20 @@ function ColorizedOutput({ text, isFailed = false }: ColorizedOutputProps) {
           return (
             <div key={i} style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
               {segs.map((seg, j) => {
-                const color =
+                const segClass =
                   seg.kind === 'verb'
-                    ? spanColor.verb(type)
+                    ? type === 'keep' ? 'text-primary font-bold' : 'text-destructive font-bold'
                     : seg.kind === 'rule'
-                      ? spanColor.rule
+                      ? 'text-muted-foreground font-semibold'
                       : seg.kind === 'name'
-                        ? spanColor.name
+                        ? 'text-foreground'
                         : seg.kind === 'date'
-                          ? spanColor.date
+                          ? 'text-muted-foreground'
                           : seg.kind === 'hash'
-                            ? spanColor.hash
-                            : spanColor.plain
-                const fontWeight = seg.kind === 'verb' ? 700 : seg.kind === 'rule' ? 600 : 400
+                            ? 'text-foreground/30'
+                            : 'text-foreground/60'
                 return (
-                  <span key={j} style={{ color, fontWeight }}>
+                  <span key={j} className={segClass}>
                     {seg.text}
                   </span>
                 )
@@ -229,13 +211,14 @@ function ColorizedOutput({ text, isFailed = false }: ColorizedOutputProps) {
           )
         }
 
+        const lineClass = isFailed && type === 'normal' ? 'text-destructive' : LINE_CLASS[type]
         return (
           <div
             key={i}
+            className={lineClass}
             style={{
               whiteSpace: 'pre-wrap',
               wordBreak: 'break-all',
-              color: colorMap[type],
               fontWeight: type === 'stats-deleted' || type === 'stats-all' ? 500 : 400,
             }}
           >
@@ -271,17 +254,12 @@ function PruneResultsDialog({
   onCloseAll,
 }: PruneResultsDialogProps) {
   const { t } = useTranslation()
-  const { effectiveMode } = useTheme()
-  const isDark = effectiveMode === 'dark'
 
   const isFailed = results.prune_result?.success === false
   const isDryRun = results.dry_run
   const stdout = results.prune_result?.stdout ?? ''
   const stderr = results.prune_result?.stderr ?? ''
   const hasOutput = stdout || stderr
-
-  const borderColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.09)'
-  const terminalBg = isDark ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.035)'
 
   const headerIcon = isFailed ? (
     <XCircle size={20} />
@@ -309,9 +287,7 @@ function PruneResultsDialog({
       ? t('dialogs.prune.operationFailed')
       : t('dialogs.prune.pruneResultsTitle')
 
-  const stderrSectionBorderColor = isFailed
-    ? 'rgba(239,68,68,0.2)'
-    : borderColor
+  const stderrSectionBorderClass = isFailed ? 'border-destructive/20' : 'border-border'
 
   const footer = (
     <div className="flex items-center justify-end gap-2 px-5 py-3">
@@ -376,21 +352,9 @@ function PruneResultsDialog({
       {/* ── Output ── */}
       <div className="px-5 pb-4">
         {hasOutput ? (
-          <div
-            className="rounded-xl overflow-hidden"
-            style={{
-              border: `1px solid ${borderColor}`,
-              background: terminalBg,
-            }}
-          >
+          <div className="rounded-xl overflow-hidden border border-border bg-foreground/[0.02]">
             {/* Terminal header bar */}
-            <div
-              className="flex items-center gap-2 px-3 py-1.5 border-b"
-              style={{
-                borderColor,
-                background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
-              }}
-            >
+            <div className="flex items-center gap-2 px-3 py-1.5 border-b border-border bg-foreground/[0.03]">
               <span className="text-muted-foreground flex">
                 <Terminal size={13} />
               </span>
@@ -402,18 +366,9 @@ function PruneResultsDialog({
             {stdout && <ColorizedOutput text={stdout} />}
 
             {stderr && (
-              <div
-                style={{
-                  borderTop: stdout ? `1px solid ${borderColor}` : 'none',
-                }}
-              >
+              <div className={stdout ? 'border-t border-border' : ''}>
                 {stdout && (
-                  <div
-                    className="flex items-center gap-2 px-3 py-1.5 border-b"
-                    style={{
-                      borderColor: stderrSectionBorderColor,
-                    }}
-                  >
+                  <div className={`flex items-center gap-2 px-3 py-1.5 border-b ${stderrSectionBorderClass}`}>
                     <span
                       className={`text-[0.6rem] font-bold uppercase tracking-[0.08em] ${isFailed ? 'text-destructive' : 'text-muted-foreground'}`}
                     >
@@ -426,10 +381,7 @@ function PruneResultsDialog({
             )}
           </div>
         ) : (
-          <div
-            className="py-8 text-center text-muted-foreground rounded-xl border"
-            style={{ borderColor }}
-          >
+          <div className="py-8 text-center text-muted-foreground rounded-xl border border-border">
             <p className="text-sm">{t('dialogs.prune.noArchivesWouldBeDeleted')}</p>
           </div>
         )}
@@ -456,8 +408,6 @@ export default function PruneRepositoryDialog({
   results,
 }: PruneRepositoryDialogProps) {
   const { t } = useTranslation()
-  const { effectiveMode } = useTheme()
-  const isDark = effectiveMode === 'dark'
   const [pruneForm, setPruneForm] = useState<PruneForm>(defaultPruneForm)
   const [resultsOpen, setResultsOpen] = useState(false)
   const [activeOp, setActiveOp] = useState<'dry_run' | 'prune' | null>(null)
@@ -498,8 +448,6 @@ export default function PruneRepositoryDialog({
     { key: 'keep_quarterly' as const, icon: <CalendarRange size={14} />, label: t('dialogs.prune.keepQuarterly') },
     { key: 'keep_yearly' as const, icon: <Calendar size={14} />, label: t('dialogs.prune.keepYearly') },
   ]
-
-  const borderColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.09)'
 
   const footer = (
     <div className="flex items-center justify-end gap-2 px-5 py-3">
@@ -587,28 +535,11 @@ export default function PruneRepositoryDialog({
             {t('dialogs.prune.retentionPolicy')}
           </p>
 
-          <div
-            className="rounded-xl overflow-hidden mb-1.5"
-            style={{ border: `1px solid ${borderColor}` }}
-          >
+          <div className="rounded-xl overflow-hidden mb-1.5 border border-border">
             {retentionFields.map((field, i) => (
               <div
                 key={field.key}
-                className="flex items-center gap-3 px-4 py-2.5 transition-colors duration-150"
-                style={{
-                  borderBottom: i < retentionFields.length - 1 ? `1px solid ${borderColor}` : 'none',
-                  background: isDark ? 'rgba(255,255,255,0.015)' : 'rgba(0,0,0,0.012)',
-                }}
-                onMouseEnter={(e) => {
-                  ;(e.currentTarget as HTMLDivElement).style.background = isDark
-                    ? 'rgba(255,255,255,0.03)'
-                    : 'rgba(0,0,0,0.025)'
-                }}
-                onMouseLeave={(e) => {
-                  ;(e.currentTarget as HTMLDivElement).style.background = isDark
-                    ? 'rgba(255,255,255,0.015)'
-                    : 'rgba(0,0,0,0.012)'
-                }}
+                className={`flex items-center gap-3 px-4 py-2.5 transition-colors duration-150 bg-foreground/[0.015] hover:bg-foreground/[0.03]${i < retentionFields.length - 1 ? ' border-b border-border' : ''}`}
               >
                 <span className="text-muted-foreground flex flex-shrink-0">{field.icon}</span>
                 <label
@@ -618,12 +549,8 @@ export default function PruneRepositoryDialog({
                   {field.label}
                 </label>
                 <div
-                  className="flex items-center rounded px-2 py-1"
-                  style={{
-                    border: `1px solid ${borderColor}`,
-                    background: 'var(--background)',
-                    width: 72,
-                  }}
+                  className="flex items-center rounded px-2 py-1 border border-border bg-background"
+                  style={{ width: 72 }}
                 >
                   <input
                     id={`prune-${field.key}`}

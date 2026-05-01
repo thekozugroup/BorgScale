@@ -10,7 +10,6 @@ import { useAnalytics } from '../hooks/useAnalytics'
 import { useAuth } from '../hooks/useAuth'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useTheme } from '../context/ThemeContext'
 
 interface Mount {
   mount_id: string
@@ -58,15 +57,20 @@ function MountCard({
   onForceUnmount: (mount: Mount) => void
 }) {
   const { t } = useTranslation()
-  const { effectiveMode } = useTheme()
-  const isDark = effectiveMode === 'dark'
 
   const parts = mount.source.split('::')
   const archiveName = parts.length > 1 ? parts[1] : parts[0]
   const repoName = parts.length > 1 ? parts[0] : ''
 
-  const iconBtn = () =>
-    `flex items-center justify-center w-7 h-7 rounded-lg transition-colors duration-150 flex-shrink-0`
+  const iconBtn = (variant: 'info' | 'warning' | 'destructive') => {
+    const colorClass =
+      variant === 'info'
+        ? 'text-primary hover:bg-primary/10'
+        : variant === 'warning'
+          ? 'text-foreground hover:bg-muted'
+          : 'text-destructive hover:bg-destructive/10'
+    return `flex items-center justify-center w-7 h-7 rounded-lg transition-colors duration-150 flex-shrink-0 ${colorClass}`
+  }
 
   return (
     <div
@@ -119,18 +123,7 @@ function MountCard({
               type="button"
               onClick={() => onCopy(mount)}
               aria-label={t('mounts.actions.copyAccessCommand')}
-              className={iconBtn()}
-              style={{
-                color: isDark ? 'rgba(96,165,250,0.6)' : 'rgba(37,99,235,0.5)',
-              }}
-              onMouseEnter={e => {
-                ;(e.currentTarget as HTMLButtonElement).style.color = isDark ? '#60a5fa' : '#2563eb'
-                ;(e.currentTarget as HTMLButtonElement).style.background = isDark ? 'rgba(96,165,250,0.12)' : 'rgba(37,99,235,0.09)'
-              }}
-              onMouseLeave={e => {
-                ;(e.currentTarget as HTMLButtonElement).style.color = isDark ? 'rgba(96,165,250,0.6)' : 'rgba(37,99,235,0.5)'
-                ;(e.currentTarget as HTMLButtonElement).style.background = ''
-              }}
+              className={iconBtn('info')}
             >
               <Copy size={15} />
             </button>
@@ -144,18 +137,7 @@ function MountCard({
               type="button"
               onClick={() => onUnmount(mount)}
               aria-label={t('mounts.actions.unmountArchive')}
-              className={iconBtn()}
-              style={{
-                color: isDark ? 'rgba(251,191,36,0.6)' : 'rgba(217,119,6,0.5)',
-              }}
-              onMouseEnter={e => {
-                ;(e.currentTarget as HTMLButtonElement).style.color = isDark ? '#fbbf24' : '#d97706'
-                ;(e.currentTarget as HTMLButtonElement).style.background = isDark ? 'rgba(251,191,36,0.12)' : 'rgba(217,119,6,0.09)'
-              }}
-              onMouseLeave={e => {
-                ;(e.currentTarget as HTMLButtonElement).style.color = isDark ? 'rgba(251,191,36,0.6)' : 'rgba(217,119,6,0.5)'
-                ;(e.currentTarget as HTMLButtonElement).style.background = ''
-              }}
+              className={iconBtn('warning')}
             >
               <Trash2 size={15} />
             </button>
@@ -169,18 +151,7 @@ function MountCard({
               type="button"
               onClick={() => onForceUnmount(mount)}
               aria-label={t('mounts.actions.forceUnmountTooltip')}
-              className={iconBtn()}
-              style={{
-                color: isDark ? 'rgba(248,113,113,0.6)' : 'rgba(220,38,38,0.5)',
-              }}
-              onMouseEnter={e => {
-                ;(e.currentTarget as HTMLButtonElement).style.color = isDark ? '#f87171' : '#dc2626'
-                ;(e.currentTarget as HTMLButtonElement).style.background = isDark ? 'rgba(248,113,113,0.12)' : 'rgba(220,38,38,0.09)'
-              }}
-              onMouseLeave={e => {
-                ;(e.currentTarget as HTMLButtonElement).style.color = isDark ? 'rgba(248,113,113,0.6)' : 'rgba(220,38,38,0.5)'
-                ;(e.currentTarget as HTMLButtonElement).style.background = ''
-              }}
+              className={iconBtn('destructive')}
             >
               <XCircle size={15} />
             </button>
@@ -194,8 +165,6 @@ function MountCard({
 
 export default function MountsManagementTab() {
   const { t } = useTranslation()
-  const { effectiveMode } = useTheme()
-  const isDark = effectiveMode === 'dark'
   const queryClient = useQueryClient()
   const { track, EventCategory, EventAction } = useAnalytics()
   const { hasGlobalPermission } = useAuth()
@@ -246,22 +215,10 @@ export default function MountsManagementTab() {
     return null
   }
 
-  const infoBarBg = isDark ? 'rgba(14,165,233,0.1)' : 'rgba(14,165,233,0.06)'
-  const infoBarBorder = isDark ? 'rgba(14,165,233,0.2)' : 'rgba(14,165,233,0.15)'
-  const tableBorder = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)'
-  const tableHeaderBg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'
-  const tableHeaderBorder = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'
-  const countBadgeBg = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'
-
   const tableHeader = (
     <div
-      className="hidden md:grid items-center gap-2 px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-widest"
-      style={{
-        gridTemplateColumns: desktopGridTemplate,
-        background: tableHeaderBg,
-        borderBottom: `1px solid ${tableHeaderBorder}`,
-        color: 'var(--muted-foreground)',
-      }}
+      className="hidden md:grid items-center gap-2 px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-widest text-muted-foreground bg-foreground/[0.02] border-b border-foreground/[0.08]"
+      style={{ gridTemplateColumns: desktopGridTemplate }}
     >
       <span>{t('mounts.columns.archive')}</span>
       <span>{t('mounts.columns.mountLocation')}</span>
@@ -271,10 +228,7 @@ export default function MountsManagementTab() {
   )
 
   const panelHeader = (countBadge: React.ReactNode) => (
-    <div
-      className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-2 px-4 py-3 mb-6 rounded-xl"
-      style={{ background: infoBarBg, border: `1px solid ${infoBarBorder}` }}
-    >
+    <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-2 px-4 py-3 mb-6 rounded-xl bg-primary/[0.07] border border-primary/20">
       <div className="flex items-center gap-3 flex-shrink-0">
         <HardDrive size={16} style={{ opacity: 0.7 }} />
         <p className="text-[0.95rem] font-bold">{t('mountsManagement.title')}</p>
@@ -299,10 +253,7 @@ export default function MountsManagementTab() {
         {panelHeader(
           <Skeleton className="h-5 w-5 rounded" />
         )}
-        <div
-          className="rounded-2xl overflow-hidden"
-          style={{ border: `1px solid ${tableBorder}` }}
-        >
+        <div className="rounded-2xl overflow-hidden border border-foreground/[0.07]">
           {tableHeader}
           {[0, 1, 2, 3, 4].map((i) => (
             <MountCardSkeleton key={i} index={i} />
@@ -314,8 +265,8 @@ export default function MountsManagementTab() {
 
   const countBadge = (
     <span
-      className="text-[0.72rem] font-semibold px-1.5 py-0.5 rounded text-muted-foreground"
-      style={{ background: countBadgeBg, lineHeight: 1.6 }}
+      className="text-[0.72rem] font-semibold px-1.5 py-0.5 rounded text-muted-foreground bg-foreground/[0.07]"
+      style={{ lineHeight: 1.6 }}
     >
       {mounts.length}
     </span>
@@ -334,10 +285,7 @@ export default function MountsManagementTab() {
           </p>
         </div>
       ) : (
-        <div
-          className="rounded-2xl overflow-hidden"
-          style={{ border: `1px solid ${tableBorder}` }}
-        >
+        <div className="rounded-2xl overflow-hidden border border-foreground/[0.07]">
           {tableHeader}
           {mounts.map((mount) => (
             <MountCard

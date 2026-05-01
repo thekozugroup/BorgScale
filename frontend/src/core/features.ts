@@ -22,11 +22,6 @@ export const PLAN_LABEL: Record<Plan, string> = {
   enterprise: 'Enterprise',
 }
 
-export const PLAN_COLOR: Record<Plan, string> = {
-  community: '#64748b',
-  pro: '#6366f1',
-  enterprise: '#f59e0b',
-}
 
 export function planIncludes(current: Plan, required: Plan): boolean {
   return PLAN_RANK[current] >= PLAN_RANK[required]

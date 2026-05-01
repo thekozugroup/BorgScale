@@ -23,8 +23,8 @@ const ArchiveNode = ({ x, y, delay, duration, size, opacity }: NodeProps) => (
       width: size,
       height: size,
       borderRadius: '50%',
-      border: `1px solid rgba(var(--foreground-rgb,255,255,255), ${opacity * 0.25})`,
-      backgroundColor: `rgba(var(--foreground-rgb,255,255,255), ${opacity * 0.04})`,
+      border: `1px solid hsl(var(--foreground) / ${opacity * 0.25})`,
+      backgroundColor: `hsl(var(--foreground) / ${opacity * 0.04})`,
       animation: `borgPulse ${duration} ease-in-out ${delay} infinite`,
       pointerEvents: 'none',
     }}
@@ -51,7 +51,7 @@ const FloatingDot = ({
       width: 3,
       height: 3,
       borderRadius: '50%',
-      backgroundColor: 'rgba(var(--foreground-rgb,255,255,255), 0.2)',
+      backgroundColor: 'hsl(var(--foreground) / 0.2)',
       animation: `borgFloat ${duration} ease-in-out ${delay} infinite`,
       pointerEvents: 'none',
     }}
@@ -77,48 +77,15 @@ export const AUTH_STYLES = `
     0% { background-position: 0 0; }
     100% { background-position: 0 40px; }
   }
-  @keyframes borgGlow {
-    0%, 100% { box-shadow: 0 0 20px rgba(0,221,0,0.15); }
-    50% { box-shadow: 0 0 40px rgba(0,221,0,0.35); }
-  }
   @keyframes spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
-  }
-  .borg-card-input {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 10px 14px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px;
-    color: hsl(var(--foreground));
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-    font-family: inherit;
-  }
-  .borg-card-input::placeholder {
-    color: rgba(148,163,184,0.5);
-  }
-  .borg-card-input:focus {
-    border-color: rgba(0,221,0,0.5);
-    background: rgba(0,221,0,0.04);
-    box-shadow: 0 0 0 3px rgba(0,221,0,0.08);
-  }
-  .borg-card-input.error {
-    border-color: rgba(239,68,68,0.5);
-  }
-  .borg-card-input.error:focus {
-    border-color: rgba(239,68,68,0.6);
-    box-shadow: 0 0 0 3px rgba(239,68,68,0.08);
   }
   @media (prefers-reduced-motion: reduce) {
     @keyframes borgPulse { 0%, 100% { opacity: 1; } }
     @keyframes borgFloat { 0%, 100% { opacity: 0.5; } }
     @keyframes borgFadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes borgScan { 0%, 100% {} }
-    @keyframes borgGlow { 0%, 100% {} }
   }
 `
 
@@ -254,15 +221,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             }}
           >
             {/* Card */}
-            <div
-              style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: 16,
-                padding: '36px 28px',
-                backdropFilter: 'blur(12px)',
-              }}
-            >
+            <div className="bg-card/30 border border-foreground/[0.08] backdrop-blur rounded-2xl px-7 py-9">
               {children}
             </div>
           </div>

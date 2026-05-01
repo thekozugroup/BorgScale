@@ -346,6 +346,8 @@
     "mountFailed": "Impossibile montare l'archivio: {{error}}",
     "restoreStarted": "Job di ripristino avviato! Controlla la scheda Attività per monitorare i progressi.",
     "mountSuccess": "Archivio montato con successo!\n\nIl mount è all'interno del container. Per accedere ai file, esegui:\n\n{{command}}",
+    "mountCommandTitle": "Comando di accesso al terminale",
+    "mountCommandDesc": "Apri questo comando in un terminale per sfogliare la cartella montata.",
     "toasts": {
       "deleteFailed": "Impossibile eliminare l'archivio",
       "restoreFailed": "Impossibile avviare il ripristino",

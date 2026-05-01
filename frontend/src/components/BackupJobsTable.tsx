@@ -402,9 +402,9 @@ export const BackupJobsTable = <T extends Job = Job>({
                   <TooltipTrigger asChild>
                     <div className="flex items-center">
                       {isScheduled ? (
-                        <Calendar size={18} color="#1976d2" />
+                        <Calendar size={18} className="text-primary" />
                       ) : (
-                        <User size={18} color="#666" />
+                        <User size={18} className="text-muted-foreground" />
                       )}
                     </div>
                   </TooltipTrigger>
