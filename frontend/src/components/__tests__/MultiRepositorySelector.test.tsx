@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { fireEvent, screen, renderWithProviders } from '../../test/test-utils'
 import { describe, it, expect, vi } from 'vitest'
 import { MultiRepositorySelector } from '../MultiRepositorySelector'
 import { Repository } from '@/types'
@@ -12,7 +12,7 @@ const mockRepositories: Repository[] = [
 describe('MultiRepositorySelector Uniqueness', () => {
   it('should dedup repositories when duplicate is added', () => {
     const onChange = vi.fn()
-    render(
+    renderWithProviders(
       <MultiRepositorySelector
         repositories={mockRepositories}
         selectedIds={[1]}
@@ -20,21 +20,18 @@ describe('MultiRepositorySelector Uniqueness', () => {
         allowReorder={true}
       />
     )
-    // Repo A (id:1) is already selected — clicking it again should remove it or be a no-op;
-    // the component uses toggle semantics, so clicking a selected repo deselects it.
-    // For uniqueness: open the dropdown and click Repo A (already selected).
-    // Use the actual component API: open dropdown by clicking the input/button
-    const dropdownTrigger = screen.getByPlaceholderText(/select repositories/i)
-    fireEvent.click(dropdownTrigger)
+    // Open the dropdown by clicking the trigger div (shows "Search or add more..." text)
+    const dropdownTrigger = screen.getByText(/Search or add more|Select repositories/i).closest('div[class*="cursor-pointer"]') ?? screen.getByText(/Search or add more/i).closest('div')
+    fireEvent.click(dropdownTrigger!)
 
-    // Repo A option should appear
-    const repoAOption = screen.getAllByText('Repo A')
-    expect(repoAOption.length).toBeGreaterThan(0)
+    // Repo A option should appear in the dropdown list
+    const repoAOptions = screen.getAllByText('Repo A')
+    expect(repoAOptions.length).toBeGreaterThan(0)
   })
 
   it('should allow adding distinct repositories', () => {
     const onChange = vi.fn()
-    render(
+    renderWithProviders(
       <MultiRepositorySelector
         repositories={mockRepositories}
         selectedIds={[1]}
@@ -43,11 +40,11 @@ describe('MultiRepositorySelector Uniqueness', () => {
       />
     )
 
-    // Open dropdown
-    const dropdownTrigger = screen.getByPlaceholderText(/select repositories/i)
-    fireEvent.click(dropdownTrigger)
+    // Open dropdown by clicking the trigger
+    const dropdownTrigger = screen.getByText(/Search or add more|Select repositories/i).closest('div[class*="cursor-pointer"]') ?? screen.getByText(/Search or add more/i).closest('div')
+    fireEvent.click(dropdownTrigger!)
 
-    // Click Repo B (not yet selected)
+    // Click Repo B (not yet selected) - it appears in the dropdown options
     const repoBOptions = screen.getAllByText('Repo B')
     fireEvent.click(repoBOptions[repoBOptions.length - 1])
 

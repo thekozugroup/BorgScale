@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
+import { screen, renderWithProviders } from '../../test/test-utils'
 import RepositoryInfo from '../RepositoryInfo'
 
 describe('RepositoryInfo', () => {
@@ -24,54 +24,56 @@ describe('RepositoryInfo', () => {
 
   describe('Loading State', () => {
     it('shows loading message when loading is true', () => {
-      render(<RepositoryInfo loading={true} />)
+      renderWithProviders(<RepositoryInfo loading={true} />)
       expect(screen.getByText('Loading repository info...')).toBeInTheDocument()
     })
 
     it('does not show repository stats when loading', () => {
-      render(<RepositoryInfo loading={true} repoInfo={mockRepoInfo} />)
+      renderWithProviders(<RepositoryInfo loading={true} repoInfo={mockRepoInfo} />)
       expect(screen.queryByText('Archives')).not.toBeInTheDocument()
     })
   })
 
   describe('Empty State', () => {
     it('returns null when repoInfo is undefined', () => {
-      const { container } = render(<RepositoryInfo />)
-      expect(container.firstChild).toBeNull()
+      renderWithProviders(<RepositoryInfo />)
+      expect(screen.queryByText('Archives')).not.toBeInTheDocument()
+      expect(screen.queryByText('Total Size')).not.toBeInTheDocument()
     })
 
     it('returns null when repoInfo is null', () => {
-      const { container } = render(<RepositoryInfo repoInfo={undefined} />)
-      expect(container.firstChild).toBeNull()
+      renderWithProviders(<RepositoryInfo repoInfo={undefined} />)
+      expect(screen.queryByText('Archives')).not.toBeInTheDocument()
+      expect(screen.queryByText('Total Size')).not.toBeInTheDocument()
     })
   })
 
   describe('Repository Statistics', () => {
     it('displays archives count', () => {
-      render(<RepositoryInfo repoInfo={mockRepoInfo} archivesCount={10} />)
+      renderWithProviders(<RepositoryInfo repoInfo={mockRepoInfo} archivesCount={10} />)
       expect(screen.getByText('Archives')).toBeInTheDocument()
       expect(screen.getByText('10')).toBeInTheDocument()
     })
 
     it('displays archives count as 0 when not provided', () => {
-      render(<RepositoryInfo repoInfo={mockRepoInfo} />)
+      renderWithProviders(<RepositoryInfo repoInfo={mockRepoInfo} />)
       expect(screen.getByText('0')).toBeInTheDocument()
     })
 
     it('displays formatted total size', () => {
-      render(<RepositoryInfo repoInfo={mockRepoInfo} />)
+      renderWithProviders(<RepositoryInfo repoInfo={mockRepoInfo} />)
       expect(screen.getByText('Total Size')).toBeInTheDocument()
       expect(screen.getByText('100.00 MB')).toBeInTheDocument()
     })
 
     it('displays formatted deduplicated size', () => {
-      render(<RepositoryInfo repoInfo={mockRepoInfo} />)
+      renderWithProviders(<RepositoryInfo repoInfo={mockRepoInfo} />)
       expect(screen.getByText('Unique Data')).toBeInTheDocument()
       expect(screen.getByText('25.00 MB')).toBeInTheDocument()
     })
 
     it('displays formatted last modified date', () => {
-      render(<RepositoryInfo repoInfo={mockRepoInfo} />)
+      renderWithProviders(<RepositoryInfo repoInfo={mockRepoInfo} />)
       expect(screen.getByText('Last Modified')).toBeInTheDocument()
       // The formatDate utility will format this, just check it's present
       expect(screen.getByText(/Jan|2024|15/)).toBeInTheDocument()
@@ -82,7 +84,7 @@ describe('RepositoryInfo', () => {
         ...mockRepoInfo,
         cache: { stats: {} },
       }
-      render(<RepositoryInfo repoInfo={infoWithoutSize} />)
+      renderWithProviders(<RepositoryInfo repoInfo={infoWithoutSize} />)
       const naElements = screen.getAllByText('N/A')
       expect(naElements.length).toBeGreaterThan(0)
     })
@@ -96,7 +98,7 @@ describe('RepositoryInfo', () => {
           },
         },
       }
-      render(<RepositoryInfo repoInfo={infoWithoutDedup} />)
+      renderWithProviders(<RepositoryInfo repoInfo={infoWithoutDedup} />)
       expect(screen.getAllByText('N/A').length).toBeGreaterThan(0)
     })
 
@@ -105,14 +107,14 @@ describe('RepositoryInfo', () => {
         ...mockRepoInfo,
         repository: {},
       }
-      render(<RepositoryInfo repoInfo={infoWithoutDate} />)
+      renderWithProviders(<RepositoryInfo repoInfo={infoWithoutDate} />)
       expect(screen.getAllByText('N/A').length).toBeGreaterThan(0)
     })
   })
 
   describe('Encryption Information', () => {
     it('displays encryption mode chip when present', () => {
-      render(<RepositoryInfo repoInfo={mockRepoInfo} />)
+      renderWithProviders(<RepositoryInfo repoInfo={mockRepoInfo} />)
       expect(screen.getByText('Encryption: repokey-blake2')).toBeInTheDocument()
     })
 
@@ -121,7 +123,7 @@ describe('RepositoryInfo', () => {
         ...mockRepoInfo,
         encryption: {},
       }
-      render(<RepositoryInfo repoInfo={infoWithoutEncryption} />)
+      renderWithProviders(<RepositoryInfo repoInfo={infoWithoutEncryption} />)
       expect(screen.queryByText(/Encryption:/)).not.toBeInTheDocument()
     })
 
@@ -130,7 +132,7 @@ describe('RepositoryInfo', () => {
         repository: mockRepoInfo.repository,
         cache: mockRepoInfo.cache,
       }
-      render(<RepositoryInfo repoInfo={infoWithoutEncryption} />)
+      renderWithProviders(<RepositoryInfo repoInfo={infoWithoutEncryption} />)
       expect(screen.queryByText(/Encryption:/)).not.toBeInTheDocument()
     })
   })
@@ -146,7 +148,7 @@ describe('RepositoryInfo', () => {
           },
         },
       }
-      render(<RepositoryInfo repoInfo={infoWithZeros} archivesCount={0} />)
+      renderWithProviders(<RepositoryInfo repoInfo={infoWithZeros} archivesCount={0} />)
       expect(screen.getByText('0')).toBeInTheDocument()
       // Zero values are treated as falsy, so N/A is displayed
       expect(screen.getAllByText('N/A').length).toBeGreaterThan(0)
@@ -158,7 +160,7 @@ describe('RepositoryInfo', () => {
           id: 'test',
         },
       }
-      render(<RepositoryInfo repoInfo={partialInfo} />)
+      renderWithProviders(<RepositoryInfo repoInfo={partialInfo} />)
       expect(screen.getByText('Archives')).toBeInTheDocument()
       expect(screen.getAllByText('N/A').length).toBeGreaterThan(0)
     })

@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material'
+import { useTheme } from '../context/ThemeContext'
 
 interface VersionChipProps {
   label: string
@@ -7,48 +7,43 @@ interface VersionChipProps {
 }
 
 export default function VersionChip({ label, version, accent = false }: VersionChipProps) {
+  const { effectiveMode } = useTheme()
+  const isDark = effectiveMode === 'dark'
+
   return (
-    <Box
-      sx={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 0.5,
-        px: 0.875,
-        py: 0.25,
-        borderRadius: '4px',
-        bgcolor: accent
-          ? (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(99,102,241,0.12)' : 'rgba(99,102,241,0.08)'
-          : 'action.hover',
-        border: '1px solid',
-        borderColor: accent
-          ? (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(99,102,241,0.3)' : 'rgba(99,102,241,0.25)'
-          : 'divider',
+    <span
+      className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded"
+      style={{
+        background: accent
+          ? isDark ? 'rgba(99,102,241,0.12)' : 'rgba(99,102,241,0.08)'
+          : isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+        border: `1px solid ${accent
+          ? isDark ? 'rgba(99,102,241,0.3)' : 'rgba(99,102,241,0.25)'
+          : isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
       }}
     >
-      <Typography
-        sx={{
+      <span
+        style={{
           fontSize: '0.6rem',
           fontWeight: 700,
-          color: accent ? 'rgb(99,102,241)' : 'text.disabled',
+          color: accent ? 'rgb(99,102,241)' : isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
           letterSpacing: '0.04em',
           lineHeight: 1,
         }}
       >
         {label}
-      </Typography>
-      <Typography
-        sx={{
+      </span>
+      <span
+        style={{
           fontSize: '0.6rem',
           fontWeight: 500,
-          color: 'text.secondary',
           fontFamily: 'monospace',
           lineHeight: 1,
+          color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
         }}
       >
         {version}
-      </Typography>
-    </Box>
+      </span>
+    </span>
   )
 }

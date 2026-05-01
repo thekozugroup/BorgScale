@@ -1,13 +1,13 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { screen, fireEvent, waitFor, renderWithProviders } from '../../test/test-utils'
 import RepositoryInfoDialog from '../RepositoryInfoDialog'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import type { ReactElement } from 'react'
 
 // Wrap renders in TooltipProvider (required by shadcn Tooltip)
 function renderDialog(ui: ReactElement) {
-  return render(<TooltipProvider>{ui}</TooltipProvider>)
+  return renderWithProviders(<TooltipProvider>{ui}</TooltipProvider>)
 }
 
 vi.mock('../../services/api', () => ({

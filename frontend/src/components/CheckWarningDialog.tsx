@@ -1,22 +1,11 @@
-import {
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-  Box,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  TextField,
-  CircularProgress,
-  Tooltip,
-} from '@mui/material'
-import ResponsiveDialog from './ResponsiveDialog'
-import { Warning, CheckCircle, Lock, InfoOutlined } from '@mui/icons-material'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { AlertTriangle, Lock, CheckCircle2, Info, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import ResponsiveDialog from './ResponsiveDialog'
 
 interface CheckWarningDialogProps {
   open: boolean
@@ -38,136 +27,92 @@ export default function CheckWarningDialog({
   const { t } = useTranslation()
   const [maxDuration, setMaxDuration] = useState<number>(3600)
   const isBorg2 = borgVersion === 2
+
   return (
     <ResponsiveDialog open={open} onClose={onCancel} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Warning color="warning" />
-        {t('dialogs.checkWarning.title')}
-      </DialogTitle>
-      <DialogContent>
-        <Typography variant="body1" gutterBottom>
+      <div className="p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <AlertTriangle size={20} className="text-muted-foreground flex-shrink-0" />
+          <h3 className="text-lg font-semibold">{t('dialogs.checkWarning.title')}</h3>
+        </div>
+
+        <p className="text-sm mb-3">
           {t('dialogs.checkWarning.description', { repositoryName })}
-        </Typography>
+        </p>
 
-        <Box sx={{ mt: 1.5 }}>
-          <Typography variant="subtitle2" gutterBottom>
-            {t('dialogs.checkWarning.important')}
-          </Typography>
-          <List dense sx={{ py: 0 }}>
-            <ListItem sx={{ py: 0.5 }}>
-              <ListItemIcon sx={{ minWidth: 36 }}>
-                <Lock fontSize="small" color="action" />
-              </ListItemIcon>
-              <ListItemText
-                primary={t('dialogs.checkWarning.repoWillBeLocked')}
-                secondary={t('dialogs.checkWarning.otherOperationsUnavailable')}
-              />
-            </ListItem>
-            <ListItem sx={{ py: 0.5 }}>
-              <ListItemIcon sx={{ minWidth: 36 }}>
-                <CheckCircle fontSize="small" color="action" />
-              </ListItemIcon>
-              <ListItemText
-                primary={t('dialogs.checkWarning.progressTracking')}
-                secondary={t('dialogs.checkWarning.progressTrackingDetail')}
-              />
-            </ListItem>
-          </List>
-        </Box>
+        <div className="mb-3">
+          <p className="text-sm font-semibold mb-2">{t('dialogs.checkWarning.important')}</p>
+          <ul className="space-y-2">
+            <li className="flex items-start gap-2 text-sm">
+              <Lock size={14} className="text-muted-foreground mt-0.5 flex-shrink-0" />
+              <span>
+                <span className="font-medium">{t('dialogs.checkWarning.repoWillBeLocked')}</span>
+                <span className="block text-xs text-muted-foreground">{t('dialogs.checkWarning.otherOperationsUnavailable')}</span>
+              </span>
+            </li>
+            <li className="flex items-start gap-2 text-sm">
+              <CheckCircle2 size={14} className="text-muted-foreground mt-0.5 flex-shrink-0" />
+              <span>
+                <span className="font-medium">{t('dialogs.checkWarning.progressTracking')}</span>
+                <span className="block text-xs text-muted-foreground">{t('dialogs.checkWarning.progressTrackingDetail')}</span>
+              </span>
+            </li>
+          </ul>
+        </div>
 
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+        <p className="text-sm text-muted-foreground mb-4">
           {t('dialogs.checkWarning.otherReposAccessible')}
-        </Typography>
+        </p>
 
-        <Box sx={{ mt: 2 }}>
-          <TextField
-            label={t('dialogs.checkWarning.maxDurationLabel')}
+        <div className="mb-4 flex flex-col gap-1">
+          <Label>{t('dialogs.checkWarning.maxDurationLabel')}</Label>
+          <Input
             type="number"
             value={maxDuration}
             onChange={(e) => {
               const value = parseInt(e.target.value)
               setMaxDuration(isNaN(value) ? 3600 : value)
             }}
-            fullWidth
-            helperText={t('dialogs.checkWarning.maxDurationHelper')}
-            InputProps={{
-              inputProps: { min: 0 },
-            }}
+            min={0}
           />
-        </Box>
+          <p className="text-xs text-muted-foreground">{t('dialogs.checkWarning.maxDurationHelper')}</p>
+        </div>
 
         {isBorg2 && (
-          <Box
-            sx={{
-              mt: 1,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-              color: 'warning.light',
-            }}
-          >
-            <Typography
-              variant="body2"
-              sx={{
-                lineHeight: 1.4,
-                color: 'inherit',
-                fontWeight: 500,
-              }}
-            >
-              {t('dialogs.checkWarning.borg2InlineNotice')}
-            </Typography>
-            <Tooltip
-              arrow
-              placement="top"
-              title={
-                <Box sx={{ py: 0.25 }}>
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {t('dialogs.checkWarning.borg2TooltipTitle')}
-                  </Typography>
-                  <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
-                    {t('dialogs.checkWarning.borg2PartialCheckNotice')}
-                  </Typography>
-                </Box>
-              }
-            >
-              <Box
-                component="button"
-                type="button"
-                aria-label={t('dialogs.checkWarning.borg2TooltipTitle')}
-                sx={{
-                  appearance: 'none',
-                  border: 0,
-                  background: 'transparent',
-                  color: 'inherit',
-                  p: 0,
-                  m: 0,
-                  lineHeight: 0,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                <InfoOutlined sx={{ fontSize: 18 }} />
-              </Box>
+          <div className="flex items-center gap-1.5 mt-2 text-muted-foreground">
+            <p className="text-sm font-medium leading-snug">{t('dialogs.checkWarning.borg2InlineNotice')}</p>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button type="button" aria-label={t('dialogs.checkWarning.borg2TooltipTitle')} className="inline-flex items-center cursor-pointer">
+                  <Info size={16} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="font-semibold">{t('dialogs.checkWarning.borg2TooltipTitle')}</p>
+                <p className="mt-1 text-xs">{t('dialogs.checkWarning.borg2PartialCheckNotice')}</p>
+              </TooltipContent>
             </Tooltip>
-          </Box>
+          </div>
         )}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onCancel} disabled={isLoading}>
-          {t('dialogs.checkWarning.cancel')}
-        </Button>
-        <Button
-          onClick={() => onConfirm(maxDuration)}
-          variant="contained"
-          color="warning"
-          disabled={isLoading}
-          startIcon={isLoading ? <CircularProgress size={16} color="inherit" /> : <CheckCircle />}
-        >
-          {isLoading ? t('status.running') : t('dialogs.checkWarning.confirm')}
-        </Button>
-      </DialogActions>
+
+        <div className="flex justify-end gap-2 mt-6">
+          <Button variant="ghost" onClick={onCancel} disabled={isLoading}>
+            {t('dialogs.checkWarning.cancel')}
+          </Button>
+          <Button
+            onClick={() => onConfirm(maxDuration)}
+            disabled={isLoading}
+            variant="default"
+          >
+            {isLoading ? (
+              <Loader2 size={16} className="mr-2 animate-spin" />
+            ) : (
+              <CheckCircle2 size={16} className="mr-2" />
+            )}
+            {isLoading ? t('status.running') : t('dialogs.checkWarning.confirm')}
+          </Button>
+        </div>
+      </div>
     </ResponsiveDialog>
   )
 }

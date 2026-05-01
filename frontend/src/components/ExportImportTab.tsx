@@ -309,7 +309,7 @@ const ExportImportTab: React.FC = () => {
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-2">
                   {importResult.success ? (
-                    <CheckCircle size={22} className="text-green-500" />
+                    <CheckCircle size={22} className="text-primary" />
                   ) : (
                     <AlertCircle size={22} className="text-destructive" />
                   )}

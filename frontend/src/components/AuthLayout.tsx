@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BASE_PATH } from '@/utils/basePath'
+import { Boxes } from 'lucide-react'
 
 // ─── Animated background nodes ──────────────────────────────────────────────
 
@@ -158,30 +158,6 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             padding: '24px 32px',
           }}
         >
-          {/* Grid dot pattern */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundImage: 'radial-gradient(circle, rgba(0,221,0,0.12) 1px, transparent 1px)',
-              backgroundSize: '28px 28px',
-              animation: 'borgScan 8s linear infinite',
-              maskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%)',
-            }}
-          />
-
-          {/* Radial vignette */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background:
-                'radial-gradient(ellipse 70% 70% at 50% 50%, transparent 30%, rgba(4,10,4,0.85) 100%)',
-              pointerEvents: 'none',
-            }}
-          />
 
           {/* Floating archive nodes */}
           <ArchiveNode x="8%" y="12%" delay="0s" duration="4.2s" size={48} opacity={0.7} />
@@ -208,89 +184,20 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
               animation: 'borgFadeIn 0.6s ease-out both',
             }}
           >
-            {/* Logo with glow ring */}
-            <div
-              style={{
-                position: 'relative',
-                marginBottom: 12,
-                animation: 'borgGlow 3s ease-in-out infinite',
-                borderRadius: 30,
-              }}
-            >
-              <div
-                aria-hidden="true"
-                style={{
-                  position: 'absolute',
-                  inset: -16,
-                  borderRadius: '50%',
-                  background: 'radial-gradient(circle, rgba(0,221,0,0.2) 0%, transparent 70%)',
-                }}
-              />
-              <div
-                style={{
-                  width: 72,
-                  height: 72,
-                  borderRadius: 30,
-                  background: 'linear-gradient(135deg, #065f46 0%, #059669 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: 11,
-                  boxShadow: '0 4px 14px rgba(5,150,105,0.4)',
-                  flexShrink: 0,
-                }}
-              >
-                <img
-                  src={`${BASE_PATH}/logo.png`}
-                  alt="BorgUI"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
-                    filter: 'brightness(2.2) contrast(1.1)',
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* App name + version badge */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                marginTop: 20,
-                marginBottom: 20,
-              }}
-            >
-              <h1
+            {/* Logo + wordmark */}
+            <div className="flex items-center gap-3" style={{ marginBottom: 20, marginTop: 8 }}>
+              <Boxes className="h-10 w-10" style={{ color: 'rgba(0,221,0,0.85)' }} />
+              <span
                 style={{
                   fontSize: '2rem',
                   fontWeight: 700,
                   color: '#f1f5f9',
-                  letterSpacing: '0.14em',
+                  letterSpacing: '0.1em',
                   textTransform: 'uppercase',
-                  margin: 0,
                   lineHeight: 1.1,
                 }}
               >
                 BorgScale
-              </h1>
-              <span
-                style={{
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.04em',
-                  padding: '3px 7px',
-                  borderRadius: 6,
-                  background: 'rgba(5,150,105,0.15)',
-                  border: '1px solid rgba(5,150,105,0.35)',
-                  color: '#34d399',
-                  lineHeight: 1.5,
-                  userSelect: 'none',
-                }}
-              >
-                2.0
               </span>
             </div>
 
@@ -342,21 +249,6 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             position: 'relative',
           }}
         >
-          {/* Subtle corner glow */}
-          <div
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
-              width: 280,
-              height: 280,
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(0,221,0,0.06) 0%, transparent 70%)',
-              pointerEvents: 'none',
-              transform: 'translate(40%, -40%)',
-            }}
-          />
 
           <div
             style={{

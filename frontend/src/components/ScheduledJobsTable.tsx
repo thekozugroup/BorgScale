@@ -1,6 +1,6 @@
-import { Box, Skeleton, Stack, Typography, alpha } from '@mui/material'
 import { Clock } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { Skeleton } from '@/components/ui/skeleton'
 import ScheduleJobCard from './ScheduleJobCard'
 
 interface ScheduledJob {
@@ -70,144 +70,66 @@ const ScheduledJobsTable = ({
   const renderContent = () => {
     if (isLoading) {
       return (
-        <Stack spacing={2}>
+        <div className="flex flex-col gap-4">
           {[0, 1, 2].map((i) => (
-            <Box
+            <div
               key={i}
-              sx={{
-                borderRadius: 2,
-                bgcolor: 'background.paper',
-                overflow: 'hidden',
-                boxShadow: (theme) =>
-                  theme.palette.mode === 'dark'
-                    ? `0 0 0 1px ${alpha('#fff', 0.08)}, 0 4px 16px ${alpha('#000', 0.25)}`
-                    : `0 0 0 1px ${alpha('#000', 0.08)}, 0 2px 8px ${alpha('#000', 0.07)}`,
+              className="rounded-lg bg-background overflow-hidden"
+              style={{
+                boxShadow: '0 0 0 1px rgba(255,255,255,0.08), 0 4px 16px rgba(0,0,0,0.25)',
                 opacity: Math.max(0.4, 1 - i * 0.2),
               }}
             >
-              <Box
-                sx={{ px: { xs: 1.75, sm: 2 }, pt: { xs: 1.75, sm: 2 }, pb: { xs: 1.5, sm: 1.75 } }}
-              >
-                {/* Title row + badge (Switch toggle) */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    justifyContent: 'space-between',
-                    gap: 1,
-                    mb: 1.5,
-                  }}
-                >
-                  <Box sx={{ flex: 1 }}>
-                    <Skeleton
-                      variant="text"
-                      width={[150, 190, 130][i]}
-                      height={28}
-                      sx={{ transform: 'none', borderRadius: 0.5 }}
-                    />
-                  </Box>
-                  {/* Switch + enabled text badge */}
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>
-                    <Skeleton variant="rounded" width={34} height={20} sx={{ borderRadius: 10 }} />
-                    <Skeleton
-                      variant="text"
-                      width={48}
-                      height={14}
-                      sx={{ transform: 'none', borderRadius: 0.5 }}
-                    />
-                  </Box>
-                </Box>
+              <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3.5 sm:pb-4">
+                {/* Title row + badge */}
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <Skeleton className="h-6 rounded" style={{ width: [150, 190, 130][i] }} />
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <Skeleton className="w-8 h-5 rounded-full" />
+                    <Skeleton className="h-3.5 rounded" style={{ width: 48 }} />
+                  </div>
+                </div>
 
                 {/* Stats grid — 4 columns */}
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' },
-                    borderRadius: 1.5,
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    overflow: 'hidden',
-                    mb: 1.5,
-                  }}
-                >
+                <div className="grid grid-cols-4 rounded-md overflow-hidden mb-3 border border-border">
                   {[0, 1, 2, 3].map((j) => (
-                    <Box
+                    <div
                       key={j}
-                      sx={{
-                        px: 1.5,
-                        py: 1.1,
-                        borderRight: j < 3 ? '1px solid' : 0,
-                        borderColor: 'divider',
-                      }}
+                      className="px-3 py-2.5"
+                      style={{ borderRight: j < 3 ? '1px solid var(--border)' : 'none' }}
                     >
-                      <Skeleton
-                        variant="text"
-                        width={38}
-                        height={10}
-                        sx={{ transform: 'none', borderRadius: 0.5, mb: 0.5 }}
-                      />
-                      <Skeleton
-                        variant="text"
-                        width={[58, 48, 54, 44][j]}
-                        height={16}
-                        sx={{ transform: 'none', borderRadius: 0.5 }}
-                      />
-                    </Box>
+                      <Skeleton className="h-2.5 mb-1.5 rounded" style={{ width: 38 }} />
+                      <Skeleton className="h-4 rounded" style={{ width: [58, 48, 54, 44][j] }} />
+                    </div>
                   ))}
-                </Box>
+                </div>
 
-                {/* Actions row — 3 icon buttons + Run Now primary button */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.5,
-                    pt: 1.25,
-                    borderTop: '1px solid',
-                    borderColor: 'divider',
-                  }}
-                >
-                  <Skeleton variant="rounded" width={32} height={32} sx={{ borderRadius: 1.5 }} />
-                  <Skeleton variant="rounded" width={32} height={32} sx={{ borderRadius: 1.5 }} />
-                  <Skeleton variant="rounded" width={32} height={32} sx={{ borderRadius: 1.5 }} />
-                  <Skeleton
-                    variant="rounded"
-                    width={88}
-                    height={30}
-                    sx={{ borderRadius: 1, ml: 'auto' }}
-                  />
-                </Box>
-              </Box>
-            </Box>
+                {/* Actions row */}
+                <div className="flex items-center gap-1 pt-3 border-t border-border">
+                  <Skeleton className="w-8 h-8 rounded-md" />
+                  <Skeleton className="w-8 h-8 rounded-md" />
+                  <Skeleton className="w-8 h-8 rounded-md" />
+                  <Skeleton className="w-22 h-7 rounded ml-auto" style={{ width: 88 }} />
+                </div>
+              </div>
+            </div>
           ))}
-        </Stack>
+        </div>
       )
     }
 
     if (jobs.length === 0) {
       return (
-        <Box
-          sx={{
-            py: 6,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            color: 'text.secondary',
-          }}
-        >
+        <div className="py-12 flex flex-col items-center text-muted-foreground">
           <Clock size={40} style={{ opacity: 0.25, marginBottom: 12 }} />
-          <Typography variant="body1" gutterBottom>
-            {t('scheduledJobsTableSection.noJobsFound')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('scheduledJobsTableSection.noJobsDesc')}
-          </Typography>
-        </Box>
+          <p className="text-base mb-1">{t('scheduledJobsTableSection.noJobsFound')}</p>
+          <p className="text-sm text-muted-foreground">{t('scheduledJobsTableSection.noJobsDesc')}</p>
+        </div>
       )
     }
 
     return (
-      <Stack spacing={2}>
+      <div className="flex flex-col gap-4">
         {jobs.map((job) => (
           <ScheduleJobCard
             key={job.id}
@@ -223,17 +145,15 @@ const ScheduledJobsTable = ({
             isDuplicatePending={isDuplicatePending}
           />
         ))}
-      </Stack>
+      </div>
     )
   }
 
   return (
-    <Box>
-      <Typography variant="h6" fontWeight={600} sx={{ mb: 2 }}>
-        {t('scheduledJobsTableSection.title')}
-      </Typography>
+    <div>
+      <p className="text-base font-semibold mb-4">{t('scheduledJobsTableSection.title')}</p>
       {renderContent()}
-    </Box>
+    </div>
   )
 }
 

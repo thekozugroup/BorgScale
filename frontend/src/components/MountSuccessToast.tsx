@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Box, Typography, IconButton, alpha, useTheme } from '@mui/material'
 import { HardDrive, Copy, Check, X } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 
@@ -9,12 +8,7 @@ interface MountSuccessToastProps {
 }
 
 export default function MountSuccessToast({ toastId, command }: MountSuccessToastProps) {
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
   const [copied, setCopied] = useState(false)
-
-  const borderColor = isDark ? alpha('#fff', 0.1) : alpha('#000', 0.1)
-  const surface = isDark ? '#1e2124' : '#ffffff'
 
   const handleCopy = () => {
     navigator.clipboard.writeText(command).then(() => {
@@ -24,101 +18,39 @@ export default function MountSuccessToast({ toastId, command }: MountSuccessToas
   }
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 1.25,
-        p: 1.5,
-        bgcolor: surface,
-        border: '1px solid',
-        borderColor,
-        borderRadius: 2,
-        boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 24px rgba(0,0,0,0.12)',
-        maxWidth: 480,
-        width: '100%',
-      }}
-    >
+    <div className="flex flex-col gap-3 p-3 rounded-lg max-w-[480px] w-full border border-border bg-background shadow-lg">
       {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 30,
-            height: 30,
-            borderRadius: 1.25,
-            bgcolor: alpha(theme.palette.success.main, isDark ? 0.18 : 0.1),
-            color: theme.palette.success.main,
-            flexShrink: 0,
-          }}
-        >
+      <div className="flex items-center gap-3">
+        <div className="w-7 h-7 rounded flex items-center justify-center flex-shrink-0 bg-primary/10 text-primary">
           <HardDrive size={15} />
-        </Box>
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography
-            variant="body2"
-            fontWeight={600}
-            sx={{ fontSize: '0.82rem', lineHeight: 1.3 }}
-          >
-            Archive Mounted
-          </Typography>
-          <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.72rem' }}>
-            Access via Docker:
-          </Typography>
-        </Box>
-        <IconButton
-          size="small"
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold leading-tight">Archive Mounted</p>
+          <p className="text-xs text-muted-foreground">Access via Docker:</p>
+        </div>
+        <button
           onClick={() => toast.dismiss(toastId)}
-          sx={{ color: 'text.disabled', flexShrink: 0, p: 0.25 }}
+          className="p-0.5 rounded text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
         >
           <X size={13} />
-        </IconButton>
-      </Box>
+        </button>
+      </div>
 
       {/* Command block */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          px: 1.25,
-          py: 0.75,
-          bgcolor: isDark ? alpha('#000', 0.4) : alpha('#000', 0.04),
-          border: '1px solid',
-          borderColor,
-          borderRadius: 1.25,
-        }}
-      >
-        <Typography
-          component="code"
-          sx={{
-            flex: 1,
-            fontSize: '0.7rem',
-            fontFamily: 'ui-monospace, "Cascadia Code", "Fira Code", monospace',
-            color: isDark ? alpha('#fff', 0.82) : alpha('#000', 0.8),
-            wordBreak: 'break-all',
-            lineHeight: 1.5,
-          }}
+      <div className="flex items-center gap-2 px-3 py-2 rounded border border-border bg-muted/40">
+        <code
+          className="flex-1 text-[0.7rem] break-all leading-relaxed font-mono text-foreground"
         >
           {command}
-        </Typography>
-        <IconButton
-          size="small"
+        </code>
+        <button
           onClick={handleCopy}
           title={copied ? 'Copied!' : 'Copy command'}
-          sx={{
-            flexShrink: 0,
-            color: copied ? 'success.main' : 'text.disabled',
-            p: 0.5,
-            transition: 'color 150ms',
-            '&:hover': { color: copied ? 'success.main' : 'text.secondary' },
-          }}
+          className={`flex-shrink-0 p-1 rounded transition-colors ${copied ? 'text-primary' : 'text-muted-foreground'}`}
         >
           {copied ? <Check size={13} /> : <Copy size={13} />}
-        </IconButton>
-      </Box>
-    </Box>
+        </button>
+      </div>
+    </div>
   )
 }

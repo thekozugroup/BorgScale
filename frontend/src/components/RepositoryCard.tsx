@@ -55,9 +55,9 @@ const STAT_ICONS = [
 
 const STAT_COLOR_CLASSES = [
   'text-primary/70',
-  'text-emerald-500/70',
-  'text-amber-500/70',
-  'text-sky-500/70',
+  'text-primary/60',
+  'text-muted-foreground/80',
+  'text-muted-foreground/70',
 ] as const
 
 export default function RepositoryCard({
@@ -202,19 +202,19 @@ export default function RepositoryCard({
       className={cn(
         'relative overflow-hidden rounded-xl bg-card',
         isMaintenanceRunning
-          ? 'shadow-[0_0_0_1px_theme(colors.amber.500/40),0_4px_16px_theme(colors.black/20),0_2px_6px_theme(colors.amber.500/10)]'
+          ? 'shadow-[0_0_0_1px_theme(colors.border),0_4px_16px_theme(colors.black/20)] ring-1 ring-border'
           : 'shadow-[0_0_0_1px_theme(colors.border),0_2px_8px_theme(colors.black/7%)] dark:shadow-[0_0_0_1px_theme(colors.border),0_4px_16px_theme(colors.black/25%)]',
         'transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5',
         isMaintenanceRunning
-          ? 'hover:shadow-[0_0_0_1px_theme(colors.amber.500/55),0_8px_24px_theme(colors.black/28),0_4px_12px_theme(colors.amber.500/15)]'
-          : 'hover:shadow-[0_0_0_1px_theme(colors.emerald.600/30),0_8px_24px_theme(colors.black/12),0_2px_8px_theme(colors.emerald.600/8%)]'
+          ? 'hover:shadow-[0_0_0_1px_theme(colors.border),0_8px_24px_theme(colors.black/28)]'
+          : 'hover:shadow-[0_0_0_1px_theme(colors.border),0_8px_24px_theme(colors.black/12)]'
       )}
     >
       {/* Ambient glow when maintenance running */}
       {isMaintenanceRunning && (
         <div
           aria-hidden
-          className="pointer-events-none absolute -left-8 -top-8 h-24 w-40 animate-pulse rounded-full bg-amber-500/15 blur-3xl dark:bg-amber-500/18"
+          className="pointer-events-none absolute -left-8 -top-8 h-24 w-40 animate-pulse rounded-full bg-foreground/5 blur-3xl"
         />
       )}
 
@@ -243,8 +243,8 @@ export default function RepositoryCard({
                       className={cn(
                         'h-5 max-w-[140px] shrink truncate px-2 text-[0.64rem] font-bold sm:max-w-[170px]',
                         scheduleBadge.variant === 'warning'
-                          ? 'border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                          : 'border-emerald-500/25 bg-emerald-500/9 text-emerald-600 dark:text-emerald-400'
+                          ? 'border-border bg-muted text-muted-foreground'
+                          : 'border-border bg-muted text-muted-foreground'
                       )}
                     >
                       {scheduleBadge.label}
@@ -389,7 +389,7 @@ export default function RepositoryCard({
                         iconBtnBase,
                         checkJob
                           ? 'bg-primary/10 text-primary hover:bg-primary/18 hover:text-primary'
-                          : 'text-emerald-600/55 hover:bg-emerald-500/10 hover:text-emerald-600 dark:text-emerald-400/55 dark:hover:text-emerald-400'
+                          : 'text-muted-foreground/55 hover:bg-accent hover:text-foreground'
                       )}
                     >
                       {checkJob ? (
@@ -445,7 +445,7 @@ export default function RepositoryCard({
                         iconBtnBase,
                         pruneJob
                           ? 'bg-primary/10 text-primary hover:bg-primary/18 hover:text-primary'
-                          : 'text-amber-600/55 hover:bg-amber-500/10 hover:text-amber-600 dark:text-amber-400/55 dark:hover:text-amber-400'
+                          : 'text-muted-foreground/55 hover:bg-accent hover:text-foreground'
                       )}
                     >
                       {pruneJob ? (
@@ -474,7 +474,7 @@ export default function RepositoryCard({
                       disabled={isMaintenanceRunning}
                       className={cn(
                         iconBtnBase,
-                        'text-sky-500/55 hover:bg-sky-500/10 hover:text-sky-600 dark:text-sky-400/55 dark:hover:text-sky-400'
+                        'text-muted-foreground/55 hover:bg-accent hover:text-foreground'
                       )}
                     >
                       <FolderOpen size={16} />
@@ -521,7 +521,7 @@ export default function RepositoryCard({
                       onBackupNow()
                     }}
                     disabled={isMaintenanceRunning}
-                    className="h-7.5 shrink-0 bg-emerald-600 px-2 text-[0.78rem] text-white hover:bg-emerald-700 disabled:bg-muted disabled:text-muted-foreground sm:px-3"
+                    className="h-7.5 shrink-0 px-2 text-[0.78rem] disabled:bg-muted disabled:text-muted-foreground sm:px-3"
                   >
                     <Play size={13} />
                     <span className="hidden sm:inline">{t('repositoryCard.buttons.backupNow')}</span>
@@ -537,9 +537,9 @@ export default function RepositoryCard({
 
         {/* ── Running State Message ── */}
         {(checkJob?.progress_message || compactJob?.progress_message || elapsedTime) && (
-          <div className="mt-3 rounded-md border border-amber-500/22 bg-amber-500/7 px-3 py-2">
+          <div className="mt-3 rounded-md border border-border bg-muted/50 px-3 py-2">
             {(checkJob?.progress_message || compactJob?.progress_message) && (
-              <p className="block font-mono text-[0.72rem] text-amber-600 dark:text-amber-400">
+              <p className="block font-mono text-[0.72rem] text-foreground">
                 {checkJob?.progress_message || compactJob?.progress_message}
               </p>
             )}

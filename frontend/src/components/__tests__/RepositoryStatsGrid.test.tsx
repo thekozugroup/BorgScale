@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
+import { screen, renderWithProviders } from '../../test/test-utils'
 import RepositoryStatsGrid from '../RepositoryStatsGrid'
 
 describe('RepositoryStatsGrid', () => {
@@ -10,7 +10,7 @@ describe('RepositoryStatsGrid', () => {
   }
 
   it('renders all stat cards', () => {
-    render(<RepositoryStatsGrid stats={mockStats} archivesCount={10} />)
+    renderWithProviders(<RepositoryStatsGrid stats={mockStats} archivesCount={10} />)
 
     expect(screen.getByText('Total Archives')).toBeInTheDocument()
     expect(screen.getByText('Total Archive Size')).toBeInTheDocument()
@@ -19,26 +19,26 @@ describe('RepositoryStatsGrid', () => {
   })
 
   it('displays correct archives count', () => {
-    render(<RepositoryStatsGrid stats={mockStats} archivesCount={42} />)
+    renderWithProviders(<RepositoryStatsGrid stats={mockStats} archivesCount={42} />)
 
     expect(screen.getByText('42')).toBeInTheDocument()
   })
 
   it('formats deduplicated size correctly', () => {
-    render(<RepositoryStatsGrid stats={mockStats} archivesCount={10} />)
+    renderWithProviders(<RepositoryStatsGrid stats={mockStats} archivesCount={10} />)
 
     // 1 GB formatted
     expect(screen.getByText('1.00 GB')).toBeInTheDocument()
   })
 
   it('formats original size correctly', () => {
-    render(<RepositoryStatsGrid stats={mockStats} archivesCount={10} />)
+    renderWithProviders(<RepositoryStatsGrid stats={mockStats} archivesCount={10} />)
 
     expect(screen.getByText('5.00 GB')).toBeInTheDocument()
   })
 
   it('formats compressed size correctly', () => {
-    render(<RepositoryStatsGrid stats={mockStats} archivesCount={10} />)
+    renderWithProviders(<RepositoryStatsGrid stats={mockStats} archivesCount={10} />)
 
     expect(screen.getByText('2.00 GB')).toBeInTheDocument()
   })
@@ -50,7 +50,7 @@ describe('RepositoryStatsGrid', () => {
       deduplicated_size: 0,
     }
 
-    render(<RepositoryStatsGrid stats={zeroStats} archivesCount={0} />)
+    renderWithProviders(<RepositoryStatsGrid stats={zeroStats} archivesCount={0} />)
 
     expect(screen.getAllByText('0 B')).toHaveLength(3)
   })
@@ -62,13 +62,13 @@ describe('RepositoryStatsGrid', () => {
       deduplicated_size: 1024, // 1 KB
     }
 
-    render(<RepositoryStatsGrid stats={smallStats} archivesCount={1} />)
+    renderWithProviders(<RepositoryStatsGrid stats={smallStats} archivesCount={1} />)
 
     expect(screen.getByText('1.00 KB')).toBeInTheDocument()
   })
 
   it('shows number of files instead of compressed size for Borg 2', () => {
-    render(
+    renderWithProviders(
       <RepositoryStatsGrid
         stats={{ ...mockStats, total_files: 16 }}
         archivesCount={10}

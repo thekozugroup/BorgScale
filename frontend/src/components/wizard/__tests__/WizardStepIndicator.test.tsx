@@ -1,6 +1,6 @@
-import { render, screen, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+import { screen, act, renderWithProviders } from '../../../test/test-utils'
 import WizardStepIndicator from '../WizardStepIndicator'
 import { FolderOpen, Database, Shield, Settings, CheckCircle } from 'lucide-react'
 
@@ -43,7 +43,7 @@ describe('WizardStepIndicator', () => {
 
     describe('Rendering', () => {
       it('renders all step labels', () => {
-        render(<WizardStepIndicator steps={mockSteps} currentStep={0} />)
+        renderWithProviders(<WizardStepIndicator steps={mockSteps} currentStep={0} />)
 
         expect(screen.getByText('Location')).toBeInTheDocument()
         expect(screen.getByText('Source')).toBeInTheDocument()
@@ -53,7 +53,7 @@ describe('WizardStepIndicator', () => {
       })
 
       it('renders step numbers', () => {
-        render(<WizardStepIndicator steps={mockSteps} currentStep={0} />)
+        renderWithProviders(<WizardStepIndicator steps={mockSteps} currentStep={0} />)
 
         expect(screen.getByText('1.')).toBeInTheDocument()
         expect(screen.getByText('2.')).toBeInTheDocument()
@@ -64,7 +64,7 @@ describe('WizardStepIndicator', () => {
 
       it('renders with fewer steps', () => {
         const threeSteps = mockSteps.slice(0, 3)
-        render(<WizardStepIndicator steps={threeSteps} currentStep={0} />)
+        renderWithProviders(<WizardStepIndicator steps={threeSteps} currentStep={0} />)
 
         expect(screen.getByText('Location')).toBeInTheDocument()
         expect(screen.getByText('Source')).toBeInTheDocument()
@@ -79,7 +79,7 @@ describe('WizardStepIndicator', () => {
         const user = userEvent.setup()
         const onStepClick = vi.fn()
 
-        render(
+        renderWithProviders(
           <WizardStepIndicator steps={mockSteps} currentStep={0} onStepClick={onStepClick} />
         )
 
@@ -92,7 +92,7 @@ describe('WizardStepIndicator', () => {
         const user = userEvent.setup()
         const onStepClick = vi.fn()
 
-        render(
+        renderWithProviders(
           <WizardStepIndicator steps={mockSteps} currentStep={0} onStepClick={onStepClick} />
         )
 
@@ -110,7 +110,7 @@ describe('WizardStepIndicator', () => {
         const user = userEvent.setup()
         const onStepClick = vi.fn()
 
-        render(
+        renderWithProviders(
           <WizardStepIndicator steps={mockSteps} currentStep={0} onStepClick={onStepClick} />
         )
 
@@ -122,7 +122,7 @@ describe('WizardStepIndicator', () => {
         const user = userEvent.setup()
         const onStepClick = vi.fn()
 
-        render(
+        renderWithProviders(
           <WizardStepIndicator steps={mockSteps} currentStep={4} onStepClick={onStepClick} />
         )
 
@@ -133,19 +133,19 @@ describe('WizardStepIndicator', () => {
 
     describe('Theme Support', () => {
       it('renders in light mode', () => {
-        render(<WizardStepIndicator steps={mockSteps} currentStep={0} />)
+        renderWithProviders(<WizardStepIndicator steps={mockSteps} currentStep={0} />)
         expect(screen.getByText('Location')).toBeInTheDocument()
       })
 
       it('renders in dark mode', () => {
-        render(<WizardStepIndicator steps={mockSteps} currentStep={0} />)
+        renderWithProviders(<WizardStepIndicator steps={mockSteps} currentStep={0} />)
         expect(screen.getByText('Location')).toBeInTheDocument()
       })
     })
 
     describe('Current Step Highlighting', () => {
       it('highlights the current step', () => {
-        render(<WizardStepIndicator steps={mockSteps} currentStep={2} />)
+        renderWithProviders(<WizardStepIndicator steps={mockSteps} currentStep={2} />)
         expect(screen.getByText('Security')).toBeInTheDocument()
       })
     })
@@ -163,18 +163,18 @@ describe('WizardStepIndicator', () => {
     })
 
     it('shows "Step X / N" counter', () => {
-      render(<WizardStepIndicator steps={mockSteps} currentStep={1} />)
+      renderWithProviders(<WizardStepIndicator steps={mockSteps} currentStep={1} />)
       expect(screen.getByText('Step 2 / 5')).toBeInTheDocument()
     })
 
     it('shows the active step label', () => {
-      render(<WizardStepIndicator steps={mockSteps} currentStep={2} />)
+      renderWithProviders(<WizardStepIndicator steps={mockSteps} currentStep={2} />)
       // "Security" is the label for step index 2
       expect(screen.getByText('Security')).toBeInTheDocument()
     })
 
     it('does not show non-active step labels', () => {
-      render(<WizardStepIndicator steps={mockSteps} currentStep={2} />)
+      renderWithProviders(<WizardStepIndicator steps={mockSteps} currentStep={2} />)
       expect(screen.queryByText('Location')).not.toBeInTheDocument()
       expect(screen.queryByText('Source')).not.toBeInTheDocument()
       expect(screen.queryByText('Config')).not.toBeInTheDocument()
@@ -185,7 +185,7 @@ describe('WizardStepIndicator', () => {
       const user = userEvent.setup()
       const onStepClick = vi.fn()
 
-      render(
+      renderWithProviders(
         <WizardStepIndicator steps={mockSteps} currentStep={0} onStepClick={onStepClick} />
       )
 
@@ -194,7 +194,7 @@ describe('WizardStepIndicator', () => {
     })
 
     it('updates the step counter when currentStep changes', () => {
-      const { rerender } = render(<WizardStepIndicator steps={mockSteps} currentStep={0} />)
+      const { rerender } = renderWithProviders(<WizardStepIndicator steps={mockSteps} currentStep={0} />)
       expect(screen.getByText('Step 1 / 5')).toBeInTheDocument()
 
       act(() => {
@@ -205,7 +205,7 @@ describe('WizardStepIndicator', () => {
     })
 
     it('renders in dark mode', () => {
-      render(<WizardStepIndicator steps={mockSteps} currentStep={0} />)
+      renderWithProviders(<WizardStepIndicator steps={mockSteps} currentStep={0} />)
       expect(screen.getByText('Step 1 / 5')).toBeInTheDocument()
       expect(screen.getByText('Location')).toBeInTheDocument()
     })

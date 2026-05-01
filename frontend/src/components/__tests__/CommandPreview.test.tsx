@@ -1,11 +1,11 @@
-import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
+import { screen, renderWithProviders } from '../../test/test-utils'
 import CommandPreview from '../CommandPreview'
 
 describe('CommandPreview', () => {
   describe('Local source backups', () => {
     it('renders init and backup steps for create mode', () => {
-      render(
+      renderWithProviders(
         <CommandPreview
           mode="create"
           repositoryPath="/backups/repo"
@@ -25,7 +25,7 @@ describe('CommandPreview', () => {
     })
 
     it('renders borg2 init and backup commands for Borg 2 repositories', () => {
-      render(
+      renderWithProviders(
         <CommandPreview
           mode="create"
           borgVersion={2}
@@ -45,7 +45,7 @@ describe('CommandPreview', () => {
     })
 
     it('renders only backup step for import mode (no step number)', () => {
-      render(
+      renderWithProviders(
         <CommandPreview
           mode="import"
           repositoryPath="/backups/repo"
@@ -63,7 +63,7 @@ describe('CommandPreview', () => {
     })
 
     it('does not show backup step for observe mode', () => {
-      render(
+      renderWithProviders(
         <CommandPreview
           mode="create"
           repositoryPath="/backups/repo"
@@ -78,7 +78,7 @@ describe('CommandPreview', () => {
     })
 
     it('handles SSH repository type correctly', () => {
-      render(
+      renderWithProviders(
         <CommandPreview
           mode="create"
           repositoryPath="/backups/repo"
@@ -99,7 +99,7 @@ describe('CommandPreview', () => {
     })
 
     it('includes remote-path flag when specified', () => {
-      render(
+      renderWithProviders(
         <CommandPreview
           mode="create"
           repositoryPath="/backups/repo"
@@ -125,7 +125,7 @@ describe('CommandPreview', () => {
     }
 
     it('renders all steps for create mode with remote source', () => {
-      render(
+      renderWithProviders(
         <CommandPreview
           mode="create"
           repositoryPath="/local/backups"
@@ -148,7 +148,7 @@ describe('CommandPreview', () => {
     })
 
     it('renders mount, backup, cleanup steps for import mode with remote source', () => {
-      render(
+      renderWithProviders(
         <CommandPreview
           mode="import"
           repositoryPath="/local/backups"
@@ -168,7 +168,7 @@ describe('CommandPreview', () => {
     })
 
     it('extracts basename from source directory for borg command', () => {
-      render(
+      renderWithProviders(
         <CommandPreview
           mode="import"
           repositoryPath="/backups"
@@ -192,7 +192,7 @@ describe('CommandPreview', () => {
         port: 2222,
       }
 
-      render(
+      renderWithProviders(
         <CommandPreview
           mode="import"
           repositoryPath="/backups"
@@ -207,7 +207,7 @@ describe('CommandPreview', () => {
     })
 
     it('shows helpful descriptions for each step', () => {
-      render(
+      renderWithProviders(
         <CommandPreview
           mode="import"
           repositoryPath="/backups"
@@ -226,7 +226,7 @@ describe('CommandPreview', () => {
     })
 
     it('resolves dot paths against the SSH connection default path', () => {
-      render(
+      renderWithProviders(
         <CommandPreview
           mode="import"
           repositoryPath="/backups"
@@ -247,7 +247,7 @@ describe('CommandPreview', () => {
     })
 
     it('does not apply ssh path prefix in the preview for remote SSHFS sources', () => {
-      render(
+      renderWithProviders(
         <CommandPreview
           mode="import"
           repositoryPath="/backups"
@@ -269,7 +269,7 @@ describe('CommandPreview', () => {
 
   describe('Edge cases', () => {
     it('renders backup-only mode without workflow steps', () => {
-      render(
+      renderWithProviders(
         <CommandPreview
           mode="import"
           displayMode="backup-only"
@@ -287,7 +287,7 @@ describe('CommandPreview', () => {
     })
 
     it('uses default source path when none provided', () => {
-      render(
+      renderWithProviders(
         <CommandPreview
           mode="create"
           repositoryPath="/backups"
@@ -302,7 +302,7 @@ describe('CommandPreview', () => {
     })
 
     it('uses default repository path when none provided', () => {
-      render(
+      renderWithProviders(
         <CommandPreview
           mode="create"
           repositoryPath=""
@@ -319,7 +319,7 @@ describe('CommandPreview', () => {
     })
 
     it('handles remote source without SSH connection gracefully', () => {
-      render(
+      renderWithProviders(
         <CommandPreview
           mode="import"
           repositoryPath="/backups"

@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
-import { Box, IconButton, MenuItem, Select, Typography } from '@mui/material'
 import { History, Info, RefreshCw } from 'lucide-react'
 import { activityAPI } from '../services/api'
 import { useAnalytics } from '../hooks/useAnalytics'
@@ -19,10 +18,10 @@ interface ActivityItem {
   log_file_path: string | null
   archive_name: string | null
   package_name: string | null
-  repository_path: string | null // Full repository path
-  triggered_by?: string // 'manual' or 'schedule'
+  repository_path: string | null
+  triggered_by?: string
   schedule_id?: number | null
-  schedule_name?: string | null // Schedule name if triggered by schedule
+  schedule_name?: string | null
   has_logs?: boolean
 }
 
@@ -34,7 +33,6 @@ const Activity: React.FC = () => {
   const [typeFilter, setTypeFilter] = useState<string>('all')
   const [statusFilter, setStatusFilter] = useState<string>('all')
 
-  // Fetch activity data
   const {
     data: activities,
     isLoading,
@@ -45,96 +43,78 @@ const Activity: React.FC = () => {
       const params: Record<string, unknown> = { limit: 200 }
       if (typeFilter !== 'all') params.job_type = typeFilter
       if (statusFilter !== 'all') params.status = statusFilter
-
       const response = await activityAPI.list(params)
       return response.data
     },
-    refetchInterval: 3000, // Refresh every 3 seconds
+    refetchInterval: 3000,
   })
 
   const handleTypeFilterChange = (value: string) => {
     setTypeFilter(value)
-    track(EventCategory.NAVIGATION, EventAction.FILTER, {
-      filter_kind: 'type',
-      filter_value: value,
-    })
+    track(EventCategory.NAVIGATION, EventAction.FILTER, { filter_kind: 'type', filter_value: value })
   }
 
   const handleStatusFilterChange = (value: string) => {
     setStatusFilter(value)
-    track(EventCategory.NAVIGATION, EventAction.FILTER, {
-      filter_kind: 'status',
-      filter_value: value,
-    })
+    track(EventCategory.NAVIGATION, EventAction.FILTER, { filter_kind: 'status', filter_value: value })
   }
 
-  // Just return all activities without grouping
   const processedActivities = React.useMemo(() => {
     if (!activities) return { grouped: [], individual: [] }
     return { grouped: [], individual: activities }
   }, [activities])
 
+  const selectClass = "rounded-xl border border-input bg-background h-8 px-2 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-ring min-w-[140px]"
+
   return (
-    <Box>
+    <div>
       {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          justifyContent: 'space-between',
-          alignItems: { xs: 'flex-start', sm: 'center' },
-          gap: 2,
-          mb: 3,
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <History size={32} />
-          <Box>
-            <Typography variant="h4">{t('activity.title')}</Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t('activity.subtitle')}
-            </Typography>
-          </Box>
-        </Box>
-        <IconButton
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+        <div className="flex items-center gap-3">
+          <History size={28} className="flex-shrink-0" />
+          <div>
+            <p className="text-2xl font-bold">{t('activity.title')}</p>
+            <p className="text-sm text-muted-foreground">{t('activity.subtitle')}</p>
+          </div>
+        </div>
+        <button
+          type="button"
           onClick={() => refetch()}
           title="Refresh"
-          sx={{ alignSelf: { xs: 'flex-end', sm: 'auto' } }}
+          className="self-end sm:self-auto flex items-center justify-center w-9 h-9 rounded-xl border border-border hover:bg-muted/40 transition-colors"
         >
-          <RefreshCw size={20} />
-        </IconButton>
-      </Box>
+          <RefreshCw size={18} />
+        </button>
+      </div>
 
       {/* Filters */}
-      <Box sx={{ mb: 3, display: 'flex', flexWrap: 'wrap', gap: 1.5, alignItems: 'center' }}>
-        <Select
-          size="small"
+      <div className="flex flex-wrap gap-3 items-center mb-6">
+        <select
           value={typeFilter}
           onChange={(e) => handleTypeFilterChange(e.target.value)}
-          sx={{ minWidth: 160, fontSize: '0.8rem', fontWeight: 600, borderRadius: 1.5 }}
+          className={selectClass}
         >
-          <MenuItem value="all">{t('activity.filters.allTypes')}</MenuItem>
-          <MenuItem value="backup">{t('activity.filters.types.backup')}</MenuItem>
-          <MenuItem value="restore">{t('activity.filters.types.restore')}</MenuItem>
-          <MenuItem value="check">{t('activity.filters.types.check')}</MenuItem>
-          <MenuItem value="compact">{t('activity.filters.types.compact')}</MenuItem>
-          <MenuItem value="prune">{t('activity.filters.types.prune')}</MenuItem>
-          <MenuItem value="package">{t('activity.filters.types.package')}</MenuItem>
-        </Select>
+          <option value="all">{t('activity.filters.allTypes')}</option>
+          <option value="backup">{t('activity.filters.types.backup')}</option>
+          <option value="restore">{t('activity.filters.types.restore')}</option>
+          <option value="check">{t('activity.filters.types.check')}</option>
+          <option value="compact">{t('activity.filters.types.compact')}</option>
+          <option value="prune">{t('activity.filters.types.prune')}</option>
+          <option value="package">{t('activity.filters.types.package')}</option>
+        </select>
 
-        <Select
-          size="small"
+        <select
           value={statusFilter}
           onChange={(e) => handleStatusFilterChange(e.target.value)}
-          sx={{ minWidth: 140, fontSize: '0.8rem', fontWeight: 600, borderRadius: 1.5 }}
+          className={selectClass}
         >
-          <MenuItem value="all">{t('activity.filters.allStatus')}</MenuItem>
-          <MenuItem value="completed">{t('activity.filters.statuses.completed')}</MenuItem>
-          <MenuItem value="failed">{t('activity.filters.statuses.failed')}</MenuItem>
-          <MenuItem value="running">{t('activity.filters.statuses.running')}</MenuItem>
-          <MenuItem value="pending">{t('activity.filters.statuses.pending')}</MenuItem>
-        </Select>
-      </Box>
+          <option value="all">{t('activity.filters.allStatus')}</option>
+          <option value="completed">{t('activity.filters.statuses.completed')}</option>
+          <option value="failed">{t('activity.filters.statuses.failed')}</option>
+          <option value="running">{t('activity.filters.statuses.running')}</option>
+          <option value="pending">{t('activity.filters.statuses.pending')}</option>
+        </select>
+      </div>
 
       {/* Activity List */}
       {isLoading ? (
@@ -143,13 +123,7 @@ const Activity: React.FC = () => {
           showTypeColumn={true}
           showTriggerColumn={true}
           loading={true}
-          actions={{
-            viewLogs: true,
-            downloadLogs: true,
-            errorInfo: true,
-            breakLock: true,
-            delete: true,
-          }}
+          actions={{ viewLogs: true, downloadLogs: true, errorInfo: true, breakLock: true, delete: true }}
           canBreakLocks={canManageActivityJobs}
           canDeleteJobs={canManageActivityJobs}
           getRowKey={(activity) => `${activity.type}-${activity.id}`}
@@ -163,13 +137,7 @@ const Activity: React.FC = () => {
           showTypeColumn={true}
           showTriggerColumn={true}
           loading={false}
-          actions={{
-            viewLogs: true,
-            downloadLogs: true,
-            errorInfo: true,
-            breakLock: true,
-            delete: true,
-          }}
+          actions={{ viewLogs: true, downloadLogs: true, errorInfo: true, breakLock: true, delete: true }}
           canBreakLocks={canManageActivityJobs}
           canDeleteJobs={canManageActivityJobs}
           getRowKey={(activity) => `${activity.type}-${activity.id}`}
@@ -183,7 +151,7 @@ const Activity: React.FC = () => {
           }}
         />
       )}
-    </Box>
+    </div>
   )
 }
 

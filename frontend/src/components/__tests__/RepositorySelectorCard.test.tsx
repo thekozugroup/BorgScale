@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
+import { screen, fireEvent, renderWithProviders } from '../../test/test-utils'
 import RepositorySelectorCard from '../RepositorySelectorCard'
 
 describe('RepositorySelectorCard', () => {
@@ -10,7 +10,7 @@ describe('RepositorySelectorCard', () => {
   ]
 
   it('renders with title and icon', () => {
-    render(
+    renderWithProviders(
       <RepositorySelectorCard repositories={mockRepositories} value={null} onChange={vi.fn()} />
     )
 
@@ -19,46 +19,45 @@ describe('RepositorySelectorCard', () => {
   })
 
   it('renders all repositories in dropdown', () => {
-    render(
+    renderWithProviders(
       <RepositorySelectorCard repositories={mockRepositories} value={null} onChange={vi.fn()} />
     )
 
-    // Open dropdown
+    // Open dropdown using pointerDown (required for Radix Select)
     const select = screen.getByRole('combobox')
-    fireEvent.mouseDown(select)
+    fireEvent.pointerDown(select, { button: 0, pointerType: 'mouse' })
 
     // Check all repositories are present
-    expect(screen.getByText('Repo 1')).toBeInTheDocument()
-    expect(screen.getByText('Repo 2')).toBeInTheDocument()
-    expect(screen.getByText('Repo 3')).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: /Repo 1/ })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: /Repo 2/ })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: /Repo 3/ })).toBeInTheDocument()
   })
 
   it('shows selected repository', () => {
-    render(<RepositorySelectorCard repositories={mockRepositories} value={2} onChange={vi.fn()} />)
+    renderWithProviders(<RepositorySelectorCard repositories={mockRepositories} value={2} onChange={vi.fn()} />)
 
-    // MUI Select renders the value in a native input with class MuiSelect-nativeInput
-    const nativeInput = document.querySelector('.MuiSelect-nativeInput') as HTMLInputElement
-    expect(nativeInput).toHaveValue('2')
+    // Radix Select shows selected value as text in the trigger
+    expect(screen.getByText('Repo 2')).toBeInTheDocument()
   })
 
   it('calls onRepositoryChange when selection changes', () => {
     const handleChange = vi.fn()
-    render(
+    renderWithProviders(
       <RepositorySelectorCard repositories={mockRepositories} value={1} onChange={handleChange} />
     )
 
     // Open dropdown
     const select = screen.getByRole('combobox')
-    fireEvent.mouseDown(select)
+    fireEvent.pointerDown(select, { button: 0, pointerType: 'mouse' })
 
     // Select different repository
-    fireEvent.click(screen.getByText('Repo 3'))
+    fireEvent.click(screen.getByRole('option', { name: /Repo 3/ }))
 
     expect(handleChange).toHaveBeenCalledWith(3)
   })
 
   it('disables select when loading', () => {
-    render(
+    renderWithProviders(
       <RepositorySelectorCard
         repositories={mockRepositories}
         value={null}
@@ -67,29 +66,26 @@ describe('RepositorySelectorCard', () => {
       />
     )
 
-    // MUI Select renders a hidden input that carries the disabled state
-    const hiddenInput = document.querySelector('input[aria-hidden="true"]') as HTMLInputElement
-    expect(hiddenInput).toBeDisabled()
+    // shadcn Select trigger button is disabled when loading
+    expect(screen.getByRole('combobox')).toBeDisabled()
   })
 
   it('shows loading message when loading', () => {
-    const { container } = render(
+    renderWithProviders(
       <RepositorySelectorCard repositories={[]} value={null} onChange={vi.fn()} loading={true} />
     )
 
-    // The loading message is in a MenuItem, but since select is disabled, we can't open it
-    // Instead, verify the select is disabled which indicates loading state
-    const hiddenInput = container.querySelector('input[aria-hidden="true"]') as HTMLInputElement
-    expect(hiddenInput).toBeDisabled()
+    // The loading state disables the select
+    expect(screen.getByRole('combobox')).toBeDisabled()
   })
 
   it('shows empty message when no repositories', () => {
-    render(<RepositorySelectorCard repositories={[]} value={null} onChange={vi.fn()} />)
+    renderWithProviders(<RepositorySelectorCard repositories={[]} value={null} onChange={vi.fn()} />)
 
     // Open dropdown
     const select = screen.getByRole('combobox')
-    fireEvent.mouseDown(select)
+    fireEvent.pointerDown(select, { button: 0, pointerType: 'mouse' })
 
-    expect(screen.getByText('Select a repository...')).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: /Select a repository/ })).toBeInTheDocument()
   })
 })

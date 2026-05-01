@@ -52,11 +52,11 @@ export default function RepoSelect({
   className,
 }: RepoSelectProps) {
   const selectedRepo =
-    value && value !== ''
+    value && value !== '' && value !== '__placeholder__'
       ? repositories.find((r) => (valueKey === 'id' ? r.id === Number(value) : r.path === value))
       : null
 
-  const strValue = value !== null && value !== undefined && value !== '' ? String(value) : ''
+  const strValue = value !== null && value !== undefined && value !== '' ? String(value) : '__placeholder__'
 
   const renderSelectedValue = () => {
     if (loading) {
@@ -104,6 +104,7 @@ export default function RepoSelect({
       <Select
         value={strValue}
         onValueChange={(val) => {
+          if (val === '__placeholder__') return
           if (valueKey === 'id') {
             onChange(Number(val))
           } else {
@@ -120,7 +121,7 @@ export default function RepoSelect({
         <SelectContent>
           {prefixItems}
           {!prefixItems && (
-            <SelectItem value="" disabled>
+            <SelectItem value="__placeholder__" disabled>
               {loading ? loadingLabel : placeholderLabel}
             </SelectItem>
           )}

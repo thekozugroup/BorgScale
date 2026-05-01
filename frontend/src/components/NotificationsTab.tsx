@@ -493,7 +493,7 @@ const NotificationsTab: React.FC = () => {
               </p>
             </div>
 
-            <div className="rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3 text-sm text-blue-900 dark:text-blue-200">
+            <div className="rounded-lg bg-muted/40 border border-border p-3 text-sm text-muted-foreground">
               <strong>{t('notifications.form.tipLabel')}</strong>{' '}
               {t('notifications.form.tipText')}
             </div>

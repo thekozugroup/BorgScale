@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { screen, fireEvent, renderWithProviders } from '../../test/test-utils'
 import ArchiveCard from '../ArchiveCard'
 
 describe('ArchiveCard', () => {
@@ -23,7 +23,7 @@ describe('ArchiveCard', () => {
   })
 
   it('renders archive name and date', () => {
-    render(<ArchiveCard archive={mockArchive} {...mockHandlers} />)
+    renderWithProviders(<ArchiveCard archive={mockArchive} {...mockHandlers} />)
 
     expect(screen.getByText('backup-2024-01-15')).toBeInTheDocument()
     // Date formatting is locale-dependent, just check it's rendered (archive name + at least one date)
@@ -31,7 +31,7 @@ describe('ArchiveCard', () => {
   })
 
   it('renders all action buttons', () => {
-    render(<ArchiveCard archive={mockArchive} {...mockHandlers} />)
+    renderWithProviders(<ArchiveCard archive={mockArchive} {...mockHandlers} />)
 
     expect(screen.getByRole('button', { name: /view/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /restore/i })).toBeInTheDocument()
@@ -41,7 +41,7 @@ describe('ArchiveCard', () => {
   })
 
   it('calls onView when View button is clicked', () => {
-    render(<ArchiveCard archive={mockArchive} {...mockHandlers} />)
+    renderWithProviders(<ArchiveCard archive={mockArchive} {...mockHandlers} />)
 
     fireEvent.click(screen.getByRole('button', { name: /view/i }))
 
@@ -50,7 +50,7 @@ describe('ArchiveCard', () => {
   })
 
   it('calls onRestore when Restore button is clicked', () => {
-    render(<ArchiveCard archive={mockArchive} {...mockHandlers} />)
+    renderWithProviders(<ArchiveCard archive={mockArchive} {...mockHandlers} />)
 
     fireEvent.click(screen.getByRole('button', { name: /restore/i }))
 
@@ -59,7 +59,7 @@ describe('ArchiveCard', () => {
   })
 
   it('calls onMount when Mount button is clicked', () => {
-    render(<ArchiveCard archive={mockArchive} {...mockHandlers} />)
+    renderWithProviders(<ArchiveCard archive={mockArchive} {...mockHandlers} />)
 
     fireEvent.click(screen.getByRole('button', { name: /mount/i }))
 
@@ -68,7 +68,7 @@ describe('ArchiveCard', () => {
   })
 
   it('calls onDelete with archive name when delete button is clicked', () => {
-    render(<ArchiveCard archive={mockArchive} {...mockHandlers} />)
+    renderWithProviders(<ArchiveCard archive={mockArchive} {...mockHandlers} />)
 
     const deleteButton = screen.getByRole('button', { name: /delete/i })
     fireEvent.click(deleteButton)
@@ -78,14 +78,14 @@ describe('ArchiveCard', () => {
   })
 
   it('disables Mount button when mountDisabled is true', () => {
-    render(<ArchiveCard archive={mockArchive} {...mockHandlers} mountDisabled={true} />)
+    renderWithProviders(<ArchiveCard archive={mockArchive} {...mockHandlers} mountDisabled={true} />)
 
     const mountButton = screen.getByRole('button', { name: /mount/i })
     expect(mountButton).toBeDisabled()
   })
 
   it('enables Mount button when mountDisabled is false', () => {
-    render(<ArchiveCard archive={mockArchive} {...mockHandlers} mountDisabled={false} />)
+    renderWithProviders(<ArchiveCard archive={mockArchive} {...mockHandlers} mountDisabled={false} />)
 
     const mountButton = screen.getByRole('button', { name: /mount/i })
     expect(mountButton).not.toBeDisabled()
@@ -93,7 +93,7 @@ describe('ArchiveCard', () => {
 
   describe('canDelete prop', () => {
     it('hides delete button when canDelete is false', () => {
-      render(<ArchiveCard archive={mockArchive} {...mockHandlers} canDelete={false} />)
+      renderWithProviders(<ArchiveCard archive={mockArchive} {...mockHandlers} canDelete={false} />)
 
       // View, Restore, Mount remain — delete icon button is gone
       expect(screen.getByRole('button', { name: /view/i })).toBeInTheDocument()
@@ -103,23 +103,24 @@ describe('ArchiveCard', () => {
     })
 
     it('shows delete button when canDelete is true', () => {
-      render(<ArchiveCard archive={mockArchive} {...mockHandlers} canDelete={true} />)
+      renderWithProviders(<ArchiveCard archive={mockArchive} {...mockHandlers} canDelete={true} />)
 
       expect(screen.getAllByRole('button')).toHaveLength(4)
     })
 
     it('shows delete button by default', () => {
-      render(<ArchiveCard archive={mockArchive} {...mockHandlers} />)
+      renderWithProviders(<ArchiveCard archive={mockArchive} {...mockHandlers} />)
 
       expect(screen.getAllByRole('button')).toHaveLength(4)
     })
   })
 
   it('has hover effect styling', () => {
-    const { container } = render(<ArchiveCard archive={mockArchive} {...mockHandlers} />)
+    const { container } = renderWithProviders(<ArchiveCard archive={mockArchive} {...mockHandlers} />)
 
     // Row uses a transition class for hover effect
-    const card = container.firstChild as HTMLElement
+    const card = container.querySelector('[class*="transition"]') as HTMLElement
+    expect(card).toBeInTheDocument()
     expect(card.className).toMatch(/transition/)
   })
 })

@@ -139,10 +139,10 @@ export default function RepositoryInfoDialog({
                   {/* Repository Details Cards */}
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                     {/* Encryption */}
-                    <div className="rounded-lg border bg-purple-50/60 p-3.5 dark:bg-purple-950/20">
+                    <div className="rounded-lg border bg-muted/40 p-3.5">
                       <div className="mb-2 flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
-                          <Lock size={20} className="text-purple-700 dark:text-purple-400" />
+                          <Lock size={20} className="text-muted-foreground" />
                           <span className="text-sm font-medium text-muted-foreground">
                             {t('dialogs.repositoryInfo.encryption')}
                           </span>
@@ -156,8 +156,8 @@ export default function RepositoryInfoDialog({
                                 aria-label={t('dialogs.repositoryInfo.exportKeyfileTooltip')}
                                 className={cn(
                                   'inline-flex size-7.5 items-center justify-center rounded-md',
-                                  'bg-purple-700 text-white transition-transform',
-                                  'hover:scale-110 hover:bg-purple-900 dark:bg-purple-600 dark:hover:bg-purple-800'
+                                  'bg-primary text-primary-foreground transition-transform',
+                                  'hover:scale-110 hover:bg-primary/90'
                                 )}
                               >
                                 <Download size={14} />
@@ -169,20 +169,20 @@ export default function RepositoryInfoDialog({
                           </Tooltip>
                         )}
                       </div>
-                      <p className="ml-8 text-base font-bold text-purple-700 dark:text-purple-400">
+                      <p className="ml-8 text-base font-bold text-foreground">
                         {displayRepositoryInfo.encryption?.mode || 'N/A'}
                       </p>
                     </div>
 
                     {/* Last Modified */}
-                    <div className="rounded-lg border bg-sky-50/60 p-3.5 dark:bg-sky-950/20">
+                    <div className="rounded-lg border bg-muted/40 p-3.5">
                       <div className="mb-2 flex items-center gap-2.5">
-                        <Calendar size={20} className="text-sky-700 dark:text-sky-400" />
+                        <Calendar size={20} className="text-muted-foreground" />
                         <span className="text-sm font-medium text-muted-foreground">
                           {t('dialogs.repositoryInfo.lastModified')}
                         </span>
                       </div>
-                      <p className="ml-8 text-sm font-semibold text-sky-700 dark:text-sky-400">
+                      <p className="ml-8 text-sm font-semibold text-foreground">
                         {displayRepositoryInfo.repository?.last_modified
                           ? formatDateShort(displayRepositoryInfo.repository.last_modified)
                           : 'N/A'}
@@ -207,8 +207,8 @@ export default function RepositoryInfoDialog({
                     (displayRepositoryInfo.cache.stats.total_size ?? 0) > 0 ? (
                     <RepositoryStatsV1 stats={displayRepositoryInfo.cache.stats} />
                   ) : (
-                    <div className="flex items-start gap-3 rounded-lg border border-blue-500/20 bg-blue-50/50 p-4 dark:bg-blue-950/20">
-                      <Info size={18} className="mt-0.5 shrink-0 text-blue-600 dark:text-blue-400" />
+                    <div className="flex items-start gap-3 rounded-lg border border-border bg-muted/40 p-4">
+                      <Info size={18} className="mt-0.5 shrink-0 text-muted-foreground" />
                       <div>
                         <p className="text-sm font-semibold text-foreground">
                           {t('dialogs.repositoryInfo.noBackupsYet')}

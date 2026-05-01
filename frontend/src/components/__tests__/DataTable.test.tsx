@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { fireEvent, screen, renderWithProviders } from '../../test/test-utils'
 import { describe, it, expect, vi } from 'vitest'
 import DataTable, { Column, ActionButton } from '../DataTable'
 
@@ -24,7 +24,7 @@ const mockColumns: Column<TestData>[] = [
 
 describe('DataTable', () => {
   it('renders loading state correctly', () => {
-    render(<DataTable data={[]} columns={mockColumns} getRowKey={(row) => row.id} loading={true} />)
+    renderWithProviders(<DataTable data={[]} columns={mockColumns} getRowKey={(row) => row.id} loading={true} />)
     expect(screen.getByRole('table')).toBeInTheDocument()
     expect(screen.getAllByText('Name').length).toBeGreaterThan(0)
   })
@@ -36,7 +36,7 @@ describe('DataTable', () => {
       description: 'Please add some data',
     }
 
-    render(
+    renderWithProviders(
       <DataTable
         data={[]}
         columns={mockColumns}
@@ -51,7 +51,7 @@ describe('DataTable', () => {
   })
 
   it('renders table headers and data rows correctly', () => {
-    render(<DataTable data={mockData} columns={mockColumns} getRowKey={(row) => row.id} />)
+    renderWithProviders(<DataTable data={mockData} columns={mockColumns} getRowKey={(row) => row.id} />)
 
     // Check headers
     expect(screen.getByText('Name')).toBeInTheDocument()
@@ -74,14 +74,14 @@ describe('DataTable', () => {
       },
     ]
 
-    render(<DataTable data={mockData} columns={customColumns} getRowKey={(row) => row.id} />)
+    renderWithProviders(<DataTable data={mockData} columns={customColumns} getRowKey={(row) => row.id} />)
 
     expect(screen.getByText('Edit John Doe')).toBeInTheDocument()
   })
 
   it('handles row clicks', () => {
     const handleRowClick = vi.fn()
-    render(
+    renderWithProviders(
       <DataTable
         data={mockData}
         columns={mockColumns}
@@ -113,7 +113,7 @@ describe('DataTable', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <DataTable
         data={mockData}
         columns={mockColumns}
@@ -144,7 +144,7 @@ describe('DataTable', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <DataTable
         data={mockData}
         columns={mockColumns}

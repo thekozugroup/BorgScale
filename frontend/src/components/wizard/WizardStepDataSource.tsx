@@ -107,7 +107,7 @@ export default function WizardStepDataSource({
           </div>
           <p className="text-xs text-muted-foreground">{t('wizard.dataSource.localDescription')}</p>
           {hasRemoteDirs && (
-            <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {t('wizard.dataSource.removeRemoteDirsFirst')}
             </p>
           )}
@@ -149,7 +149,7 @@ export default function WizardStepDataSource({
                 : t('wizard.dataSource.remoteDescription')}
             </p>
             {hasLocalDirs && !isRemoteToRemoteDisabled && (
-              <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {t('wizard.dataSource.removeLocalDirsFirst')}
               </p>
             )}
@@ -221,7 +221,7 @@ export default function WizardStepDataSource({
                             </div>
                           </div>
                           {conn.status === 'connected' && (
-                            <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
+                            <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
                           )}
                         </div>
                       </SelectItem>

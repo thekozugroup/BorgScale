@@ -1,31 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Alert,
-  Box,
-  Button,
-  Chip,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Radio,
-  RadioGroup,
-  Select,
-  Typography,
-  Tooltip,
-} from '@mui/material'
-
-type OnFailureMode = 'fail' | 'continue' | 'skip'
-import {
   Trash2,
   FileCode,
   Clock,
@@ -34,12 +9,19 @@ import {
   Play,
   CheckCircle,
   XCircle,
+  Loader2,
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import api from '../services/api'
 import { translateBackendKey } from '../utils/translateBackendKey'
 import ScriptParameterInputs, { ScriptParameter } from './ScriptParameterInputs'
 import { useAnalytics } from '../hooks/useAnalytics'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
+
+type OnFailureMode = 'fail' | 'continue' | 'skip'
 
 interface Script {
   id: number
@@ -75,6 +57,13 @@ interface RepositoryScriptsTabProps {
   onScriptsChange?: (hasScripts: boolean) => void
   hasInlineScript?: boolean
   onClearInlineScript?: () => void
+}
+
+const RUN_ON_BADGE: Record<string, string> = {
+  success: 'bg-primary/10 text-primary border-primary/20',
+  failure: 'bg-destructive/10 text-destructive border-destructive/20',
+  warning: 'bg-muted text-muted-foreground border-border',
+  always: 'bg-secondary text-secondary-foreground border-border',
 }
 
 export default function RepositoryScriptsTab({
@@ -153,7 +142,6 @@ export default function RepositoryScriptsTab({
     try {
       const nextOrder = Math.max(0, ...scripts.map((s) => s.execution_order)) + 1
 
-      // Clear inline script if this is the first library script being added
       if (scripts.length === 0 && hasInlineScript && onClearInlineScript) {
         onClearInlineScript()
       }
@@ -172,7 +160,6 @@ export default function RepositoryScriptsTab({
       fetchAssignedScripts()
       setAddDialogOpen(false)
       setSelectedScriptId('')
-      if (onUpdate) onUpdate()
       if (onUpdate) onUpdate()
       const addedScript = availableScripts.find((s) => s.id === selectedScriptId)
       trackScripts(EventAction.CREATE, addedScript?.name, {
@@ -281,22 +268,14 @@ export default function RepositoryScriptsTab({
 
   const areParametersOutOfSync = (script: RepositoryScript): boolean => {
     if (!script.parameters || script.parameters.length === 0) return false
-
     const paramValues = script.parameter_values || {}
     const scriptParams = script.parameters
-
-    // Check if all required parameters have values
     const missingRequired = scriptParams.some((p) => p.required && !paramValues[p.name])
     if (missingRequired) return true
-
-    // Check if stored values have parameters that no longer exist in script
     const currentParamNames = new Set(scriptParams.map((p) => p.name))
-    const hasOrphanedParams = Object.keys(paramValues).some((key) => !currentParamNames.has(key))
-
-    return hasOrphanedParams
+    return Object.keys(paramValues).some((key) => !currentParamNames.has(key))
   }
 
-  // Expose function to parent to open dialog - MUST be before any conditional returns (Rules of Hooks)
   React.useLayoutEffect(() => {
     const key = `openScriptDialog_${repositoryId}_${hookType}`
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -307,193 +286,135 @@ export default function RepositoryScriptsTab({
     }
   }, [repositoryId, hookType])
 
-  const getRunOnColor = (runOn: string) => {
-    switch (runOn) {
-      case 'success':
-        return 'success'
-      case 'failure':
-        return 'error'
-      case 'warning':
-        return 'warning'
-      case 'always':
-        return 'info'
-      default:
-        return 'default'
-    }
-  }
-
   const renderScriptList = () => {
-    if (scripts.length === 0) {
-      return null
-    }
+    if (scripts.length === 0) return null
 
     return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+      <div className="flex flex-col gap-1">
         {scripts.map((script) => {
           const effectiveTimeout = script.custom_timeout || script.default_timeout
           const effectiveRunOn = script.custom_run_on || script.default_run_on
           const effectiveSkipOnFailure = script.skip_on_failure === true
-          // Default to true if not set (migration fallback / new default)
           const effectiveContinueOnError =
             !effectiveSkipOnFailure &&
             (script.continue_on_error !== null ? script.continue_on_error : true)
-
           const isPreBackup = hookType === 'pre-backup'
 
           return (
-            <Box
+            <div
               key={script.id}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                p: 0.75,
-                border: 1,
-                borderColor: 'divider',
-                borderRadius: 1,
-                bgcolor: 'background.paper',
-                '&:hover': {
-                  bgcolor: 'action.hover',
-                },
-              }}
+              className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg border border-border bg-background hover:bg-muted/30 transition-colors duration-150 flex-wrap"
             >
-              {/* Script Icon & Name */}
-              <FileCode size={16} style={{ flexShrink: 0, opacity: 0.6 }} />
-              <Typography variant="body2" sx={{ fontWeight: 500, minWidth: 0, flex: 1 }}>
-                {script.script_name}
-              </Typography>
+              <FileCode size={14} className="flex-shrink-0 opacity-60" />
+              <p className="text-sm font-medium flex-1 min-w-0 truncate">{script.script_name}</p>
 
               {/* Badges */}
-              <Chip
-                label={`#${script.execution_order}`}
-                size="small"
-                sx={{ height: 20, fontSize: '0.7rem' }}
-              />
+              <span className="inline-flex items-center px-1.5 py-0 rounded text-[0.65rem] font-semibold bg-muted text-muted-foreground border border-border" style={{ height: 18 }}>
+                #{script.execution_order}
+              </span>
               {script.parameters && script.parameters.length > 0 && (
-                <Tooltip
-                  title={t('repositoryScripts.parametersConfigured', {
-                    count: script.parameters.length,
-                  })}
-                >
-                  <Chip
-                    label={`${script.parameters.length} param${script.parameters.length > 1 ? 's' : ''}`}
-                    size="small"
-                    color="info"
-                    variant="outlined"
-                    sx={{ height: 20, fontSize: '0.7rem' }}
-                  />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="inline-flex items-center px-1.5 rounded text-[0.65rem] font-semibold bg-muted text-muted-foreground border border-border cursor-default" style={{ height: 18 }}>
+                      {script.parameters.length} param{script.parameters.length > 1 ? 's' : ''}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {t('repositoryScripts.parametersConfigured', { count: script.parameters.length })}
+                  </TooltipContent>
                 </Tooltip>
               )}
               {areParametersOutOfSync(script) && (
-                <Tooltip title={t('repositoryScripts.tooltips.parametersOutOfSync')}>
-                  <Chip
-                    icon={<AlertTriangle size={12} />}
-                    label={t('repositoryScripts.chips.outOfSync')}
-                    size="small"
-                    color="warning"
-                    sx={{ height: 20, fontSize: '0.7rem' }}
-                  />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="inline-flex items-center gap-0.5 px-1.5 rounded text-[0.65rem] font-semibold bg-muted text-muted-foreground border border-border cursor-default" style={{ height: 18 }}>
+                      <AlertTriangle size={10} />
+                      {t('repositoryScripts.chips.outOfSync')}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>{t('repositoryScripts.tooltips.parametersOutOfSync')}</TooltipContent>
                 </Tooltip>
               )}
               {!isPreBackup && (
-                <Chip
-                  label={effectiveRunOn}
-                  size="small"
-                  color={
-                    getRunOnColor(effectiveRunOn) as
-                      | 'success'
-                      | 'error'
-                      | 'warning'
-                      | 'info'
-                      | 'default'
-                  }
-                  sx={{ height: 20, fontSize: '0.7rem' }}
-                />
+                <span className={cn('inline-flex items-center px-1.5 rounded text-[0.65rem] font-semibold border cursor-default', RUN_ON_BADGE[effectiveRunOn] ?? 'bg-muted text-muted-foreground border-border')} style={{ height: 18 }}>
+                  {effectiveRunOn}
+                </span>
               )}
               {isPreBackup && effectiveSkipOnFailure && (
-                <Chip
-                  label={t('repositoryScripts.chips.skipsGracefully')}
-                  size="small"
-                  color="info"
-                  variant="outlined"
-                  sx={{ height: 20, fontSize: '0.7rem' }}
-                />
+                <span className="inline-flex items-center px-1.5 rounded text-[0.65rem] font-semibold bg-muted text-muted-foreground border border-border" style={{ height: 18 }}>
+                  {t('repositoryScripts.chips.skipsGracefully')}
+                </span>
               )}
               {isPreBackup && effectiveContinueOnError && (
-                <Chip
-                  label={t('repositoryScripts.chips.continuesOnError')}
-                  size="small"
-                  color="warning"
-                  variant="outlined"
-                  sx={{ height: 20, fontSize: '0.7rem' }}
-                />
+                <span className="inline-flex items-center px-1.5 rounded text-[0.65rem] font-semibold bg-muted text-muted-foreground border border-border" style={{ height: 18 }}>
+                  {t('repositoryScripts.chips.continuesOnError')}
+                </span>
               )}
 
-              {/* Timeout */}
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <Clock size={12} style={{ opacity: 0.6 }} />
-                <Typography variant="caption" color="text.secondary">
-                  {effectiveTimeout}s
-                </Typography>
-              </Box>
+              <div className="flex items-center gap-0.5 text-muted-foreground">
+                <Clock size={11} className="opacity-60" />
+                <span className="text-xs">{effectiveTimeout}s</span>
+              </div>
 
               {/* Actions */}
-              <Box sx={{ display: 'flex', gap: 0.25, ml: 'auto' }}>
-                <Tooltip title={t('repositoryScripts.tooltips.testScript', 'Test run this script')}>
-                  <IconButton
-                    size="small"
-                    onClick={() => handleTestScript(script)}
-                    color="success"
-                    sx={{ p: 0.5 }}
-                  >
-                    <Play size={16} />
-                  </IconButton>
+              <div className="flex gap-0.5 ml-auto">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={() => handleTestScript(script)}
+                      className="flex items-center justify-center w-6 h-6 rounded text-muted-foreground/60 hover:text-foreground hover:bg-accent transition-colors"
+                    >
+                      <Play size={14} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>{t('repositoryScripts.tooltips.testScript', 'Test run this script')}</TooltipContent>
                 </Tooltip>
                 {script.parameters && script.parameters.length > 0 && (
-                  <Tooltip title={t('repositoryScripts.tooltips.configureParameters')}>
-                    <IconButton
-                      size="small"
-                      onClick={() => setEditParametersDialog({ open: true, script })}
-                      color="primary"
-                      sx={{ p: 0.5 }}
-                    >
-                      <Settings size={16} />
-                    </IconButton>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => setEditParametersDialog({ open: true, script })}
+                        className="flex items-center justify-center w-6 h-6 rounded text-muted-foreground/60 hover:text-foreground hover:bg-accent transition-colors"
+                      >
+                        <Settings size={14} />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>{t('repositoryScripts.tooltips.configureParameters')}</TooltipContent>
                   </Tooltip>
                 )}
-                <Tooltip title={t('repositoryScripts.tooltips.remove')}>
-                  <IconButton
-                    size="small"
-                    onClick={() => handleRemoveScript(script.id)}
-                    color="error"
-                    sx={{ p: 0.5 }}
-                  >
-                    <Trash2 size={16} />
-                  </IconButton>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveScript(script.id)}
+                      className="flex items-center justify-center w-6 h-6 rounded text-destructive/60 hover:text-destructive hover:bg-destructive/10 transition-colors"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>{t('repositoryScripts.tooltips.remove')}</TooltipContent>
                 </Tooltip>
-              </Box>
-            </Box>
+              </div>
+            </div>
           )
         })}
-      </Box>
+      </div>
     )
   }
 
   if (loading) {
-    return <Typography>{t('repositoryScriptsTab.loading')}</Typography>
+    return <p className="text-sm text-muted-foreground">{t('repositoryScriptsTab.loading')}</p>
   }
 
   return (
-    <Box>
+    <div>
       {renderScriptList()}
 
-      {/* Add Script Dialog */}
       <RepositoryScriptDialog
         open={addDialogOpen}
-        onClose={() => {
-          setAddDialogOpen(false)
-          setSelectedScriptId('')
-        }}
+        onClose={() => { setAddDialogOpen(false); setSelectedScriptId('') }}
         availableScripts={availableScripts}
         selectedScriptId={selectedScriptId}
         onScriptSelect={setSelectedScriptId}
@@ -503,7 +424,6 @@ export default function RepositoryScriptsTab({
         hasInlineScript={hasInlineScript}
       />
 
-      {/* Edit Parameters Dialog */}
       {editParametersDialog.script && (
         <EditParametersDialog
           open={editParametersDialog.open}
@@ -516,7 +436,6 @@ export default function RepositoryScriptsTab({
         />
       )}
 
-      {/* Test Run Dialog */}
       <ScriptTestDialog
         open={testDialog.open}
         onClose={() => setTestDialog({ open: false, script: null, running: false, result: null })}
@@ -524,7 +443,7 @@ export default function RepositoryScriptsTab({
         running={testDialog.running}
         result={testDialog.result}
       />
-    </Box>
+    </div>
   )
 }
 
@@ -546,6 +465,12 @@ interface RepositoryScriptDialogProps {
   hasInlineScript?: boolean
 }
 
+const FAILURE_MODE_OPTIONS: { value: OnFailureMode; labelKey: string }[] = [
+  { value: 'fail', labelKey: 'scriptEditor.onFailureFail' },
+  { value: 'continue', labelKey: 'scriptEditor.onFailureContinue' },
+  { value: 'skip', labelKey: 'scriptEditor.onFailureSkip' },
+]
+
 function RepositoryScriptDialog({
   open,
   onClose,
@@ -562,16 +487,12 @@ function RepositoryScriptDialog({
   const [parameterValues, setParameterValues] = useState<Record<string, string>>({})
   const isPreBackup = hookType === 'pre-backup'
 
-  // Get selected script details
   const selectedScript = availableScripts.find((s) => s.id === selectedScriptId)
-
-  // Check if selected script has parameters
   const hasParameters =
     selectedScript?.parameters &&
     Array.isArray(selectedScript.parameters) &&
     selectedScript.parameters.length > 0
 
-  // Reset local state when dialog opens/closes
   useEffect(() => {
     if (open) {
       setOnFailureMode('fail')
@@ -579,7 +500,6 @@ function RepositoryScriptDialog({
     }
   }, [open])
 
-  // Debug: log selected script and parameters
   useEffect(() => {
     if (selectedScript) {
       console.log('Selected script:', selectedScript.name, 'Parameters:', selectedScript.parameters)
@@ -595,94 +515,73 @@ function RepositoryScriptDialog({
   }
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{t('repositoryScripts.dialog.assignTitle')}</DialogTitle>
-      <DialogContent>
-        <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>{t('repositoryScripts.dialog.assignTitle')}</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-4 pt-2">
           {isPreBackup && hasInlineScript && scriptsCount === 0 && (
-            <Alert severity="warning">
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm border border-border bg-muted/40 text-muted-foreground">
+              <AlertTriangle size={15} className="flex-shrink-0 mt-0.5" />
               Adding a library script will replace your current inline script for this hook.
-            </Alert>
+            </div>
           )}
-          <FormControl fullWidth>
-            <InputLabel>{t('repositoryScripts.dialog.selectScriptLabel')}</InputLabel>
-            <Select
-              value={selectedScriptId}
-              label={t('repositoryScripts.dialog.selectScriptLabel')}
-              onChange={(e) => onScriptSelect(e.target.value as number)}
-              renderValue={(value) => {
-                const s = availableScripts.find((sc) => sc.id === value)
-                return s ? s.name : ''
-              }}
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 400,
-                  },
-                },
-              }}
-            >
-              {availableScripts.map((script) => (
-                <MenuItem key={script.id} value={script.id}>
-                  <Box>
-                    <Typography variant="body2">{script.name}</Typography>
-                    {script.description && (
-                      <Typography variant="caption" color="text.secondary" display="block">
-                        {script.description}
-                      </Typography>
-                    )}
-                  </Box>
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
 
-          {/* Show parameters if selected script has them */}
+          <div>
+            <p className="text-xs font-semibold mb-1.5">{t('repositoryScripts.dialog.selectScriptLabel')}</p>
+            <select
+              value={selectedScriptId}
+              onChange={(e) => onScriptSelect(Number(e.target.value))}
+              className="w-full rounded-md border border-input bg-background px-3 h-9 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="">— {t('repositoryScripts.dialog.selectScriptLabel')} —</option>
+              {availableScripts.map((script) => (
+                <option key={script.id} value={script.id}>
+                  {script.name}{script.description ? ` — ${script.description}` : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {hasParameters && (
-            <Box sx={{ pt: 1 }}>
-              <ScriptParameterInputs
-                parameters={selectedScript.parameters!}
-                values={parameterValues}
-                onChange={setParameterValues}
-              />
-            </Box>
+            <ScriptParameterInputs
+              parameters={selectedScript.parameters!}
+              values={parameterValues}
+              onChange={setParameterValues}
+            />
           )}
 
           {isPreBackup && (
-            <FormControl sx={{ ml: 1 }}>
-              <FormLabel sx={{ fontSize: '0.875rem' }}>
-                {t('repositoryScripts.dialog.onFailureLabel')}
-              </FormLabel>
-              <RadioGroup
-                value={onFailureMode}
-                onChange={(e) => setOnFailureMode(e.target.value as OnFailureMode)}
-              >
-                <FormControlLabel
-                  value="fail"
-                  control={<Radio size="small" />}
-                  label={t('scriptEditor.onFailureFail')}
-                />
-                <FormControlLabel
-                  value="continue"
-                  control={<Radio size="small" />}
-                  label={t('scriptEditor.onFailureContinue')}
-                />
-                <FormControlLabel
-                  value="skip"
-                  control={<Radio size="small" />}
-                  label={t('scriptEditor.onFailureSkip')}
-                />
-              </RadioGroup>
-            </FormControl>
+            <div>
+              <p className="text-xs font-semibold mb-2">{t('repositoryScripts.dialog.onFailureLabel')}</p>
+              <div className="flex flex-col gap-1.5">
+                {FAILURE_MODE_OPTIONS.map((opt) => (
+                  <label key={opt.value} className="flex items-center gap-2 cursor-pointer text-sm">
+                    <input
+                      type="radio"
+                      name="onFailureMode_assign"
+                      value={opt.value}
+                      checked={onFailureMode === opt.value}
+                      onChange={() => setOnFailureMode(opt.value)}
+                    />
+                    {t(opt.labelKey)}
+                  </label>
+                ))}
+              </div>
+            </div>
           )}
-        </Box>
+
+          <div className="flex items-center justify-end gap-2 pt-1">
+            <Button variant="outline" size="sm" onClick={onClose}>
+              {t('repositoryScripts.dialog.cancel')}
+            </Button>
+            <Button size="sm" onClick={handleSubmit} disabled={!selectedScriptId}>
+              {t('repositoryScripts.dialog.assignScript')}
+            </Button>
+          </div>
+        </div>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>{t('repositoryScripts.dialog.cancel')}</Button>
-        <Button onClick={handleSubmit} variant="contained" disabled={!selectedScriptId}>
-          {t('repositoryScripts.dialog.assignScript')}
-        </Button>
-      </DialogActions>
     </Dialog>
   )
 }
@@ -706,7 +605,6 @@ function EditParametersDialog({
   const [parameterValues, setParameterValues] = useState<Record<string, string>>({})
   const [onFailureMode, setOnFailureMode] = useState<OnFailureMode>('fail')
 
-  // Initialize values when dialog opens
   useEffect(() => {
     if (open) {
       setParameterValues(script.parameter_values ? { ...script.parameter_values } : {})
@@ -716,17 +614,15 @@ function EditParametersDialog({
     }
   }, [open, script])
 
-  const handleSubmit = () => {
-    onSubmit(parameterValues, onFailureMode)
-  }
-
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>
-        {t('repositoryScripts.parametersDialog.title', { scriptName: script.script_name })}
-      </DialogTitle>
-      <DialogContent>
-        <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>
+            {t('repositoryScripts.parametersDialog.title', { scriptName: script.script_name })}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-4 pt-2">
           {script.parameters && script.parameters.length > 0 ? (
             <ScriptParameterInputs
               parameters={script.parameters}
@@ -734,43 +630,41 @@ function EditParametersDialog({
               onChange={setParameterValues}
             />
           ) : (
-            <Alert severity="info">{t('repositoryScripts.parametersDialog.noParameters')}</Alert>
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm border border-border bg-muted/40 text-muted-foreground">
+              {t('repositoryScripts.parametersDialog.noParameters')}
+            </div>
           )}
+
           {isPreBackup && (
-            <FormControl>
-              <FormLabel sx={{ fontSize: '0.875rem' }}>
-                {t('repositoryScripts.dialog.onFailureLabel')}
-              </FormLabel>
-              <RadioGroup
-                value={onFailureMode}
-                onChange={(e) => setOnFailureMode(e.target.value as OnFailureMode)}
-              >
-                <FormControlLabel
-                  value="fail"
-                  control={<Radio size="small" />}
-                  label={t('scriptEditor.onFailureFail')}
-                />
-                <FormControlLabel
-                  value="continue"
-                  control={<Radio size="small" />}
-                  label={t('scriptEditor.onFailureContinue')}
-                />
-                <FormControlLabel
-                  value="skip"
-                  control={<Radio size="small" />}
-                  label={t('scriptEditor.onFailureSkip')}
-                />
-              </RadioGroup>
-            </FormControl>
+            <div>
+              <p className="text-xs font-semibold mb-2">{t('repositoryScripts.dialog.onFailureLabel')}</p>
+              <div className="flex flex-col gap-1.5">
+                {FAILURE_MODE_OPTIONS.map((opt) => (
+                  <label key={opt.value} className="flex items-center gap-2 cursor-pointer text-sm">
+                    <input
+                      type="radio"
+                      name="onFailureMode_edit"
+                      value={opt.value}
+                      checked={onFailureMode === opt.value}
+                      onChange={() => setOnFailureMode(opt.value)}
+                    />
+                    {t(opt.labelKey)}
+                  </label>
+                ))}
+              </div>
+            </div>
           )}
-        </Box>
+
+          <div className="flex items-center justify-end gap-2 pt-1">
+            <Button variant="outline" size="sm" onClick={onClose}>
+              {t('repositoryScripts.parametersDialog.cancel')}
+            </Button>
+            <Button size="sm" onClick={() => onSubmit(parameterValues, onFailureMode)}>
+              {t('repositoryScripts.parametersDialog.saveParameters')}
+            </Button>
+          </div>
+        </div>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>{t('repositoryScripts.parametersDialog.cancel')}</Button>
-        <Button onClick={handleSubmit} variant="contained">
-          {t('repositoryScripts.parametersDialog.saveParameters')}
-        </Button>
-      </DialogActions>
     </Dialog>
   )
 }
@@ -793,105 +687,73 @@ function ScriptTestDialog({ open, onClose, scriptName, running, result }: Script
   const { t } = useTranslation()
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>
-        <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Typography variant="h6">Test: {scriptName}</Typography>
-          {running && <CircularProgress size={20} />}
-          {result && (
-            <Box display="flex" alignItems="center" gap={1}>
-              {result.success ? (
-                <CheckCircle size={20} color="#4caf50" />
-              ) : (
-                <XCircle size={20} color="#f44336" />
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <span>Test: {scriptName}</span>
+              {running && <Loader2 size={18} className="animate-spin text-muted-foreground" />}
+              {result && (
+                <div className="flex items-center gap-2">
+                  {result.success ? (
+                    <CheckCircle size={18} className="text-primary" />
+                  ) : (
+                    <XCircle size={18} className="text-destructive" />
+                  )}
+                  <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border', result.exit_code === 0 ? 'bg-primary/10 text-primary border-primary/20' : 'bg-destructive/10 text-destructive border-destructive/20')}>
+                    Exit: {result.exit_code}
+                  </span>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border border-border text-muted-foreground">
+                    {result.execution_time.toFixed(2)}s
+                  </span>
+                </div>
               )}
-              <Chip
-                label={`Exit: ${result.exit_code}`}
-                size="small"
-                color={result.exit_code === 0 ? 'success' : 'error'}
-              />
-              <Chip
-                label={`${result.execution_time.toFixed(2)}s`}
-                size="small"
-                variant="outlined"
-              />
-            </Box>
+            </div>
+          </DialogTitle>
+        </DialogHeader>
+        <div className="pt-2 border-t border-border flex flex-col gap-3">
+          {running && (
+            <div className="flex justify-center py-6">
+              <Loader2 size={28} className="animate-spin text-muted-foreground" />
+            </div>
           )}
-        </Box>
-      </DialogTitle>
-      <DialogContent dividers>
-        {running && (
-          <Box display="flex" justifyContent="center" py={4}>
-            <CircularProgress />
-          </Box>
-        )}
-        {result && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {result.stdout && (
-              <Box>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  display="block"
-                  sx={{ mb: 0.5 }}
-                >
-                  {t('scriptEditor.stdout')}
-                </Typography>
-                <Paper sx={{ p: 2, bgcolor: '#1e1e1e', maxHeight: 300, overflow: 'auto' }}>
-                  <Typography
-                    component="pre"
-                    sx={{
-                      m: 0,
-                      color: '#d4d4d4',
-                      fontFamily: 'monospace',
-                      fontSize: '0.875rem',
-                      whiteSpace: 'pre-wrap',
-                      wordBreak: 'break-word',
-                    }}
-                  >
-                    {result.stdout}
-                  </Typography>
-                </Paper>
-              </Box>
-            )}
-            {result.stderr && (
-              <Box>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  display="block"
-                  sx={{ mb: 0.5 }}
-                >
-                  {t('scriptEditor.stderr')}
-                </Typography>
-                <Paper sx={{ p: 2, bgcolor: '#1e1e1e', maxHeight: 200, overflow: 'auto' }}>
-                  <Typography
-                    component="pre"
-                    sx={{
-                      m: 0,
-                      color: '#f48771',
-                      fontFamily: 'monospace',
-                      fontSize: '0.875rem',
-                      whiteSpace: 'pre-wrap',
-                      wordBreak: 'break-word',
-                    }}
-                  >
-                    {result.stderr}
-                  </Typography>
-                </Paper>
-              </Box>
-            )}
-            {!result.stdout && !result.stderr && (
-              <Alert severity={result.success ? 'success' : 'error'}>
-                {result.success ? t('scriptEditor.testPassed') : t('scriptEditor.testFailed')}
-              </Alert>
-            )}
-          </Box>
-        )}
+          {result && (
+            <>
+              {result.stdout && (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">{t('scriptEditor.stdout')}</p>
+                  <div className="p-3 rounded-xl overflow-auto max-h-72 bg-neutral-900">
+                    <pre className="text-sm whitespace-pre-wrap break-words m-0 text-neutral-200 font-mono">
+                      {result.stdout}
+                    </pre>
+                  </div>
+                </div>
+              )}
+              {result.stderr && (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">{t('scriptEditor.stderr')}</p>
+                  <div className="p-3 rounded-xl overflow-auto max-h-48 bg-neutral-900">
+                    <pre className="text-sm whitespace-pre-wrap break-words m-0 text-destructive font-mono">
+                      {result.stderr}
+                    </pre>
+                  </div>
+                </div>
+              )}
+              {!result.stdout && !result.stderr && (
+                <div className={`p-3 rounded-xl text-sm border ${result.success ? 'border-primary/20 bg-primary/10 text-primary' : 'border-destructive/25 bg-destructive/10 text-destructive'}`}>
+                  {result.success ? t('scriptEditor.testPassed') : t('scriptEditor.testFailed')}
+                </div>
+              )}
+            </>
+          )}
+          <div className="flex justify-end pt-1">
+            <Button variant="outline" size="sm" onClick={onClose}>
+              {t('common.buttons.cancel')}
+            </Button>
+          </div>
+        </div>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>{t('common.buttons.cancel')}</Button>
-      </DialogActions>
     </Dialog>
   )
 }

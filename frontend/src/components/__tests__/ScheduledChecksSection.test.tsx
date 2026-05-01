@@ -1,9 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { waitFor } from '@testing-library/react'
 import { AxiosResponse } from 'axios'
 
 import ScheduledChecksSection from '../ScheduledChecksSection'
-import { renderWithProviders, screen } from '../../test/test-utils'
+import { renderWithProviders, screen, waitFor } from '../../test/test-utils'
 import { repositoriesAPI } from '@/services/api.ts'
 
 vi.mock('../../services/api', () => ({

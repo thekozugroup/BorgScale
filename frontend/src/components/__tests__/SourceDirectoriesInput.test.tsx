@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { screen, renderWithProviders } from '../../test/test-utils'
 import userEvent from '@testing-library/user-event'
 import SourceDirectoriesInput from '../SourceDirectoriesInput'
 
@@ -14,37 +14,37 @@ describe('SourceDirectoriesInput', () => {
 
   describe('Rendering', () => {
     it('renders title and description', () => {
-      render(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
+      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
       expect(screen.getByText('Source Directories & Files')).toBeInTheDocument()
       expect(screen.getByText(/Specify which directories or files to backup/)).toBeInTheDocument()
     })
 
     it('renders required asterisk when required=true', () => {
-      render(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} required={true} />)
+      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} required={true} />)
       expect(screen.getByText('*')).toBeInTheDocument()
       expect(screen.getByText(/at least one required/)).toBeInTheDocument()
     })
 
     it('does not render required asterisk when required=false', () => {
-      render(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} required={false} />)
+      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} required={false} />)
       expect(screen.queryByText('*')).not.toBeInTheDocument()
       expect(screen.getByText(/optional/)).toBeInTheDocument()
     })
 
     it('shows tooltip helper icon when required and no directories', () => {
-      render(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} required={true} />)
+      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} required={true} />)
       expect(screen.getByRole('button', { name: /source directories.*help/i })).toBeInTheDocument()
     })
 
     it('does not show tooltip helper icon when required=false and no directories', () => {
-      render(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} required={false} />)
+      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} required={false} />)
       expect(
         screen.queryByRole('button', { name: /source directories.*help/i })
       ).not.toBeInTheDocument()
     })
 
     it('still keeps the helper icon available when directories exist', () => {
-      render(
+      renderWithProviders(
         <SourceDirectoriesInput
           directories={['/home/user/docs']}
           onChange={mockOnChange}
@@ -56,25 +56,25 @@ describe('SourceDirectoriesInput', () => {
 
     it('renders existing directories', () => {
       const dirs = ['/home/user/docs', '/var/data']
-      render(<SourceDirectoriesInput directories={dirs} onChange={mockOnChange} />)
+      renderWithProviders(<SourceDirectoriesInput directories={dirs} onChange={mockOnChange} />)
       expect(screen.getByText('/home/user/docs')).toBeInTheDocument()
       expect(screen.getByText('/var/data')).toBeInTheDocument()
     })
 
     it('renders input field with placeholder', () => {
-      render(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
+      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
       expect(
         screen.getByPlaceholderText('/home/user/documents or /var/log/app.log')
       ).toBeInTheDocument()
     })
 
     it('renders Add button', () => {
-      render(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
+      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
       expect(screen.getByRole('button', { name: /Add/i })).toBeInTheDocument()
     })
 
     it('renders browse button when onBrowseClick provided', () => {
-      render(
+      renderWithProviders(
         <SourceDirectoriesInput
           directories={[]}
           onChange={mockOnChange}
@@ -85,7 +85,7 @@ describe('SourceDirectoriesInput', () => {
     })
 
     it('does not render browse button when onBrowseClick not provided', () => {
-      render(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
+      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
       expect(screen.queryByTitle('Browse directories and files')).not.toBeInTheDocument()
     })
   })
@@ -93,7 +93,7 @@ describe('SourceDirectoriesInput', () => {
   describe('Adding directories', () => {
     it('adds directory when clicking Add button', async () => {
       const user = userEvent.setup()
-      render(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
+      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
 
       const input = screen.getByPlaceholderText('/home/user/documents or /var/log/app.log')
       await user.type(input, '/new/directory')
@@ -104,7 +104,7 @@ describe('SourceDirectoriesInput', () => {
 
     it('adds directory when pressing Enter', async () => {
       const user = userEvent.setup()
-      render(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
+      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
 
       const input = screen.getByPlaceholderText('/home/user/documents or /var/log/app.log')
       await user.type(input, '/new/directory{enter}')
@@ -114,7 +114,7 @@ describe('SourceDirectoriesInput', () => {
 
     it('appends to existing directories', async () => {
       const user = userEvent.setup()
-      render(<SourceDirectoriesInput directories={['/existing/dir']} onChange={mockOnChange} />)
+      renderWithProviders(<SourceDirectoriesInput directories={['/existing/dir']} onChange={mockOnChange} />)
 
       const input = screen.getByPlaceholderText('/home/user/documents or /var/log/app.log')
       await user.type(input, '/new/directory')
@@ -125,7 +125,7 @@ describe('SourceDirectoriesInput', () => {
 
     it('trims whitespace from input', async () => {
       const user = userEvent.setup()
-      render(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
+      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
 
       const input = screen.getByPlaceholderText('/home/user/documents or /var/log/app.log')
       await user.type(input, '  /new/directory  ')
@@ -136,7 +136,7 @@ describe('SourceDirectoriesInput', () => {
 
     it('clears input after adding', async () => {
       const user = userEvent.setup()
-      render(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
+      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
 
       const input = screen.getByPlaceholderText('/home/user/documents or /var/log/app.log')
       await user.type(input, '/new/directory')
@@ -147,7 +147,7 @@ describe('SourceDirectoriesInput', () => {
 
     it('does not add empty directory', async () => {
       const user = userEvent.setup()
-      render(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
+      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
 
       await user.click(screen.getByRole('button', { name: /Add/i }))
 
@@ -156,7 +156,7 @@ describe('SourceDirectoriesInput', () => {
 
     it('does not add whitespace-only directory', async () => {
       const user = userEvent.setup()
-      render(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
+      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} />)
 
       const input = screen.getByPlaceholderText('/home/user/documents or /var/log/app.log')
       await user.type(input, '   ')
@@ -169,19 +169,15 @@ describe('SourceDirectoriesInput', () => {
   describe('Removing directories', () => {
     it('removes directory when clicking delete button', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <SourceDirectoriesInput
           directories={['/first/dir', '/second/dir', '/third/dir']}
           onChange={mockOnChange}
         />
       )
 
-      // Get all delete buttons (there should be 3)
-      const deleteButtons = screen.getAllByRole('button', { name: '' })
-      // Filter to only get the delete icon buttons (they have DeleteIcon)
-      const deleteIconButtons = deleteButtons.filter((btn) =>
-        btn.querySelector('svg[data-testid="DeleteIcon"]')
-      )
+      // Get all delete buttons by aria-label
+      const deleteIconButtons = screen.getAllByRole('button', { name: /^Remove / })
 
       // Click the second delete button (index 1)
       await user.click(deleteIconButtons[1])
@@ -191,17 +187,14 @@ describe('SourceDirectoriesInput', () => {
 
     it('removes first directory correctly', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <SourceDirectoriesInput
           directories={['/first/dir', '/second/dir']}
           onChange={mockOnChange}
         />
       )
 
-      const deleteButtons = screen.getAllByRole('button', { name: '' })
-      const deleteIconButtons = deleteButtons.filter((btn) =>
-        btn.querySelector('svg[data-testid="DeleteIcon"]')
-      )
+      const deleteIconButtons = screen.getAllByRole('button', { name: /^Remove / })
 
       await user.click(deleteIconButtons[0])
 
@@ -210,17 +203,14 @@ describe('SourceDirectoriesInput', () => {
 
     it('removes last directory correctly', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <SourceDirectoriesInput
           directories={['/first/dir', '/second/dir']}
           onChange={mockOnChange}
         />
       )
 
-      const deleteButtons = screen.getAllByRole('button', { name: '' })
-      const deleteIconButtons = deleteButtons.filter((btn) =>
-        btn.querySelector('svg[data-testid="DeleteIcon"]')
-      )
+      const deleteIconButtons = screen.getAllByRole('button', { name: /^Remove / })
 
       await user.click(deleteIconButtons[1])
 
@@ -231,7 +221,7 @@ describe('SourceDirectoriesInput', () => {
   describe('Browse functionality', () => {
     it('calls onBrowseClick when browse button clicked', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <SourceDirectoriesInput
           directories={[]}
           onChange={mockOnChange}
@@ -247,33 +237,29 @@ describe('SourceDirectoriesInput', () => {
 
   describe('Disabled state', () => {
     it('disables input when disabled=true', () => {
-      render(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} disabled={true} />)
+      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} disabled={true} />)
       expect(screen.getByPlaceholderText('/home/user/documents or /var/log/app.log')).toBeDisabled()
     })
 
     it('disables Add button when disabled=true', () => {
-      render(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} disabled={true} />)
+      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} disabled={true} />)
       expect(screen.getByRole('button', { name: /Add/i })).toBeDisabled()
     })
 
     it('disables delete buttons when disabled=true', () => {
-      render(
+      renderWithProviders(
         <SourceDirectoriesInput
           directories={['/some/dir']}
           onChange={mockOnChange}
           disabled={true}
         />
       )
-      const deleteButtons = screen.getAllByRole('button')
-      // The delete button should be disabled
-      const deleteBtn = deleteButtons.find((btn) =>
-        btn.querySelector('svg[data-testid="DeleteIcon"]')
-      )
+      const deleteBtn = screen.getByRole('button', { name: /^Remove / })
       expect(deleteBtn).toBeDisabled()
     })
 
     it('disables browse button when disabled=true', () => {
-      render(
+      renderWithProviders(
         <SourceDirectoriesInput
           directories={[]}
           onChange={mockOnChange}

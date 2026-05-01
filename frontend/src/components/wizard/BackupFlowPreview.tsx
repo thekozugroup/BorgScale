@@ -54,7 +54,7 @@ function FlowNode({
         )}
         {path && (
           <p
-            className="text-xs font-mono truncate leading-tight text-blue-600 dark:text-blue-400 opacity-85 cursor-default mt-0.5"
+            className="text-xs font-mono truncate leading-tight text-muted-foreground opacity-85 cursor-default mt-0.5"
             title={path}
           >
             {path}
@@ -69,16 +69,16 @@ function FlowNode({
 function Connector({ double = false }: { double?: boolean }) {
   return (
     <div className="flex items-center shrink-0 gap-0.5 px-1">
-      <div className="w-4 border-t-2 border-dashed border-blue-400/40" />
+      <div className="w-4 border-t-2 border-dashed border-border" />
       {double ? (
-        <div className="flex text-blue-500/70">
+        <div className="flex text-muted-foreground">
           <ArrowRight size={13} />
           <ArrowRight size={13} className="-ml-1.5" />
         </div>
       ) : (
-        <MoveRight size={14} className="text-blue-500/75" />
+        <MoveRight size={14} className="text-muted-foreground" />
       )}
-      <div className="w-4 border-t-2 border-dashed border-blue-400/40" />
+      <div className="w-4 border-t-2 border-dashed border-border" />
     </div>
   )
 }
@@ -129,13 +129,13 @@ export default function BackupFlowPreview({
       : undefined
 
   return (
-    <div className="rounded-lg bg-blue-50/50 dark:bg-blue-950/10 p-3 flex flex-col gap-3 overflow-hidden">
+    <div className="rounded-lg bg-muted/30 border border-border p-3 flex flex-col gap-3 overflow-hidden">
       {/* Summary header */}
       <div className="flex items-baseline gap-2 flex-wrap">
         <span className="text-[0.6rem] text-muted-foreground font-bold uppercase tracking-widest shrink-0">
           Backup Flow
         </span>
-        <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
+        <span className="text-xs font-medium text-foreground">
           {getSummaryText()}
         </span>
       </div>
@@ -147,8 +147,8 @@ export default function BackupFlowPreview({
           icon={getSourceIcon()}
           label={getSourceLabel()}
           subtitle={sourceSubtitle}
-          colorClass="bg-blue-500/20 text-blue-600 dark:text-blue-400"
-          bgClass="bg-blue-500/5 dark:bg-blue-500/10"
+          colorClass="bg-muted text-muted-foreground"
+          bgClass="bg-muted/40"
         />
 
         <Connector double={showSshfsIntermediate} />
@@ -159,8 +159,8 @@ export default function BackupFlowPreview({
             <FlowNode
               icon={<Server size={16} />}
               label={t('wizard.backupFlowPreview.viaSSHFS')}
-              colorClass="bg-amber-500/20 text-amber-600 dark:text-amber-400"
-              bgClass="bg-amber-500/5 dark:bg-amber-500/10"
+              colorClass="bg-muted text-muted-foreground"
+              bgClass="bg-muted/40"
             />
             <Connector />
           </>
@@ -171,8 +171,8 @@ export default function BackupFlowPreview({
           icon={getRepoIcon()}
           label={getRepoLabel()}
           path={repositoryPath || undefined}
-          colorClass="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-          bgClass="bg-emerald-500/5 dark:bg-emerald-500/10"
+          colorClass="bg-muted text-muted-foreground"
+          bgClass="bg-muted/40"
         />
       </div>
     </div>

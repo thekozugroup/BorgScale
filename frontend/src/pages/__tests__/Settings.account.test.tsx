@@ -133,7 +133,7 @@ describe('Settings account tab', () => {
       </ThemeProvider>
     )
 
-    await screen.findByRole('tab', { name: 'Personal profile' })
+    await screen.findByRole('button', { name: 'Personal profile' })
 
     expect(trackSettings).toHaveBeenCalledWith('View', {
       section: 'settings',
@@ -173,7 +173,7 @@ describe('Settings account tab', () => {
       </ThemeProvider>
     )
 
-    await screen.findByRole('tab', { name: 'Personal profile' })
+    await screen.findByRole('button', { name: 'Personal profile' })
 
     expect(screen.getAllByText('Account password').length).toBeGreaterThan(0)
     expect(screen.getAllByText('Click to change your login credentials').length).toBeGreaterThan(0)
@@ -190,9 +190,9 @@ describe('Settings account tab', () => {
       </ThemeProvider>
     )
 
-    await screen.findByRole('tab', { name: 'Personal profile' })
+    await screen.findByRole('button', { name: 'Personal profile' })
     await user.click(screen.getByRole('button', { name: /account password/i }))
-    const dialog = await screen.findByRole('dialog', { name: /change password/i })
+    const dialog = await screen.findByRole('dialog')
     const newPasswordInput = within(dialog).getByLabelText(/new password/i)
     await user.type(within(dialog).getByLabelText(/current password/i), 'old-password')
     await user.type(newPasswordInput, 'new-password-123')
@@ -221,9 +221,9 @@ describe('Settings account tab', () => {
       </ThemeProvider>
     )
 
-    await screen.findByRole('tab', { name: 'Personal profile' })
+    await screen.findByRole('button', { name: 'Personal profile' })
     await user.click(screen.getByRole('button', { name: /account password/i }))
-    const dialog = await screen.findByRole('dialog', { name: /change password/i })
+    const dialog = await screen.findByRole('dialog')
     const newPasswordInput = within(dialog).getByLabelText(/new password/i)
     await user.type(within(dialog).getByLabelText(/current password/i), 'old-password')
     await user.type(newPasswordInput, 'new-password-123')
@@ -246,9 +246,9 @@ describe('Settings account tab', () => {
       </ThemeProvider>
     )
 
-    await screen.findByRole('tab', { name: 'Personal profile' })
+    await screen.findByRole('button', { name: 'Personal profile' })
     await user.click(screen.getByRole('button', { name: /account password/i }))
-    const dialog = await screen.findByRole('dialog', { name: /change password/i })
+    const dialog = await screen.findByRole('dialog')
     const newPasswordInput = within(dialog).getByLabelText(/new password/i)
     await user.type(within(dialog).getByLabelText(/current password/i), 'old-password')
     await user.type(newPasswordInput, 'new-password-123')

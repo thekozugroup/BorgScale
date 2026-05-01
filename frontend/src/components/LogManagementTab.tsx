@@ -1,29 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  Box,
-  Typography,
-  Button,
-  Stack,
-  Alert,
-  FormControl,
-  FormControlLabel,
-  Radio,
-  RadioGroup,
-  TextField,
-  Slider,
-  Checkbox,
-  LinearProgress,
-  Divider,
-  CircularProgress,
-} from '@mui/material'
-import { Save, Trash2, AlertTriangle, HardDrive } from 'lucide-react'
+import { Save, Trash2, AlertTriangle, HardDrive, Loader2 } from 'lucide-react'
 import SettingsCard from './SettingsCard'
 import { toast } from 'react-hot-toast'
 import { settingsAPI } from '../services/api'
 import { translateBackendKey } from '../utils/translateBackendKey'
 import { useAnalytics } from '../hooks/useAnalytics'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 interface LogStorage {
   total_size_mb: number
@@ -48,14 +34,12 @@ const LogManagementTab: React.FC = () => {
   const queryClient = useQueryClient()
   const { trackSystem, EventAction } = useAnalytics()
 
-  // Local state for form values
   const [logSavePolicy, setLogSavePolicy] = useState('failed_and_warnings')
   const [retentionDays, setRetentionDays] = useState(30)
   const [maxTotalSizeMb, setMaxTotalSizeMb] = useState(500)
   const [cleanupOnStartup, setCleanupOnStartup] = useState(true)
   const [hasChanges, setHasChanges] = useState(false)
 
-  // Fetch system settings
   const { data: settingsData, isLoading: loadingSettings } = useQuery({
     queryKey: ['system-settings'],
     queryFn: async () => {
@@ -64,20 +48,18 @@ const LogManagementTab: React.FC = () => {
     },
   })
 
-  // Fetch log storage stats (refresh every 30s)
   const { data: logStorageData, isLoading: loadingStorage } = useQuery({
     queryKey: ['log-storage-stats'],
     queryFn: async () => {
       const response = await settingsAPI.getLogStorageStats()
       return response.data
     },
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 30000,
   })
 
   const logStorage: LogStorage | undefined = logStorageData?.storage || settingsData?.log_storage
   const settings: SystemSettings | undefined = settingsData?.settings
 
-  // Initialize form values from fetched settings
   useEffect(() => {
     if (settings) {
       setLogSavePolicy(settings.log_save_policy || 'failed_and_warnings')
@@ -88,7 +70,6 @@ const LogManagementTab: React.FC = () => {
     }
   }, [settings])
 
-  // Track form changes
   useEffect(() => {
     if (settings) {
       const changed =
@@ -100,7 +81,6 @@ const LogManagementTab: React.FC = () => {
     }
   }, [logSavePolicy, retentionDays, maxTotalSizeMb, cleanupOnStartup, settings])
 
-  // Save settings mutation
   const saveSettingsMutation = useMutation({
     mutationFn: async () => {
       const response = await settingsAPI.updateSystemSettings({
@@ -137,7 +117,6 @@ const LogManagementTab: React.FC = () => {
     },
   })
 
-  // Manual cleanup mutation
   const cleanupMutation = useMutation({
     mutationFn: async () => {
       const response = await settingsAPI.manualLogCleanup()
@@ -182,334 +161,294 @@ const LogManagementTab: React.FC = () => {
 
   if (loadingSettings) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-        <CircularProgress />
-      </Box>
+      <div className="flex justify-center items-center" style={{ minHeight: 400 }}>
+        <Loader2 size={28} className="animate-spin text-muted-foreground" />
+      </div>
     )
   }
 
   const usagePercent = logStorage?.usage_percent || 0
   const isHighUsage = usagePercent >= 80
+  const usageBarColor = isHighUsage ? '#f59e0b' : '#6366f1'
+
+  const radioOptions = [
+    {
+      value: 'failed_only',
+      label: 'Failed Jobs Only',
+      description: 'Save logs only for failed or cancelled jobs (minimal disk usage)',
+    },
+    {
+      value: 'failed_and_warnings',
+      label: 'Failed Jobs and Warnings (Recommended)',
+      description: 'Save logs for failed jobs and any job with warnings or errors',
+    },
+    {
+      value: 'all_jobs',
+      label: 'All Jobs',
+      description: 'Save logs for all jobs, including successful ones (maximum disk usage)',
+    },
+  ]
 
   return (
-    <Box>
-      {/* Header Section */}
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          justifyContent: 'space-between',
-          alignItems: { xs: 'stretch', sm: 'center' },
-          gap: 1.5,
-          mb: 3,
-        }}
-      >
-        <Box>
-          <Typography variant="h6" fontWeight={600}>
-            {t('logManagement.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
+    <div>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6">
+        <div>
+          <p className="text-lg font-semibold mb-1">{t('logManagement.title')}</p>
+          <p className="text-sm text-muted-foreground">
             Configure log storage, retention, and cleanup policies for job logs
-          </Typography>
-        </Box>
+          </p>
+        </div>
         <Button
-          variant="contained"
-          startIcon={
-            saveSettingsMutation.isPending ? <CircularProgress size={16} /> : <Save size={16} />
-          }
           onClick={handleSaveSettings}
           disabled={!hasChanges || saveSettingsMutation.isPending}
-          sx={{ width: { xs: '100%', sm: 'auto' } }}
+          className="w-full sm:w-auto gap-1.5"
         >
+          {saveSettingsMutation.isPending ? (
+            <Loader2 size={15} className="animate-spin" />
+          ) : (
+            <Save size={15} />
+          )}
           {saveSettingsMutation.isPending ? t('logManagement.saving') : t('logManagement.save')}
         </Button>
-      </Box>
+      </div>
 
-      <Stack spacing={3}>
+      <div className="flex flex-col gap-6">
         {/* Current Usage Card */}
         <SettingsCard>
-          <Stack spacing={3}>
-            <Box>
-              <Box display="flex" alignItems="center" gap={1} mb={1}>
-                <HardDrive size={20} />
-                <Typography variant="subtitle1" fontWeight={600}>
-                  Storage Usage
-                </Typography>
-              </Box>
-              <Typography variant="body2" color="text.secondary">
+          <div className="flex flex-col gap-5">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <HardDrive size={18} />
+                <p className="text-sm font-semibold">Storage Usage</p>
+              </div>
+              <p className="text-sm text-muted-foreground">
                 Current log storage utilization and statistics
-              </Typography>
-            </Box>
+              </p>
+            </div>
 
-            <Divider />
+            <div className="border-t border-border" />
 
             {loadingStorage ? (
-              <Box py={2}>
-                <LinearProgress />
-              </Box>
+              <div className="py-2">
+                <div className="h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-muted-foreground/30 rounded-full animate-pulse w-1/2" />
+                </div>
+              </div>
             ) : (
               <>
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' },
-                    gap: 3,
-                  }}
-                >
-                  <Box>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ textTransform: 'uppercase', fontWeight: 600 }}
-                    >
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
+                  <div>
+                    <p className="text-[0.65rem] font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                       Total Size
-                    </Typography>
-                    <Typography variant="h5" fontWeight={600} sx={{ mt: 0.5 }}>
-                      {logStorage?.total_size_mb || 0} MB
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ textTransform: 'uppercase', fontWeight: 600 }}
-                    >
+                    </p>
+                    <p className="text-2xl font-bold">{logStorage?.total_size_mb || 0} MB</p>
+                  </div>
+                  <div>
+                    <p className="text-[0.65rem] font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                       File Count
-                    </Typography>
-                    <Typography variant="h5" fontWeight={600} sx={{ mt: 0.5 }}>
-                      {logStorage?.file_count || 0}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ textTransform: 'uppercase', fontWeight: 600 }}
-                    >
+                    </p>
+                    <p className="text-2xl font-bold">{logStorage?.file_count || 0}</p>
+                  </div>
+                  <div>
+                    <p className="text-[0.65rem] font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                       Oldest Log
-                    </Typography>
-                    <Typography variant="body1" sx={{ mt: 0.5 }}>
-                      {formatDate(logStorage?.oldest_log_date || null)}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ textTransform: 'uppercase', fontWeight: 600 }}
-                    >
+                    </p>
+                    <p className="text-sm mt-1">{formatDate(logStorage?.oldest_log_date || null)}</p>
+                  </div>
+                  <div>
+                    <p className="text-[0.65rem] font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                       Newest Log
-                    </Typography>
-                    <Typography variant="body1" sx={{ mt: 0.5 }}>
-                      {formatDate(logStorage?.newest_log_date || null)}
-                    </Typography>
-                  </Box>
-                </Box>
+                    </p>
+                    <p className="text-sm mt-1">{formatDate(logStorage?.newest_log_date || null)}</p>
+                  </div>
+                </div>
 
-                <Box>
-                  <Box display="flex" justifyContent="space-between" mb={1}>
-                    <Typography variant="body2" fontWeight={600}>
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <p className="text-sm font-semibold">
                       {usagePercent}% of {logStorage?.limit_mb || 0} MB
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    </p>
+                    <p className="text-sm text-muted-foreground">
                       {Math.max(0, (logStorage?.limit_mb || 0) - (logStorage?.total_size_mb || 0))}{' '}
                       MB available
-                    </Typography>
-                  </Box>
-                  <LinearProgress
-                    variant="determinate"
-                    value={Math.min(usagePercent, 100)}
-                    color={isHighUsage ? 'warning' : 'primary'}
-                    sx={{ height: 8, borderRadius: 4 }}
-                  />
-                </Box>
+                    </p>
+                  </div>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-300"
+                      style={{
+                        width: `${Math.min(usagePercent, 100)}%`,
+                        background: usageBarColor,
+                      }}
+                    />
+                  </div>
+                </div>
 
                 {isHighUsage && (
-                  <Alert severity="warning" icon={<AlertTriangle size={20} />}>
-                    Log storage usage is at {usagePercent}%. Consider running cleanup or increasing
-                    the size limit.
-                  </Alert>
+                  <div
+                    className="flex items-start gap-2 p-3 rounded-xl text-sm"
+                    style={{
+                      background: 'rgba(245,158,11,0.1)',
+                      border: '1px solid rgba(245,158,11,0.25)',
+                      color: '#b45309',
+                    }}
+                  >
+                    <AlertTriangle size={16} className="flex-shrink-0 mt-0.5" />
+                    <span>
+                      Log storage usage is at {usagePercent}%. Consider running cleanup or
+                      increasing the size limit.
+                    </span>
+                  </div>
                 )}
 
-                <Box sx={{ pt: 1 }}>
+                <div>
                   <Button
-                    variant="outlined"
-                    color="error"
-                    startIcon={
-                      cleanupMutation.isPending ? (
-                        <CircularProgress size={16} />
-                      ) : (
-                        <Trash2 size={16} />
-                      )
-                    }
+                    variant="outline"
                     onClick={handleCleanup}
                     disabled={cleanupMutation.isPending}
+                    className="gap-1.5 text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
                   >
+                    {cleanupMutation.isPending ? (
+                      <Loader2 size={15} className="animate-spin" />
+                    ) : (
+                      <Trash2 size={15} />
+                    )}
                     {cleanupMutation.isPending
                       ? t('logManagement.clearing')
                       : t('logManagement.clearLogs')}
                   </Button>
-                </Box>
+                </div>
               </>
             )}
-          </Stack>
+          </div>
         </SettingsCard>
 
         {/* Log Storage Policy */}
         <SettingsCard>
-          <Stack spacing={3}>
-            <Box>
-              <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-                Log Storage Policy
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
+          <div className="flex flex-col gap-5">
+            <div>
+              <p className="text-sm font-semibold mb-1">Log Storage Policy</p>
+              <p className="text-sm text-muted-foreground">
                 Choose which job types should have their logs saved to disk
-              </Typography>
-            </Box>
+              </p>
+            </div>
 
-            <Divider />
+            <div className="border-t border-border" />
 
-            <FormControl component="fieldset">
-              <RadioGroup value={logSavePolicy} onChange={(e) => setLogSavePolicy(e.target.value)}>
-                <FormControlLabel
-                  value="failed_only"
-                  control={<Radio />}
-                  label={
-                    <Box sx={{ py: 1 }}>
-                      <Typography variant="body1" fontWeight={500}>
-                        Failed Jobs Only
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Save logs only for failed or cancelled jobs (minimal disk usage)
-                      </Typography>
-                    </Box>
-                  }
-                  sx={{ mb: 1, alignItems: 'flex-start', '.MuiRadio-root': { mt: 1.25 } }}
-                />
-                <FormControlLabel
-                  value="failed_and_warnings"
-                  control={<Radio />}
-                  label={
-                    <Box sx={{ py: 1 }}>
-                      <Typography variant="body1" fontWeight={500}>
-                        Failed Jobs and Warnings (Recommended)
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Save logs for failed jobs and any job with warnings or errors
-                      </Typography>
-                    </Box>
-                  }
-                  sx={{ mb: 1, alignItems: 'flex-start', '.MuiRadio-root': { mt: 1.25 } }}
-                />
-                <FormControlLabel
-                  value="all_jobs"
-                  control={<Radio />}
-                  label={
-                    <Box sx={{ py: 1 }}>
-                      <Typography variant="body1" fontWeight={500}>
-                        All Jobs
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Save logs for all jobs, including successful ones (maximum disk usage)
-                      </Typography>
-                    </Box>
-                  }
-                  sx={{ alignItems: 'flex-start', '.MuiRadio-root': { mt: 1.25 } }}
-                />
-              </RadioGroup>
-            </FormControl>
-          </Stack>
+            <div className="flex flex-col gap-3">
+              {radioOptions.map((opt) => (
+                <label
+                  key={opt.value}
+                  className="flex items-start gap-3 cursor-pointer"
+                  onClick={() => setLogSavePolicy(opt.value)}
+                >
+                  <input
+                    type="radio"
+                    name="logSavePolicy"
+                    value={opt.value}
+                    checked={logSavePolicy === opt.value}
+                    onChange={() => setLogSavePolicy(opt.value)}
+                    className="mt-1 flex-shrink-0"
+                  />
+                  <div className="py-1">
+                    <p className="text-sm font-medium">{opt.label}</p>
+                    <p className="text-sm text-muted-foreground">{opt.description}</p>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
         </SettingsCard>
 
         {/* Retention Settings */}
         <SettingsCard>
-          <Stack spacing={3}>
-            <Box>
-              <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-                Retention Settings
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
+          <div className="flex flex-col gap-5">
+            <div>
+              <p className="text-sm font-semibold mb-1">Retention Settings</p>
+              <p className="text-sm text-muted-foreground">
                 Configure how long logs are kept and maximum storage size
-              </Typography>
-            </Box>
+              </p>
+            </div>
 
-            <Divider />
+            <div className="border-t border-border" />
 
-            <Box>
-              <Typography variant="body2" fontWeight={600} gutterBottom>
+            <div>
+              <p className="text-sm font-semibold mb-3">
                 Log Retention Period: {retentionDays} days
-              </Typography>
-              <Box sx={{ px: 1, pt: 1 }}>
-                <Slider
-                  value={retentionDays}
-                  onChange={(_, value) => setRetentionDays(value as number)}
+              </p>
+              <div className="px-1 pt-1 pb-2">
+                <input
+                  type="range"
                   min={7}
                   max={90}
                   step={1}
-                  marks={[
-                    { value: 7, label: '7d' },
-                    { value: 30, label: '30d' },
-                    { value: 60, label: '60d' },
-                    { value: 90, label: '90d' },
-                  ]}
-                  valueLabelDisplay="auto"
+                  value={retentionDays}
+                  onChange={(e) => setRetentionDays(Number(e.target.value))}
+                  className="w-full accent-primary"
                 />
-              </Box>
-              <Typography variant="caption" color="text.secondary">
+                <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                  <span>7d</span>
+                  <span>30d</span>
+                  <span>60d</span>
+                  <span>90d</span>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
                 Logs older than this will be automatically deleted during cleanup
-              </Typography>
-            </Box>
+              </p>
+            </div>
 
-            <Box>
-              <TextField
-                label="Maximum Total Size (MB)"
+            <div>
+              <Label className="text-xs font-semibold mb-1.5 block">
+                Maximum Total Size (MB)
+              </Label>
+              <Input
                 type="number"
                 value={maxTotalSizeMb}
                 onChange={(e) => setMaxTotalSizeMb(Math.max(10, parseInt(e.target.value) || 10))}
-                inputProps={{ min: 10, max: 10000, step: 50 }}
-                fullWidth
-                helperText="Total size limit for all log files. Min: 10 MB, Max: 10,000 MB (10 GB)"
+                min={10}
+                max={10000}
+                step={50}
+                className="h-9 text-sm max-w-xs"
               />
-            </Box>
-          </Stack>
+              <p className="text-xs text-muted-foreground mt-1.5">
+                Total size limit for all log files. Min: 10 MB, Max: 10,000 MB (10 GB)
+              </p>
+            </div>
+          </div>
         </SettingsCard>
 
-        {/* Cleanup Options */}
+        {/* Automatic Cleanup */}
         <SettingsCard>
-          <Stack spacing={3}>
-            <Box>
-              <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-                Automatic Cleanup
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
+          <div className="flex flex-col gap-5">
+            <div>
+              <p className="text-sm font-semibold mb-1">Automatic Cleanup</p>
+              <p className="text-sm text-muted-foreground">
                 Configure when log cleanup runs automatically
-              </Typography>
-            </Box>
+              </p>
+            </div>
 
-            <Divider />
+            <div className="border-t border-border" />
 
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={cleanupOnStartup}
-                  onChange={(e) => setCleanupOnStartup(e.target.checked)}
-                />
-              }
-              label={
-                <Box>
-                  <Typography variant="body1" fontWeight={500}>
-                    Run cleanup on application startup
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Automatically clean old logs when the application starts
-                  </Typography>
-                </Box>
-              }
-            />
-          </Stack>
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={cleanupOnStartup}
+                onChange={(e) => setCleanupOnStartup(e.target.checked)}
+                className="mt-1 flex-shrink-0"
+              />
+              <div>
+                <p className="text-sm font-medium">Run cleanup on application startup</p>
+                <p className="text-sm text-muted-foreground">
+                  Automatically clean old logs when the application starts
+                </p>
+              </div>
+            </label>
+          </div>
         </SettingsCard>
-      </Stack>
-    </Box>
+      </div>
+    </div>
   )
 }
 

@@ -15,7 +15,9 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import EntityCard, { ActionItem, StatItem } from './EntityCard'
-import { Box, CircularProgress, Tooltip, useTheme, alpha } from '@mui/material'
+import { Loader2 } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { useTheme } from '../context/ThemeContext'
 import { formatDateShort } from '../utils/dateUtils'
 
 interface NotificationSetting {
@@ -81,8 +83,8 @@ export default function NotificationCard({
   isTesting = false,
 }: NotificationCardProps) {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
+  const { effectiveMode } = useTheme()
+  const isDark = effectiveMode === 'dark'
 
   const eventCount = [
     notification.notify_on_backup_start,
@@ -130,18 +132,18 @@ export default function NotificationCard({
 
   // Badge: plain icon only, no text, no border
   const badge = (
-    <Box
-      sx={{
+    <div
+      style={{
         display: 'flex',
         color: notification.enabled
-          ? theme.palette.success.main
+          ? '#059669'
           : isDark
-            ? alpha('#fff', 0.2)
-            : alpha('#000', 0.2),
+            ? 'rgba(255,255,255,0.2)'
+            : 'rgba(0,0,0,0.2)',
       }}
     >
       {notification.enabled ? <Bell size={16} /> : <BellOff size={16} />}
-    </Box>
+    </div>
   )
 
   // Event categories strip — 4 groups, each lit when any event in that category is on
@@ -201,55 +203,37 @@ export default function NotificationCard({
   const ACTIVE_COLOR = '#059669'
 
   const eventTags = (
-    <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
+    <div className="flex gap-1.5 flex-wrap">
       {categories.map((cat) => (
-        <Tooltip key={cat.label} title={`${cat.label}: ${cat.tooltip}`} arrow>
-          <Box
-            sx={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 0.4,
-              px: 0.75,
-              py: 0.3,
-              borderRadius: 1,
-              border: '1px solid',
-              cursor: 'default',
-              transition: 'all 150ms',
-              ...(cat.active
-                ? {
-                    borderColor: alpha(ACTIVE_COLOR, isDark ? 0.4 : 0.35),
-                    bgcolor: alpha(ACTIVE_COLOR, isDark ? 0.12 : 0.07),
-                    color: ACTIVE_COLOR,
-                  }
-                : {
-                    borderColor: isDark ? alpha('#fff', 0.08) : alpha('#000', 0.08),
-                    bgcolor: 'transparent',
-                    color: isDark ? alpha('#fff', 0.2) : alpha('#000', 0.2),
-                  }),
-            }}
-          >
-            {cat.icon}
-            <Box
-              component="span"
-              sx={{
-                fontSize: '0.62rem',
-                fontWeight: 600,
-                letterSpacing: '0.04em',
-                lineHeight: 1,
-                textTransform: 'uppercase',
+        <Tooltip key={cat.label}>
+          <TooltipTrigger asChild>
+            <div
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border cursor-default transition-all duration-150"
+              style={cat.active ? {
+                borderColor: isDark ? `${ACTIVE_COLOR}66` : `${ACTIVE_COLOR}59`,
+                background: isDark ? `${ACTIVE_COLOR}1f` : `${ACTIVE_COLOR}12`,
+                color: ACTIVE_COLOR,
+              } : {
+                borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+                background: 'transparent',
+                color: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
               }}
             >
-              {cat.label}
-            </Box>
-          </Box>
+              {cat.icon}
+              <span className="text-[0.62rem] font-semibold tracking-[0.04em] leading-none uppercase">
+                {cat.label}
+              </span>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>{`${cat.label}: ${cat.tooltip}`}</TooltipContent>
         </Tooltip>
       ))}
-    </Box>
+    </div>
   )
 
   const actions: ActionItem[] = [
     {
-      icon: isTesting ? <CircularProgress size={16} /> : <TestTube size={16} />,
+      icon: isTesting ? <Loader2 size={16} className="animate-spin" /> : <TestTube size={16} />,
       tooltip: t('notifications.card.actions.sendTest'),
       onClick: onTest,
       disabled: isTesting,

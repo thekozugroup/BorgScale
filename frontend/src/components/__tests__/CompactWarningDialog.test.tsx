@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { screen, renderWithProviders } from '../../test/test-utils'
 import userEvent from '@testing-library/user-event'
 import CompactWarningDialog from '../CompactWarningDialog'
 
@@ -14,7 +14,7 @@ describe('CompactWarningDialog', () => {
 
   describe('Rendering', () => {
     it('renders dialog title', () => {
-      render(
+      renderWithProviders(
         <CompactWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -26,7 +26,7 @@ describe('CompactWarningDialog', () => {
     })
 
     it('renders repository name', () => {
-      render(
+      renderWithProviders(
         <CompactWarningDialog
           open={true}
           repositoryName="my-backup-repo"
@@ -38,7 +38,7 @@ describe('CompactWarningDialog', () => {
     })
 
     it('renders description text', () => {
-      render(
+      renderWithProviders(
         <CompactWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -52,7 +52,7 @@ describe('CompactWarningDialog', () => {
     })
 
     it('renders warning about repository being locked', () => {
-      render(
+      renderWithProviders(
         <CompactWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -64,7 +64,7 @@ describe('CompactWarningDialog', () => {
     })
 
     it('renders progress tracking info', () => {
-      render(
+      renderWithProviders(
         <CompactWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -76,7 +76,7 @@ describe('CompactWarningDialog', () => {
     })
 
     it('renders tip text', () => {
-      render(
+      renderWithProviders(
         <CompactWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -88,7 +88,7 @@ describe('CompactWarningDialog', () => {
     })
 
     it('renders Cancel button', () => {
-      render(
+      renderWithProviders(
         <CompactWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -100,7 +100,7 @@ describe('CompactWarningDialog', () => {
     })
 
     it('renders Start Compacting button', () => {
-      render(
+      renderWithProviders(
         <CompactWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -112,7 +112,7 @@ describe('CompactWarningDialog', () => {
     })
 
     it('does not render when open is false', () => {
-      render(
+      renderWithProviders(
         <CompactWarningDialog
           open={false}
           repositoryName="test-repo"
@@ -127,7 +127,7 @@ describe('CompactWarningDialog', () => {
   describe('User interactions', () => {
     it('calls onConfirm when Start Compacting is clicked', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <CompactWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -142,7 +142,7 @@ describe('CompactWarningDialog', () => {
 
     it('calls onCancel when Cancel is clicked', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <CompactWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -158,7 +158,7 @@ describe('CompactWarningDialog', () => {
 
   describe('Loading state', () => {
     it('shows Starting... text when isLoading is true', () => {
-      render(
+      renderWithProviders(
         <CompactWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -171,7 +171,7 @@ describe('CompactWarningDialog', () => {
     })
 
     it('disables Cancel button when isLoading is true', () => {
-      render(
+      renderWithProviders(
         <CompactWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -184,7 +184,7 @@ describe('CompactWarningDialog', () => {
     })
 
     it('disables confirm button when isLoading is true', () => {
-      render(
+      renderWithProviders(
         <CompactWarningDialog
           open={true}
           repositoryName="test-repo"
@@ -197,7 +197,7 @@ describe('CompactWarningDialog', () => {
     })
 
     it('enables buttons when isLoading is false', () => {
-      render(
+      renderWithProviders(
         <CompactWarningDialog
           open={true}
           repositoryName="test-repo"

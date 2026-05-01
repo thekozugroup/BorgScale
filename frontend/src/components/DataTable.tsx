@@ -1,26 +1,70 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-  Paper,
-  IconButton,
-  Tooltip,
-  Box,
-  Typography,
-  Skeleton,
-  SxProps,
-  Theme,
-  Stack,
-  Divider,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Skeleton } from '@/components/ui/skeleton'
+import { cn } from '@/lib/utils'
+
+// ── Hoisted pagination bar ─────────────────────────────────────────────────
+// Must live outside DataTable to avoid react-hooks/static-components lint error.
+interface PaginationBarProps {
+  page: number
+  rowsPerPage: number
+  dataLength: number
+  totalPages: number
+  rowsPerPageOptions: number[]
+  onPageChange: (updater: (p: number) => number) => void
+  onRowsPerPageChange: (e: React.ChangeEvent<HTMLSelectElement>) => void
+}
+
+export function PaginationBar({
+  page,
+  rowsPerPage,
+  dataLength,
+  totalPages,
+  rowsPerPageOptions,
+  onPageChange,
+  onRowsPerPageChange,
+}: PaginationBarProps) {
+  const { t } = useTranslation()
+  return (
+    <div className="flex items-center justify-between px-3 py-2 border-t border-border text-sm text-muted-foreground flex-wrap gap-2">
+      <div className="flex items-center gap-2">
+        <span className="text-xs">{t('dataTable.rowsPerPage')}</span>
+        <select
+          className="text-xs bg-background border border-border rounded px-1 py-0.5 focus:outline-none"
+          value={rowsPerPage}
+          onChange={onRowsPerPageChange}
+        >
+          {rowsPerPageOptions.map((n) => (
+            <option key={n} value={n}>{n}</option>
+          ))}
+        </select>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-xs">
+          {page * rowsPerPage + 1}–{Math.min((page + 1) * rowsPerPage, dataLength)} of {dataLength}
+        </span>
+        <button
+          className="w-7 h-7 rounded flex items-center justify-center hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+          disabled={page === 0}
+          onClick={() => onPageChange((p) => p - 1)}
+          aria-label="Previous page"
+        >
+          <ChevronLeft size={16} />
+        </button>
+        <button
+          className="w-7 h-7 rounded flex items-center justify-center hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed"
+          disabled={page >= totalPages - 1}
+          onClick={() => onPageChange((p) => p + 1)}
+          aria-label="Next page"
+        >
+          <ChevronRight size={16} />
+        </button>
+      </div>
+    </div>
+  )
+}
 
 export interface Column<T> {
   id: string
@@ -79,22 +123,38 @@ export interface DataTableProps<T> {
   // Pagination
   defaultRowsPerPage?: number
   rowsPerPageOptions?: number[]
-  tableId?: string // Unique identifier for localStorage persistence
+  tableId?: string
 
-  // Additional features
-  sx?: SxProps<Theme>
+  // Additional features (accepted for compat, unused)
+  sx?: object
 
   // Mobile rendering
   mobileBreakpoint?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 }
 
-const ACTION_HOVER_BG_BY_COLOR: Record<string, string> = {
-  primary: 'rgba(59,130,246,0.12)',
-  error: 'rgba(239,68,68,0.12)',
-  warning: 'rgba(245,158,11,0.12)',
-  success: 'rgba(34,197,94,0.12)',
-  info: 'rgba(14,165,233,0.12)',
-  default: 'rgba(255,255,255,0.06)',
+const ACTION_COLORS: Record<string, string> = {
+  primary: '#3b82f6',
+  error: '#ef4444',
+  warning: '#f97316',
+  success: '#22c55e',
+  info: '#0ea5e9',
+}
+
+const BREAKPOINT_PX: Record<string, number> = {
+  xs: 0, sm: 640, md: 768, lg: 1024, xl: 1280,
+}
+
+function useIsMobileWidth(bp: string) {
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const px = BREAKPOINT_PX[bp] ?? 640
+    const mq = window.matchMedia(`(max-width: ${px - 1}px)`)
+    const update = () => setIsMobile(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [bp])
+  return isMobile
 }
 
 export default function DataTable<T>({
@@ -103,7 +163,6 @@ export default function DataTable<T>({
   actions,
   onRowClick,
   getRowKey,
-  headerBgColor = 'background.default',
   enableHover = true,
   enablePointer = false,
   stickyHeader = false,
@@ -115,551 +174,321 @@ export default function DataTable<T>({
   defaultRowsPerPage = 10,
   rowsPerPageOptions = [5, 10, 25, 50, 100],
   tableId,
-  sx,
   mobileBreakpoint = 'sm',
 }: DataTableProps<T>) {
-  // Load saved rows per page from localStorage if available
+  const { t } = useTranslation()
+
   const getInitialRowsPerPage = () => {
     if (!tableId) return defaultRowsPerPage
     const saved = localStorage.getItem(`table-rows-per-page-${tableId}`)
     if (saved) {
       const parsed = parseInt(saved, 10)
-      // Validate that the saved value is in the options
-      if (rowsPerPageOptions.includes(parsed)) {
-        return parsed
-      }
+      if (rowsPerPageOptions.includes(parsed)) return parsed
     }
     return defaultRowsPerPage
   }
 
-  // Pagination state
   const [page, setPage] = useState(0)
-  const { t } = useTranslation()
   const [rowsPerPage, setRowsPerPage] = useState(getInitialRowsPerPage)
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down(mobileBreakpoint))
+  const isMobile = useIsMobileWidth(mobileBreakpoint)
 
-  const handleChangePage = (_event: unknown, newPage: number) => {
-    setPage(newPage)
+  const handleChangeRowsPerPage = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = parseInt(e.target.value, 10)
+    setRowsPerPage(val)
+    setPage(0)
+    if (tableId) localStorage.setItem(`table-rows-per-page-${tableId}`, String(val))
   }
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newRowsPerPage = parseInt(event.target.value, 10)
-    setRowsPerPage(newRowsPerPage)
-    setPage(0) // Reset to first page when changing rows per page
-
-    // Save to localStorage if tableId is provided
-    if (tableId) {
-      localStorage.setItem(`table-rows-per-page-${tableId}`, String(newRowsPerPage))
-    }
-  }
-
-  // Calculate paginated data
   const paginatedData = data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-  // Loading state — skeleton rows matching the table structure
+  const totalPages = Math.ceil(data.length / rowsPerPage)
+
+  const borderClass = variant === 'outlined' ? 'border border-border' : 'shadow-md'
+  const radiusStyle = { borderRadius: borderRadius * 4 }
+
+  // --- Loading skeleton ---
+  const skeletonRows = 5
+  const rowWidths = [
+    [55, 70, 45, 60, 50],
+    [70, 50, 65, 40, 55],
+    [45, 65, 55, 70, 60],
+    [60, 40, 70, 55, 45],
+    [50, 60, 45, 65, 70],
+  ]
+
   if (loading) {
-    const skeletonRows = 5
-    const rowWidths = [
-      [55, 70, 45, 60, 50],
-      [70, 50, 65, 40, 55],
-      [45, 65, 55, 70, 60],
-      [60, 40, 70, 55, 45],
-      [50, 60, 45, 65, 70],
-    ]
     if (isMobile) {
       return (
-        <Paper variant={variant} sx={{ borderRadius, overflow: 'hidden', ...sx }}>
-          <Stack divider={<Divider sx={{ borderColor: 'divider' }} />}>
-            {Array.from({ length: skeletonRows }).map((_, i) => (
-              <Box
-                key={i}
-                sx={{
-                  p: 1.5,
-                  opacity: Math.max(0.25, 1 - i * 0.15),
-                  animation: `skeletonFadeIn 0.3s ease forwards`,
-                  animationDelay: `${i * 50}ms`,
-                  '@keyframes skeletonFadeIn': {
-                    from: { opacity: 0 },
-                    to: { opacity: Math.max(0.25, 1 - i * 0.15) },
-                  },
-                }}
-              >
-                <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.25 }}>
-                  {columns.map((col, ci) => (
-                    <Box
-                      key={col.id}
-                      sx={{ minWidth: 0, ...(col.mobileFullWidth ? { gridColumn: 'span 2' } : {}) }}
-                    >
-                      <Skeleton
-                        variant="text"
-                        width={48}
-                        height={9}
-                        sx={{ transform: 'none', mb: 0.5, borderRadius: 0.5 }}
-                      />
-                      <Skeleton
-                        variant="text"
-                        width={`${rowWidths[i][ci % 5]}%`}
-                        height={16}
-                        sx={{ transform: 'none', borderRadius: 0.5 }}
-                      />
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
-            ))}
-          </Stack>
-        </Paper>
+        <div className={cn('overflow-hidden bg-background', borderClass)} style={radiusStyle}>
+          {Array.from({ length: skeletonRows }).map((_, i) => (
+            <div
+              key={i}
+              className="p-3 border-b border-border last:border-0"
+              style={{ opacity: Math.max(0.25, 1 - i * 0.15) }}
+            >
+              <div className="grid grid-cols-2 gap-3">
+                {columns.map((col, ci) => (
+                  <div
+                    key={col.id}
+                    className={cn('min-w-0', col.mobileFullWidth ? 'col-span-2' : '')}
+                  >
+                    <Skeleton className="h-2 mb-1.5 rounded" style={{ width: 48 }} />
+                    <Skeleton className="h-4 rounded" style={{ width: `${rowWidths[i][ci % 5]}%` }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       )
     }
     return (
-      <TableContainer component={Paper} variant={variant} sx={{ borderRadius, maxHeight, ...sx }}>
-        <Table stickyHeader={stickyHeader} sx={{ tableLayout: 'fixed' }}>
-          <TableHead>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell
-                  key={column.id}
-                  align={column.align || 'left'}
-                  sx={{
-                    bgcolor: headerBgColor,
-                    fontWeight: 700,
-                    color: 'text.disabled',
-                    fontSize: '0.7rem',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    whiteSpace: 'nowrap',
-                    width: column.width,
-                    minWidth: column.minWidth,
-                    maxWidth: column.width,
-                  }}
+      <div
+        className={cn('overflow-auto bg-background', borderClass)}
+        style={{ ...radiusStyle, maxHeight }}
+      >
+        <table className="w-full table-fixed border-collapse">
+          <thead className={stickyHeader ? 'sticky top-0 z-10 bg-background' : ''}>
+            <tr>
+              {columns.map((col) => (
+                <th
+                  key={col.id}
+                  className="px-3 py-2 text-left text-[0.7rem] font-bold uppercase tracking-[0.05em] text-muted-foreground whitespace-nowrap border-b border-border"
+                  style={{ width: col.width, minWidth: col.minWidth }}
                 >
-                  {column.label}
-                </TableCell>
+                  {col.label}
+                </th>
               ))}
               {actions && actions.length > 0 && (
-                <TableCell
-                  align="right"
-                  sx={{
-                    bgcolor: headerBgColor,
-                    fontWeight: 700,
-                    color: 'text.disabled',
-                    fontSize: '0.7rem',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    width: '152px',
-                    minWidth: '152px',
-                    maxWidth: '152px',
-                  }}
-                >
+                <th className="px-3 py-2 text-right text-[0.7rem] font-bold uppercase tracking-[0.05em] text-muted-foreground border-b border-border" style={{ width: 152 }}>
                   {t('dataTable.actions')}
-                </TableCell>
+                </th>
               )}
-            </TableRow>
-          </TableHead>
-          <TableBody>
+            </tr>
+          </thead>
+          <tbody>
             {Array.from({ length: skeletonRows }).map((_, i) => (
-              <TableRow
-                key={i}
-                sx={{
-                  opacity: Math.max(0.2, 1 - i * 0.15),
-                  '&:last-child td': { borderBottom: 0 },
-                }}
-              >
-                {columns.map((column, ci) => (
-                  <TableCell
-                    key={column.id}
-                    sx={{ width: column.width, minWidth: column.minWidth, maxWidth: column.width }}
-                  >
-                    <Skeleton
-                      variant="text"
-                      width={`${rowWidths[i][ci % 5]}%`}
-                      height={18}
-                      sx={{ transform: 'none', borderRadius: 0.5 }}
-                    />
-                  </TableCell>
+              <tr key={i} style={{ opacity: Math.max(0.2, 1 - i * 0.15) }}>
+                {columns.map((col, ci) => (
+                  <td key={col.id} className="px-3 py-2.5 border-b border-border last:border-0">
+                    <Skeleton className="h-4 rounded" style={{ width: `${rowWidths[i][ci % 5]}%` }} />
+                  </td>
                 ))}
                 {actions && actions.length > 0 && (
-                  <TableCell align="right" sx={{ width: '130px' }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 0.5 }}>
+                  <td className="px-3 py-2.5 border-b border-border last:border-0">
+                    <div className="flex justify-end gap-1">
                       {actions.slice(0, 3).map((_, ai) => (
-                        <Skeleton
-                          key={ai}
-                          variant="rounded"
-                          width={28}
-                          height={28}
-                          sx={{ borderRadius: 1 }}
-                        />
+                        <Skeleton key={ai} className="w-7 h-7 rounded" />
                       ))}
-                    </Box>
-                  </TableCell>
+                    </div>
+                  </td>
                 )}
-              </TableRow>
+              </tr>
             ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+          </tbody>
+        </table>
+      </div>
     )
   }
 
-  // Empty state
+  // --- Empty state ---
   if (data.length === 0 && emptyState) {
     return (
-      <Paper variant={variant} sx={{ borderRadius, ...sx }}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            py: 8,
-            px: 3,
-            textAlign: 'center',
-          }}
-        >
-          <Box sx={{ mb: 2, color: 'text.secondary', opacity: 0.6 }}>{emptyState.icon}</Box>
-          <Typography variant="h6" fontWeight={600} gutterBottom>
-            {emptyState.title}
-          </Typography>
+      <div className={cn('bg-background', borderClass)} style={radiusStyle}>
+        <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+          <div className="mb-4 text-muted-foreground opacity-60">{emptyState.icon}</div>
+          <p className="text-base font-semibold mb-1">{emptyState.title}</p>
           {emptyState.description && (
-            <Typography variant="body2" color="text.secondary">
-              {emptyState.description}
-            </Typography>
+            <p className="text-sm text-muted-foreground">{emptyState.description}</p>
           )}
-        </Box>
-      </Paper>
+        </div>
+      </div>
     )
   }
 
+  // --- Render actions helper ---
   const renderActions = (
     row: T,
     iconOpacity = 0.45,
-    justify: 'flex-start' | 'flex-end' = 'flex-end'
+    justify: 'start' | 'end' = 'end'
   ) => (
-    <Box sx={{ display: 'flex', gap: 0.5, justifyContent: justify, flexWrap: 'nowrap' }}>
+    <div className={cn('flex gap-1 flex-nowrap', justify === 'end' ? 'justify-end' : 'justify-start')}>
       {actions?.map((action, idx) => {
         const shouldShow = action.show ? action.show(row) : true
         if (!shouldShow) return null
-
         const isDisabled = action.disabled ? action.disabled(row) : false
         const tooltipText =
-          typeof action.tooltip === 'function'
-            ? action.tooltip(row)
-            : action.tooltip || action.label
-
-        const hoverBg = ACTION_HOVER_BG_BY_COLOR[action.color || 'default']
+          typeof action.tooltip === 'function' ? action.tooltip(row) : action.tooltip || action.label
+        const actionColor = action.color && action.color !== 'default' ? ACTION_COLORS[action.color] : undefined
 
         return (
-          <Tooltip key={idx} title={tooltipText} arrow>
-            <span>
-              <IconButton
-                size="small"
-                color={action.color || 'default'}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  action.onClick(row)
-                }}
-                disabled={isDisabled}
-                aria-label={tooltipText}
-                sx={{
-                  borderRadius: 1,
-                  opacity: iconOpacity,
-                  transition: 'opacity 140ms ease, background-color 140ms ease',
-                  '&:hover': {
-                    opacity: 1,
-                    bgcolor: hoverBg,
-                  },
-                  '&.Mui-disabled': { opacity: 0.2 },
-                }}
-              >
-                {action.icon}
-              </IconButton>
-            </span>
+          <Tooltip key={idx}>
+            <TooltipTrigger asChild>
+              <span>
+                <button
+                  aria-label={tooltipText}
+                  disabled={isDisabled}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    action.onClick(row)
+                  }}
+                  className="w-7 h-7 rounded flex items-center justify-center transition-all duration-150 disabled:opacity-20 disabled:cursor-not-allowed"
+                  style={{ opacity: isDisabled ? 0.2 : iconOpacity, color: actionColor }}
+                  onMouseEnter={(e) => {
+                    if (!isDisabled) {
+                      ;(e.currentTarget as HTMLButtonElement).style.opacity = '1'
+                      if (actionColor) (e.currentTarget as HTMLButtonElement).style.background = actionColor + '1f'
+                      else (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isDisabled) {
+                      ;(e.currentTarget as HTMLButtonElement).style.opacity = String(iconOpacity)
+                      ;(e.currentTarget as HTMLButtonElement).style.background = ''
+                    }
+                  }}
+                >
+                  {action.icon}
+                </button>
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>{tooltipText}</TooltipContent>
           </Tooltip>
         )
       })}
-    </Box>
+    </div>
   )
 
+  // --- Mobile card layout ---
   if (isMobile) {
     return (
-      <Paper variant={variant} sx={{ borderRadius, overflow: 'hidden', ...sx }}>
-        <Stack divider={<Divider sx={{ borderColor: 'divider' }} />}>
-          {paginatedData.map((row) => (
-            <Box
-              key={getRowKey(row)}
-              onClick={onRowClick ? () => onRowClick(row) : undefined}
-              sx={{
-                p: 1.5,
-                ...(enableHover && {
-                  '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.02)',
-                  },
-                }),
-                ...(enablePointer &&
-                  onRowClick && {
-                    cursor: 'pointer',
-                  }),
-                transition: 'background-color 180ms ease',
-              }}
-            >
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: 1.25,
-                }}
-              >
-                {columns.map((column) => (
-                  <Box
-                    key={column.id}
-                    sx={{
-                      minWidth: 0,
-                      overflow: 'hidden',
-                      ...(column.mobileFullWidth && { gridColumn: 'span 2' }),
-                    }}
-                  >
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        display: 'block',
-                        mb: 0.25,
-                        color: 'text.secondary',
-                        fontWeight: 700,
-                        letterSpacing: '0.03em',
-                        textTransform: 'uppercase',
-                        fontSize: '0.6rem',
-                      }}
-                    >
-                      {column.label}
-                    </Typography>
-                    <Box sx={{ minWidth: 0, overflow: 'hidden' }}>
-                      {column.render
-                        ? column.render(row)
-                        : ((row as Record<string, unknown>)[column.id] as React.ReactNode)}
-                    </Box>
-                  </Box>
-                ))}
-                {actions && actions.length > 0 && (
-                  <Box sx={{ minWidth: 0 }}>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        display: 'block',
-                        mb: 0.25,
-                        color: 'text.secondary',
-                        fontWeight: 700,
-                        letterSpacing: '0.03em',
-                        textTransform: 'uppercase',
-                        fontSize: '0.6rem',
-                      }}
-                    >
-                      {t('dataTable.actions')}
-                    </Typography>
-                    {renderActions(row, 0.7, 'flex-start')}
-                  </Box>
-                )}
-              </Box>
-            </Box>
-          ))}
-        </Stack>
+      <div className={cn('overflow-hidden bg-background', borderClass)} style={radiusStyle}>
+        {paginatedData.map((row) => (
+          <div
+            key={getRowKey(row)}
+            className={cn(
+              'p-3 border-b border-border last:border-0 transition-colors duration-180',
+              enableHover && 'hover:bg-foreground/[0.02]',
+              enablePointer && onRowClick && 'cursor-pointer'
+            )}
+            onClick={onRowClick ? () => onRowClick(row) : undefined}
+          >
+            <div className="grid grid-cols-2 gap-3">
+              {columns.map((column) => (
+                <div
+                  key={column.id}
+                  className={cn('min-w-0 overflow-hidden', column.mobileFullWidth && 'col-span-2')}
+                >
+                  <p className="text-[0.6rem] font-bold uppercase tracking-[0.03em] text-muted-foreground mb-0.5">
+                    {column.label}
+                  </p>
+                  <div className="min-w-0 overflow-hidden">
+                    {column.render
+                      ? column.render(row)
+                      : ((row as Record<string, unknown>)[column.id] as React.ReactNode)}
+                  </div>
+                </div>
+              ))}
+              {actions && actions.length > 0 && (
+                <div className="min-w-0">
+                  <p className="text-[0.6rem] font-bold uppercase tracking-[0.03em] text-muted-foreground mb-0.5">
+                    {t('dataTable.actions')}
+                  </p>
+                  {renderActions(row, 0.7, 'start')}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
         {data.length > 0 && (
-          <TablePagination
-            component="div"
-            count={data.length}
+          <PaginationBar
             page={page}
-            onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
+            dataLength={data.length}
+            totalPages={totalPages}
             rowsPerPageOptions={rowsPerPageOptions}
-            labelRowsPerPage={t('dataTable.rowsPerPage')}
-            labelDisplayedRows={({ from, to, count }) =>
-              `${from}–${to} of ${count !== -1 ? count : `more than ${to}`}`
-            }
-            sx={{
-              borderTop: 1,
-              borderColor: 'divider',
-              '.MuiTablePagination-toolbar': {
-                minHeight: '64px',
-                paddingLeft: 2,
-                paddingRight: 1,
-                flexWrap: 'wrap',
-                rowGap: 1,
-              },
-              '.MuiTablePagination-spacer': {
-                display: 'none',
-              },
-              '.MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows': {
-                marginTop: 0,
-                marginBottom: 0,
-                display: 'flex',
-                alignItems: 'center',
-              },
-              '.MuiTablePagination-select': {
-                paddingTop: 1,
-                paddingBottom: 1,
-                paddingLeft: 1,
-                paddingRight: 4,
-                display: 'flex',
-                alignItems: 'center',
-              },
-              '.MuiTablePagination-actions': {
-                marginLeft: 'auto',
-              },
-            }}
+            onPageChange={setPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
           />
         )}
-      </Paper>
+      </div>
     )
   }
 
+  // --- Desktop table ---
   return (
-    <TableContainer
-      component={Paper}
-      variant={variant}
-      sx={{
-        borderRadius,
-        maxHeight,
-        ...sx,
-      }}
-    >
-      <Table stickyHeader={stickyHeader} sx={{ tableLayout: 'fixed' }}>
-        <TableHead>
-          <TableRow>
-            {columns.map((column) => (
-              <TableCell
-                key={column.id}
-                align={column.align || 'left'}
-                sx={{
-                  bgcolor: headerBgColor,
-                  fontWeight: 700,
-                  color: 'text.disabled',
-                  fontSize: '0.7rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  whiteSpace: 'nowrap',
-                  width: column.width,
-                  minWidth: column.minWidth,
-                  maxWidth: column.width,
-                }}
-              >
-                {column.label}
-              </TableCell>
-            ))}
-            {actions && actions.length > 0 && (
-              <TableCell
-                align="right"
-                sx={{
-                  bgcolor: headerBgColor,
-                  fontWeight: 700,
-                  color: 'text.disabled',
-                  fontSize: '0.7rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                  whiteSpace: 'nowrap',
-                  width: '152px',
-                  minWidth: '152px',
-                  maxWidth: '152px',
-                }}
-              >
-                {t('dataTable.actions')}
-              </TableCell>
-            )}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {paginatedData.map((row) => (
-            <TableRow
-              key={getRowKey(row)}
-              onClick={onRowClick ? () => onRowClick(row) : undefined}
-              sx={{
-                ...(enableHover && {
-                  '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.03)',
-                    '& .MuiIconButton-root': {
-                      opacity: 0.7,
-                    },
-                  },
-                }),
-                ...(enablePointer &&
-                  onRowClick && {
-                    cursor: 'pointer',
-                  }),
-                '&:last-child td': {
-                  borderBottom: 0,
-                },
-                transition: 'background-color 180ms ease',
-              }}
-            >
-              {columns.map((column) => (
-                <TableCell
-                  key={column.id}
-                  align={column.align || 'left'}
-                  sx={{
-                    width: column.width,
-                    minWidth: column.minWidth,
-                    maxWidth: column.width,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
+    <div className={cn('bg-background', borderClass)} style={radiusStyle}>
+      <div className="overflow-auto" style={{ maxHeight }}>
+        <table className="w-full table-fixed border-collapse">
+          <thead className={stickyHeader ? 'sticky top-0 z-10 bg-background' : ''}>
+            <tr>
+              {columns.map((col) => (
+                <th
+                  key={col.id}
+                  className={cn(
+                    'px-3 py-2 text-[0.7rem] font-bold uppercase tracking-[0.05em] text-muted-foreground whitespace-nowrap border-b border-border',
+                    col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'
+                  )}
+                  style={{ width: col.width, minWidth: col.minWidth, maxWidth: col.width }}
                 >
-                  {column.render
-                    ? column.render(row)
-                    : ((row as Record<string, unknown>)[column.id] as React.ReactNode)}
-                </TableCell>
+                  {col.label}
+                </th>
               ))}
               {actions && actions.length > 0 && (
-                <TableCell
-                  align="right"
-                  sx={{ width: '130px', minWidth: '130px', maxWidth: '130px' }}
+                <th
+                  className="px-3 py-2 text-right text-[0.7rem] font-bold uppercase tracking-[0.05em] text-muted-foreground whitespace-nowrap border-b border-border"
+                  style={{ width: 152, minWidth: 152, maxWidth: 152 }}
                 >
-                  {renderActions(row)}
-                </TableCell>
+                  {t('dataTable.actions')}
+                </th>
               )}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedData.map((row) => (
+              <tr
+                key={getRowKey(row)}
+                className={cn(
+                  'transition-colors duration-180 border-b border-border last:border-0',
+                  enableHover && 'hover:bg-foreground/[0.03]',
+                  enablePointer && onRowClick && 'cursor-pointer'
+                )}
+                onClick={onRowClick ? () => onRowClick(row) : undefined}
+              >
+                {columns.map((col) => (
+                  <td
+                    key={col.id}
+                    className={cn(
+                      'px-3 py-2.5 overflow-hidden text-ellipsis',
+                      col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'
+                    )}
+                    style={{ width: col.width, minWidth: col.minWidth, maxWidth: col.width, fontWeight: col.fontWeight }}
+                  >
+                    {col.render
+                      ? col.render(row)
+                      : ((row as Record<string, unknown>)[col.id] as React.ReactNode)}
+                  </td>
+                ))}
+                {actions && actions.length > 0 && (
+                  <td className="px-3 py-2.5 text-right" style={{ width: 130, minWidth: 130, maxWidth: 130 }}>
+                    {renderActions(row)}
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {data.length > 0 && (
-        <TablePagination
-          component="div"
-          count={data.length}
+        <PaginationBar
           page={page}
-          onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+          dataLength={data.length}
+          totalPages={totalPages}
           rowsPerPageOptions={rowsPerPageOptions}
-          labelRowsPerPage={t('dataTable.rowsPerPage')}
-          labelDisplayedRows={({ from, to, count }) =>
-            `${from}–${to} of ${count !== -1 ? count : `more than ${to}`}`
-          }
-          sx={{
-            borderTop: 1,
-            borderColor: 'divider',
-            '.MuiTablePagination-toolbar': {
-              minHeight: '64px',
-              paddingLeft: 2,
-              paddingRight: 1,
-            },
-            '.MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows': {
-              marginTop: 0,
-              marginBottom: 0,
-              display: 'flex',
-              alignItems: 'center',
-            },
-            '.MuiTablePagination-select': {
-              paddingTop: 1,
-              paddingBottom: 1,
-              paddingLeft: 1,
-              paddingRight: 4,
-              display: 'flex',
-              alignItems: 'center',
-            },
-            '.MuiTablePagination-actions': {
-              marginLeft: 2,
-            },
-          }}
+          onPageChange={setPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
         />
       )}
-    </TableContainer>
+    </div>
   )
 }

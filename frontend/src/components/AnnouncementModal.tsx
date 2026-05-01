@@ -1,16 +1,4 @@
 import {
-  Box,
-  Button,
-  Chip,
-  Dialog,
-  IconButton,
-  Link,
-  Stack,
-  useTheme,
-  Typography,
-} from '@mui/material'
-import { alpha } from '@mui/material/styles'
-import {
   BellRing,
   ChevronRight,
   ExternalLink,
@@ -21,6 +9,9 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { Announcement } from '../types/announcements'
+import { Button } from '@/components/ui/button'
+import { useTheme } from '../context/ThemeContext'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 
 interface AnnouncementModalProps {
   announcement: Announcement | null
@@ -62,259 +53,225 @@ export default function AnnouncementModal({
   onCtaClick,
 }: AnnouncementModalProps) {
   const { t } = useTranslation()
-  const theme = useTheme()
+  const { effectiveMode } = useTheme()
 
   if (!announcement) return null
 
-  const isDark = theme.palette.mode === 'dark'
+  const isDark = effectiveMode === 'dark'
   const tone = getAnnouncementTone(announcement.type)
   const icon = getAnnouncementIcon(announcement.type)
+
   const accentColor =
-    tone === 'warning'
-      ? theme.palette.warning.main
-      : tone === 'info'
-        ? theme.palette.info.main
-        : theme.palette.primary.main
+    tone === 'warning' ? '#f59e0b' : tone === 'info' ? '#3b82f6' : '#6366f1'
+
   const panelBackground = isDark ? '#18181b' : '#ffffff'
   const foreground = isDark ? '#ffffff' : '#1f2937'
-  const mutedText = isDark ? alpha('#ffffff', 0.76) : alpha('#1f2937', 0.82)
-  const secondaryText = isDark ? alpha('#ffffff', 0.58) : alpha('#1f2937', 0.5)
-  const borderAlpha = isDark ? alpha('#ffffff', 0.08) : alpha('#000000', 0.1)
-  const subtleBg = isDark ? alpha('#ffffff', 0.12) : alpha('#000000', 0.06)
-  const subtleBorder = isDark ? alpha('#ffffff', 0.12) : alpha('#000000', 0.08)
-  const highlightBg = isDark ? alpha('#000000', 0.24) : alpha('#000000', 0.03)
-  const glintTop = isDark ? alpha('#ffffff', 0.08) : alpha('#ffffff', 0.6)
-  const hoverBg = isDark ? alpha('#ffffff', 0.08) : alpha('#000000', 0.06)
+  const mutedText = isDark ? 'rgba(255,255,255,0.76)' : 'rgba(31,41,55,0.82)'
+  const secondaryText = isDark ? 'rgba(255,255,255,0.58)' : 'rgba(31,41,55,0.5)'
+  const borderAlpha = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'
+  const subtleBg = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.06)'
+  const subtleBorder = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)'
+  const highlightBg = isDark ? 'rgba(0,0,0,0.24)' : 'rgba(0,0,0,0.03)'
+  const glintTop = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.6)'
+  const hoverBg = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'
 
   return (
-    <Dialog
-      open={open}
-      maxWidth="sm"
-      fullWidth
-      PaperProps={{
-        sx: {
-          overflow: 'hidden',
-          borderRadius: 3,
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onAcknowledge() }}>
+      <DialogContent
+        className="sm:max-w-md p-0 overflow-hidden gap-0"
+        style={{
           color: foreground,
           background: panelBackground,
           border: `1px solid ${borderAlpha}`,
+          borderRadius: '1.5rem',
           boxShadow: isDark
-            ? `0 28px 80px ${alpha('#000000', 0.52)}`
-            : `0 28px 80px ${alpha('#000000', 0.16)}`,
-        },
-      }}
-    >
-      <Box sx={{ px: { xs: 2.25, sm: 3 }, pt: 2.25, pb: 1.5 }}>
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
-          <Box
-            sx={{
-              width: 44,
-              height: 44,
-              borderRadius: 2,
-              bgcolor: alpha(accentColor, 0.18),
-              color: accentColor,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-              border: `1px solid ${alpha(accentColor, 0.32)}`,
-              boxShadow: `inset 0 1px 0 ${glintTop}`,
-            }}
-          >
-            {icon}
-          </Box>
+            ? `0 28px 80px rgba(0,0,0,0.52)`
+            : `0 28px 80px rgba(0,0,0,0.16)`,
+        }}
+      >
+        {/* Header section */}
+        <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-3">
+          <div className="flex items-start gap-3">
+            {/* Icon */}
+            <div
+              className="flex items-center justify-center w-11 h-11 rounded-2xl flex-shrink-0"
+              style={{
+                background: `${accentColor}2e`,
+                color: accentColor,
+                border: `1px solid ${accentColor}52`,
+                boxShadow: `inset 0 1px 0 ${glintTop}`,
+              }}
+            >
+              {icon}
+            </div>
 
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mb: 1.25 }}>
-              <Chip
-                size="small"
-                icon={<Sparkles size={12} />}
-                label={t(`announcements.types.${announcement.type}`)}
-                sx={{
-                  height: 24,
-                  bgcolor: subtleBg,
-                  color: foreground,
-                  border: `1px solid ${subtleBorder}`,
-                  '& .MuiChip-label': {
-                    px: 1.2,
-                    fontSize: '0.72rem',
-                    fontWeight: 700,
-                  },
-                  '& .MuiChip-icon': {
-                    color: mutedText,
-                  },
-                }}
-              />
-              {announcement.type === 'update_available' ? (
-                <Chip
-                  size="small"
-                  label="Latest release"
-                  sx={{
+            {/* Title + chips */}
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {/* Type chip */}
+                <span
+                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.72rem] font-bold"
+                  style={{
+                    background: subtleBg,
+                    color: foreground,
+                    border: `1px solid ${subtleBorder}`,
                     height: 24,
-                    bgcolor: alpha(accentColor, 0.16),
-                    color: accentColor,
-                    border: `1px solid ${alpha(accentColor, 0.28)}`,
-                    '& .MuiChip-label': {
-                      px: 1.2,
-                      fontSize: '0.72rem',
-                      fontWeight: 700,
-                    },
                   }}
-                />
-              ) : null}
-            </Stack>
-
-            <Typography
-              variant="h5"
-              sx={{ fontWeight: 800, lineHeight: 1.15, letterSpacing: '-0.02em', mb: 1 }}
-            >
-              {announcement.title}
-            </Typography>
-
-            <Typography
-              variant="body1"
-              sx={{ color: mutedText, lineHeight: 1.65, maxWidth: '48ch' }}
-            >
-              {announcement.message}
-            </Typography>
-          </Box>
-
-          {announcement.dismissible !== false ? (
-            <IconButton
-              onClick={onAcknowledge}
-              size="small"
-              aria-label="Close announcement"
-              sx={{
-                color: secondaryText,
-                border: `1px solid ${borderAlpha}`,
-                bgcolor: isDark ? alpha('#ffffff', 0.03) : alpha('#000000', 0.02),
-                '&:hover': {
-                  color: foreground,
-                  bgcolor: hoverBg,
-                },
-              }}
-            >
-              <X size={18} />
-            </IconButton>
-          ) : null}
-        </Box>
-      </Box>
-
-      <Box sx={{ px: { xs: 2.25, sm: 3 }, pb: { xs: 2.25, sm: 3 } }}>
-        {announcement.highlights?.length ? (
-          <Box
-            sx={{
-              p: 2,
-              mb: 2.25,
-              borderRadius: 2.5,
-              bgcolor: highlightBg,
-              border: `1px solid ${alpha(accentColor, 0.18)}`,
-              boxShadow: `inset 0 1px 0 ${isDark ? alpha('#ffffff', 0.04) : alpha('#ffffff', 0.5)}`,
-            }}
-          >
-            <Typography
-              variant="overline"
-              sx={{
-                display: 'block',
-                mb: 1.1,
-                color: accentColor,
-                fontWeight: 800,
-                letterSpacing: '0.12em',
-              }}
-            >
-              {t('announcements.highlights')}
-            </Typography>
-
-            <Stack spacing={1}>
-              {announcement.highlights.map((highlight) => (
-                <Box key={highlight} sx={{ display: 'flex', gap: 1.1, alignItems: 'flex-start' }}>
-                  <Box
-                    sx={{
-                      width: 6,
-                      height: 6,
-                      borderRadius: '50%',
-                      mt: '0.55rem',
-                      flexShrink: 0,
-                      bgcolor: accentColor,
-                      boxShadow: `0 0 0 4px ${alpha(accentColor, 0.14)}`,
+                >
+                  <Sparkles size={12} style={{ color: mutedText }} />
+                  {t(`announcements.types.${announcement.type}`)}
+                </span>
+                {announcement.type === 'update_available' && (
+                  <span
+                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[0.72rem] font-bold"
+                    style={{
+                      background: `${accentColor}29`,
+                      color: accentColor,
+                      border: `1px solid ${accentColor}47`,
+                      height: 24,
                     }}
-                  />
-                  <Typography variant="body2" sx={{ color: mutedText, lineHeight: 1.6 }}>
-                    {highlight}
-                  </Typography>
-                </Box>
-              ))}
-            </Stack>
-          </Box>
-        ) : null}
+                  >
+                    Latest release
+                  </span>
+                )}
+              </div>
 
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          spacing={1.25}
-          sx={{ alignItems: { xs: 'stretch', sm: 'center' }, justifyContent: 'space-between' }}
-        >
-          {announcement.cta_url ? (
-            <Link
-              href={announcement.cta_url}
-              target="_blank"
-              rel="noreferrer"
-              onClick={onCtaClick}
-              underline="none"
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 0.9,
-                fontSize: '0.95rem',
-                fontWeight: 700,
-                color: accentColor,
-                '&:hover': {
-                  color: alpha(accentColor, 0.82),
-                },
-              }}
-            >
-              {announcement.cta_label || t('announcements.viewDetails')}
-              <ExternalLink size={15} />
-            </Link>
-          ) : (
-            <Box />
-          )}
+              <h2
+                className="text-xl font-extrabold leading-tight tracking-tight mb-2"
+                style={{ letterSpacing: '-0.02em' }}
+              >
+                {announcement.title}
+              </h2>
 
-          <Stack direction="row" spacing={1.25} sx={{ justifyContent: 'flex-end' }}>
-            <Button
-              onClick={onSnooze}
-              variant="outlined"
-              sx={{
-                color: mutedText,
-                borderColor: isDark ? alpha('#ffffff', 0.16) : alpha('#000000', 0.15),
-                bgcolor: isDark ? alpha('#ffffff', 0.04) : alpha('#000000', 0.03),
-                '&:hover': {
-                  borderColor: isDark ? alpha('#ffffff', 0.28) : alpha('#000000', 0.25),
-                  bgcolor: hoverBg,
-                },
-              }}
-            >
-              {t('announcements.remindLater')}
-            </Button>
+              <p className="text-sm leading-relaxed max-w-prose" style={{ color: mutedText }}>
+                {announcement.message}
+              </p>
+            </div>
 
-            {announcement.dismissible !== false ? (
-              <Button
+            {/* Dismiss X */}
+            {announcement.dismissible !== false && (
+              <button
+                type="button"
                 onClick={onAcknowledge}
-                variant="contained"
-                endIcon={<ChevronRight size={16} />}
-                sx={{
-                  bgcolor: accentColor,
-                  color: theme.palette.getContrastText(accentColor),
-                  '&:hover': {
-                    bgcolor: alpha(accentColor, 0.88),
-                  },
+                aria-label="Close announcement"
+                className="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0 transition-colors duration-150"
+                style={{
+                  color: secondaryText,
+                  border: `1px solid ${borderAlpha}`,
+                  background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                }}
+                onMouseEnter={(e) => {
+                  ;(e.currentTarget as HTMLButtonElement).style.color = foreground
+                  ;(e.currentTarget as HTMLButtonElement).style.background = hoverBg
+                }}
+                onMouseLeave={(e) => {
+                  ;(e.currentTarget as HTMLButtonElement).style.color = secondaryText
+                  ;(e.currentTarget as HTMLButtonElement).style.background = isDark
+                    ? 'rgba(255,255,255,0.03)'
+                    : 'rgba(0,0,0,0.02)'
                 }}
               >
-                {t('announcements.gotIt')}
+                <X size={18} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Body section */}
+        <div className="px-5 sm:px-6 pb-5 sm:pb-6">
+          {announcement.highlights?.length ? (
+            <div
+              className="p-4 mb-4 rounded-2xl"
+              style={{
+                background: highlightBg,
+                border: `1px solid ${accentColor}2e`,
+                boxShadow: `inset 0 1px 0 ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.5)'}`,
+              }}
+            >
+              <p
+                className="text-[0.7rem] font-extrabold uppercase tracking-[0.12em] mb-2.5"
+                style={{ color: accentColor }}
+              >
+                {t('announcements.highlights')}
+              </p>
+
+              <div className="flex flex-col gap-2">
+                {announcement.highlights.map((highlight) => (
+                  <div key={highlight} className="flex gap-2.5 items-start">
+                    <div
+                      className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-2"
+                      style={{
+                        background: accentColor,
+                        boxShadow: `0 0 0 4px ${accentColor}24`,
+                      }}
+                    />
+                    <p className="text-sm leading-relaxed" style={{ color: mutedText }}>
+                      {highlight}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {/* Actions row */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            {/* CTA link */}
+            {announcement.cta_url ? (
+              <a
+                href={announcement.cta_url}
+                target="_blank"
+                rel="noreferrer"
+                onClick={onCtaClick}
+                className="inline-flex items-center gap-1.5 text-[0.95rem] font-bold transition-colors duration-150"
+                style={{ color: accentColor, textDecoration: 'none' }}
+                onMouseEnter={(e) => {
+                  ;(e.currentTarget as HTMLAnchorElement).style.color = `${accentColor}d1`
+                }}
+                onMouseLeave={(e) => {
+                  ;(e.currentTarget as HTMLAnchorElement).style.color = accentColor
+                }}
+              >
+                {announcement.cta_label || t('announcements.viewDetails')}
+                <ExternalLink size={15} />
+              </a>
+            ) : (
+              <div />
+            )}
+
+            {/* Buttons */}
+            <div className="flex items-center gap-2.5 justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onSnooze}
+                style={{
+                  color: mutedText,
+                  borderColor: isDark ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.15)',
+                  background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                }}
+              >
+                {t('announcements.remindLater')}
               </Button>
-            ) : null}
-          </Stack>
-        </Stack>
-      </Box>
+
+              {announcement.dismissible !== false && (
+                <Button
+                  size="sm"
+                  onClick={onAcknowledge}
+                  className="gap-1.5"
+                  style={{
+                    background: accentColor,
+                    color: '#ffffff',
+                  }}
+                >
+                  {t('announcements.gotIt')}
+                  <ChevronRight size={16} />
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </DialogContent>
     </Dialog>
   )
 }

@@ -1,11 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { AxiosResponse } from 'axios'
 
 import SystemSettingsTab from '../SystemSettingsTab'
 import { authAPI, settingsAPI } from '@/services/api.ts'
-import { renderWithProviders } from '../../test/test-utils'
+import { renderWithProviders, screen, waitFor } from '../../test/test-utils'
 
 vi.mock('../../services/api', () => ({
   settingsAPI: {
@@ -77,10 +76,10 @@ describe('SystemSettingsTab', () => {
     renderWithProviders(<SystemSettingsTab />)
 
     await waitFor(() => {
-      expect(screen.getByRole('tab', { name: 'Repository Monitoring' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Repository Monitoring/i })).toBeInTheDocument()
     })
 
-    await user.click(screen.getByRole('tab', { name: 'Repository Monitoring' }))
+    await user.click(screen.getByRole('button', { name: /Repository Monitoring/i }))
 
     expect(screen.getByLabelText('Max Concurrent Scheduled Backups')).toBeInTheDocument()
     expect(screen.getByLabelText('Max Concurrent Scheduled Checks')).toBeInTheDocument()
@@ -91,10 +90,10 @@ describe('SystemSettingsTab', () => {
     renderWithProviders(<SystemSettingsTab />)
 
     await waitFor(() => {
-      expect(screen.getByRole('tab', { name: 'Repository Monitoring' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Repository Monitoring/i })).toBeInTheDocument()
     })
 
-    await user.click(screen.getByRole('tab', { name: 'Repository Monitoring' }))
+    await user.click(screen.getByRole('button', { name: /Repository Monitoring/i }))
 
     const backupLimit = screen.getByLabelText('Max Concurrent Scheduled Backups')
     const checkLimit = screen.getByLabelText('Max Concurrent Scheduled Checks')

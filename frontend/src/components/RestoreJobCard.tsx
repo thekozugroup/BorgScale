@@ -49,10 +49,10 @@ const getStatusIcon = (status: string) => {
 type StatusKey = 'running' | 'completed' | 'completed_with_warnings' | 'failed'
 
 const STATUS_COLORS: Record<StatusKey, string> = {
-  running: 'bg-sky-500/10 text-sky-600 border-sky-500/18 dark:bg-sky-500/12 dark:text-sky-400 dark:border-sky-500/25',
-  completed: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/18 dark:bg-emerald-500/12 dark:text-emerald-400 dark:border-emerald-500/25',
-  completed_with_warnings: 'bg-amber-500/10 text-amber-600 border-amber-500/18 dark:bg-amber-500/12 dark:text-amber-400 dark:border-amber-500/25',
-  failed: 'bg-destructive/10 text-destructive border-destructive/18 dark:bg-destructive/12 dark:border-destructive/25',
+  running: 'bg-secondary text-secondary-foreground border-border',
+  completed: 'bg-primary/10 text-primary border-primary/20',
+  completed_with_warnings: 'bg-muted text-muted-foreground border-border',
+  failed: 'bg-destructive/10 text-destructive border-destructive/20',
 }
 
 const getStatusColorCls = (status: string): string => {
@@ -130,7 +130,7 @@ export default function RestoreJobCard({ job, showJobId = true }: RestoreJobCard
             </span>
             {getDurationText() && (
               <>
-                <span className="inline-block size-[3px] rounded-full bg-neutral-300 dark:bg-neutral-600 shrink-0" />
+                <span className="inline-block size-[3px] rounded-full bg-border shrink-0" />
                 <span className="text-sm text-muted-foreground text-[0.72rem]">
                   {getDurationText()}
                 </span>
@@ -161,11 +161,11 @@ export default function RestoreJobCard({ job, showJobId = true }: RestoreJobCard
 
       {/* Running: current file */}
       {job.status === 'running' && job.progress_details?.current_file && (
-        <div className="mt-3 rounded-md border border-sky-200 bg-sky-50 dark:border-sky-800/50 dark:bg-sky-900/20 px-3 py-2">
-          <p className="text-xs font-medium text-sky-700 dark:text-sky-300">
+        <div className="mt-3 rounded-md border border-border bg-muted/40 px-3 py-2">
+          <p className="text-xs font-medium text-foreground">
             {t('restoreJobCard.currentFile')}
           </p>
-          <p className="text-xs mt-1 font-mono break-all text-sky-700 dark:text-sky-300">
+          <p className="text-xs mt-1 font-mono break-all text-muted-foreground">
             {job.progress_details.current_file}
           </p>
         </div>
@@ -195,7 +195,7 @@ export default function RestoreJobCard({ job, showJobId = true }: RestoreJobCard
           {(job.progress_details.estimated_time_remaining || 0) > 0 && (
             <div>
               <p className="text-sm text-muted-foreground">{t('restoreJobCard.eta')}</p>
-              <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+              <p className="text-sm font-medium text-foreground">
                 {formatDurationSeconds(job.progress_details.estimated_time_remaining || 0)}
               </p>
             </div>

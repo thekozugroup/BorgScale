@@ -45,8 +45,9 @@ export default function AccountPasswordDialog({
         >
           <div className="flex flex-col gap-4 mb-4">
             <div className="flex flex-col gap-1">
-              <Label>Current password</Label>
+              <Label htmlFor="current-password">Current password</Label>
               <Input
+                id="current-password"
                 type="password"
                 value={currentPassword}
                 onChange={(e) => onFormChange({ current_password: e.target.value })}
@@ -54,8 +55,9 @@ export default function AccountPasswordDialog({
               />
             </div>
             <div className="flex flex-col gap-1">
-              <Label>New password</Label>
+              <Label htmlFor="new-password">New password</Label>
               <Input
+                id="new-password"
                 type="password"
                 value={newPassword}
                 onChange={(e) => onFormChange({ new_password: e.target.value })}
@@ -63,8 +65,9 @@ export default function AccountPasswordDialog({
               />
             </div>
             <div className="flex flex-col gap-1">
-              <Label>Confirm password</Label>
+              <Label htmlFor="confirm-password">Confirm password</Label>
               <Input
+                id="confirm-password"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => onFormChange({ confirm_password: e.target.value })}

@@ -1,10 +1,17 @@
 import React from 'react'
-import { Box, Typography, Select, MenuItem, Button, alpha, useTheme } from '@mui/material'
 import { Clock } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import BackupJobsTable from './BackupJobsTable'
 import RepoSelect from './RepoSelect'
 import { useAnalytics } from '../hooks/useAnalytics'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface ScheduledJob {
   id: number
@@ -91,8 +98,7 @@ const BackupHistorySection: React.FC<BackupHistorySectionProps> = ({
   onFilterStatusChange,
 }) => {
   const { trackNavigation, EventAction } = useAnalytics()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
+  const { t } = useTranslation()
 
   const filteredBackupJobs = backupJobs.filter((job: BackupJob) => {
     if (filterSchedule !== 'all' && job.scheduled_job_id !== filterSchedule) return false
@@ -105,175 +111,108 @@ const BackupHistorySection: React.FC<BackupHistorySectionProps> = ({
     return true
   })
 
-  const hasFilters =
-    filterSchedule !== 'all' || filterRepository !== 'all' || filterStatus !== 'all'
-
-  const { t } = useTranslation()
-
-  const filterSelectSx = {
-    fontSize: '0.8rem',
-    fontWeight: 600,
-    borderRadius: 1.5,
-    '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: isDark ? alpha('#fff', 0.1) : alpha('#000', 0.12),
-    },
-    '&:hover .MuiOutlinedInput-notchedOutline': {
-      borderColor: isDark ? alpha('#fff', 0.2) : alpha('#000', 0.25),
-    },
-  } as const
+  const hasFilters = filterSchedule !== 'all' || filterRepository !== 'all' || filterStatus !== 'all'
 
   return (
-    <Box sx={{ mt: 3 }}>
-      {/* Section header */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'space-between',
-          mb: 2,
-          gap: 1,
-        }}
-      >
-        <Box>
-          <Typography variant="h6" fontWeight={600}>
-            {t('backupHistory.title')}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
+    <div className="mt-6">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-4 gap-2">
+        <div>
+          <p className="text-base font-semibold">{t('backupHistory.title')}</p>
+          <p className="text-sm text-muted-foreground">
             {hasFilters
-              ? t('backupHistory.showingFiltered', {
-                  filtered: filteredBackupJobs.length,
-                  total: backupJobs.length,
-                })
-              : t('backupHistory.showing', {
-                  filtered: filteredBackupJobs.length,
-                  total: backupJobs.length,
-                })}
-          </Typography>
-        </Box>
-
+              ? t('backupHistory.showingFiltered', { filtered: filteredBackupJobs.length, total: backupJobs.length })
+              : t('backupHistory.showing', { filtered: filteredBackupJobs.length, total: backupJobs.length })}
+          </p>
+        </div>
         {hasFilters && (
           <Button
-            size="small"
-            variant="text"
+            size="sm"
+            variant="ghost"
+            className="font-bold flex-shrink-0"
             onClick={() => {
               onFilterScheduleChange('all')
               onFilterRepositoryChange('all')
               onFilterStatusChange('all')
-              trackNavigation(EventAction.FILTER, {
-                section: 'backup_history',
-                filter_kind: 'reset',
-              })
+              trackNavigation(EventAction.FILTER, { section: 'backup_history', filter_kind: 'reset' })
             }}
-            sx={{ px: 1, minWidth: 'auto', fontWeight: 700, borderRadius: 2, flexShrink: 0 }}
           >
             {t('common.clearFilters', { defaultValue: 'Clear filters' })}
           </Button>
         )}
-      </Box>
+      </div>
 
-      {/* Flat filter row */}
-      <Box sx={{ mb: 2.5, display: 'flex', flexWrap: 'wrap', gap: 1.5, alignItems: 'center' }}>
+      {/* Filter row */}
+      <div className="mb-5 flex flex-wrap gap-3 items-center">
         <Select
-          size="small"
-          value={filterSchedule}
-          displayEmpty
-          onChange={(e) => {
-            const value = e.target.value as number | 'all'
-            onFilterScheduleChange(value)
-            trackNavigation(EventAction.FILTER, {
-              section: 'backup_history',
-              filter_kind: 'schedule',
-              filter_value: value,
-            })
-          }}
-          sx={{
-            flex: 1,
-            minWidth: { xs: '100%', sm: 150 },
-            ...filterSelectSx,
+          value={String(filterSchedule)}
+          onValueChange={(v) => {
+            const value = v === 'all' ? 'all' : Number(v)
+            onFilterScheduleChange(value as number | 'all')
+            trackNavigation(EventAction.FILTER, { section: 'backup_history', filter_kind: 'schedule', filter_value: value })
           }}
         >
-          <MenuItem value="all">{t('backupHistory.allSchedules')}</MenuItem>
-          {scheduledJobs.map((job: ScheduledJob) => (
-            <MenuItem key={job.id} value={job.id}>
-              {job.name}
-            </MenuItem>
-          ))}
+          <SelectTrigger className="flex-1 min-w-[150px] sm:min-w-[150px] text-sm font-semibold h-9">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('backupHistory.allSchedules')}</SelectItem>
+            {scheduledJobs.map((job) => (
+              <SelectItem key={job.id} value={String(job.id)}>{job.name}</SelectItem>
+            ))}
+          </SelectContent>
         </Select>
 
-        <RepoSelect
-          repositories={repositories}
-          value={filterRepository}
-          onChange={(v) => {
-            onFilterRepositoryChange(v as string)
-            trackNavigation(EventAction.FILTER, {
-              section: 'backup_history',
-              filter_kind: 'repository',
-              filter_value: v as string,
-            })
-          }}
-          valueKey="path"
-          size="small"
-          hidePath
-          label=""
-          placeholderLabel={t('backupHistory.allRepositories')}
-          fallbackDisplayValue={t('backupHistory.allRepositories')}
-          prefixItems={<MenuItem value="all">{t('backupHistory.allRepositories')}</MenuItem>}
-          sx={{
-            flex: 2,
-            minWidth: { xs: '100%', sm: 200 },
-            ...filterSelectSx,
-          }}
-        />
+        <div className="flex-[2] min-w-[200px]">
+          <RepoSelect
+            repositories={repositories}
+            value={filterRepository}
+            onChange={(v) => {
+              onFilterRepositoryChange(v as string)
+              trackNavigation(EventAction.FILTER, { section: 'backup_history', filter_kind: 'repository', filter_value: v as string })
+            }}
+            valueKey="path"
+            size="small"
+            hidePath
+            label=""
+            placeholderLabel={t('backupHistory.allRepositories')}
+            fallbackDisplayValue={t('backupHistory.allRepositories')}
+            prefixItems={<SelectItem value="all">{t('backupHistory.allRepositories')}</SelectItem>}
+          />
+        </div>
 
         <Select
-          size="small"
           value={filterStatus}
-          displayEmpty
-          onChange={(e) => {
-            const value = e.target.value
-            onFilterStatusChange(value)
-            trackNavigation(EventAction.FILTER, {
-              section: 'backup_history',
-              filter_kind: 'status',
-              filter_value: value,
-            })
-          }}
-          sx={{
-            flex: 1,
-            minWidth: { xs: '100%', sm: 140 },
-            ...filterSelectSx,
+          onValueChange={(v) => {
+            onFilterStatusChange(v)
+            trackNavigation(EventAction.FILTER, { section: 'backup_history', filter_kind: 'status', filter_value: v })
           }}
         >
-          <MenuItem value="all">{t('backupHistory.allStatus')}</MenuItem>
-          <MenuItem value="completed">{t('backupHistory.completed')}</MenuItem>
-          <MenuItem value="failed">{t('backupHistory.failed')}</MenuItem>
-          <MenuItem value="warning">{t('backupHistory.warning')}</MenuItem>
+          <SelectTrigger className="flex-1 min-w-[140px] text-sm font-semibold h-9">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('backupHistory.allStatus')}</SelectItem>
+            <SelectItem value="completed">{t('backupHistory.completed')}</SelectItem>
+            <SelectItem value="failed">{t('backupHistory.failed')}</SelectItem>
+            <SelectItem value="warning">{t('backupHistory.warning')}</SelectItem>
+          </SelectContent>
         </Select>
-      </Box>
+      </div>
 
       <BackupJobsTable
         jobs={filteredBackupJobs}
         repositories={repositories || []}
         loading={isLoading}
-        actions={{
-          viewLogs: true,
-          cancel: true,
-          downloadLogs: true,
-          errorInfo: true,
-          delete: true,
-        }}
+        actions={{ viewLogs: true, cancel: true, downloadLogs: true, errorInfo: true, delete: true }}
         canBreakLocks={canBreakLocks}
         canDeleteJobs={canDeleteJobs}
         getRowKey={(job) => String(job.id)}
-        headerBgColor="background.default"
         enableHover={true}
         tableId="schedule"
-        emptyState={{
-          icon: <Clock size={48} />,
-          title: t('backupHistory.noJobsFound'),
-        }}
+        emptyState={{ icon: <Clock size={48} />, title: t('backupHistory.noJobsFound') }}
       />
-    </Box>
+    </div>
   )
 }
 

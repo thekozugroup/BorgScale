@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
-import { ResolvedThemeMode, ThemeMode, getTheme } from '../theme'
+import { ResolvedThemeMode, ThemeMode } from '../theme'
 
 interface ThemeContextType {
   mode: ThemeMode
@@ -75,11 +74,9 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   }
 
-  const activeTheme = getTheme(effectiveMode)
-
   return (
     <ThemeContext.Provider value={{ mode, effectiveMode, toggleTheme, setTheme }}>
-      <MuiThemeProvider theme={activeTheme}>{children}</MuiThemeProvider>
+      {children}
     </ThemeContext.Provider>
   )
 }

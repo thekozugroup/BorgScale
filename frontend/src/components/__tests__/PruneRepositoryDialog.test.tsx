@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+import { screen, renderWithProviders } from '../../test/test-utils'
 import PruneRepositoryDialog from '../PruneRepositoryDialog'
 
 const mockRepository = {
@@ -12,7 +12,7 @@ const mockRepository = {
 describe('PruneRepositoryDialog', () => {
   describe('Rendering', () => {
     it('renders dialog when open', () => {
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -30,7 +30,7 @@ describe('PruneRepositoryDialog', () => {
     })
 
     it('does not render when closed', () => {
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={false}
           repository={mockRepository}
@@ -46,7 +46,7 @@ describe('PruneRepositoryDialog', () => {
     })
 
     it('shows repository name', () => {
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -63,7 +63,7 @@ describe('PruneRepositoryDialog', () => {
 
     it('shows info about pruning', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -85,7 +85,7 @@ describe('PruneRepositoryDialog', () => {
 
   describe('Retention Policy Inputs', () => {
     it('renders all retention inputs', () => {
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -107,7 +107,7 @@ describe('PruneRepositoryDialog', () => {
     })
 
     it('shows default values', () => {
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -129,7 +129,7 @@ describe('PruneRepositoryDialog', () => {
     it('allows changing retention values', async () => {
       const user = userEvent.setup()
 
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -151,7 +151,7 @@ describe('PruneRepositoryDialog', () => {
 
   describe('Action Buttons', () => {
     it('does not render a separate cancel button in the main dialog', () => {
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -167,7 +167,7 @@ describe('PruneRepositoryDialog', () => {
     })
 
     it('renders Dry Run button', () => {
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -183,7 +183,7 @@ describe('PruneRepositoryDialog', () => {
     })
 
     it('renders Prune Archives button', () => {
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -202,7 +202,7 @@ describe('PruneRepositoryDialog', () => {
       const user = userEvent.setup()
       const onDryRun = vi.fn()
 
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -232,7 +232,7 @@ describe('PruneRepositoryDialog', () => {
       const user = userEvent.setup()
       const onConfirmPrune = vi.fn()
 
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -250,7 +250,7 @@ describe('PruneRepositoryDialog', () => {
     })
 
     it('disables buttons when loading', () => {
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -267,7 +267,7 @@ describe('PruneRepositoryDialog', () => {
     })
 
     it('keeps action labels stable when loading starts externally', () => {
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -286,7 +286,7 @@ describe('PruneRepositoryDialog', () => {
 
   describe('Results Display', () => {
     it('shows dry run results header', async () => {
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -308,7 +308,7 @@ describe('PruneRepositoryDialog', () => {
     })
 
     it('shows actual prune results header', async () => {
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -330,7 +330,7 @@ describe('PruneRepositoryDialog', () => {
     })
 
     it('shows output when available', async () => {
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -353,7 +353,7 @@ describe('PruneRepositoryDialog', () => {
     })
 
     it('shows error state for failed operation', async () => {
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -376,7 +376,7 @@ describe('PruneRepositoryDialog', () => {
     })
 
     it('shows success message for dry run', async () => {
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -402,7 +402,7 @@ describe('PruneRepositoryDialog', () => {
 
   describe('Warning Messages', () => {
     it('shows warning about deleted archives', () => {
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}
@@ -419,7 +419,7 @@ describe('PruneRepositoryDialog', () => {
 
     it('shows tip about running dry run first', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <PruneRepositoryDialog
           open={true}
           repository={mockRepository}

@@ -205,7 +205,7 @@ const Backup: React.FC = () => {
           <Button
             onClick={handleStartBackup}
             disabled={startBackupMutation.isPending || !selectedRepository || !canStartBackup}
-            className="w-full sm:w-auto flex-shrink-0 gap-1.5 font-semibold bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="w-full sm:w-auto flex-shrink-0 gap-1.5 font-semibold"
           >
             {startBackupMutation.isPending ? (
               <Loader2 size={16} className="animate-spin" />
@@ -219,7 +219,7 @@ const Backup: React.FC = () => {
         </div>
 
         {repositoriesData?.data?.repositories?.length === 0 && !loadingRepositories && (
-          <div className="flex items-start gap-2 p-3 rounded-xl text-sm mt-3" style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', color: '#b45309' }}>
+          <div className="flex items-start gap-2 p-3 rounded-xl text-sm mt-3 border border-border bg-muted/40 text-muted-foreground">
             <div>
               <p className="font-semibold">{t('backup.manualBackup.noRepositories.title')}</p>
               <p className="mt-0.5">{t('backup.manualBackup.noRepositories.subtitle')}</p>

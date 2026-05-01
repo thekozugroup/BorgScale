@@ -46,17 +46,14 @@ function SummaryRow({ label, children }: { label: string; children: React.ReactN
   )
 }
 
-const BADGE_PRIMARY = 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/30'
-const BADGE_WARNING = 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30'
+const BADGE_PRIMARY = 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20'
+const BADGE_WARNING = 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground border border-border'
 const BADGE_DEFAULT = 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border border-border text-muted-foreground'
 
-function Panel({ icon, title, headerBg, children }: { icon: React.ReactNode; title: string; headerBg?: string; children: React.ReactNode }) {
+function Panel({ icon, title, children }: { icon: React.ReactNode; title: string; headerBg?: string; children: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-border overflow-hidden">
-      <div
-        className="px-4 py-3 border-b border-border flex items-center gap-2"
-        style={{ background: headerBg ?? 'rgba(37,99,235,0.08)' }}
-      >
+      <div className="px-4 py-3 border-b border-border flex items-center gap-2 bg-muted/30">
         {icon}
         <p className="text-sm font-semibold">{title}</p>
       </div>
@@ -101,7 +98,7 @@ export default function WizardStepRestoreReview({
   return (
     <div className="flex flex-col gap-4">
       {/* Success Alert */}
-      <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#15803d' }}>
+      <div className="flex items-start gap-2 p-3 rounded-xl text-sm border border-primary/20 bg-primary/10 text-primary">
         <CheckCircle size={18} className="flex-shrink-0 mt-0.5" />
         <p className="font-semibold">
           {selectedFiles.length === 0
@@ -160,7 +157,6 @@ export default function WizardStepRestoreReview({
         <Panel
           icon={<FileCheck size={16} />}
           title={t('wizard.restoreReview.restorePreview')}
-          headerBg="rgba(245,158,11,0.08)"
         >
           <p className="text-xs text-muted-foreground mb-3">{t('wizard.restoreReview.previewNote')}</p>
           <div className="p-3 rounded-xl bg-muted/30 overflow-auto max-h-48">
@@ -168,7 +164,7 @@ export default function WizardStepRestoreReview({
               {examplePaths.map((path, index) => (
                 <div key={index} className="flex flex-col gap-0.5">
                   <p className="text-xs text-muted-foreground font-mono">Original: {path}</p>
-                  <p className="text-sm font-semibold font-mono" style={{ color: '#2563eb' }}>
+                  <p className="text-sm font-semibold font-mono text-primary">
                     → {getDestinationPath(path)}
                   </p>
                 </div>
@@ -187,7 +183,6 @@ export default function WizardStepRestoreReview({
       <Panel
         icon={<FolderOpen size={16} />}
         title={t('wizard.restoreReview.filesToRestore')}
-        headerBg="rgba(245,158,11,0.08)"
       >
         <SummaryRow label={t('wizard.restoreReview.numberOfItems')}>
           <span className={BADGE_PRIMARY}>
@@ -200,7 +195,7 @@ export default function WizardStepRestoreReview({
         {selectedFiles.length === 0 && (
           <>
             <div className="border-t border-border my-2" />
-            <div className="flex items-start gap-2 p-3 rounded-xl text-sm mt-1" style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}>
+            <div className="flex items-start gap-2 p-3 rounded-xl text-sm mt-1 border border-border bg-muted/40 text-muted-foreground">
               {t('wizard.restoreReview.entireArchiveNote')}
             </div>
           </>
@@ -208,7 +203,7 @@ export default function WizardStepRestoreReview({
       </Panel>
 
       {/* Ready Alert */}
-      <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#15803d' }}>
+      <div className="flex items-start gap-2 p-3 rounded-xl text-sm border border-primary/20 bg-primary/10 text-primary">
         <FileCheck size={16} className="flex-shrink-0 mt-0.5" />
         <p className="font-semibold">{t('wizard.restoreReview.everythingLooksGood')}</p>
       </div>

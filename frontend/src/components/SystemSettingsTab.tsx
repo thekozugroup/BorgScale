@@ -141,20 +141,20 @@ const SystemSettingsTab: React.FC = () => {
   const renderSourceLabel = (source: string | null | undefined) => {
     if (source === 'saved') {
       return (
-        <span className="text-[0.7rem] font-medium text-green-600 dark:text-green-400">
+        <span className="text-[0.7rem] font-medium text-primary">
           {' '}{t('systemSettings.sourceCustomized')}
         </span>
       )
     }
     if (source === 'env') {
       return (
-        <span className="text-[0.7rem] font-medium text-amber-600 dark:text-amber-400">
+        <span className="text-[0.7rem] font-medium text-muted-foreground">
           {' '}{t('systemSettings.sourceFromEnv')}
         </span>
       )
     }
     return (
-      <span className="text-[0.7rem] font-medium text-blue-600 dark:text-blue-400">
+      <span className="text-[0.7rem] font-medium text-muted-foreground">
         {' '}{t('systemSettings.sourceDefault')}
       </span>
     )
@@ -477,7 +477,7 @@ const SystemSettingsTab: React.FC = () => {
                 {activeSection === 1 && (
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Info size={14} className="text-blue-500 cursor-help" />
+                      <Info size={14} className="text-muted-foreground cursor-help" />
                     </TooltipTrigger>
                     <TooltipContent>{t('systemSettings.manualRefreshAlert')}</TooltipContent>
                   </Tooltip>
@@ -485,7 +485,7 @@ const SystemSettingsTab: React.FC = () => {
                 {activeSection === 2 && (
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Info size={14} className="text-blue-500 cursor-help" />
+                      <Info size={14} className="text-muted-foreground cursor-help" />
                     </TooltipTrigger>
                     <TooltipContent>{t('systemSettings.metricsHeaderHelp')}</TooltipContent>
                   </Tooltip>
@@ -493,7 +493,7 @@ const SystemSettingsTab: React.FC = () => {
                 {activeSection === 3 && (
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <AlertTriangle size={14} className="text-amber-500 cursor-help" />
+                      <AlertTriangle size={14} className="text-muted-foreground cursor-help" />
                     </TooltipTrigger>
                     <TooltipContent>
                       <strong>{t('systemSettings.warningLabel')}</strong>{' '}
@@ -557,22 +557,19 @@ const SystemSettingsTab: React.FC = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ maxWidth: 640 }}>
                   <div>
-                    <Label className="text-xs font-semibold mb-1.5 block">{t('systemSettings.maxConcurrentScheduledBackupsLabel')}</Label>
-                    <Input type="number" value={maxConcurrentScheduledBackups} onChange={(e) => setMaxConcurrentScheduledBackups(Number(e.target.value))} min={0} max={MAX_SCHEDULE_CONCURRENCY} step={1} className="h-9 text-sm" />
+                    <Label htmlFor="max-concurrent-backups" className="text-xs font-semibold mb-1.5 block">{t('systemSettings.maxConcurrentScheduledBackupsLabel')}</Label>
+                    <Input id="max-concurrent-backups" type="number" value={maxConcurrentScheduledBackups} onChange={(e) => setMaxConcurrentScheduledBackups(Number(e.target.value))} min={0} max={MAX_SCHEDULE_CONCURRENCY} step={1} className="h-9 text-sm" />
                     <p className="text-xs text-muted-foreground mt-1">{t('systemSettings.maxConcurrentScheduledBackupsHelper')}</p>
                   </div>
                   <div>
-                    <Label className="text-xs font-semibold mb-1.5 block">{t('systemSettings.maxConcurrentScheduledChecksLabel')}</Label>
-                    <Input type="number" value={maxConcurrentScheduledChecks} onChange={(e) => setMaxConcurrentScheduledChecks(Number(e.target.value))} min={0} max={MAX_SCHEDULE_CONCURRENCY} step={1} className="h-9 text-sm" />
+                    <Label htmlFor="max-concurrent-checks" className="text-xs font-semibold mb-1.5 block">{t('systemSettings.maxConcurrentScheduledChecksLabel')}</Label>
+                    <Input id="max-concurrent-checks" type="number" value={maxConcurrentScheduledChecks} onChange={(e) => setMaxConcurrentScheduledChecks(Number(e.target.value))} min={0} max={MAX_SCHEDULE_CONCURRENCY} step={1} className="h-9 text-sm" />
                     <p className="text-xs text-muted-foreground mt-1">{t('systemSettings.maxConcurrentScheduledChecksHelper')}</p>
                   </div>
                 </div>
 
                 {systemSettings?.last_stats_refresh && (
-                  <div
-                    className="flex items-start gap-2 p-3 rounded-xl text-sm"
-                    style={{ background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }}
-                  >
+                  <div className="flex items-start gap-2 p-3 rounded-xl text-sm border border-border bg-muted/40 text-muted-foreground">
                     {t('systemSettings.lastRefreshed')}{' '}
                     {new Date(systemSettings.last_stats_refresh).toLocaleString()}
                   </div>
@@ -632,14 +629,11 @@ const SystemSettingsTab: React.FC = () => {
                 </div>
 
                 {newMetricsToken && (
-                  <div
-                    className="p-4 rounded-xl"
-                    style={{ border: '1px solid rgba(34,197,94,0.4)', background: 'rgba(34,197,94,0.06)' }}
-                  >
+                  <div className="p-4 rounded-xl border border-primary/30 bg-primary/5">
                     <div className="flex flex-col gap-3">
                       <div className="flex items-center gap-1.5">
-                        <AlertTriangle size={12} className="text-amber-500" />
-                        <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
+                        <AlertTriangle size={12} className="text-muted-foreground" />
+                        <span className="text-xs font-semibold text-muted-foreground">
                           {t('systemSettings.metricsTokenDialogWarning')}
                         </span>
                       </div>
@@ -658,7 +652,7 @@ const SystemSettingsTab: React.FC = () => {
                               className={cn(
                                 'flex items-center justify-center w-7 h-7 rounded flex-shrink-0 transition-colors',
                                 metricsTokenCopied
-                                  ? 'text-green-500'
+                                  ? 'text-primary'
                                   : 'text-muted-foreground hover:text-foreground'
                               )}
                             >
@@ -725,12 +719,7 @@ const SystemSettingsTab: React.FC = () => {
             {activeSection === 4 && (
               <div className="flex flex-col gap-4">
                 <div
-                  className="flex items-start gap-2 p-3 rounded-xl text-sm"
-                  style={
-                    proxyAuthConfig?.proxy_auth_enabled
-                      ? { background: 'rgba(14,165,233,0.1)', border: '1px solid rgba(14,165,233,0.25)', color: '#0369a1' }
-                      : { background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#15803d' }
-                  }
+                  className={`flex items-start gap-2 p-3 rounded-xl text-sm border ${proxyAuthConfig?.proxy_auth_enabled ? 'border-border bg-muted/40 text-muted-foreground' : 'border-primary/20 bg-primary/10 text-primary'}`}
                 >
                   {proxyAuthConfig?.proxy_auth_enabled
                     ? t('systemSettings.proxyAuthEnabledStatus')
@@ -754,10 +743,7 @@ const SystemSettingsTab: React.FC = () => {
                 )}
 
                 {proxyAuthConfig?.proxy_auth_health?.warnings?.length ? (
-                  <div
-                    className="p-3 rounded-xl text-sm flex flex-col gap-2"
-                    style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', color: '#b45309' }}
-                  >
+                  <div className="p-3 rounded-xl text-sm flex flex-col gap-2 border border-border bg-muted/40 text-foreground">
                     <p className="font-semibold">{t('systemSettings.proxyAuthWarningsTitle')}</p>
                     <div className="flex flex-col gap-1.5">
                       {proxyAuthConfig.proxy_auth_health.warnings.map((warning: { code: string; message: string }) => (
@@ -766,10 +752,7 @@ const SystemSettingsTab: React.FC = () => {
                     </div>
                   </div>
                 ) : proxyAuthConfig?.proxy_auth_enabled ? (
-                  <div
-                    className="p-3 rounded-xl text-sm"
-                    style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#15803d' }}
-                  >
+                  <div className="p-3 rounded-xl text-sm border border-primary/20 bg-primary/10 text-primary">
                     {t('systemSettings.proxyAuthNoWarnings')}
                   </div>
                 ) : null}

@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
+import { screen, fireEvent, renderWithProviders } from '../../test/test-utils'
 import PruneSettingsInput from '../PruneSettingsInput'
 
 describe('PruneSettingsInput', () => {
@@ -14,7 +14,7 @@ describe('PruneSettingsInput', () => {
 
   it('renders all six input fields', () => {
     const onChange = vi.fn()
-    render(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
+    renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
 
     expect(screen.getByLabelText(/Keep Hourly/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/Keep Daily/i)).toBeInTheDocument()
@@ -26,7 +26,7 @@ describe('PruneSettingsInput', () => {
 
   it('displays correct initial values', () => {
     const onChange = vi.fn()
-    render(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
+    renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
 
     expect(screen.getByLabelText(/Keep Hourly/i)).toHaveValue(0)
     expect(screen.getByLabelText(/Keep Daily/i)).toHaveValue(7)
@@ -38,7 +38,7 @@ describe('PruneSettingsInput', () => {
 
   it('calls onChange when hourly value changes', () => {
     const onChange = vi.fn()
-    render(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
+    renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
 
     const hourlyInput = screen.getByLabelText(/Keep Hourly/i)
     fireEvent.change(hourlyInput, { target: { value: '24' } })
@@ -51,7 +51,7 @@ describe('PruneSettingsInput', () => {
 
   it('calls onChange when daily value changes', () => {
     const onChange = vi.fn()
-    render(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
+    renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
 
     const dailyInput = screen.getByLabelText(/Keep Daily/i)
     fireEvent.change(dailyInput, { target: { value: '14' } })
@@ -64,7 +64,7 @@ describe('PruneSettingsInput', () => {
 
   it('prevents negative values', () => {
     const onChange = vi.fn()
-    render(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
+    renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
 
     const dailyInput = screen.getByLabelText(/Keep Daily/i)
     fireEvent.change(dailyInput, { target: { value: '-5' } })
@@ -77,7 +77,7 @@ describe('PruneSettingsInput', () => {
 
   it('handles invalid input gracefully', () => {
     const onChange = vi.fn()
-    render(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
+    renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
 
     const weeklyInput = screen.getByLabelText(/Keep Weekly/i)
     fireEvent.change(weeklyInput, { target: { value: 'invalid' } })
@@ -90,7 +90,7 @@ describe('PruneSettingsInput', () => {
 
   it('disables all inputs when disabled prop is true', () => {
     const onChange = vi.fn()
-    render(<PruneSettingsInput values={defaultValues} onChange={onChange} disabled={true} />)
+    renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} disabled={true} />)
 
     expect(screen.getByLabelText(/Keep Hourly/i)).toBeDisabled()
     expect(screen.getByLabelText(/Keep Daily/i)).toBeDisabled()
@@ -102,7 +102,7 @@ describe('PruneSettingsInput', () => {
 
   it('displays helper text for each field', () => {
     const onChange = vi.fn()
-    render(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
+    renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
 
     expect(screen.getByText(/Hourly backups to keep/i)).toBeInTheDocument()
     expect(screen.getByText(/Daily backups to keep/i)).toBeInTheDocument()
@@ -123,7 +123,7 @@ describe('PruneSettingsInput', () => {
       keepYearly: 0,
     }
 
-    render(<PruneSettingsInput values={allZeroValues} onChange={onChange} />)
+    renderWithProviders(<PruneSettingsInput values={allZeroValues} onChange={onChange} />)
 
     Object.values(screen.getAllByRole('spinbutton')).forEach((input) => {
       expect(input).toHaveValue(0)
@@ -132,7 +132,7 @@ describe('PruneSettingsInput', () => {
 
   it('handles large values correctly', () => {
     const onChange = vi.fn()
-    render(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
+    renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
 
     const yearlyInput = screen.getByLabelText(/Keep Yearly/i)
     fireEvent.change(yearlyInput, { target: { value: '999' } })

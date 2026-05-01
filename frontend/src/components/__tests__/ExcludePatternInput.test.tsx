@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { screen, renderWithProviders } from '../../test/test-utils'
 import userEvent from '@testing-library/user-event'
 import ExcludePatternInput from '../ExcludePatternInput'
 
@@ -14,31 +14,31 @@ describe('ExcludePatternInput', () => {
 
   describe('Rendering', () => {
     it('renders title and description', () => {
-      render(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
+      renderWithProviders(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
       expect(screen.getByText('Exclude Patterns (Optional)')).toBeInTheDocument()
       expect(screen.getByText(/Specify patterns to exclude/)).toBeInTheDocument()
     })
 
     it('renders existing patterns', () => {
       const patterns = ['*.log', '*.tmp', 'node_modules']
-      render(<ExcludePatternInput patterns={patterns} onChange={mockOnChange} />)
+      renderWithProviders(<ExcludePatternInput patterns={patterns} onChange={mockOnChange} />)
       expect(screen.getByText('*.log')).toBeInTheDocument()
       expect(screen.getByText('*.tmp')).toBeInTheDocument()
       expect(screen.getByText('node_modules')).toBeInTheDocument()
     })
 
     it('renders input field with placeholder', () => {
-      render(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
+      renderWithProviders(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
       expect(screen.getByPlaceholderText('*.log or /path/to/exclude')).toBeInTheDocument()
     })
 
     it('renders Add button', () => {
-      render(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
+      renderWithProviders(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
       expect(screen.getByRole('button', { name: /Add/i })).toBeInTheDocument()
     })
 
     it('renders browse button when onBrowseClick provided', () => {
-      render(
+      renderWithProviders(
         <ExcludePatternInput
           patterns={[]}
           onChange={mockOnChange}
@@ -49,7 +49,7 @@ describe('ExcludePatternInput', () => {
     })
 
     it('does not render browse button when onBrowseClick not provided', () => {
-      render(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
+      renderWithProviders(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
       expect(screen.queryByTitle('Browse to exclude')).not.toBeInTheDocument()
     })
   })
@@ -57,7 +57,7 @@ describe('ExcludePatternInput', () => {
   describe('Adding patterns', () => {
     it('adds pattern when clicking Add button', async () => {
       const user = userEvent.setup()
-      render(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
+      renderWithProviders(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
 
       const input = screen.getByPlaceholderText('*.log or /path/to/exclude')
       await user.type(input, '*.log')
@@ -68,7 +68,7 @@ describe('ExcludePatternInput', () => {
 
     it('adds pattern when pressing Enter', async () => {
       const user = userEvent.setup()
-      render(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
+      renderWithProviders(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
 
       const input = screen.getByPlaceholderText('*.log or /path/to/exclude')
       await user.type(input, '__pycache__{enter}')
@@ -78,7 +78,7 @@ describe('ExcludePatternInput', () => {
 
     it('appends to existing patterns', async () => {
       const user = userEvent.setup()
-      render(<ExcludePatternInput patterns={['*.log']} onChange={mockOnChange} />)
+      renderWithProviders(<ExcludePatternInput patterns={['*.log']} onChange={mockOnChange} />)
 
       const input = screen.getByPlaceholderText('*.log or /path/to/exclude')
       await user.type(input, '*.tmp')
@@ -89,7 +89,7 @@ describe('ExcludePatternInput', () => {
 
     it('trims whitespace from input', async () => {
       const user = userEvent.setup()
-      render(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
+      renderWithProviders(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
 
       const input = screen.getByPlaceholderText('*.log or /path/to/exclude')
       await user.type(input, '  *.log  ')
@@ -100,7 +100,7 @@ describe('ExcludePatternInput', () => {
 
     it('clears input after adding', async () => {
       const user = userEvent.setup()
-      render(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
+      renderWithProviders(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
 
       const input = screen.getByPlaceholderText('*.log or /path/to/exclude')
       await user.type(input, '*.log')
@@ -111,7 +111,7 @@ describe('ExcludePatternInput', () => {
 
     it('does not add empty pattern', async () => {
       const user = userEvent.setup()
-      render(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
+      renderWithProviders(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
 
       await user.click(screen.getByRole('button', { name: /Add/i }))
 
@@ -120,7 +120,7 @@ describe('ExcludePatternInput', () => {
 
     it('does not add whitespace-only pattern', async () => {
       const user = userEvent.setup()
-      render(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
+      renderWithProviders(<ExcludePatternInput patterns={[]} onChange={mockOnChange} />)
 
       const input = screen.getByPlaceholderText('*.log or /path/to/exclude')
       await user.type(input, '   ')
@@ -133,17 +133,15 @@ describe('ExcludePatternInput', () => {
   describe('Removing patterns', () => {
     it('removes pattern when clicking delete button', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <ExcludePatternInput
           patterns={['*.log', '*.tmp', 'node_modules']}
           onChange={mockOnChange}
         />
       )
 
-      // Get all delete buttons
-      const deleteButtons = screen
-        .getAllByRole('button')
-        .filter((btn) => btn.querySelector('svg[data-testid="DeleteIcon"]'))
+      // Get all delete buttons by aria-label
+      const deleteButtons = screen.getAllByRole('button', { name: /^Remove / })
 
       // Click the second delete button (index 1 = *.tmp)
       await user.click(deleteButtons[1])
@@ -153,11 +151,9 @@ describe('ExcludePatternInput', () => {
 
     it('removes first pattern correctly', async () => {
       const user = userEvent.setup()
-      render(<ExcludePatternInput patterns={['*.log', '*.tmp']} onChange={mockOnChange} />)
+      renderWithProviders(<ExcludePatternInput patterns={['*.log', '*.tmp']} onChange={mockOnChange} />)
 
-      const deleteButtons = screen
-        .getAllByRole('button')
-        .filter((btn) => btn.querySelector('svg[data-testid="DeleteIcon"]'))
+      const deleteButtons = screen.getAllByRole('button', { name: /^Remove / })
 
       await user.click(deleteButtons[0])
 
@@ -166,11 +162,9 @@ describe('ExcludePatternInput', () => {
 
     it('removes last pattern correctly', async () => {
       const user = userEvent.setup()
-      render(<ExcludePatternInput patterns={['*.log', '*.tmp']} onChange={mockOnChange} />)
+      renderWithProviders(<ExcludePatternInput patterns={['*.log', '*.tmp']} onChange={mockOnChange} />)
 
-      const deleteButtons = screen
-        .getAllByRole('button')
-        .filter((btn) => btn.querySelector('svg[data-testid="DeleteIcon"]'))
+      const deleteButtons = screen.getAllByRole('button', { name: /^Remove / })
 
       await user.click(deleteButtons[1])
 
@@ -181,7 +175,7 @@ describe('ExcludePatternInput', () => {
   describe('Browse functionality', () => {
     it('calls onBrowseClick when browse button clicked', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <ExcludePatternInput
           patterns={[]}
           onChange={mockOnChange}
@@ -197,25 +191,23 @@ describe('ExcludePatternInput', () => {
 
   describe('Disabled state', () => {
     it('disables input when disabled=true', () => {
-      render(<ExcludePatternInput patterns={[]} onChange={mockOnChange} disabled={true} />)
+      renderWithProviders(<ExcludePatternInput patterns={[]} onChange={mockOnChange} disabled={true} />)
       expect(screen.getByPlaceholderText('*.log or /path/to/exclude')).toBeDisabled()
     })
 
     it('disables Add button when disabled=true', () => {
-      render(<ExcludePatternInput patterns={[]} onChange={mockOnChange} disabled={true} />)
+      renderWithProviders(<ExcludePatternInput patterns={[]} onChange={mockOnChange} disabled={true} />)
       expect(screen.getByRole('button', { name: /Add/i })).toBeDisabled()
     })
 
     it('disables delete buttons when disabled=true', () => {
-      render(<ExcludePatternInput patterns={['*.log']} onChange={mockOnChange} disabled={true} />)
-      const deleteBtn = screen
-        .getAllByRole('button')
-        .find((btn) => btn.querySelector('svg[data-testid="DeleteIcon"]'))
+      renderWithProviders(<ExcludePatternInput patterns={['*.log']} onChange={mockOnChange} disabled={true} />)
+      const deleteBtn = screen.getByRole('button', { name: /^Remove / })
       expect(deleteBtn).toBeDisabled()
     })
 
     it('disables browse button when disabled=true', () => {
-      render(
+      renderWithProviders(
         <ExcludePatternInput
           patterns={[]}
           onChange={mockOnChange}

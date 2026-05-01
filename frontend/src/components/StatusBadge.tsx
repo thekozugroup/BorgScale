@@ -1,6 +1,7 @@
 import React from 'react'
-import { Chip } from '@mui/material'
+import { Badge } from '@/components/ui/badge'
 import { useTranslation } from 'react-i18next'
+import { cn } from '@/lib/utils'
 
 interface StatusBadgeProps {
   status: string
@@ -12,30 +13,28 @@ interface StatusBadgeProps {
  * Standardized status badge component used across Activity, Schedule, and Dashboard views
  * Shows consistent color and label representation for all job statuses (no icon)
  */
-export const StatusBadge: React.FC<StatusBadgeProps> = ({
-  status,
-  size = 'small',
-  variant = 'outlined',
-}) => {
+export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   const { t } = useTranslation()
 
-  const getStatusColor = (status: string): 'success' | 'error' | 'warning' | 'info' | 'default' => {
+  const getStatusClasses = (status: string): string => {
     switch (status.toLowerCase()) {
       case 'completed':
       case 'success':
-        return 'success'
+        return 'bg-primary/10 text-primary border-primary/20'
       case 'completed_with_warnings':
-        return 'warning'
+        return 'bg-muted text-muted-foreground border-border'
       case 'failed':
       case 'error':
-        return 'error'
+        return 'bg-destructive/10 text-destructive border-destructive/20'
       case 'running':
       case 'in_progress':
-        return 'info'
+        return 'bg-secondary text-secondary-foreground border-border'
       case 'pending':
-        return 'default'
+        return 'bg-muted text-muted-foreground border-border'
+      case 'cancelled':
+        return 'bg-muted text-muted-foreground border-border'
       default:
-        return 'default'
+        return 'bg-muted text-muted-foreground border-border'
     }
   }
 
@@ -60,13 +59,12 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   }
 
   return (
-    <Chip
-      label={getStatusLabel(status)}
-      color={getStatusColor(status)}
-      size={size}
-      variant={variant}
-      sx={{ fontWeight: 500 }}
-    />
+    <Badge
+      className={cn('font-medium border', getStatusClasses(status))}
+      variant="outline"
+    >
+      {getStatusLabel(status)}
+    </Badge>
   )
 }
 

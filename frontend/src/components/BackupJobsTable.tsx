@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Box, Typography, Chip, Tooltip } from '@mui/material'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Badge } from '@/components/ui/badge'
 import {
   Eye,
   Download,
@@ -103,26 +104,6 @@ const getTypeLabel = (type: string, t: (key: string) => string): string => {
   }
 }
 
-const getTypeColor = (
-  type: string
-): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
-  switch (type) {
-    case 'backup':
-      return 'primary'
-    case 'restore':
-      return 'secondary'
-    case 'check':
-      return 'info'
-    case 'compact':
-      return 'warning'
-    case 'prune':
-      return 'warning'
-    case 'package':
-      return 'success'
-    default:
-      return 'default'
-  }
-}
 
 export const BackupJobsTable = <T extends Job = Job>({
   jobs,
@@ -349,9 +330,7 @@ export const BackupJobsTable = <T extends Job = Job>({
       align: 'left',
       width: '80px',
       render: (job: T) => (
-        <Typography variant="body2" fontWeight={600} color="primary">
-          #{job.id}
-        </Typography>
+        <span className="text-sm font-semibold text-primary">#{job.id}</span>
       ),
     },
     {
@@ -364,7 +343,7 @@ export const BackupJobsTable = <T extends Job = Job>({
         // Handle Activity items with different repository field names
         if (job.type && job.type === 'package') {
           const displayName = job.archive_name || job.package_name || '-'
-          return <Typography variant="body2">{displayName}</Typography>
+          return <span className="text-sm">{displayName}</span>
         }
 
         // For backup/restore/check/compact in Activity tab
@@ -398,16 +377,9 @@ export const BackupJobsTable = <T extends Job = Job>({
             align: 'left' as const,
             width: '120px',
             render: (job: T) => (
-              <Chip
-                label={getTypeLabel(job.type || '', t)}
-                color={getTypeColor(job.type || '')}
-                size="small"
-                variant="outlined"
-                sx={{
-                  maxWidth: '100%',
-                  '& .MuiChip-label': { overflow: 'hidden', textOverflow: 'ellipsis' },
-                }}
-              />
+              <Badge variant="outline" className="max-w-full truncate text-xs">
+                {getTypeLabel(job.type || '', t)}
+              </Badge>
             ),
           },
         ]
@@ -422,23 +394,21 @@ export const BackupJobsTable = <T extends Job = Job>({
             width: '70px',
             render: (job: T) => {
               const isScheduled = job.triggered_by === 'schedule'
+              const tipText = isScheduled
+                ? t('backupJobsTable.scheduledById', { id: job.schedule_id || 'N/A' })
+                : t('backupJobsTable.manual')
               return (
-                <Tooltip
-                  title={
-                    isScheduled
-                      ? t('backupJobsTable.scheduledById', { id: job.schedule_id || 'N/A' })
-                      : t('backupJobsTable.manual')
-                  }
-                  placement="top"
-                  arrow
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {isScheduled ? (
-                      <Calendar size={18} color="#1976d2" />
-                    ) : (
-                      <User size={18} color="#666" />
-                    )}
-                  </Box>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center">
+                      {isScheduled ? (
+                        <Calendar size={18} color="#1976d2" />
+                      ) : (
+                        <User size={18} color="#666" />
+                      )}
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>{tipText}</TooltipContent>
                 </Tooltip>
               )
             },
@@ -458,9 +428,7 @@ export const BackupJobsTable = <T extends Job = Job>({
       align: 'left',
       width: '160px',
       render: (job: T) => (
-        <Typography variant="body2" color="text.secondary">
-          {job.started_at ? formatDate(job.started_at) : '-'}
-        </Typography>
+        <span className="text-sm text-muted-foreground">{job.started_at ? formatDate(job.started_at) : '-'}</span>
       ),
     },
     {
@@ -469,9 +437,9 @@ export const BackupJobsTable = <T extends Job = Job>({
       align: 'left',
       width: '110px',
       render: (job: T) => (
-        <Typography variant="body2" color="text.secondary">
+        <span className="text-sm text-muted-foreground">
           {formatTimeRange(job.started_at, job.completed_at, job.status)}
-        </Typography>
+        </span>
       ),
     },
   ]
@@ -608,11 +576,7 @@ export const BackupJobsTable = <T extends Job = Job>({
 
   // Build default emptyState
   const defaultEmptyState: EmptyState = {
-    icon: (
-      <Box sx={{ color: 'text.disabled' }}>
-        <Clock size={48} />
-      </Box>
-    ),
+    icon: <Clock size={48} className="text-muted-foreground opacity-40" />,
     title: t('backupJobsTable.empty'),
     description: t('backupJobsTable.empty'),
   }

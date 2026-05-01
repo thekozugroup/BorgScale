@@ -613,9 +613,9 @@ export default function SSHConnectionsSingleKey() {
   const warningAlertStyle = { background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.25)', color: '#b45309' }
   const successAlertStyle = { background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', color: '#15803d' }
 
-  const FormField = ({ label, children, helper }: { label: string; children: React.ReactNode; helper?: string }) => (
+  const FormField = ({ label, children, helper, fieldId }: { label: string; children: React.ReactNode; helper?: string; fieldId?: string }) => (
     <div>
-      <Label className="text-xs font-semibold mb-1.5 block">{label}</Label>
+      <Label htmlFor={fieldId} className="text-xs font-semibold mb-1.5 block">{label}</Label>
       {children}
       {helper && <p className="text-xs text-muted-foreground mt-1">{helper}</p>}
     </div>
@@ -661,7 +661,7 @@ export default function SSHConnectionsSingleKey() {
           </div>
           <p className="text-base font-semibold flex-1">{t('sshConnections.systemKey.title')}</p>
           {keyExists && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border border-green-500/30 bg-green-500/10 text-green-700 dark:text-green-400">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border border-primary/20 bg-primary/10 text-primary">
               <CheckCircle size={12} /> Active
             </span>
           )}
@@ -726,11 +726,11 @@ export default function SSHConnectionsSingleKey() {
 
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-3">
-              <Button onClick={() => setDeployDialogOpen(true)} className="w-full sm:w-auto gap-1.5" title="Automatically deploy SSH key using password authentication">
+              <Button onClick={() => setDeployDialogOpen(true)} className="w-full sm:w-auto gap-1.5" aria-label="Automatically deploy SSH key using password authentication" title="Automatically deploy SSH key using password authentication">
                 <Plus size={18} />
                 {t('sshConnections.systemKey.actions.deploy')}
               </Button>
-              <Button variant="outline" onClick={() => setTestConnectionDialogOpen(true)} className="w-full sm:w-auto gap-1.5" title="Add a connection for a manually deployed SSH key">
+              <Button variant="outline" onClick={() => setTestConnectionDialogOpen(true)} className="w-full sm:w-auto gap-1.5" aria-label="Add a connection for a manually deployed SSH key" title="Add a connection for a manually deployed SSH key">
                 <Wifi size={18} />
                 {t('sshConnections.systemKey.actions.addManual')}
               </Button>
@@ -754,7 +754,7 @@ export default function SSHConnectionsSingleKey() {
               )}
             </div>
             {!keyExists && connections.length > 0 && (
-              <span title={t('sshConnections.systemKey.noKey')} className="text-amber-500 cursor-help">
+              <span title={t('sshConnections.systemKey.noKey')} className="text-muted-foreground cursor-help">
                 <Info size={18} />
               </span>
             )}
@@ -860,18 +860,18 @@ export default function SSHConnectionsSingleKey() {
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>{t('sshConnections.deployDialog.title')}</DialogTitle></DialogHeader>
           <div className="flex flex-col gap-4 pt-1">
-            <FormField label={t('sshConnections.deployDialog.host')}>
-              <Input value={connectionForm.host} onChange={(e) => setConnectionForm({ ...connectionForm, host: e.target.value })} placeholder="192.168.1.100 or example.com" className="h-9 text-sm" />
+            <FormField label={t('sshConnections.deployDialog.host')} fieldId="deploy-host">
+              <Input id="deploy-host" value={connectionForm.host} onChange={(e) => setConnectionForm({ ...connectionForm, host: e.target.value })} placeholder="192.168.1.100 or example.com" className="h-9 text-sm" />
             </FormField>
-            <FormField label={t('sshConnections.deployDialog.username')}>
-              <Input value={connectionForm.username} onChange={(e) => setConnectionForm({ ...connectionForm, username: e.target.value })} placeholder="root" className="h-9 text-sm" />
+            <FormField label={t('sshConnections.deployDialog.username')} fieldId="deploy-username">
+              <Input id="deploy-username" value={connectionForm.username} onChange={(e) => setConnectionForm({ ...connectionForm, username: e.target.value })} placeholder="root" className="h-9 text-sm" />
             </FormField>
-            <FormField label={t('sshConnections.deployDialog.port')}>
-              <Input type="number" value={connectionForm.port} onChange={(e) => setConnectionForm({ ...connectionForm, port: parseInt(e.target.value) })} className="h-9 text-sm" />
+            <FormField label={t('sshConnections.deployDialog.port')} fieldId="deploy-port">
+              <Input id="deploy-port" type="number" value={connectionForm.port} onChange={(e) => setConnectionForm({ ...connectionForm, port: parseInt(e.target.value) })} className="h-9 text-sm" />
             </FormField>
-            <FormField label={t('sshConnections.deployDialog.password')}>
+            <FormField label={t('sshConnections.deployDialog.password')} fieldId="deploy-password">
               <div className="relative">
-                <Input type="password" value={connectionForm.password} onChange={(e) => setConnectionForm({ ...connectionForm, password: e.target.value })} placeholder="Server password (for initial deployment)" className="h-9 text-sm pr-9" />
+                <Input id="deploy-password" type="password" value={connectionForm.password} onChange={(e) => setConnectionForm({ ...connectionForm, password: e.target.value })} placeholder="Server password (for initial deployment)" className="h-9 text-sm pr-9" />
                 <span title="The password is used to deploy your public key to the server's authorized_keys file. After deployment, you'll connect using the SSH key." className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground cursor-help">
                   <Info size={18} />
                 </span>
@@ -884,11 +884,11 @@ export default function SSHConnectionsSingleKey() {
                 <p className="text-xs text-muted-foreground">Required by Hetzner Storage Box. Disable for Synology NAS or older SSH servers.</p>
               </div>
             </label>
-            <FormField label={t('sshConnections.deployDialog.defaultPath')} helper="Starting directory for SSH file browsing (e.g., /home for Hetzner Storage Box)">
-              <Input value={connectionForm.default_path} onChange={(e) => setConnectionForm({ ...connectionForm, default_path: e.target.value })} placeholder="/home" className="h-9 text-sm" />
+            <FormField label={t('sshConnections.deployDialog.defaultPath')} helper="Starting directory for SSH file browsing (e.g., /home for Hetzner Storage Box)" fieldId="deploy-default-path">
+              <Input id="deploy-default-path" value={connectionForm.default_path} onChange={(e) => setConnectionForm({ ...connectionForm, default_path: e.target.value })} placeholder="/home" className="h-9 text-sm" />
             </FormField>
-            <FormField label={t('sshConnections.deployDialog.mountPoint')} helper="Friendly name for this remote machine (e.g., hetzner, backup-server)">
-              <Input value={connectionForm.mount_point} onChange={(e) => setConnectionForm({ ...connectionForm, mount_point: e.target.value })} placeholder="hetzner or homeserver" className="h-9 text-sm" />
+            <FormField label={t('sshConnections.deployDialog.mountPoint')} helper="Friendly name for this remote machine (e.g., hetzner, backup-server)" fieldId="deploy-mount-point">
+              <Input id="deploy-mount-point" value={connectionForm.mount_point} onChange={(e) => setConnectionForm({ ...connectionForm, mount_point: e.target.value })} placeholder="hetzner or homeserver" className="h-9 text-sm" />
             </FormField>
             <div className="flex justify-end gap-2 pt-1">
               <Button variant="outline" onClick={() => setDeployDialogOpen(false)}>Cancel</Button>
@@ -911,14 +911,14 @@ export default function SSHConnectionsSingleKey() {
               <p className="text-xs mb-0.5">2. {t('sshConnections.manualConnectionDialog.instructions.step2')}</p>
               <p className="text-xs">3. {t('sshConnections.manualConnectionDialog.instructions.step3')}</p>
             </div>
-            <FormField label={t('sshConnections.deployDialog.host')}>
-              <Input value={testConnectionForm.host} onChange={(e) => setTestConnectionForm({ ...testConnectionForm, host: e.target.value })} placeholder="192.168.1.100 or example.com" className="h-9 text-sm" />
+            <FormField label={t('sshConnections.deployDialog.host')} fieldId="test-conn-host">
+              <Input id="test-conn-host" value={testConnectionForm.host} onChange={(e) => setTestConnectionForm({ ...testConnectionForm, host: e.target.value })} placeholder="192.168.1.100 or example.com" className="h-9 text-sm" />
             </FormField>
-            <FormField label={t('sshConnections.deployDialog.username')}>
-              <Input value={testConnectionForm.username} onChange={(e) => setTestConnectionForm({ ...testConnectionForm, username: e.target.value })} placeholder="root" className="h-9 text-sm" />
+            <FormField label={t('sshConnections.deployDialog.username')} fieldId="test-conn-username">
+              <Input id="test-conn-username" value={testConnectionForm.username} onChange={(e) => setTestConnectionForm({ ...testConnectionForm, username: e.target.value })} placeholder="root" className="h-9 text-sm" />
             </FormField>
-            <FormField label={t('sshConnections.deployDialog.port')}>
-              <Input type="number" value={testConnectionForm.port} onChange={(e) => setTestConnectionForm({ ...testConnectionForm, port: parseInt(e.target.value) })} className="h-9 text-sm" />
+            <FormField label={t('sshConnections.deployDialog.port')} fieldId="test-conn-port">
+              <Input id="test-conn-port" type="number" value={testConnectionForm.port} onChange={(e) => setTestConnectionForm({ ...testConnectionForm, port: parseInt(e.target.value) })} className="h-9 text-sm" />
             </FormField>
             <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={successAlertStyle}>
               This will test the connection and add it to your connections list if successful.
@@ -938,14 +938,14 @@ export default function SSHConnectionsSingleKey() {
         <DialogContent className="max-w-sm">
           <DialogHeader><DialogTitle>{t('sshConnections.editConnectionDialog.title')}</DialogTitle></DialogHeader>
           <div className="flex flex-col gap-4 pt-1">
-            <FormField label={t('sshConnections.deployDialog.host')}>
-              <Input value={editConnectionForm.host} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, host: e.target.value })} placeholder="192.168.1.100 or example.com" className="h-9 text-sm" />
+            <FormField label={t('sshConnections.deployDialog.host')} fieldId="edit-conn-host">
+              <Input id="edit-conn-host" value={editConnectionForm.host} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, host: e.target.value })} placeholder="192.168.1.100 or example.com" className="h-9 text-sm" />
             </FormField>
-            <FormField label={t('sshConnections.deployDialog.username')}>
-              <Input value={editConnectionForm.username} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, username: e.target.value })} placeholder="root" className="h-9 text-sm" />
+            <FormField label={t('sshConnections.deployDialog.username')} fieldId="edit-conn-username">
+              <Input id="edit-conn-username" value={editConnectionForm.username} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, username: e.target.value })} placeholder="root" className="h-9 text-sm" />
             </FormField>
-            <FormField label={t('sshConnections.deployDialog.port')}>
-              <Input type="number" value={editConnectionForm.port} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, port: parseInt(e.target.value) })} className="h-9 text-sm" />
+            <FormField label={t('sshConnections.deployDialog.port')} fieldId="edit-conn-port">
+              <Input id="edit-conn-port" type="number" value={editConnectionForm.port} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, port: parseInt(e.target.value) })} className="h-9 text-sm" />
             </FormField>
             <label className="flex items-start gap-2 cursor-pointer">
               <input type="checkbox" checked={editConnectionForm.use_sftp_mode} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, use_sftp_mode: e.target.checked })} className="mt-0.5" />
@@ -961,11 +961,11 @@ export default function SSHConnectionsSingleKey() {
                 <p className="text-xs text-muted-foreground">{t('sshConnections.deployDialog.useSudoHint')}</p>
               </div>
             </label>
-            <FormField label={t('sshConnections.deployDialog.defaultPath')} helper="Starting directory for SSH file browsing (e.g., /home for Hetzner Storage Box)">
-              <Input value={editConnectionForm.default_path} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, default_path: e.target.value })} placeholder="/home" className="h-9 text-sm" />
+            <FormField label={t('sshConnections.deployDialog.defaultPath')} helper="Starting directory for SSH file browsing (e.g., /home for Hetzner Storage Box)" fieldId="edit-conn-default-path">
+              <Input id="edit-conn-default-path" value={editConnectionForm.default_path} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, default_path: e.target.value })} placeholder="/home" className="h-9 text-sm" />
             </FormField>
-            <FormField label={t('sshConnections.deployDialog.mountPoint')} helper="Friendly name for this remote machine (e.g., hetzner, backup-server)">
-              <Input value={editConnectionForm.mount_point} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, mount_point: e.target.value })} placeholder="hetzner or homeserver" className="h-9 text-sm" />
+            <FormField label={t('sshConnections.deployDialog.mountPoint')} helper="Friendly name for this remote machine (e.g., hetzner, backup-server)" fieldId="edit-conn-mount-point">
+              <Input id="edit-conn-mount-point" value={editConnectionForm.mount_point} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, mount_point: e.target.value })} placeholder="hetzner or homeserver" className="h-9 text-sm" />
             </FormField>
             <div className="flex items-start gap-2 p-3 rounded-xl text-sm" style={infoAlertStyle}>
               Update the connection details. You may want to test the connection after updating.

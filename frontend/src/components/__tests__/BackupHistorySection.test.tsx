@@ -1,5 +1,5 @@
-import { render, screen, fireEvent, within } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
+import { screen, fireEvent, within, renderWithProviders } from '../../test/test-utils'
 import BackupHistorySection from '../BackupHistorySection'
 
 // Mock BackupJobsTable
@@ -120,14 +120,14 @@ describe('BackupHistorySection', () => {
   }
 
   it('renders header and description', () => {
-    render(<BackupHistorySection {...defaultProps} />)
+    renderWithProviders(<BackupHistorySection {...defaultProps} />)
 
     expect(screen.getByText('Backup History')).toBeInTheDocument()
     expect(screen.getByText(/Showing 3 of 3 backup jobs/)).toBeInTheDocument()
   })
 
   it('renders three filter dropdowns', () => {
-    render(<BackupHistorySection {...defaultProps} />)
+    renderWithProviders(<BackupHistorySection {...defaultProps} />)
 
     // Three comboboxes should be present: schedule, repository, status
     expect(screen.getAllByRole('combobox').length).toBeGreaterThanOrEqual(3)
@@ -136,20 +136,20 @@ describe('BackupHistorySection', () => {
   })
 
   it('renders BackupJobsTable with all jobs', () => {
-    render(<BackupHistorySection {...defaultProps} />)
+    renderWithProviders(<BackupHistorySection {...defaultProps} />)
 
     expect(screen.getByTestId('backup-jobs-table')).toBeInTheDocument()
     expect(screen.getByText('Table with 3 jobs')).toBeInTheDocument()
   })
 
   it('shows loading state when isLoading is true', () => {
-    render(<BackupHistorySection {...defaultProps} isLoading={true} />)
+    renderWithProviders(<BackupHistorySection {...defaultProps} isLoading={true} />)
 
     expect(screen.getByText('Loading backup jobs...')).toBeInTheDocument()
   })
 
   it('filters by schedule', () => {
-    render(<BackupHistorySection {...defaultProps} filterSchedule={1} />)
+    renderWithProviders(<BackupHistorySection {...defaultProps} filterSchedule={1} />)
 
     // Jobs 1 and 3 have scheduled_job_id = 1
     expect(screen.getByText('Table with 2 jobs')).toBeInTheDocument()
@@ -157,7 +157,7 @@ describe('BackupHistorySection', () => {
   })
 
   it('filters by repository', () => {
-    render(<BackupHistorySection {...defaultProps} filterRepository="/path/to/repo-a" />)
+    renderWithProviders(<BackupHistorySection {...defaultProps} filterRepository="/path/to/repo-a" />)
 
     // Jobs 1 and 3 have repository = '/path/to/repo-a'
     expect(screen.getByText('Table with 2 jobs')).toBeInTheDocument()
@@ -165,7 +165,7 @@ describe('BackupHistorySection', () => {
   })
 
   it('filters by completed status', () => {
-    render(<BackupHistorySection {...defaultProps} filterStatus="completed" />)
+    renderWithProviders(<BackupHistorySection {...defaultProps} filterStatus="completed" />)
 
     // Only job 1 has status = 'completed'
     expect(screen.getByText('Table with 1 jobs')).toBeInTheDocument()
@@ -173,21 +173,21 @@ describe('BackupHistorySection', () => {
   })
 
   it('filters by failed status', () => {
-    render(<BackupHistorySection {...defaultProps} filterStatus="failed" />)
+    renderWithProviders(<BackupHistorySection {...defaultProps} filterStatus="failed" />)
 
     // Only job 2 has status = 'failed'
     expect(screen.getByText('Table with 1 jobs')).toBeInTheDocument()
   })
 
   it('filters by warning status', () => {
-    render(<BackupHistorySection {...defaultProps} filterStatus="warning" />)
+    renderWithProviders(<BackupHistorySection {...defaultProps} filterStatus="warning" />)
 
     // Only job 3 has status = 'completed_with_warnings'
     expect(screen.getByText('Table with 1 jobs')).toBeInTheDocument()
   })
 
   it('combines multiple filters', () => {
-    render(
+    renderWithProviders(
       <BackupHistorySection
         {...defaultProps}
         filterSchedule={1}
@@ -202,12 +202,12 @@ describe('BackupHistorySection', () => {
 
   it('calls onFilterScheduleChange when schedule filter changes', () => {
     const onFilterScheduleChange = vi.fn()
-    render(
+    renderWithProviders(
       <BackupHistorySection {...defaultProps} onFilterScheduleChange={onFilterScheduleChange} />
     )
 
     const scheduleSelect = screen.getByText('All Schedules')
-    fireEvent.mouseDown(scheduleSelect)
+    fireEvent.pointerDown(scheduleSelect, { button: 0, pointerType: 'mouse' })
 
     const listbox = within(screen.getByRole('listbox'))
     const dailyOption = listbox.getByText('Daily Backup')
@@ -218,13 +218,13 @@ describe('BackupHistorySection', () => {
 
   it('calls onFilterRepositoryChange when repository filter changes', () => {
     const onFilterRepositoryChange = vi.fn()
-    render(
+    renderWithProviders(
       <BackupHistorySection {...defaultProps} onFilterRepositoryChange={onFilterRepositoryChange} />
     )
 
     // Repository is the second combobox (schedule, repository, status order)
     const repoCombobox = screen.getAllByRole('combobox')[1]
-    fireEvent.mouseDown(repoCombobox)
+    fireEvent.pointerDown(repoCombobox, { button: 0, pointerType: 'mouse' })
 
     const listbox = within(screen.getByRole('listbox'))
     const repoOption = listbox.getByText('Repo A')
@@ -235,10 +235,10 @@ describe('BackupHistorySection', () => {
 
   it('calls onFilterStatusChange when status filter changes', () => {
     const onFilterStatusChange = vi.fn()
-    render(<BackupHistorySection {...defaultProps} onFilterStatusChange={onFilterStatusChange} />)
+    renderWithProviders(<BackupHistorySection {...defaultProps} onFilterStatusChange={onFilterStatusChange} />)
 
     const statusSelect = screen.getByText('All Status')
-    fireEvent.mouseDown(statusSelect)
+    fireEvent.pointerDown(statusSelect, { button: 0, pointerType: 'mouse' })
 
     const listbox = within(screen.getByRole('listbox'))
     const completedOption = listbox.getByText('Completed')
@@ -248,10 +248,10 @@ describe('BackupHistorySection', () => {
   })
 
   it('renders all schedule options in dropdown', () => {
-    render(<BackupHistorySection {...defaultProps} />)
+    renderWithProviders(<BackupHistorySection {...defaultProps} />)
 
     const scheduleSelect = screen.getByText('All Schedules')
-    fireEvent.mouseDown(scheduleSelect)
+    fireEvent.pointerDown(scheduleSelect, { button: 0, pointerType: 'mouse' })
 
     const listbox = within(screen.getByRole('listbox'))
     expect(listbox.getByText('All Schedules')).toBeInTheDocument()
@@ -260,11 +260,11 @@ describe('BackupHistorySection', () => {
   })
 
   it('renders all repository options in dropdown', () => {
-    render(<BackupHistorySection {...defaultProps} />)
+    renderWithProviders(<BackupHistorySection {...defaultProps} />)
 
     // Repository is the second combobox (schedule, repository, status order)
     const repoCombobox = screen.getAllByRole('combobox')[1]
-    fireEvent.mouseDown(repoCombobox)
+    fireEvent.pointerDown(repoCombobox, { button: 0, pointerType: 'mouse' })
 
     const listbox = within(screen.getByRole('listbox'))
     expect(listbox.getByText('All Repositories')).toBeInTheDocument()
@@ -273,10 +273,10 @@ describe('BackupHistorySection', () => {
   })
 
   it('renders all status options in dropdown', () => {
-    render(<BackupHistorySection {...defaultProps} />)
+    renderWithProviders(<BackupHistorySection {...defaultProps} />)
 
     const statusSelect = screen.getByText('All Status')
-    fireEvent.mouseDown(statusSelect)
+    fireEvent.pointerDown(statusSelect, { button: 0, pointerType: 'mouse' })
 
     const listbox = within(screen.getByRole('listbox'))
     expect(listbox.getByText('All Status')).toBeInTheDocument()
@@ -286,14 +286,14 @@ describe('BackupHistorySection', () => {
   })
 
   it('shows no filtered indicator when no filters are applied', () => {
-    render(<BackupHistorySection {...defaultProps} />)
+    renderWithProviders(<BackupHistorySection {...defaultProps} />)
 
     const description = screen.getByText(/Showing 3 of 3 backup jobs/)
     expect(description.textContent).not.toContain('(filtered)')
   })
 
   it('renders empty state when all jobs are filtered out', () => {
-    render(<BackupHistorySection {...defaultProps} filterStatus="completed" filterSchedule={2} />)
+    renderWithProviders(<BackupHistorySection {...defaultProps} filterStatus="completed" filterSchedule={2} />)
 
     // No jobs match: schedule 2 has only a failed job
     expect(screen.getByText('Table with 0 jobs')).toBeInTheDocument()
@@ -301,7 +301,7 @@ describe('BackupHistorySection', () => {
   })
 
   it('renders with empty backup jobs array', () => {
-    render(<BackupHistorySection {...defaultProps} backupJobs={[]} />)
+    renderWithProviders(<BackupHistorySection {...defaultProps} backupJobs={[]} />)
 
     expect(screen.getByText('Table with 0 jobs')).toBeInTheDocument()
     expect(screen.getByText(/Showing 0 of 0 backup jobs/)).toBeInTheDocument()

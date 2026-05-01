@@ -1,7 +1,7 @@
 import React from 'react'
-import { Box, Stack, Typography, Tooltip } from '@mui/material'
 import { HardDrive } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface RepositoryCellProps {
   repositoryName?: string | null
@@ -19,44 +19,23 @@ export const RepositoryCell: React.FC<RepositoryCellProps> = ({
   withIcon = true,
 }) => {
   const { t } = useTranslation()
-  // Use the friendly name if available (from database), otherwise show path
   const displayName = repositoryName || repositoryPath || t('common.unknown')
   const displayPath = repositoryPath || ''
 
   return (
-    <Tooltip title={displayPath || t('repositoryCell.noPath')} placement="top" arrow>
-      <Stack direction="row" spacing={1} alignItems="flex-start" sx={{ color: 'text.secondary' }}>
-        {withIcon && <HardDrive size={16} style={{ flexShrink: 0, marginTop: 2 }} />}
-        <Box sx={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
-          <Typography
-            variant="body2"
-            fontWeight={500}
-            sx={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {displayName}
-          </Typography>
-          {repositoryPath && (
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{
-                fontFamily: 'monospace',
-                fontSize: '0.7rem',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                display: 'block',
-              }}
-            >
-              {displayPath}
-            </Typography>
-          )}
-        </Box>
-      </Stack>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className="flex flex-row gap-2 items-start text-muted-foreground cursor-default">
+          {withIcon && <HardDrive size={16} className="flex-shrink-0 mt-0.5" />}
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
+            {repositoryPath && (
+              <p className="text-[0.7rem] text-muted-foreground font-mono truncate">{displayPath}</p>
+            )}
+          </div>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent>{displayPath || t('repositoryCell.noPath')}</TooltipContent>
     </Tooltip>
   )
 }

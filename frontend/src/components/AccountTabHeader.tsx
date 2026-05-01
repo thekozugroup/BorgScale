@@ -1,17 +1,12 @@
-import { Box, Typography } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 
 export default function AccountTabHeader() {
   const { t } = useTranslation()
 
   return (
-    <Box>
-      <Typography variant="h5" fontWeight={700} gutterBottom>
-        {t('settings.account.title')}
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        {t('settings.account.description')}
-      </Typography>
-    </Box>
+    <div>
+      <h2 className="text-lg font-bold mb-1">{t('settings.account.title')}</h2>
+      <p className="text-sm text-muted-foreground">{t('settings.account.description')}</p>
+    </div>
   )
 }

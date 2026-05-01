@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { DialogContent, DialogActions, Button, Typography } from '@mui/material'
+import { Button } from '@/components/ui/button'
 import ResponsiveDialog from './ResponsiveDialog'
 
 interface CancelJobDialogProps {
@@ -13,25 +13,16 @@ export default function CancelJobDialog({ open, onClose, onConfirm }: CancelJobD
   const { t } = useTranslation()
   return (
     <ResponsiveDialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogContent sx={{ pt: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          {t('dialogs.cancelJob.title')}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {t('dialogs.cancelJob.message')}
-        </Typography>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>{t('common.buttons.cancel')}</Button>
-        <Button
-          onClick={onConfirm}
-          color="error"
-          variant="contained"
-          sx={{ boxShadow: '0 2px 8px rgba(220,38,38,0.35)' }}
-        >
-          {t('dialogs.cancelJob.confirm')}
-        </Button>
-      </DialogActions>
+      <div className="p-6 pt-6">
+        <h3 className="text-lg font-semibold mb-2">{t('dialogs.cancelJob.title')}</h3>
+        <p className="text-sm text-muted-foreground mb-6">{t('dialogs.cancelJob.message')}</p>
+        <div className="flex justify-end gap-2">
+          <Button variant="ghost" onClick={onClose}>{t('common.buttons.cancel')}</Button>
+          <Button variant="destructive" onClick={onConfirm}>
+            {t('dialogs.cancelJob.confirm')}
+          </Button>
+        </div>
+      </div>
     </ResponsiveDialog>
   )
 }

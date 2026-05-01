@@ -111,7 +111,7 @@ const WizardStepScheduleReview: React.FC<WizardStepScheduleReviewProps> = ({
         </span>
         <span
           title={t('wizard.scheduleWizard.review.readyToCreate')}
-          className="flex items-center gap-1 text-[0.65rem] font-semibold px-2 py-0.5 rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800 cursor-help"
+          className="flex items-center gap-1 text-[0.65rem] font-semibold px-2 py-0.5 rounded-full border bg-muted text-foreground border-border cursor-help"
         >
           <Rocket size={10} />
           Ready
@@ -132,8 +132,8 @@ const WizardStepScheduleReview: React.FC<WizardStepScheduleReviewProps> = ({
         <SectionCard
           icon={<Calendar size={14} />}
           label={t('wizard.scheduleWizard.review.jobSummary')}
-          iconClass="bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400"
-          cardClass="bg-blue-50/60 dark:bg-blue-950/20"
+          iconClass="bg-muted text-muted-foreground"
+          cardClass="bg-muted/20"
         >
           <AttrRow label={t('wizard.scheduleWizard.review.name')}>
             <span className="text-sm font-bold">{data.name}</span>
@@ -155,8 +155,8 @@ const WizardStepScheduleReview: React.FC<WizardStepScheduleReviewProps> = ({
         <SectionCard
           icon={<Database size={14} />}
           label={t('wizard.scheduleWizard.review.repositories', { count: selectedRepos.length })}
-          iconClass="bg-amber-100 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400"
-          cardClass="bg-amber-50/60 dark:bg-amber-950/20"
+          iconClass="bg-muted text-muted-foreground"
+          cardClass="bg-muted/20"
         >
           {selectedRepos.length === 0 ? (
             <span className="text-sm text-muted-foreground">
@@ -178,8 +178,8 @@ const WizardStepScheduleReview: React.FC<WizardStepScheduleReviewProps> = ({
         <SectionCard
           icon={<Code size={14} />}
           label={t('wizard.scheduleWizard.review.scriptsConfiguration')}
-          iconClass="bg-violet-100 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400"
-          cardClass="bg-violet-50/60 dark:bg-violet-950/20"
+          iconClass="bg-muted text-muted-foreground"
+          cardClass="bg-muted/20"
         >
           <AttrRow label={t('wizard.scheduleWizard.review.preBackupScript')}>
             {preScript ? (
@@ -219,15 +219,15 @@ const WizardStepScheduleReview: React.FC<WizardStepScheduleReviewProps> = ({
         <SectionCard
           icon={<Wrench size={14} />}
           label={t('wizard.scheduleWizard.review.maintenanceSettings')}
-          iconClass="bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400"
-          cardClass="bg-emerald-50/60 dark:bg-emerald-950/20"
+          iconClass="bg-muted text-muted-foreground"
+          cardClass="bg-muted/20"
         >
           <AttrRow label={t('wizard.scheduleWizard.review.pruneAfterBackup')}>
             <span
               className={cn(
                 'text-[0.62rem] font-semibold px-1.5 py-0.5 rounded-full',
                 data.runPruneAfter
-                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
+                  ? 'bg-primary/10 text-primary'
                   : 'bg-muted text-muted-foreground'
               )}
             >
@@ -246,7 +246,7 @@ const WizardStepScheduleReview: React.FC<WizardStepScheduleReviewProps> = ({
               className={cn(
                 'text-[0.62rem] font-semibold px-1.5 py-0.5 rounded-full',
                 data.runCompactAfter
-                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
+                  ? 'bg-primary/10 text-primary'
                   : 'bg-muted text-muted-foreground'
               )}
             >

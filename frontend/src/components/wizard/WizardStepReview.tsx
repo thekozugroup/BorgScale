@@ -201,7 +201,7 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
         {mode === 'create' && data.repositoryMode === 'full' && (
           <span
             title={t('wizard.review.repositoryInitialized')}
-            className="flex items-center gap-1 text-[0.65rem] font-semibold px-2 py-0.5 rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-800 cursor-help"
+            className="flex items-center gap-1 text-[0.65rem] font-semibold px-2 py-0.5 rounded-full border bg-muted text-foreground border-border cursor-help"
           >
             <Rocket size={10} />
             Ready to Initialize
@@ -224,8 +224,8 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
         <SectionCard
           icon={<FolderOpen size={14} />}
           label={t('wizard.review.repository')}
-          iconClass="bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400"
-          cardClass="bg-blue-50/60 dark:bg-blue-950/20"
+          iconClass="bg-muted text-muted-foreground"
+          cardClass="bg-muted/20"
         >
           <AttrRow label={t('wizard.review.name')}>
             <span className="text-sm font-bold">{data.name}</span>
@@ -272,29 +272,29 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
           label={t('wizard.review.security')}
           iconClass={cn(
             isEncrypted
-              ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400'
-              : 'bg-red-100 text-red-600 dark:bg-red-950/40 dark:text-red-400'
+              ? 'bg-primary/10 text-primary'
+              : 'bg-destructive/10 text-destructive'
           )}
           cardClass={cn(
             isEncrypted
-              ? 'bg-emerald-50/60 dark:bg-emerald-950/20'
-              : 'bg-red-50/60 dark:bg-red-950/20'
+              ? 'bg-muted/20'
+              : 'bg-muted/20'
           )}
         >
           {mode === 'create' && (
             <AttrRow label={t('wizard.review.encryption')}>
               <div className="flex items-center gap-1">
                 {isEncrypted ? (
-                  <Lock size={11} className="text-emerald-600 dark:text-emerald-400" />
+                  <Lock size={11} className="text-primary" />
                 ) : (
-                  <Unlock size={11} className="text-red-600 dark:text-red-400" />
+                  <Unlock size={11} className="text-destructive" />
                 )}
                 <span
                   className={cn(
                     'text-[0.62rem] font-semibold px-1.5 py-0.5 rounded-full',
                     isEncrypted
-                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
-                      : 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400'
+                      ? 'bg-primary/10 text-primary'
+                      : 'bg-destructive/10 text-destructive'
                   )}
                 >
                   {t(getEncryptionLabelKey(data.encryption))}
@@ -336,8 +336,8 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
           <SectionCard
             icon={data.dataSource === 'local' ? <HardDrive size={14} /> : <Laptop size={14} />}
             label={t('wizard.review.dataSource')}
-            iconClass="bg-amber-100 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400"
-            cardClass="bg-amber-50/60 dark:bg-amber-950/20"
+            iconClass="bg-muted text-muted-foreground"
+            cardClass="bg-muted/20"
           >
             <AttrRow label={t('wizard.review.source')}>
               <span className="text-sm font-medium">
@@ -369,8 +369,8 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
           <SectionCard
             icon={<Settings size={14} />}
             label={t('wizard.review.backupConfiguration')}
-            iconClass="bg-violet-100 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400"
-            cardClass="bg-violet-50/60 dark:bg-violet-950/20"
+            iconClass="bg-muted text-muted-foreground"
+            cardClass="bg-muted/20"
           >
             <AttrRow label={t('wizard.review.compression')}>
               <CodePill>{data.compression}</CodePill>

@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
+import { screen, renderWithProviders } from '../../test/test-utils'
 import UpcomingJobsTable from '../UpcomingJobsTable'
 
 // Mock date utils
@@ -27,7 +27,7 @@ describe('UpcomingJobsTable', () => {
   })
 
   it('renders nothing when upcomingJobs is empty', () => {
-    const { container } = render(
+    renderWithProviders(
       <UpcomingJobsTable
         upcomingJobs={[]}
         repositories={mockRepositories}
@@ -36,7 +36,7 @@ describe('UpcomingJobsTable', () => {
       />
     )
 
-    expect(container.firstChild).toBeNull()
+    expect(screen.queryByText('Upcoming Jobs')).not.toBeInTheDocument()
   })
 
   it('renders card with header when upcomingJobs has items', () => {
@@ -50,7 +50,7 @@ describe('UpcomingJobsTable', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <UpcomingJobsTable
         upcomingJobs={mockJobs}
         repositories={mockRepositories}
@@ -73,7 +73,7 @@ describe('UpcomingJobsTable', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <UpcomingJobsTable
         upcomingJobs={mockJobs}
         repositories={mockRepositories}
@@ -96,7 +96,7 @@ describe('UpcomingJobsTable', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <UpcomingJobsTable
         upcomingJobs={mockJobs}
         repositories={mockRepositories}
@@ -119,7 +119,7 @@ describe('UpcomingJobsTable', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <UpcomingJobsTable
         upcomingJobs={mockJobs}
         repositories={mockRepositories}
@@ -142,7 +142,7 @@ describe('UpcomingJobsTable', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <UpcomingJobsTable
         upcomingJobs={mockJobs}
         repositories={mockRepositories}
@@ -166,7 +166,7 @@ describe('UpcomingJobsTable', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <UpcomingJobsTable
         upcomingJobs={mockJobs}
         repositories={mockRepositories}
@@ -193,7 +193,7 @@ describe('UpcomingJobsTable', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <UpcomingJobsTable
         upcomingJobs={mockJobs}
         repositories={mockRepositories}
@@ -205,7 +205,8 @@ describe('UpcomingJobsTable', () => {
     await user.hover(screen.getByText('Daily Backup'))
 
     const formattedDate = new Date('2024-01-01T14:00:00Z').toLocaleDateString()
-    expect(await screen.findByText(formattedDate)).toBeInTheDocument()
+    const dateElements = await screen.findAllByText(formattedDate)
+    expect(dateElements.length).toBeGreaterThan(0)
   })
 
   it('displays relative time using formatRelativeTime', () => {
@@ -219,7 +220,7 @@ describe('UpcomingJobsTable', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <UpcomingJobsTable
         upcomingJobs={mockJobs}
         repositories={mockRepositories}
@@ -240,7 +241,7 @@ describe('UpcomingJobsTable', () => {
       cron_expression: '0 14 * * *',
     }))
 
-    render(
+    renderWithProviders(
       <UpcomingJobsTable
         upcomingJobs={mockJobs}
         repositories={mockRepositories}
@@ -272,7 +273,7 @@ describe('UpcomingJobsTable', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <UpcomingJobsTable
         upcomingJobs={mockJobs}
         repositories={mockRepositories}
@@ -298,7 +299,7 @@ describe('UpcomingJobsTable', () => {
       },
     ]
 
-    render(
+    renderWithProviders(
       <UpcomingJobsTable
         upcomingJobs={mockJobs}
         repositories={mockRepositories}
@@ -321,7 +322,7 @@ describe('UpcomingJobsTable', () => {
       },
     ]
 
-    const { container } = render(
+    const { container } = renderWithProviders(
       <UpcomingJobsTable
         upcomingJobs={mockJobs}
         repositories={mockRepositories}

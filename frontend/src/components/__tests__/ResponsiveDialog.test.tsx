@@ -1,14 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import { useMediaQuery } from '@mui/material'
+import { screen, renderWithProviders } from '../../test/test-utils'
 import ResponsiveDialog from '../ResponsiveDialog'
 
-vi.mock('@mui/material', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@mui/material')>()
-  return { ...actual, useMediaQuery: vi.fn() }
-})
-
-const mockUseMediaQuery = vi.mocked(useMediaQuery)
+// Helper: mock window.matchMedia for mobile vs desktop
+function mockMatchMedia(matches: boolean) {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  })
+}
 
 describe('ResponsiveDialog', () => {
   const onClose = vi.fn()
@@ -19,11 +28,11 @@ describe('ResponsiveDialog', () => {
 
   describe('desktop (md+)', () => {
     beforeEach(() => {
-      mockUseMediaQuery.mockReturnValue(false)
+      mockMatchMedia(false) // max-width: 767px does NOT match → desktop
     })
 
     it('renders a Dialog (role=dialog) when open', () => {
-      render(
+      renderWithProviders(
         <ResponsiveDialog open={true} onClose={onClose}>
           <div>content</div>
         </ResponsiveDialog>
@@ -32,7 +41,7 @@ describe('ResponsiveDialog', () => {
     })
 
     it('does not render when open is false', () => {
-      render(
+      renderWithProviders(
         <ResponsiveDialog open={false} onClose={onClose}>
           <div>content</div>
         </ResponsiveDialog>
@@ -41,7 +50,7 @@ describe('ResponsiveDialog', () => {
     })
 
     it('renders children', () => {
-      render(
+      renderWithProviders(
         <ResponsiveDialog open={true} onClose={onClose}>
           <div>hello world</div>
         </ResponsiveDialog>
@@ -52,21 +61,20 @@ describe('ResponsiveDialog', () => {
 
   describe('mobile (< md)', () => {
     beforeEach(() => {
-      mockUseMediaQuery.mockReturnValue(true)
+      mockMatchMedia(true) // max-width: 767px matches → mobile
     })
 
     it('renders the drag handle when open', () => {
-      render(
+      renderWithProviders(
         <ResponsiveDialog open={true} onClose={onClose}>
           <div>content</div>
         </ResponsiveDialog>
       )
-      // screen queries search the entire document including portals
       expect(screen.getByTestId('drag-handle')).toBeInTheDocument()
     })
 
     it('renders children', () => {
-      render(
+      renderWithProviders(
         <ResponsiveDialog open={true} onClose={onClose}>
           <div>mobile content</div>
         </ResponsiveDialog>
@@ -75,7 +83,7 @@ describe('ResponsiveDialog', () => {
     })
 
     it('does not render content when open is false', () => {
-      render(
+      renderWithProviders(
         <ResponsiveDialog open={false} onClose={onClose}>
           <div>hidden</div>
         </ResponsiveDialog>
@@ -86,11 +94,11 @@ describe('ResponsiveDialog', () => {
 
   describe('footer prop — mobile', () => {
     beforeEach(() => {
-      mockUseMediaQuery.mockReturnValue(true)
+      mockMatchMedia(true)
     })
 
     it('renders footer outside the scrollable area when provided', () => {
-      render(
+      renderWithProviders(
         <ResponsiveDialog
           open={true}
           onClose={onClose}
@@ -104,7 +112,7 @@ describe('ResponsiveDialog', () => {
     })
 
     it('does not render footer container when footer is not provided', () => {
-      render(
+      renderWithProviders(
         <ResponsiveDialog open={true} onClose={onClose}>
           <div>content</div>
         </ResponsiveDialog>
@@ -115,11 +123,11 @@ describe('ResponsiveDialog', () => {
 
   describe('footer prop — desktop', () => {
     beforeEach(() => {
-      mockUseMediaQuery.mockReturnValue(false)
+      mockMatchMedia(false)
     })
 
     it('renders footer as part of dialog children when provided', () => {
-      render(
+      renderWithProviders(
         <ResponsiveDialog
           open={true}
           onClose={onClose}

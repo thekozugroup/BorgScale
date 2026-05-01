@@ -1,6 +1,6 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { screen, fireEvent, waitFor, renderWithProviders } from '../../test/test-utils'
+import { QueryClient } from '@tanstack/react-query'
 import Dashboard from '../DashboardV3'
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
@@ -10,13 +10,21 @@ const { getOverviewMock } = vi.hoisted(() => ({
   getOverviewMock: vi.fn(),
 }))
 
-vi.mock('react-router-dom', () => ({
-  useNavigate: () => mockNavigate,
-}))
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  }
+})
 
-vi.mock('../../context/ThemeContext', () => ({
-  useTheme: () => ({ mode: 'dark', effectiveMode: 'dark' }),
-}))
+vi.mock('../../context/ThemeContext', async () => {
+  const actual = await vi.importActual<typeof import('../../context/ThemeContext')>('../../context/ThemeContext')
+  return {
+    ...actual,
+    useTheme: () => ({ mode: 'dark', effectiveMode: 'dark' }),
+  }
+})
 
 vi.mock('../../utils/basePath', () => ({
   BASE_PATH: '',
@@ -33,11 +41,8 @@ vi.mock('../../services/api', () => ({
 const createQueryClient = () => new QueryClient({ defaultOptions: { queries: { retry: false } } })
 
 function renderDashboard() {
-  return render(
-    <QueryClientProvider client={createQueryClient()}>
-      <Dashboard />
-    </QueryClientProvider>
-  )
+  const queryClient = createQueryClient()
+  return renderWithProviders(<Dashboard />, { queryClient })
 }
 
 function mockFetchSuccess(data: unknown) {
@@ -155,8 +160,8 @@ function makeOverview(overrides: Record<string, unknown> = {}) {
 beforeEach(() => {
   vi.clearAllMocks()
   getOverviewMock.mockResolvedValue({ data: makeOverview() })
-  // Default: suppress localStorage access
-  vi.stubGlobal('localStorage', { getItem: () => 'test-token' })
+  // Default: suppress localStorage access (provide setItem to avoid ThemeProvider errors)
+  vi.stubGlobal('localStorage', { getItem: () => 'test-token', setItem: vi.fn(), removeItem: vi.fn() })
 })
 
 // ─── Tests ────────────────────────────────────────────────────────────────────

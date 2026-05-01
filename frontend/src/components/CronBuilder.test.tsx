@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
+import { screen, fireEvent, renderWithProviders } from '../test/test-utils'
 import CronBuilder from './CronBuilder'
 
 // Mock dateUtils to avoid timezone complexity in component tests
@@ -10,7 +10,7 @@ vi.mock('../utils/dateUtils', () => ({
 
 describe('CronBuilder', () => {
   it('renders correctly with initial daily value', () => {
-    render(<CronBuilder value="0 2 * * *" onChange={() => {}} />)
+    renderWithProviders(<CronBuilder value="0 2 * * *" onChange={() => {}} />)
 
     // Should show "Daily" selected
     expect(screen.getByText('Daily')).toBeInTheDocument()
@@ -28,7 +28,7 @@ describe('CronBuilder', () => {
 
   it('switches to Weekly frequency and shows days', () => {
     const handleChange = vi.fn()
-    render(<CronBuilder value="0 2 * * *" onChange={handleChange} />)
+    renderWithProviders(<CronBuilder value="0 2 * * *" onChange={handleChange} />)
 
     // Click "Weekly" toggle
     fireEvent.click(screen.getByText('Weekly'))
@@ -44,7 +44,7 @@ describe('CronBuilder', () => {
 
   it('updates time when inputs change', () => {
     const handleChange = vi.fn()
-    render(<CronBuilder value="0 2 * * *" onChange={handleChange} />)
+    renderWithProviders(<CronBuilder value="0 2 * * *" onChange={handleChange} />)
 
     const inputs = screen.getAllByRole('spinbutton')
     const hourInput = inputs[0]
@@ -59,7 +59,7 @@ describe('CronBuilder', () => {
 
   it('handles interval inputs in Hourly mode', () => {
     const handleChange = vi.fn()
-    render(
+    renderWithProviders(
       <CronBuilder
         value="0 0 * * *" // Start daily
         onChange={handleChange}

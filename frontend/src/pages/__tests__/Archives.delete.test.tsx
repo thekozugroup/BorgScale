@@ -5,10 +5,9 @@
  * because `repository-info` was not being invalidated alongside `repository-archives`.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QueryClient } from '@tanstack/react-query'
-import { renderWithProviders } from '../../test/test-utils'
+import { renderWithProviders, screen, waitFor, act } from '../../test/test-utils'
 import Archives from '../Archives'
 import * as apiModule from '../../services/api'
 

@@ -1,20 +1,5 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Box,
-  Typography,
-  Button,
-  Stack,
-  CircularProgress,
-  Chip,
-  Tooltip,
-  InputBase,
-  alpha,
-  useTheme,
-} from '@mui/material'
 import ResponsiveDialog from './ResponsiveDialog'
 import {
   Scissors,
@@ -29,8 +14,12 @@ import {
   CheckCircle2,
   XCircle,
   Terminal,
+  Loader2,
 } from 'lucide-react'
 import { Repository } from '../types'
+import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { useTheme } from '../context/ThemeContext'
 
 interface PruneForm {
   keep_hourly: number
@@ -114,15 +103,14 @@ function classifyLine(msg: string): BorgLineType {
 
 // Segment a "Keeping/Pruning archive ..." line into typed spans
 function segmentArchiveLine(line: string) {
-  // Pattern: <Verb> archive <rule?>: <spaces><name> <date> [<hash>]
   const ruleMatch = line.match(/(\(rule:[^)]+\))/)
   const hashMatch = line.match(/\[([a-f0-9]{16,})\]/)
   const colonIdx = line.indexOf(':')
 
   if (colonIdx === -1) return [{ text: line, kind: 'verb' as const }]
 
-  const prefix = line.slice(0, colonIdx + 1) // "Keeping archive (rule: ...): "
-  const rest = line.slice(colonIdx + 1) // "   archive-name date [hash]"
+  const prefix = line.slice(0, colonIdx + 1)
+  const rest = line.slice(colonIdx + 1)
 
   const segments: { text: string; kind: 'verb' | 'rule' | 'name' | 'date' | 'hash' | 'plain' }[] =
     []
@@ -139,7 +127,6 @@ function segmentArchiveLine(line: string) {
   if (hashMatch) {
     const hStart = rest.lastIndexOf('[' + hashMatch[1])
     const beforeHash = rest.slice(0, hStart).trimEnd()
-    // Split beforeHash into name + date (last word-group is date-like)
     const dateMatch = beforeHash.match(/\s+((?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),\s+\S+\s+\S+)$/)
     if (dateMatch) {
       segments.push({
@@ -164,50 +151,42 @@ interface ColorizedOutputProps {
 }
 
 function ColorizedOutput({ text, isFailed = false }: ColorizedOutputProps) {
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
+  const { effectiveMode } = useTheme()
+  const isDark = effectiveMode === 'dark'
 
   const lines = text.split('\n').map(extractMessage)
 
   const colorMap: Record<BorgLineType, string | undefined> = {
-    keep: isDark ? theme.palette.success.light : theme.palette.success.dark,
-    prune: isDark ? theme.palette.error.light : theme.palette.error.dark,
-    separator: isDark ? alpha('#fff', 0.2) : alpha('#000', 0.25),
-    'stats-deleted': isDark ? theme.palette.error.light : theme.palette.error.dark,
-    'stats-all': isDark ? alpha('#fff', 0.85) : alpha('#000', 0.82),
-    'stats-chunk': isDark ? alpha('#fff', 0.45) : alpha('#000', 0.45),
-    'stats-header': isDark ? alpha('#fff', 0.45) : alpha('#000', 0.45),
+    keep: isDark ? '#4ade80' : '#166534',
+    prune: isDark ? '#f87171' : '#991b1b',
+    separator: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.25)',
+    'stats-deleted': isDark ? '#f87171' : '#991b1b',
+    'stats-all': isDark ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.82)',
+    'stats-chunk': isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)',
+    'stats-header': isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)',
     empty: undefined,
     normal: isFailed
-      ? isDark
-        ? theme.palette.error.light
-        : theme.palette.error.dark
-      : isDark
-        ? alpha('#fff', 0.82)
-        : alpha('#000', 0.78),
+      ? isDark ? '#f87171' : '#991b1b'
+      : isDark ? 'rgba(255,255,255,0.82)' : 'rgba(0,0,0,0.78)',
   }
 
   const spanColor = {
     verb: (type: 'keep' | 'prune') =>
       type === 'keep'
-        ? isDark
-          ? theme.palette.success.light
-          : theme.palette.success.dark
-        : isDark
-          ? theme.palette.error.light
-          : theme.palette.error.dark,
-    rule: isDark ? theme.palette.warning.light : '#b45309',
-    name: isDark ? alpha('#fff', 0.82) : alpha('#000', 0.82),
-    date: isDark ? alpha('#fff', 0.45) : alpha('#000', 0.42),
-    hash: isDark ? alpha('#fff', 0.25) : alpha('#000', 0.28),
-    plain: isDark ? alpha('#fff', 0.55) : alpha('#000', 0.55),
+        ? isDark ? '#4ade80' : '#166534'
+        : isDark ? '#f87171' : '#991b1b',
+    rule: isDark ? '#fde68a' : '#b45309',
+    name: isDark ? 'rgba(255,255,255,0.82)' : 'rgba(0,0,0,0.82)',
+    date: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.42)',
+    hash: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.28)',
+    plain: isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)',
   }
 
   return (
-    <Box
-      sx={{
-        m: 0,
-        p: 2,
+    <div
+      style={{
+        margin: 0,
+        padding: '0.5rem',
         fontSize: '0.745rem',
         lineHeight: 1.7,
         overflow: 'auto',
@@ -219,13 +198,13 @@ function ColorizedOutput({ text, isFailed = false }: ColorizedOutputProps) {
         const type = classifyLine(line)
 
         if (type === 'empty') {
-          return <Box key={i} component="div" sx={{ height: '0.5em' }} />
+          return <div key={i} style={{ height: '0.5em' }} />
         }
 
         if (type === 'keep' || type === 'prune') {
           const segs = segmentArchiveLine(line)
           return (
-            <Box key={i} component="div" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+            <div key={i} style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
               {segs.map((seg, j) => {
                 const color =
                   seg.kind === 'verb'
@@ -241,20 +220,19 @@ function ColorizedOutput({ text, isFailed = false }: ColorizedOutputProps) {
                             : spanColor.plain
                 const fontWeight = seg.kind === 'verb' ? 700 : seg.kind === 'rule' ? 600 : 400
                 return (
-                  <Box key={j} component="span" sx={{ color, fontWeight }}>
+                  <span key={j} style={{ color, fontWeight }}>
                     {seg.text}
-                  </Box>
+                  </span>
                 )
               })}
-            </Box>
+            </div>
           )
         }
 
         return (
-          <Box
+          <div
             key={i}
-            component="div"
-            sx={{
+            style={{
               whiteSpace: 'pre-wrap',
               wordBreak: 'break-all',
               color: colorMap[type],
@@ -262,10 +240,10 @@ function ColorizedOutput({ text, isFailed = false }: ColorizedOutputProps) {
             }}
           >
             {line}
-          </Box>
+          </div>
         )
       })}
-    </Box>
+    </div>
   )
 }
 
@@ -293,8 +271,8 @@ function PruneResultsDialog({
   onCloseAll,
 }: PruneResultsDialogProps) {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
+  const { effectiveMode } = useTheme()
+  const isDark = effectiveMode === 'dark'
 
   const isFailed = results.prune_result?.success === false
   const isDryRun = results.dry_run
@@ -302,10 +280,9 @@ function PruneResultsDialog({
   const stderr = results.prune_result?.stderr ?? ''
   const hasOutput = stdout || stderr
 
-  const borderColor = isDark ? alpha('#fff', 0.08) : alpha('#000', 0.09)
-  const terminalBg = isDark ? alpha('#000', 0.45) : alpha('#000', 0.035)
+  const borderColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.09)'
+  const terminalBg = isDark ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.035)'
 
-  // Determine header appearance
   const headerIcon = isFailed ? (
     <XCircle size={20} />
   ) : isDryRun ? (
@@ -314,21 +291,17 @@ function PruneResultsDialog({
     <CheckCircle2 size={20} />
   )
 
-  const headerColor = isFailed
-    ? theme.palette.error.main
-    : isDryRun
-      ? theme.palette.warning.main
-      : theme.palette.success.main
-
-  const headerBg = alpha(headerColor, isDark ? 0.18 : 0.1)
-
   const badge = isFailed
     ? t('dialogs.prune.pruneFailedBadge')
     : isDryRun
       ? t('dialogs.prune.dryRunPreviewBadge')
       : t('dialogs.prune.pruneCompleteBadge')
 
-  const badgeColor = isFailed ? 'error' : isDryRun ? 'warning' : 'success'
+  const badgeColor = isFailed
+    ? 'text-destructive bg-destructive/10 border-destructive/30'
+    : isDryRun
+      ? 'text-muted-foreground bg-muted border-border'
+      : 'text-primary bg-primary/10 border-primary/20'
 
   const title = isDryRun
     ? t('dialogs.prune.dryRunResultsTitle')
@@ -336,199 +309,137 @@ function PruneResultsDialog({
       ? t('dialogs.prune.operationFailed')
       : t('dialogs.prune.pruneResultsTitle')
 
+  const stderrSectionBorderColor = isFailed
+    ? 'rgba(239,68,68,0.2)'
+    : borderColor
+
+  const footer = (
+    <div className="flex items-center justify-end gap-2 px-5 py-3">
+      {isDryRun && !isFailed ? (
+        <>
+          <Button variant="outline" size="sm" onClick={onClose}>
+            {t('dialogs.prune.close')}
+          </Button>
+          <Button
+            size="sm"
+            disabled={isLoading}
+            className="gap-1.5 whitespace-nowrap bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            onClick={() => onRunPrune(currentForm)}
+          >
+            {isLoading ? <Loader2 size={13} className="animate-spin" /> : <Scissors size={13} />}
+            {isLoading ? t('status.running') : t('dialogs.prune.runPruneNow')}
+          </Button>
+        </>
+      ) : (
+        <Button
+          size="sm"
+          variant={isFailed ? 'destructive' : 'default'}
+          onClick={onCloseAll}
+        >
+          {isFailed ? t('dialogs.prune.close') : t('dialogs.prune.done')}
+        </Button>
+      )}
+    </div>
+  )
+
   return (
-    <ResponsiveDialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <ResponsiveDialog open={open} onClose={onClose} maxWidth="md" fullWidth footer={footer}>
       {/* ── Title ── */}
-      <DialogTitle sx={{ pb: 1.5 }}>
-        <Stack direction="row" spacing={1.5} alignItems="flex-start">
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: 38,
-              height: 38,
-              borderRadius: 1.5,
-              bgcolor: headerBg,
-              color: headerColor,
-              flexShrink: 0,
-            }}
+      <div className="px-5 pt-5 pb-4">
+        <div className="flex items-start gap-3">
+          <div
+            className={`flex items-center justify-center w-10 h-10 rounded-xl flex-shrink-0 ${isFailed ? 'bg-destructive/10 text-destructive' : isDryRun ? 'bg-muted text-muted-foreground' : 'bg-primary/10 text-primary'}`}
           >
             {headerIcon}
-          </Box>
-          <Box sx={{ minWidth: 0, flex: 1 }}>
-            <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
-              <Typography variant="h6" fontWeight={600} lineHeight={1.3}>
-                {title}
-              </Typography>
-              <Chip
-                label={badge}
-                color={badgeColor}
-                size="small"
-                sx={{
-                  height: 18,
-                  fontSize: '0.6rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.06em',
-                  '.MuiChip-label': { px: 1 },
-                }}
-              />
-            </Stack>
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-base font-semibold leading-tight">{title}</p>
+              <span
+                className={`px-2 py-0.5 rounded text-[0.6rem] font-bold uppercase tracking-[0.06em] border ${badgeColor}`}
+              >
+                {badge}
+              </span>
+            </div>
             {repository?.name && (
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                noWrap
-                sx={{ fontFamily: 'ui-monospace, monospace', fontSize: '0.72rem', mt: 0.25 }}
+              <p
+                className="text-[0.72rem] text-muted-foreground truncate mt-0.5"
+                style={{ fontFamily: 'ui-monospace, monospace' }}
               >
                 {repository.name}
-              </Typography>
+              </p>
             )}
-          </Box>
-        </Stack>
-      </DialogTitle>
+          </div>
+        </div>
+      </div>
 
       {/* ── Output ── */}
-      <DialogContent sx={{ pt: 0 }}>
+      <div className="px-5 pb-4">
         {hasOutput ? (
-          <Box
-            sx={{
-              border: '1px solid',
-              borderColor,
-              borderRadius: 1.5,
-              overflow: 'hidden',
-              bgcolor: terminalBg,
+          <div
+            className="rounded-xl overflow-hidden"
+            style={{
+              border: `1px solid ${borderColor}`,
+              background: terminalBg,
             }}
           >
             {/* Terminal header bar */}
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                px: 1.5,
-                py: 0.75,
-                borderBottom: '1px solid',
+            <div
+              className="flex items-center gap-2 px-3 py-1.5 border-b"
+              style={{
                 borderColor,
-                bgcolor: isDark ? alpha('#fff', 0.03) : alpha('#000', 0.03),
+                background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
               }}
             >
-              <Box sx={{ color: 'text.disabled', display: 'flex' }}>
+              <span className="text-muted-foreground flex">
                 <Terminal size={13} />
-              </Box>
-              <Typography
-                variant="caption"
-                sx={{
-                  fontWeight: 700,
-                  fontSize: '0.6rem',
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  color: 'text.disabled',
-                }}
-              >
+              </span>
+              <span className="text-[0.6rem] font-bold uppercase tracking-[0.08em] text-muted-foreground">
                 {t('dialogs.prune.outputLabel')}
-              </Typography>
-            </Box>
+              </span>
+            </div>
 
-            {/* stdout */}
             {stdout && <ColorizedOutput text={stdout} />}
 
-            {/* stderr — shown as a distinct section when present alongside stdout */}
             {stderr && (
-              <Box
-                sx={{
-                  borderTop: stdout ? '1px solid' : 'none',
-                  borderColor,
+              <div
+                style={{
+                  borderTop: stdout ? `1px solid ${borderColor}` : 'none',
                 }}
               >
                 {stdout && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                      px: 1.5,
-                      py: 0.75,
-                      borderBottom: '1px solid',
-                      borderColor: isFailed
-                        ? alpha(theme.palette.error.main, 0.2)
-                        : alpha(theme.palette.warning.main, 0.2),
+                  <div
+                    className="flex items-center gap-2 px-3 py-1.5 border-b"
+                    style={{
+                      borderColor: stderrSectionBorderColor,
                     }}
                   >
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        fontWeight: 700,
-                        fontSize: '0.6rem',
-                        letterSpacing: '0.08em',
-                        textTransform: 'uppercase',
-                        color: isFailed ? 'error.main' : 'warning.main',
-                      }}
+                    <span
+                      className={`text-[0.6rem] font-bold uppercase tracking-[0.08em] ${isFailed ? 'text-destructive' : 'text-muted-foreground'}`}
                     >
                       {t('dialogs.prune.messagesLabel')}
-                    </Typography>
-                  </Box>
+                    </span>
+                  </div>
                 )}
                 <ColorizedOutput text={stderr} isFailed={isFailed} />
-              </Box>
+              </div>
             )}
-          </Box>
+          </div>
         ) : (
-          <Box
-            sx={{
-              py: 4,
-              textAlign: 'center',
-              color: 'text.disabled',
-              border: '1px solid',
-              borderColor,
-              borderRadius: 1.5,
-            }}
+          <div
+            className="py-8 text-center text-muted-foreground rounded-xl border"
+            style={{ borderColor }}
           >
-            <Typography variant="body2">{t('dialogs.prune.noArchivesWouldBeDeleted')}</Typography>
-          </Box>
+            <p className="text-sm">{t('dialogs.prune.noArchivesWouldBeDeleted')}</p>
+          </div>
         )}
 
-        {/* ── Contextual note below output ── */}
         {!isFailed && (
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ display: 'block', mt: 1.5, px: 0.25, lineHeight: 1.5 }}
-          >
+          <p className="text-xs text-muted-foreground mt-3 px-0.5 leading-relaxed">
             {isDryRun ? t('dialogs.prune.dryRunNote') : t('dialogs.prune.pruneNote')}
-          </Typography>
+          </p>
         )}
-      </DialogContent>
-
-      {/* ── Actions ── */}
-      <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
-        {isDryRun && !isFailed ? (
-          <>
-            <Button variant="outlined" onClick={onClose}>
-              {t('dialogs.prune.close')}
-            </Button>
-            <Button
-              variant="contained"
-              color="error"
-              disabled={isLoading}
-              startIcon={
-                isLoading ? <CircularProgress size={15} color="inherit" /> : <Scissors size={15} />
-              }
-              onClick={() => onRunPrune(currentForm)}
-              sx={{
-                whiteSpace: 'nowrap',
-                boxShadow: `0 2px 8px ${alpha(theme.palette.error.main, 0.35)}`,
-              }}
-            >
-              {isLoading ? t('status.running') : t('dialogs.prune.runPruneNow')}
-            </Button>
-          </>
-        ) : (
-          <Button variant="contained" color={isFailed ? 'error' : 'primary'} onClick={onCloseAll}>
-            {isFailed ? t('dialogs.prune.close') : t('dialogs.prune.done')}
-          </Button>
-        )}
-      </DialogActions>
+      </div>
     </ResponsiveDialog>
   )
 }
@@ -545,8 +456,8 @@ export default function PruneRepositoryDialog({
   results,
 }: PruneRepositoryDialogProps) {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
+  const { effectiveMode } = useTheme()
+  const isDark = effectiveMode === 'dark'
   const [pruneForm, setPruneForm] = useState<PruneForm>(defaultPruneForm)
   const [resultsOpen, setResultsOpen] = useState(false)
   const [activeOp, setActiveOp] = useState<'dry_run' | 'prune' | null>(null)
@@ -555,12 +466,10 @@ export default function PruneRepositoryDialog({
     if (open) setPruneForm(defaultPruneForm)
   }, [open])
 
-  // Clear active op when loading finishes
   React.useEffect(() => {
     if (!isLoading) setActiveOp(null)
   }, [isLoading])
 
-  // Open the results dialog whenever new results arrive
   React.useEffect(() => {
     if (results) {
       setResultsOpen(true)
@@ -582,271 +491,169 @@ export default function PruneRepositoryDialog({
   }
 
   const retentionFields = [
-    {
-      key: 'keep_hourly' as const,
-      icon: <Clock size={14} />,
-      label: t('dialogs.prune.keepHourly'),
-    },
+    { key: 'keep_hourly' as const, icon: <Clock size={14} />, label: t('dialogs.prune.keepHourly') },
     { key: 'keep_daily' as const, icon: <Sun size={14} />, label: t('dialogs.prune.keepDaily') },
-    {
-      key: 'keep_weekly' as const,
-      icon: <CalendarDays size={14} />,
-      label: t('dialogs.prune.keepWeekly'),
-    },
-    {
-      key: 'keep_monthly' as const,
-      icon: <CalendarRange size={14} />,
-      label: t('dialogs.prune.keepMonthly'),
-    },
-    {
-      key: 'keep_quarterly' as const,
-      icon: <CalendarRange size={14} />,
-      label: t('dialogs.prune.keepQuarterly'),
-    },
-    {
-      key: 'keep_yearly' as const,
-      icon: <Calendar size={14} />,
-      label: t('dialogs.prune.keepYearly'),
-    },
+    { key: 'keep_weekly' as const, icon: <CalendarDays size={14} />, label: t('dialogs.prune.keepWeekly') },
+    { key: 'keep_monthly' as const, icon: <CalendarRange size={14} />, label: t('dialogs.prune.keepMonthly') },
+    { key: 'keep_quarterly' as const, icon: <CalendarRange size={14} />, label: t('dialogs.prune.keepQuarterly') },
+    { key: 'keep_yearly' as const, icon: <Calendar size={14} />, label: t('dialogs.prune.keepYearly') },
   ]
 
-  const borderColor = isDark ? alpha('#fff', 0.08) : alpha('#000', 0.09)
+  const borderColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.09)'
+
+  const footer = (
+    <div className="flex items-center justify-end gap-2 px-5 py-3">
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={isLoading}
+        className="gap-1.5 whitespace-nowrap"
+        onClick={() => {
+          setActiveOp('dry_run')
+          onDryRun(pruneForm)
+        }}
+      >
+        {activeOp === 'dry_run' ? (
+          <Loader2 size={13} className="animate-spin" />
+        ) : (
+          <FlaskConical size={13} />
+        )}
+        {activeOp === 'dry_run' ? t('status.running') : t('dialogs.prune.dryRunButton')}
+      </Button>
+      <Button
+        size="sm"
+        disabled={isLoading}
+        className="gap-1.5 whitespace-nowrap bg-destructive text-destructive-foreground hover:bg-destructive/90"
+        onClick={() => {
+          setActiveOp('prune')
+          onConfirmPrune(pruneForm)
+        }}
+      >
+        {activeOp === 'prune' ? (
+          <Loader2 size={13} className="animate-spin" />
+        ) : (
+          <Scissors size={13} />
+        )}
+        {activeOp === 'prune' ? t('status.running') : t('dialogs.pruneRepository.confirm')}
+      </Button>
+    </div>
+  )
 
   return (
     <>
-      <ResponsiveDialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <ResponsiveDialog open={open} onClose={onClose} maxWidth="sm" fullWidth footer={footer}>
         {/* ── Title ── */}
-        <DialogTitle sx={{ pb: 1.5 }}>
-          <Stack direction="row" spacing={1.5} alignItems="flex-start">
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 36,
-                height: 36,
-                borderRadius: 1.5,
-                bgcolor: alpha(theme.palette.warning.main, isDark ? 0.18 : 0.1),
-                color: theme.palette.warning.main,
-                flexShrink: 0,
-              }}
+        <div className="px-5 pt-5 pb-4">
+          <div className="flex items-start gap-3">
+            <div
+              className="flex items-center justify-center w-9 h-9 rounded-xl flex-shrink-0 bg-muted text-muted-foreground"
             >
               <Scissors size={18} />
-            </Box>
-            <Box sx={{ minWidth: 0 }}>
-              <Typography variant="h6" fontWeight={600} lineHeight={1.3}>
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-base font-semibold leading-tight">
                 {t('dialogs.pruneRepository.title')}
-              </Typography>
+              </p>
               {repository?.name && (
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  noWrap
-                  sx={{ fontFamily: 'ui-monospace, monospace', fontSize: '0.72rem' }}
+                <p
+                  className="text-[0.72rem] text-muted-foreground truncate"
+                  style={{ fontFamily: 'ui-monospace, monospace' }}
                 >
                   {repository.name}
-                </Typography>
+                </p>
               )}
-            </Box>
-            <Tooltip
-              title={
-                <Box>
-                  <Typography variant="body2" fontWeight={600} gutterBottom>
-                    {t('dialogs.prune.whatDoesPruningDo')}
-                  </Typography>
-                  <Typography variant="body2" gutterBottom>
-                    {t('dialogs.prune.explanation')}
-                  </Typography>
-                  <Typography variant="body2" fontWeight={600}>
-                    {t('dialogs.prune.dryRunTip')}
-                  </Typography>
-                </Box>
-              }
-              arrow
-              placement="top"
-            >
-              <Box
-                sx={{
-                  ml: 'auto',
-                  display: 'flex',
-                  color: 'text.disabled',
-                  cursor: 'help',
-                  flexShrink: 0,
-                  mt: '3px',
-                }}
-              >
-                <Info size={15} />
-              </Box>
+            </div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  className="ml-auto flex text-muted-foreground cursor-help flex-shrink-0 mt-0.5"
+                >
+                  <Info size={15} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p className="font-semibold mb-1">{t('dialogs.prune.whatDoesPruningDo')}</p>
+                <p className="mb-1">{t('dialogs.prune.explanation')}</p>
+                <p className="font-semibold">{t('dialogs.prune.dryRunTip')}</p>
+              </TooltipContent>
             </Tooltip>
-          </Stack>
-        </DialogTitle>
+          </div>
+        </div>
 
-        <DialogContent sx={{ pt: 0 }}>
+        <div className="px-5 pb-4">
           {/* ── Retention policy ── */}
-          <Typography
-            variant="caption"
-            sx={{
-              display: 'block',
-              fontWeight: 700,
-              fontSize: '0.6rem',
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: 'text.disabled',
-              mb: 1,
-            }}
-          >
+          <p className="text-[0.6rem] font-bold uppercase tracking-[0.08em] text-muted-foreground mb-2">
             {t('dialogs.prune.retentionPolicy')}
-          </Typography>
+          </p>
 
-          <Box
-            sx={{
-              border: '1px solid',
-              borderColor,
-              borderRadius: 1.5,
-              overflow: 'hidden',
-              mb: 0.75,
-            }}
+          <div
+            className="rounded-xl overflow-hidden mb-1.5"
+            style={{ border: `1px solid ${borderColor}` }}
           >
             {retentionFields.map((field, i) => (
-              <Box
+              <div
                 key={field.key}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1.5,
-                  px: 1.75,
-                  py: 0.9,
-                  borderBottom: i < retentionFields.length - 1 ? '1px solid' : 0,
-                  borderColor,
-                  bgcolor: isDark ? alpha('#fff', 0.015) : alpha('#000', 0.012),
-                  '&:hover': {
-                    bgcolor: isDark ? alpha('#fff', 0.03) : alpha('#000', 0.025),
-                  },
-                  transition: 'background-color 150ms',
+                className="flex items-center gap-3 px-4 py-2.5 transition-colors duration-150"
+                style={{
+                  borderBottom: i < retentionFields.length - 1 ? `1px solid ${borderColor}` : 'none',
+                  background: isDark ? 'rgba(255,255,255,0.015)' : 'rgba(0,0,0,0.012)',
+                }}
+                onMouseEnter={(e) => {
+                  ;(e.currentTarget as HTMLDivElement).style.background = isDark
+                    ? 'rgba(255,255,255,0.03)'
+                    : 'rgba(0,0,0,0.025)'
+                }}
+                onMouseLeave={(e) => {
+                  ;(e.currentTarget as HTMLDivElement).style.background = isDark
+                    ? 'rgba(255,255,255,0.015)'
+                    : 'rgba(0,0,0,0.012)'
                 }}
               >
-                <Box sx={{ color: 'text.disabled', display: 'flex', flexShrink: 0 }}>
-                  {field.icon}
-                </Box>
-                <Typography variant="body2" sx={{ flex: 1, fontSize: '0.8rem' }}>
-                  {field.label}
-                </Typography>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    border: '1px solid',
-                    borderColor,
-                    borderRadius: 1,
-                    px: 1,
-                    py: 0.35,
-                    bgcolor: 'background.paper',
+                <span className="text-muted-foreground flex flex-shrink-0">{field.icon}</span>
+                <p className="flex-1 text-sm">{field.label}</p>
+                <div
+                  className="flex items-center rounded px-2 py-1"
+                  style={{
+                    border: `1px solid ${borderColor}`,
+                    background: 'var(--background)',
                     width: 72,
                   }}
                 >
-                  <InputBase
+                  <input
                     type="number"
                     value={pruneForm[field.key]}
+                    min={0}
                     onChange={(e) =>
                       setPruneForm({ ...pruneForm, [field.key]: parseInt(e.target.value) || 0 })
                     }
-                    inputProps={{ min: 0, style: { textAlign: 'center', padding: 0 } }}
-                    sx={{
-                      fontSize: '0.85rem',
-                      fontWeight: 600,
-                      fontVariantNumeric: 'tabular-nums',
-                      flex: 1,
-                    }}
+                    className="w-full text-center text-sm font-semibold tabular-nums bg-transparent outline-none p-0"
+                    style={{ MozAppearance: 'textfield' } as React.CSSProperties}
                   />
-                </Box>
-              </Box>
+                </div>
+              </div>
             ))}
-          </Box>
+          </div>
 
-          <Typography
-            variant="caption"
-            color="text.disabled"
-            sx={{ display: 'block', mb: 2, px: 0.25 }}
-          >
+          <p className="text-xs text-muted-foreground mb-4 px-0.5">
             {t('dialogs.prune.exampleExplanation')}
-          </Typography>
+          </p>
 
           {/* ── Warning strip ── */}
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 1,
-              alignItems: 'flex-start',
-              p: 1.5,
-              borderRadius: 1.5,
-              border: '1px solid',
-              borderColor: alpha(theme.palette.warning.main, 0.25),
-              bgcolor: alpha(theme.palette.warning.main, isDark ? 0.08 : 0.05),
-            }}
-          >
-            <Box
-              sx={{ color: theme.palette.warning.main, display: 'flex', flexShrink: 0, mt: '1px' }}
-            >
+          <div className="flex gap-2 items-start p-3 rounded-xl border border-border bg-muted/40">
+            <span className="flex flex-shrink-0 mt-0.5 text-muted-foreground">
               <TriangleAlert size={14} />
-            </Box>
-            <Box sx={{ minWidth: 0 }}>
-              <Typography
-                variant="body2"
-                fontWeight={600}
-                sx={{ fontSize: '0.8rem', color: isDark ? 'warning.light' : 'warning.dark' }}
-              >
+            </span>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-foreground">
                 {t('dialogs.prune.warningTitle')}
-              </Typography>
-              <Typography variant="body2" sx={{ fontSize: '0.78rem', color: 'text.secondary' }}>
+              </p>
+              <p className="text-[0.78rem] text-muted-foreground">
                 {t('dialogs.prune.warningCompact')}
-              </Typography>
-            </Box>
-          </Box>
-        </DialogContent>
-
-        {/* ── Actions ── */}
-        <DialogActions sx={{ px: 3, pb: 2.5, gap: 1 }}>
-          <Button
-            onClick={() => {
-              setActiveOp('dry_run')
-              onDryRun(pruneForm)
-            }}
-            variant="outlined"
-            disabled={isLoading}
-            startIcon={
-              activeOp === 'dry_run' ? (
-                <CircularProgress size={15} color="inherit" />
-              ) : (
-                <FlaskConical size={15} />
-              )
-            }
-            sx={{ whiteSpace: 'nowrap' }}
-          >
-            {activeOp === 'dry_run' ? t('status.running') : t('dialogs.prune.dryRunButton')}
-          </Button>
-          <Button
-            onClick={() => {
-              setActiveOp('prune')
-              onConfirmPrune(pruneForm)
-            }}
-            variant="contained"
-            color="error"
-            disabled={isLoading}
-            startIcon={
-              activeOp === 'prune' ? (
-                <CircularProgress size={15} color="inherit" />
-              ) : (
-                <Scissors size={15} />
-              )
-            }
-            sx={{
-              whiteSpace: 'nowrap',
-              boxShadow: `0 2px 8px ${alpha(theme.palette.error.main, 0.35)}`,
-            }}
-          >
-            {activeOp === 'prune' ? t('status.running') : t('dialogs.pruneRepository.confirm')}
-          </Button>
-        </DialogActions>
+              </p>
+            </div>
+          </div>
+        </div>
       </ResponsiveDialog>
 
       {/* ── Results Dialog (separate overlay) ── */}

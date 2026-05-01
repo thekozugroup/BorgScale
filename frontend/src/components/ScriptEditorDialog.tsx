@@ -1,29 +1,16 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Box,
-  Typography,
-  CircularProgress,
-  Chip,
-  Paper,
-  TextField,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Radio,
-  RadioGroup,
-} from '@mui/material'
-
-type OnFailureMode = 'fail' | 'continue' | 'skip'
-import { Play, CheckCircle, XCircle, AlertTriangle } from 'lucide-react'
+import { Play, CheckCircle, XCircle, AlertTriangle, Loader2 } from 'lucide-react'
 import CodeEditor from './CodeEditor'
 import api from '../services/api'
 import { translateBackendKey } from '../utils/translateBackendKey'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { cn } from '@/lib/utils'
+
+type OnFailureMode = 'fail' | 'continue' | 'skip'
 
 interface ScriptEditorDialogProps {
   open: boolean
@@ -37,7 +24,7 @@ interface ScriptEditorDialogProps {
   onFailureMode?: OnFailureMode
   onFailureModeChange?: (value: OnFailureMode) => void
   showContinueOnFailure?: boolean
-  repositoryId?: number | null // When provided, injects BORG_UI_ context into test runs
+  repositoryId?: number | null
 }
 
 export default function ScriptEditorDialog({
@@ -65,9 +52,7 @@ export default function ScriptEditorDialog({
   } | null>(null)
 
   const handleTestRun = async () => {
-    if (!value || value.trim() === '') {
-      return
-    }
+    if (!value || value.trim() === '') return
 
     setTestRunning(true)
     setTestResult(null)
@@ -92,28 +77,32 @@ export default function ScriptEditorDialog({
     }
   }
 
-  const handleSave = () => {
-    onClose()
-  }
+  const failureModeOptions: { value: OnFailureMode; label: string }[] = [
+    { value: 'fail', label: t('scriptEditor.onFailureFail') },
+    { value: 'continue', label: t('scriptEditor.onFailureContinue') },
+    { value: 'skip', label: t('scriptEditor.onFailureSkip') },
+  ]
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
-      <DialogTitle>
-        <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Typography variant="h6">{title}</Typography>
-          <Button
-            variant="outlined"
-            startIcon={testRunning ? <CircularProgress size={16} /> : <Play size={16} />}
-            onClick={handleTestRun}
-            disabled={testRunning || !value || value.trim() === ''}
-          >
-            {testRunning ? t('scriptEditor.testing') : t('scriptEditor.testRun')}
-          </Button>
-        </Box>
-      </DialogTitle>
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <div className="flex items-center justify-between">
+            <DialogTitle>{title}</DialogTitle>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleTestRun}
+              disabled={testRunning || !value || value.trim() === ''}
+              className="gap-1.5"
+            >
+              {testRunning ? <Loader2 size={14} className="animate-spin" /> : <Play size={14} />}
+              {testRunning ? t('scriptEditor.testing') : t('scriptEditor.testRun')}
+            </Button>
+          </div>
+        </DialogHeader>
 
-      <DialogContent dividers>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <div className="flex flex-col gap-4 pt-2">
           <CodeEditor
             label=""
             value={value}
@@ -122,158 +111,115 @@ export default function ScriptEditorDialog({
             height="400px"
           />
 
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-            <TextField
-              label={t('scriptEditor.timeoutLabel')}
-              type="number"
-              value={timeout}
-              onChange={(e) => onTimeoutChange?.(parseInt(e.target.value) || 300)}
-              inputProps={{ min: 30, max: 3600 }}
-              helperText={t('scriptEditor.timeoutHint')}
-              sx={{ flex: 1 }}
-            />
+          <div className="flex gap-4 items-start flex-wrap">
+            <div className="flex-1 min-w-[160px]">
+              <Label className="text-xs font-semibold mb-1.5 block">{t('scriptEditor.timeoutLabel')}</Label>
+              <Input
+                type="number"
+                value={timeout}
+                onChange={(e) => onTimeoutChange?.(parseInt(e.target.value) || 300)}
+                min={30}
+                max={3600}
+                className="h-9 text-sm"
+              />
+              <p className="text-xs text-muted-foreground mt-1">{t('scriptEditor.timeoutHint')}</p>
+            </div>
+
             {showContinueOnFailure && (
-              <FormControl sx={{ mt: 1 }}>
-                <FormLabel sx={{ fontSize: '0.875rem' }}>
-                  {t('scriptEditor.onFailureLabel')}
-                </FormLabel>
-                <RadioGroup
-                  row
-                  value={onFailureMode}
-                  onChange={(e) => onFailureModeChange?.(e.target.value as OnFailureMode)}
-                >
-                  <FormControlLabel
-                    value="fail"
-                    control={<Radio size="small" />}
-                    label={t('scriptEditor.onFailureFail')}
-                  />
-                  <FormControlLabel
-                    value="continue"
-                    control={<Radio size="small" />}
-                    label={t('scriptEditor.onFailureContinue')}
-                  />
-                  <FormControlLabel
-                    value="skip"
-                    control={<Radio size="small" />}
-                    label={t('scriptEditor.onFailureSkip')}
-                  />
-                </RadioGroup>
-              </FormControl>
+              <div className="flex-1 min-w-[200px]">
+                <p className="text-xs font-semibold mb-2">{t('scriptEditor.onFailureLabel')}</p>
+                <div className="flex gap-3 flex-wrap">
+                  {failureModeOptions.map((opt) => (
+                    <label key={opt.value} className="flex items-center gap-1.5 cursor-pointer text-sm">
+                      <input
+                        type="radio"
+                        name="onFailureMode"
+                        value={opt.value}
+                        checked={onFailureMode === opt.value}
+                        onChange={() => onFailureModeChange?.(opt.value)}
+                      />
+                      {opt.label}
+                    </label>
+                  ))}
+                </div>
+              </div>
             )}
-          </Box>
+          </div>
 
           {testResult && (
-            <Box sx={{ mt: 2 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+            <div className="mt-1">
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
                 {testResult.success ? (
                   <>
-                    <CheckCircle size={20} color="#4caf50" />
-                    <Typography variant="subtitle2" color="success.main">
+                    <CheckCircle size={18} className="text-primary" />
+                    <span className="text-sm font-medium text-primary">
                       {t('scriptEditor.testPassed')}
-                    </Typography>
+                    </span>
                   </>
                 ) : testResult.exit_code === 0 ? (
                   <>
-                    <AlertTriangle size={20} color="#ff9800" />
-                    <Typography variant="subtitle2" color="warning.main">
+                    <AlertTriangle size={18} className="text-muted-foreground" />
+                    <span className="text-sm font-medium text-muted-foreground">
                       {t('scriptEditor.testWarnings')}
-                    </Typography>
+                    </span>
                   </>
                 ) : (
                   <>
-                    <XCircle size={20} color="#f44336" />
-                    <Typography variant="subtitle2" color="error.main">
+                    <XCircle size={18} className="text-destructive" />
+                    <span className="text-sm font-medium text-destructive">
                       {t('scriptEditor.testFailed')}
-                    </Typography>
+                    </span>
                   </>
                 )}
-                <Chip
-                  label={t('scriptEditor.exitCode', { code: testResult.exit_code })}
-                  size="small"
-                  color={testResult.exit_code === 0 ? 'success' : 'error'}
-                  sx={{ ml: 'auto' }}
-                />
-                <Chip
-                  label={`${testResult.execution_time.toFixed(2)}s`}
-                  size="small"
-                  variant="outlined"
-                />
-              </Box>
+                <span
+                  className={cn(
+                    'ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border',
+                    testResult.exit_code === 0
+                      ? 'bg-primary/10 text-primary border-primary/20'
+                      : 'bg-destructive/10 text-destructive border-destructive/20'
+                  )}
+                >
+                  {t('scriptEditor.exitCode', { code: testResult.exit_code })}
+                </span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border border-border text-muted-foreground">
+                  {`${testResult.execution_time.toFixed(2)}s`}
+                </span>
+              </div>
 
               {testResult.stdout && (
-                <Box sx={{ mb: 2 }}>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ mb: 0.5, display: 'block' }}
-                  >
-                    {t('scriptEditor.stdout')}
-                  </Typography>
-                  <Paper
-                    sx={{
-                      p: 2,
-                      bgcolor: '#1e1e1e',
-                      maxHeight: '200px',
-                      overflow: 'auto',
-                      fontFamily: 'monospace',
-                      fontSize: '0.875rem',
-                      whiteSpace: 'pre-wrap',
-                      wordBreak: 'break-word',
-                    }}
-                  >
-                    <Typography
-                      component="pre"
-                      sx={{ m: 0, color: '#d4d4d4', fontFamily: 'inherit', fontSize: 'inherit' }}
-                    >
+                <div className="mb-3">
+                  <p className="text-xs text-muted-foreground mb-1">{t('scriptEditor.stdout')}</p>
+                  <div className="p-3 rounded-xl overflow-auto max-h-48 bg-neutral-900">
+                    <pre className="text-sm whitespace-pre-wrap break-words m-0 text-neutral-200 font-mono">
                       {testResult.stdout}
-                    </Typography>
-                  </Paper>
-                </Box>
+                    </pre>
+                  </div>
+                </div>
               )}
 
               {testResult.stderr && (
-                <Box>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ mb: 0.5, display: 'block' }}
-                  >
-                    {t('scriptEditor.stderr')}
-                  </Typography>
-                  <Paper
-                    sx={{
-                      p: 2,
-                      bgcolor: '#1e1e1e',
-                      maxHeight: '200px',
-                      overflow: 'auto',
-                      fontFamily: 'monospace',
-                      fontSize: '0.875rem',
-                      whiteSpace: 'pre-wrap',
-                      wordBreak: 'break-word',
-                    }}
-                  >
-                    <Typography
-                      component="pre"
-                      sx={{ m: 0, color: '#f48771', fontFamily: 'inherit', fontSize: 'inherit' }}
-                    >
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">{t('scriptEditor.stderr')}</p>
+                  <div className="p-3 rounded-xl overflow-auto max-h-48 bg-neutral-900">
+                    <pre className="text-sm whitespace-pre-wrap break-words m-0 text-destructive font-mono">
                       {testResult.stderr}
-                    </Typography>
-                  </Paper>
-                </Box>
+                    </pre>
+                  </div>
+                </div>
               )}
-            </Box>
+            </div>
           )}
-        </Box>
-      </DialogContent>
 
-      <DialogActions>
-        <Button onClick={onClose} color="inherit">
-          {t('common.buttons.cancel')}
-        </Button>
-        <Button onClick={handleSave} variant="contained" color="primary">
-          {t('scriptEditor.save')}
-        </Button>
-      </DialogActions>
+          <div className="flex items-center justify-end gap-2 pt-1 border-t border-border">
+            <Button variant="outline" size="sm" onClick={onClose}>
+              {t('common.buttons.cancel')}
+            </Button>
+            <Button size="sm" onClick={onClose}>
+              {t('scriptEditor.save')}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
     </Dialog>
   )
 }

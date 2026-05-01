@@ -1,4 +1,3 @@
-import { Box, Stack, Typography, useTheme } from '@mui/material'
 import { KeyRound } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import AccountPasskeysSection from './AccountPasskeysSection'
@@ -29,10 +28,6 @@ export default function AccountSecuritySettingsSection({
   onDeletePasskey,
 }: AccountSecuritySettingsSectionProps) {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
-  const neutralBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'
-  const subtleBorder = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.09)'
 
   const securityHighlights = [
     {
@@ -40,7 +35,7 @@ export default function AccountSecuritySettingsSection({
       value: totpEnabled
         ? t('settings.account.security.statusActive')
         : t('settings.account.security.statusNotEnabled'),
-      tone: totpEnabled ? 'rgba(34,197,94,0.14)' : neutralBg,
+      active: totpEnabled,
     },
     {
       label: t('settings.account.security.highlights.passkeys'),
@@ -48,115 +43,49 @@ export default function AccountSecuritySettingsSection({
         passkeys.length > 0
           ? t('settings.account.security.passkeysCount', { count: passkeys.length })
           : t('settings.account.security.statusNotConfigured'),
-      tone: passkeys.length > 0 ? 'rgba(59,130,246,0.14)' : neutralBg,
+      active: passkeys.length > 0,
     },
   ]
 
   return (
-    <Stack spacing={3.5}>
-      <Box
-        sx={{
-          px: { xs: 2, md: 3 },
-          py: { xs: 2.25, md: 2.75 },
-          borderRadius: 3,
-          border: '1px solid',
-          borderColor: 'rgba(14,165,233,0.18)',
-          background:
-            'linear-gradient(135deg, rgba(2,132,199,0.12) 0%, rgba(8,47,73,0.06) 55%, rgba(255,255,255,0.02) 100%)',
-        }}
-      >
-        <Stack spacing={2.5}>
-          <Stack direction="row" spacing={1.25} alignItems="center">
-            <Box
-              sx={{
-                width: 34,
-                height: 34,
-                borderRadius: 1.75,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                bgcolor: 'rgba(14,165,233,0.14)',
-                border: '1px solid rgba(14,165,233,0.24)',
-              }}
-            >
+    <div className="flex flex-col gap-7">
+      <div className="px-4 md:px-6 py-5 md:py-7 rounded-2xl border border-border bg-muted/20">
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-row gap-3 items-center">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 border border-border bg-muted/40">
               <KeyRound size={16} />
-            </Box>
-            <Box>
-              <Typography
-                variant="caption"
-                sx={{
-                  display: 'block',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
-                  color: 'info.light',
-                  mb: 0.35,
-                }}
-              >
+            </div>
+            <div>
+              <span className="block text-xs font-bold uppercase tracking-widest text-muted-foreground mb-0.5">
                 {t('settings.account.security.overline')}
-              </Typography>
-              <Typography variant="h6" fontWeight={700} sx={{ lineHeight: 1.1 }}>
+              </span>
+              <h3 className="text-base font-bold leading-tight">
                 {t('settings.account.security.title')}
-              </Typography>
-            </Box>
-          </Stack>
+              </h3>
+            </div>
+          </div>
 
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ maxWidth: 720, fontSize: { md: '0.95rem' } }}
-          >
+          <p className="text-sm text-muted-foreground max-w-2xl md:text-[0.95rem]">
             {t('settings.account.security.description')}
-          </Typography>
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' },
-              gap: 1.5,
-            }}
-          >
-            {securityHighlights.map((highlight) => (
-              <Box
-                key={highlight.label}
-                sx={{
-                  p: 1.75,
-                  borderRadius: 2.5,
-                  border: '1px solid',
-                  borderColor: subtleBorder,
-                  bgcolor: highlight.tone,
-                  minHeight: 88,
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{
-                    display: 'block',
-                    mb: 0.75,
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.06em',
-                    color: 'text.secondary',
-                  }}
-                >
-                  {highlight.label}
-                </Typography>
-                <Typography variant="subtitle2" fontWeight={700}>
-                  {highlight.value}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-        </Stack>
-      </Box>
+          </p>
 
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', xl: 'repeat(2, minmax(0, 1fr))' },
-          gap: 3,
-          alignItems: 'start',
-        }}
-      >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {securityHighlights.map((highlight) => (
+              <div
+                key={highlight.label}
+                className={`p-4 rounded-2xl border min-h-[88px] ${highlight.active ? 'border-border bg-primary/5' : 'border-border bg-muted/30'}`}
+              >
+                <span className="block text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1.5">
+                  {highlight.label}
+                </span>
+                <p className="text-sm font-bold">{highlight.value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
         <AccountTotpSection
           enabled={totpEnabled}
           recoveryCodesRemaining={recoveryCodesRemaining}
@@ -171,7 +100,7 @@ export default function AccountSecuritySettingsSection({
           onAdd={onAddPasskey}
           onDelete={onDeletePasskey}
         />
-      </Box>
-    </Stack>
+      </div>
+    </div>
   )
 }

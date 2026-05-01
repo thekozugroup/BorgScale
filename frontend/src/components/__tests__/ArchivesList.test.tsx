@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { screen, renderWithProviders } from '../../test/test-utils'
 import userEvent from '@testing-library/user-event'
 import ArchivesList from '../ArchivesList'
 
@@ -43,7 +43,7 @@ describe('ArchivesList', () => {
   }
 
   it('renders loading state', () => {
-    render(
+    renderWithProviders(
       <ArchivesList archives={[]} repositoryName="Test Repo" loading={true} {...mockHandlers} />
     )
 
@@ -51,7 +51,7 @@ describe('ArchivesList', () => {
   })
 
   it('renders empty state when no archives', () => {
-    render(
+    renderWithProviders(
       <ArchivesList archives={[]} repositoryName="Test Repo" loading={false} {...mockHandlers} />
     )
 
@@ -59,7 +59,7 @@ describe('ArchivesList', () => {
   })
 
   it('renders header with repository name and count', () => {
-    render(
+    renderWithProviders(
       <ArchivesList
         archives={mockArchives}
         repositoryName="My Backup Repo"
@@ -73,7 +73,7 @@ describe('ArchivesList', () => {
   })
 
   it('shows numeric count badge for a single archive', () => {
-    render(
+    renderWithProviders(
       <ArchivesList
         archives={[mockArchives[0]]}
         repositoryName="Test Repo"
@@ -86,7 +86,7 @@ describe('ArchivesList', () => {
   })
 
   it('renders all archives as cards', () => {
-    render(
+    renderWithProviders(
       <ArchivesList
         archives={mockArchives}
         repositoryName="Test Repo"
@@ -105,7 +105,7 @@ describe('ArchivesList', () => {
   })
 
   it('does not render header in loading state', () => {
-    render(
+    renderWithProviders(
       <ArchivesList
         archives={mockArchives}
         repositoryName="Test Repo"
@@ -118,7 +118,7 @@ describe('ArchivesList', () => {
   })
 
   it('does not render header in empty state', () => {
-    render(
+    renderWithProviders(
       <ArchivesList archives={[]} repositoryName="Test Repo" loading={false} {...mockHandlers} />
     )
 
@@ -134,7 +134,7 @@ describe('ArchivesList', () => {
       time: '2024-01-15T10:00:00Z',
     }))
 
-    render(
+    renderWithProviders(
       <ArchivesList
         archives={manyArchives}
         repositoryName="Test Repo"
@@ -168,7 +168,7 @@ describe('ArchivesList', () => {
 
     it('renders pagination controls when archives exist', () => {
       const archives = createArchives(15)
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={archives}
           repositoryName="Test Repo"
@@ -182,7 +182,7 @@ describe('ArchivesList', () => {
     })
 
     it('does not render pagination for empty archives', () => {
-      render(
+      renderWithProviders(
         <ArchivesList archives={[]} repositoryName="Test Repo" loading={false} {...mockHandlers} />
       )
 
@@ -191,7 +191,7 @@ describe('ArchivesList', () => {
 
     it('displays correct number of archives per page', () => {
       const archives = createArchives(25)
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={archives}
           repositoryName="Test Repo"
@@ -210,7 +210,7 @@ describe('ArchivesList', () => {
 
     it('shows correct pagination text', () => {
       const archives = createArchives(35)
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={archives}
           repositoryName="Test Repo"
@@ -225,7 +225,7 @@ describe('ArchivesList', () => {
 
     it('handles custom rows per page options', () => {
       const archives = createArchives(50)
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={archives}
           repositoryName="Test Repo"
@@ -241,7 +241,7 @@ describe('ArchivesList', () => {
 
     it('renders all archives on single page when count is less than page size', () => {
       const archives = createArchives(5)
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={archives}
           repositoryName="Test Repo"
@@ -284,7 +284,7 @@ describe('ArchivesList', () => {
     ]
 
     it('displays sort dropdown in flat view', () => {
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={archivesWithDates}
           repositoryName="Test Repo"
@@ -300,7 +300,7 @@ describe('ArchivesList', () => {
 
     it('changes sort order to oldest first', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={archivesWithDates}
           repositoryName="Test Repo"
@@ -318,7 +318,7 @@ describe('ArchivesList', () => {
 
     it('hides sort dropdown in grouped view', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={archivesWithDates}
           repositoryName="Test Repo"
@@ -364,7 +364,7 @@ describe('ArchivesList', () => {
     ]
 
     it('displays filter dropdown', () => {
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={mixedArchives}
           repositoryName="Test Repo"
@@ -381,7 +381,7 @@ describe('ArchivesList', () => {
 
     it('filters to show only scheduled archives', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={mixedArchives}
           repositoryName="Test Repo"
@@ -400,7 +400,7 @@ describe('ArchivesList', () => {
 
     it('filters to show only manual archives', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={mixedArchives}
           repositoryName="Test Repo"
@@ -418,7 +418,7 @@ describe('ArchivesList', () => {
     })
 
     it('shows filtered count when filter is active', () => {
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={mixedArchives}
           repositoryName="Test Repo"
@@ -435,7 +435,7 @@ describe('ArchivesList', () => {
       const allScheduled = mixedArchives.filter((a) => a.comment)
       const user = userEvent.setup()
 
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={allScheduled}
           repositoryName="Test Repo"
@@ -472,7 +472,7 @@ describe('ArchivesList', () => {
     ]
 
     it('displays view mode toggle buttons', () => {
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={recentArchives}
           repositoryName="Test Repo"
@@ -487,7 +487,7 @@ describe('ArchivesList', () => {
 
     it('switches to grouped view', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={recentArchives}
           repositoryName="Test Repo"
@@ -507,7 +507,7 @@ describe('ArchivesList', () => {
       const user = userEvent.setup()
       localStorage.setItem('archives-list-grouping-enabled', 'true')
 
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={recentArchives}
           repositoryName="Test Repo"
@@ -525,7 +525,7 @@ describe('ArchivesList', () => {
 
     it('does not change mode when clicking same button', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={recentArchives}
           repositoryName="Test Repo"
@@ -575,7 +575,7 @@ describe('ArchivesList', () => {
     it('renders accordions in grouped view', () => {
       localStorage.setItem('archives-list-grouping-enabled', 'true')
 
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={groupedArchives}
           repositoryName="Test Repo"
@@ -593,7 +593,7 @@ describe('ArchivesList', () => {
       localStorage.setItem('archives-list-grouping-enabled', 'true')
       localStorage.setItem('archives-list-expanded-groups', JSON.stringify(['today']))
 
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={groupedArchives}
           repositoryName="Test Repo"
@@ -615,7 +615,7 @@ describe('ArchivesList', () => {
     it('displays archive count in group badge', () => {
       localStorage.setItem('archives-list-grouping-enabled', 'true')
 
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={groupedArchives}
           repositoryName="Test Repo"
@@ -640,7 +640,7 @@ describe('ArchivesList', () => {
 
       localStorage.setItem('archives-list-grouping-enabled', 'true')
 
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={manyArchives}
           repositoryName="Test Repo"
@@ -665,7 +665,7 @@ describe('ArchivesList', () => {
         time: '2024-01-15T10:00:00Z',
       }))
 
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={archives}
           repositoryName="Test Repo"
@@ -688,7 +688,7 @@ describe('ArchivesList', () => {
         time: '2024-01-15T10:00:00Z',
       }))
 
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={archives}
           repositoryName="Test Repo"
@@ -706,7 +706,7 @@ describe('ArchivesList', () => {
     it('loads saved sort preference', () => {
       localStorage.setItem('archives-list-sort-by', 'date-asc')
 
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={mockArchives}
           repositoryName="Test Repo"
@@ -722,7 +722,7 @@ describe('ArchivesList', () => {
     it('loads saved filter preference', () => {
       localStorage.setItem('archives-list-filter', 'scheduled')
 
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={mockArchives}
           repositoryName="Test Repo"
@@ -738,7 +738,7 @@ describe('ArchivesList', () => {
     it('loads saved grouping preference', () => {
       localStorage.setItem('archives-list-grouping-enabled', 'true')
 
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={mockArchives}
           repositoryName="Test Repo"
@@ -767,7 +767,7 @@ describe('ArchivesList', () => {
 
       // Should not throw error
       expect(() => {
-        render(
+        renderWithProviders(
           <ArchivesList
             archives={archives}
             repositoryName="Test Repo"
@@ -782,7 +782,7 @@ describe('ArchivesList', () => {
       localStorage.setItem('archives-list-sort-by', 'invalid-sort')
       localStorage.setItem('archives-list-filter', 'invalid-filter')
 
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={mockArchives}
           repositoryName="Test Repo"
@@ -811,7 +811,7 @@ describe('ArchivesList', () => {
       const user = userEvent.setup()
       const archives = createArchives(30)
 
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={archives}
           repositoryName="Test Repo"
@@ -833,7 +833,7 @@ describe('ArchivesList', () => {
       const user = userEvent.setup()
       const archives = createArchives(25)
 
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={archives}
           repositoryName="Test Repo"
@@ -854,7 +854,7 @@ describe('ArchivesList', () => {
       const user = userEvent.setup()
       const archives = createArchives(25)
 
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={archives}
           repositoryName="Test Repo"
@@ -879,7 +879,7 @@ describe('ArchivesList', () => {
 
   describe('mountDisabled prop', () => {
     it('passes mountDisabled to ArchiveCard', () => {
-      render(
+      renderWithProviders(
         <ArchivesList
           archives={mockArchives}
           repositoryName="Test Repo"

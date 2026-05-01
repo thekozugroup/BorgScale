@@ -1,6 +1,7 @@
-import { Box, Button, Stack, Typography, useTheme } from '@mui/material'
 import { KeyRound, ShieldCheck } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 interface AccountTotpSectionProps {
   enabled: boolean
@@ -18,103 +19,65 @@ export default function AccountTotpSection({
   onDisable,
 }: AccountTotpSectionProps) {
   const { t } = useTranslation()
-  const theme = useTheme()
-  const isDark = theme.palette.mode === 'dark'
-  const cardGradient = isDark
-    ? 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)'
-    : 'linear-gradient(135deg, rgba(0,0,0,0.015) 0%, rgba(0,0,0,0.005) 100%)'
-  const neutralIconBg = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'
 
   return (
-    <Box>
-      <Typography variant="subtitle2" fontWeight={700} gutterBottom>
-        {t('settings.account.security.totpTitle')}
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+    <div>
+      <p className="text-sm font-bold mb-1">{t('settings.account.security.totpTitle')}</p>
+      <p className="text-sm text-muted-foreground mb-4">
         {t('settings.account.security.totpDescription')}
-      </Typography>
+      </p>
 
-      <Box
-        sx={{
-          p: 2.5,
-          borderRadius: 2.5,
-          border: '1px solid',
-          borderColor: enabled ? 'rgba(34,197,94,0.25)' : 'divider',
-          background: enabled
-            ? 'linear-gradient(135deg, rgba(34,197,94,0.08) 0%, rgba(14,116,144,0.05) 100%)'
-            : cardGradient,
-        }}
+      <div
+        className={cn(
+          'p-5 rounded-2xl border border-border',
+          enabled ? 'bg-primary/5' : 'bg-muted/20'
+        )}
       >
-        <Stack
-          direction={{ xs: 'column', md: 'row' }}
-          spacing={2}
-          justifyContent="space-between"
-          alignItems={{ xs: 'flex-start', md: 'center' }}
-        >
-          <Stack direction="row" spacing={1.5} alignItems="center">
-            <Box
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: 2,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                bgcolor: enabled ? 'rgba(34,197,94,0.16)' : neutralIconBg,
-              }}
-            >
+        <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+          <div className="flex flex-row gap-3 items-center">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-muted/40">
               {enabled ? <ShieldCheck size={18} /> : <KeyRound size={18} />}
-            </Box>
-            <Box>
-              <Typography
-                variant="caption"
-                sx={{
-                  display: 'block',
-                  mb: 0.35,
-                  fontWeight: 700,
-                  letterSpacing: '0.04em',
-                  textTransform: 'uppercase',
-                  color: enabled ? 'success.light' : 'text.secondary',
-                }}
+            </div>
+            <div>
+              <span
+                className={cn(
+                  'block text-xs font-bold uppercase tracking-wide mb-0.5',
+                  enabled ? 'text-foreground' : 'text-muted-foreground'
+                )}
               >
                 {enabled
                   ? t('settings.account.security.statusActive')
                   : t('settings.account.security.statusNotEnabled')}
-              </Typography>
-              <Typography variant="body2" fontWeight={700}>
+              </span>
+              <p className="text-sm font-bold">
                 {enabled
                   ? t('settings.account.security.totpEnabled')
                   : t('settings.account.security.totpDisabled')}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
+              </p>
+              <p className="text-xs text-muted-foreground">
                 {enabled
                   ? t('settings.account.security.recoveryCodesRemaining', {
                       count: recoveryCodesRemaining,
                     })
                   : t('settings.account.security.totpDisabledHint')}
-              </Typography>
-            </Box>
-          </Stack>
+              </p>
+            </div>
+          </div>
 
-          <Stack
-            direction="row"
-            spacing={1}
-            flexWrap="wrap"
-            sx={{ width: { xs: '100%', md: 'auto' }, alignSelf: { md: 'center' } }}
-          >
+          <div className="flex flex-row gap-2 flex-wrap w-full md:w-auto self-start md:self-center">
             <Button
-              variant={enabled ? 'outlined' : 'contained'}
+              variant={enabled ? 'outline' : 'default'}
               onClick={enabled ? onDisable : onEnable}
               disabled={loading}
-              sx={{ minWidth: { xs: '100%', sm: 160, md: 'auto' } }}
+              className="min-w-full sm:min-w-40 md:min-w-0"
             >
               {enabled
                 ? t('settings.account.security.disableTotp')
                 : t('settings.account.security.enableTotp')}
             </Button>
-          </Stack>
-        </Stack>
-      </Box>
-    </Box>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

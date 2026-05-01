@@ -1,8 +1,8 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within, renderWithProviders } from '../../test/test-utils'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest'
 import RepositoryWizard from '../RepositoryWizard'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient } from '@tanstack/react-query'
 import { sshKeysAPI } from '../../services/api'
 
 const { mockTrack, mockTrackRepository } = vi.hoisted(() => ({
@@ -105,16 +105,15 @@ const renderWizard = (
 ) => {
   const queryClient = createQueryClient()
   return {
-    ...render(
-      <QueryClientProvider client={queryClient}>
-        <RepositoryWizard
-          open={true}
-          onClose={onClose}
-          mode={mode}
-          repository={repository}
-          onSubmit={onSubmit}
-        />
-      </QueryClientProvider>
+    ...renderWithProviders(
+      <RepositoryWizard
+        open={true}
+        onClose={onClose}
+        mode={mode}
+        repository={repository}
+        onSubmit={onSubmit}
+      />,
+      { queryClient }
     ),
     onSubmit,
     onClose,
@@ -1523,10 +1522,9 @@ describe('RepositoryWizard', () => {
       expect(remoteCard).toBeInTheDocument()
 
       // First, delete the remote directory to enable switching
-      // Find the delete icon button
-      const deleteIcon = screen.getByTestId('DeleteIcon')
-      const deleteButton = deleteIcon.closest('button')
-      await user.click(deleteButton!)
+      // Find the delete icon button (aria-label="Remove <dir>")
+      const deleteButton = screen.getByRole('button', { name: /^Remove / })
+      await user.click(deleteButton)
 
       // Now the local card should be enabled, switch to BorgScale Server (local)
       await waitFor(() => {

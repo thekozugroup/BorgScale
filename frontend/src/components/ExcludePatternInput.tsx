@@ -1,16 +1,8 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Stack,
-  IconButton,
-  InputAdornment,
-} from '@mui/material'
-import DeleteIcon from '@mui/icons-material/Delete'
-import FolderOpenIcon from '@mui/icons-material/FolderOpen'
+import { Trash2, FolderOpen } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 interface ExcludePatternInputProps {
   patterns: string[]
@@ -39,7 +31,7 @@ export default function ExcludePatternInput({
     onChange(patterns.filter((_, i) => i !== index))
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault()
       handleAdd()
@@ -47,58 +39,55 @@ export default function ExcludePatternInput({
   }
 
   return (
-    <Box>
-      <Typography variant="subtitle2" gutterBottom>
-        {t('excludePatterns.title')}
-      </Typography>
-      <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1.5 }}>
-        {t('excludePatterns.hint')}
-      </Typography>
+    <div>
+      <p className="text-sm font-semibold mb-1">{t('excludePatterns.title')}</p>
+      <p className="text-xs text-muted-foreground mb-3">{t('excludePatterns.hint')}</p>
 
       {patterns.length > 0 && (
-        <Stack spacing={0.5} sx={{ mb: 1.5 }}>
+        <div className="flex flex-col gap-1 mb-3">
           {patterns.map((pattern, index) => (
-            <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="body2" sx={{ fontFamily: 'monospace', flex: 1 }}>
-                {pattern}
-              </Typography>
-              <IconButton size="small" onClick={() => handleRemove(index)} disabled={disabled}>
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Box>
+            <div key={index} className="flex items-center gap-2">
+              <span className="font-mono text-sm flex-1 truncate">{pattern}</span>
+              <button
+                type="button"
+                aria-label={`Remove ${pattern}`}
+                onClick={() => handleRemove(index)}
+                disabled={disabled}
+                className="w-7 h-7 rounded flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-muted transition-colors disabled:opacity-40"
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
           ))}
-        </Stack>
+        </div>
       )}
 
-      <Box sx={{ display: 'flex', gap: 1 }}>
-        <TextField
-          value={newPattern}
-          onChange={(e) => setNewPattern(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder={t('excludePatterns.placeholder')}
-          size="small"
-          fullWidth
-          disabled={disabled}
-          InputProps={{
-            endAdornment: onBrowseClick && (
-              <InputAdornment position="end">
-                <IconButton
-                  onClick={onBrowseClick}
-                  edge="end"
-                  size="small"
-                  title={t('excludePatterns.browseToExclude')}
-                  disabled={disabled}
-                >
-                  <FolderOpenIcon fontSize="small" />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
-        <Button variant="outlined" size="small" onClick={handleAdd} disabled={disabled}>
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <Input
+            value={newPattern}
+            onChange={(e) => setNewPattern(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={t('excludePatterns.placeholder')}
+            disabled={disabled}
+            className={onBrowseClick ? 'pr-9' : ''}
+          />
+          {onBrowseClick && (
+            <button
+              type="button"
+              onClick={onBrowseClick}
+              disabled={disabled}
+              title={t('excludePatterns.browseToExclude')}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground disabled:opacity-40"
+            >
+              <FolderOpen size={16} />
+            </button>
+          )}
+        </div>
+        <Button variant="outline" size="sm" onClick={handleAdd} disabled={disabled}>
           {t('excludePatterns.add')}
         </Button>
-      </Box>
-    </Box>
+      </div>
+    </div>
   )
 }

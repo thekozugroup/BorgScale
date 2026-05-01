@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, renderWithProviders } from '../../test/test-utils'
 import userEvent from '@testing-library/user-event'
 import CronBuilderDialog from '../CronBuilderDialog'
 
@@ -27,13 +27,13 @@ describe('CronBuilderDialog', () => {
 
   describe('Trigger Button', () => {
     it('renders trigger button with clock icon', () => {
-      render(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
+      renderWithProviders(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
       expect(screen.getByRole('button', { name: 'Open schedule builder' })).toBeInTheDocument()
     })
 
     it('opens dialog when trigger button clicked', async () => {
       const user = userEvent.setup()
-      render(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
+      renderWithProviders(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
 
       await user.click(screen.getByRole('button', { name: 'Open schedule builder' }))
 
@@ -46,7 +46,7 @@ describe('CronBuilderDialog', () => {
   describe('Dialog Content', () => {
     it('shows custom dialog title', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} dialogTitle="Custom Title" />
       )
 
@@ -59,7 +59,7 @@ describe('CronBuilderDialog', () => {
 
     it('shows CronBuilder component with current value', async () => {
       const user = userEvent.setup()
-      render(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
+      renderWithProviders(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
 
       await user.click(screen.getByRole('button', { name: 'Open schedule builder' }))
 
@@ -71,7 +71,7 @@ describe('CronBuilderDialog', () => {
 
     it('shows Cancel button', async () => {
       const user = userEvent.setup()
-      render(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
+      renderWithProviders(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
 
       await user.click(screen.getByRole('button', { name: 'Open schedule builder' }))
 
@@ -82,7 +82,7 @@ describe('CronBuilderDialog', () => {
 
     it('shows Apply Schedule button by default', async () => {
       const user = userEvent.setup()
-      render(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
+      renderWithProviders(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
 
       await user.click(screen.getByRole('button', { name: 'Open schedule builder' }))
 
@@ -93,7 +93,7 @@ describe('CronBuilderDialog', () => {
 
     it('shows custom button label', async () => {
       const user = userEvent.setup()
-      render(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} buttonLabel="Save" />)
+      renderWithProviders(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} buttonLabel="Save" />)
 
       await user.click(screen.getByRole('button', { name: 'Open schedule builder' }))
 
@@ -106,7 +106,7 @@ describe('CronBuilderDialog', () => {
   describe('User Interactions', () => {
     it('calls onChange with new value when Apply is clicked', async () => {
       const user = userEvent.setup()
-      render(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
+      renderWithProviders(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
 
       await user.click(screen.getByRole('button', { name: 'Open schedule builder' }))
 
@@ -128,7 +128,7 @@ describe('CronBuilderDialog', () => {
 
     it('does not call onChange when Cancel is clicked', async () => {
       const user = userEvent.setup()
-      render(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
+      renderWithProviders(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
 
       await user.click(screen.getByRole('button', { name: 'Open schedule builder' }))
 
@@ -150,7 +150,7 @@ describe('CronBuilderDialog', () => {
 
     it('closes dialog after Apply', async () => {
       const user = userEvent.setup()
-      render(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
+      renderWithProviders(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
 
       await user.click(screen.getByRole('button', { name: 'Open schedule builder' }))
 
@@ -167,7 +167,7 @@ describe('CronBuilderDialog', () => {
 
     it('closes dialog after Cancel', async () => {
       const user = userEvent.setup()
-      render(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
+      renderWithProviders(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
 
       await user.click(screen.getByRole('button', { name: 'Open schedule builder' }))
 
@@ -184,7 +184,7 @@ describe('CronBuilderDialog', () => {
 
     it('resets to original value when reopened after cancel', async () => {
       const user = userEvent.setup()
-      render(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
+      renderWithProviders(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} />)
 
       // Open dialog
       await user.click(screen.getByRole('button', { name: 'Open schedule builder' }))
@@ -219,7 +219,7 @@ describe('CronBuilderDialog', () => {
   describe('Props Passthrough', () => {
     it('passes label to CronBuilder', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} label="Backup Schedule" />
       )
 
@@ -232,7 +232,7 @@ describe('CronBuilderDialog', () => {
 
     it('passes helperText to CronBuilder', async () => {
       const user = userEvent.setup()
-      render(
+      renderWithProviders(
         <CronBuilderDialog
           value="0 0 * * *"
           onChange={mockOnChange}

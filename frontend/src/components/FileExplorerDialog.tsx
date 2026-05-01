@@ -437,8 +437,8 @@ export default function FileExplorerDialog({
           {/* Mount Point Info */}
           {currentPath === '/' && activeConnectionType === 'local' && sshConnections.length > 0 && (
             <div className="px-3 pb-1.5 shrink-0">
-              <div className="rounded-md border border-blue-200 bg-blue-50 dark:border-blue-800/50 dark:bg-blue-900/20 px-3 py-2">
-                <p className="text-xs text-blue-700 dark:text-blue-300">
+              <div className="rounded-md border border-border bg-muted/40 px-3 py-2">
+                <p className="text-xs text-muted-foreground">
                   {t('fileExplorer.sshInfoAlert')}
                 </p>
               </div>
@@ -488,13 +488,13 @@ export default function FileExplorerDialog({
                       >
                         <span className="shrink-0 flex items-center">
                           {item.is_mount_point ? (
-                            <HardDrive size={18} className="text-emerald-500" />
+                            <HardDrive size={18} className="text-primary" />
                           ) : item.is_local_mount ? (
-                            <HardDrive size={18} className="text-indigo-400" />
+                            <HardDrive size={18} className="text-muted-foreground" />
                           ) : item.is_borg_repo ? (
-                            <Archive size={18} className="text-red-400" />
+                            <Archive size={18} className="text-destructive/70" />
                           ) : item.is_directory ? (
-                            <FolderOpen size={18} className="text-blue-500" />
+                            <FolderOpen size={18} className="text-foreground/70" />
                           ) : (
                             <File size={18} className="text-muted-foreground" />
                           )}
@@ -503,7 +503,7 @@ export default function FileExplorerDialog({
                         <span className="flex items-center gap-1.5 flex-1 min-w-0">
                           <span className="text-sm truncate">{item.name}</span>
                           {item.is_mount_point && (
-                            <Badge className="h-4 text-[0.6rem] font-semibold px-1 bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-700/50">
+                            <Badge className="h-4 text-[0.6rem] font-semibold px-1 bg-primary/10 text-primary border-primary/20">
                               {t('fileExplorer.chips.remote')}
                             </Badge>
                           )}
@@ -513,7 +513,7 @@ export default function FileExplorerDialog({
                             </Badge>
                           )}
                           {item.is_borg_repo && (
-                            <Badge className="h-4 text-[0.6rem] font-semibold px-1 bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-700/50">
+                            <Badge className="h-4 text-[0.6rem] font-semibold px-1 bg-muted text-muted-foreground border-border">
                               {t('fileExplorer.chips.borg')}
                             </Badge>
                           )}

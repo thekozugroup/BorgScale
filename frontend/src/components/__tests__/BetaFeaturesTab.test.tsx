@@ -1,9 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import BetaFeaturesTab from '../BetaFeaturesTab'
 import { settingsAPI } from '@/services/api.ts'
-import { renderWithProviders } from '../../test/test-utils'
+import { renderWithProviders, screen, waitFor } from '../../test/test-utils'
 import { AxiosResponse } from 'axios'
 
 vi.mock('../../services/api', () => ({
@@ -45,7 +44,9 @@ describe('BetaFeaturesTab', () => {
     it('shows loading spinner while fetching settings', () => {
       vi.mocked(settingsAPI.getSystemSettings).mockImplementation(() => new Promise(() => {}))
       renderWithProviders(<BetaFeaturesTab />)
-      expect(screen.getByRole('progressbar')).toBeInTheDocument()
+      // Loading state renders a Loader2 spinner (svg with animate-spin class)
+      const spinner = document.querySelector('.animate-spin')
+      expect(spinner).toBeInTheDocument()
     })
 
     it('renders Beta Features header', async () => {

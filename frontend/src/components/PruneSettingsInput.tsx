@@ -1,6 +1,7 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Box, TextField } from '@mui/material'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 export interface PruneSettings {
   keepHourly: number
@@ -26,81 +27,35 @@ const PruneSettingsInput: React.FC<PruneSettingsInputProps> = ({
   const handleChange = (field: keyof PruneSettings, value: string) => {
     const parsedValue = parseInt(value, 10)
     const finalValue = isNaN(parsedValue) ? 0 : Math.max(0, parsedValue)
-    onChange({
-      ...values,
-      [field]: finalValue,
-    })
+    onChange({ ...values, [field]: finalValue })
   }
 
+  const fields: { key: keyof PruneSettings; label: string; hint: string }[] = [
+    { key: 'keepHourly', label: t('pruneSettings.keepHourly'), hint: t('pruneSettings.keepHourlyHint') },
+    { key: 'keepDaily', label: t('pruneSettings.keepDaily'), hint: t('pruneSettings.keepDailyHint') },
+    { key: 'keepWeekly', label: t('pruneSettings.keepWeekly'), hint: t('pruneSettings.keepWeeklyHint') },
+    { key: 'keepMonthly', label: t('pruneSettings.keepMonthly'), hint: t('pruneSettings.keepMonthlyHint') },
+    { key: 'keepQuarterly', label: t('pruneSettings.keepQuarterly'), hint: t('pruneSettings.keepQuarterlyHint') },
+    { key: 'keepYearly', label: t('pruneSettings.keepYearly'), hint: t('pruneSettings.keepYearlyHint') },
+  ]
+
   return (
-    <Box
-      sx={{
-        display: 'grid',
-        gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
-        gap: 2,
-      }}
-    >
-      <TextField
-        label={t('pruneSettings.keepHourly')}
-        type="number"
-        value={values.keepHourly}
-        onChange={(e) => handleChange('keepHourly', e.target.value)}
-        inputProps={{ min: 0 }}
-        size="small"
-        helperText={t('pruneSettings.keepHourlyHint')}
-        disabled={disabled}
-      />
-      <TextField
-        label={t('pruneSettings.keepDaily')}
-        type="number"
-        value={values.keepDaily}
-        onChange={(e) => handleChange('keepDaily', e.target.value)}
-        inputProps={{ min: 0 }}
-        size="small"
-        helperText={t('pruneSettings.keepDailyHint')}
-        disabled={disabled}
-      />
-      <TextField
-        label={t('pruneSettings.keepWeekly')}
-        type="number"
-        value={values.keepWeekly}
-        onChange={(e) => handleChange('keepWeekly', e.target.value)}
-        inputProps={{ min: 0 }}
-        size="small"
-        helperText={t('pruneSettings.keepWeeklyHint')}
-        disabled={disabled}
-      />
-      <TextField
-        label={t('pruneSettings.keepMonthly')}
-        type="number"
-        value={values.keepMonthly}
-        onChange={(e) => handleChange('keepMonthly', e.target.value)}
-        inputProps={{ min: 0 }}
-        size="small"
-        helperText={t('pruneSettings.keepMonthlyHint')}
-        disabled={disabled}
-      />
-      <TextField
-        label={t('pruneSettings.keepQuarterly')}
-        type="number"
-        value={values.keepQuarterly}
-        onChange={(e) => handleChange('keepQuarterly', e.target.value)}
-        inputProps={{ min: 0 }}
-        size="small"
-        helperText={t('pruneSettings.keepQuarterlyHint')}
-        disabled={disabled}
-      />
-      <TextField
-        label={t('pruneSettings.keepYearly')}
-        type="number"
-        value={values.keepYearly}
-        onChange={(e) => handleChange('keepYearly', e.target.value)}
-        inputProps={{ min: 0 }}
-        size="small"
-        helperText={t('pruneSettings.keepYearlyHint')}
-        disabled={disabled}
-      />
-    </Box>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {fields.map(({ key, label, hint }) => (
+        <div key={key} className="flex flex-col gap-1">
+          <Label htmlFor={`prune-${key}`}>{label}</Label>
+          <Input
+            id={`prune-${key}`}
+            type="number"
+            value={values[key]}
+            onChange={(e) => handleChange(key, e.target.value)}
+            min={0}
+            disabled={disabled}
+          />
+          <p className="text-xs text-muted-foreground">{hint}</p>
+        </div>
+      ))}
+    </div>
   )
 }
 

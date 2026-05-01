@@ -1,16 +1,13 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
+import { Label } from '@/components/ui/label'
 import {
-  Box,
-  Typography,
-  Stack,
-  FormControl,
-  InputLabel,
   Select,
-  MenuItem,
-  FormControlLabel,
-  Checkbox,
-} from '@mui/material'
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import ScriptParameterInputs, { ScriptParameter } from './ScriptParameterInputs'
 
 interface Script {
@@ -27,7 +24,6 @@ interface ScriptSelectorSectionProps {
   onPreChange: (id: number | null) => void
   onPostChange: (id: number | null) => void
   onRunRepoScriptsChange: (value: boolean) => void
-  // Script parameters
   preBackupScriptParameters?: Record<string, string>
   postBackupScriptParameters?: Record<string, string>
   onPreParametersChange?: (params: Record<string, string>) => void
@@ -49,122 +45,99 @@ const ScriptSelectorSection: React.FC<ScriptSelectorSectionProps> = ({
   onPreParametersChange,
   onPostParametersChange,
   disabled = false,
-  size = 'medium',
 }) => {
-  // Find selected scripts to get their parameters
   const { t } = useTranslation()
   const selectedPreScript = scripts.find((s) => s.id === preBackupScriptId)
   const selectedPostScript = scripts.find((s) => s.id === postBackupScriptId)
 
   return (
-    <Box sx={{ p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}>
-      <Typography variant="subtitle2" fontWeight={600} gutterBottom>
-        {t('scriptSelector.title')}
-      </Typography>
-      <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 2 }}>
-        {t('scriptSelector.subtitle')}
-      </Typography>
+    <div className="p-4 border border-border rounded-md">
+      <p className="text-sm font-semibold mb-1">{t('scriptSelector.title')}</p>
+      <p className="text-xs text-muted-foreground mb-4">{t('scriptSelector.subtitle')}</p>
 
-      <Stack spacing={2}>
-        <FormControl fullWidth size={size}>
-          <InputLabel sx={{ fontSize: size === 'medium' ? '1.1rem' : '0.875rem' }}>
-            {t('scriptSelector.preBackup')}
-          </InputLabel>
+      <div className="flex flex-col gap-4">
+        {/* Pre-backup script */}
+        <div>
+          <Label className="mb-1 block">{t('scriptSelector.preBackup')}</Label>
           <Select
-            value={preBackupScriptId || ''}
-            onChange={(e) => onPreChange(e.target.value ? Number(e.target.value) : null)}
-            label={t('scriptSelector.preBackup')}
+            value={preBackupScriptId ? String(preBackupScriptId) : '__none__'}
+            onValueChange={(v) => onPreChange(v === '__none__' ? null : Number(v))}
             disabled={disabled}
-            sx={{
-              fontSize: size === 'medium' ? '1.1rem' : '0.875rem',
-              minHeight: size === 'medium' ? 56 : undefined,
-            }}
           >
-            <MenuItem value="">
-              <em>{t('scriptSelector.none')}</em>
-            </MenuItem>
-            {scripts.map((script) => (
-              <MenuItem key={script.id} value={script.id}>
-                {script.name}
-              </MenuItem>
-            ))}
+            <SelectTrigger>
+              <SelectValue placeholder={t('scriptSelector.none')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__none__">{t('scriptSelector.none')}</SelectItem>
+              {scripts.map((script) => (
+                <SelectItem key={script.id} value={String(script.id)}>
+                  {script.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
-        </FormControl>
+        </div>
 
-        {/* Pre-backup script parameters */}
-        {selectedPreScript &&
-          selectedPreScript.parameters &&
-          selectedPreScript.parameters.length > 0 &&
-          onPreParametersChange && (
-            <Box sx={{ pl: 2, pt: 1 }}>
-              <ScriptParameterInputs
-                parameters={selectedPreScript.parameters}
-                values={preBackupScriptParameters}
-                onChange={onPreParametersChange}
-                showDescriptions={true}
-              />
-            </Box>
-          )}
-
-        <FormControl fullWidth size={size}>
-          <InputLabel sx={{ fontSize: size === 'medium' ? '1.1rem' : '0.875rem' }}>
-            {t('scriptSelector.postBackup')}
-          </InputLabel>
-          <Select
-            value={postBackupScriptId || ''}
-            onChange={(e) => onPostChange(e.target.value ? Number(e.target.value) : null)}
-            label={t('scriptSelector.postBackup')}
-            disabled={disabled}
-            sx={{
-              fontSize: size === 'medium' ? '1.1rem' : '0.875rem',
-              minHeight: size === 'medium' ? 56 : undefined,
-            }}
-          >
-            <MenuItem value="">
-              <em>{t('scriptSelector.none')}</em>
-            </MenuItem>
-            {scripts.map((script) => (
-              <MenuItem key={script.id} value={script.id}>
-                {script.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        {/* Post-backup script parameters */}
-        {selectedPostScript &&
-          selectedPostScript.parameters &&
-          selectedPostScript.parameters.length > 0 &&
-          onPostParametersChange && (
-            <Box sx={{ pl: 2, pt: 1 }}>
-              <ScriptParameterInputs
-                parameters={selectedPostScript.parameters}
-                values={postBackupScriptParameters}
-                onChange={onPostParametersChange}
-                showDescriptions={true}
-              />
-            </Box>
-          )}
-
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={runRepositoryScripts}
-              onChange={(e) => onRunRepoScriptsChange(e.target.checked)}
-              disabled={disabled}
+        {selectedPreScript?.parameters && selectedPreScript.parameters.length > 0 && onPreParametersChange && (
+          <div className="pl-4 pt-1">
+            <ScriptParameterInputs
+              parameters={selectedPreScript.parameters}
+              values={preBackupScriptParameters}
+              onChange={onPreParametersChange}
+              showDescriptions={true}
             />
-          }
-          label={
-            <Box>
-              <Typography variant="body2">{t('scriptSelector.runRepoScripts')}</Typography>
-              <Typography variant="caption" color="text.secondary">
-                {t('scriptSelector.runRepoScriptsDesc')}
-              </Typography>
-            </Box>
-          }
-        />
-      </Stack>
-    </Box>
+          </div>
+        )}
+
+        {/* Post-backup script */}
+        <div>
+          <Label className="mb-1 block">{t('scriptSelector.postBackup')}</Label>
+          <Select
+            value={postBackupScriptId ? String(postBackupScriptId) : '__none__'}
+            onValueChange={(v) => onPostChange(v === '__none__' ? null : Number(v))}
+            disabled={disabled}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={t('scriptSelector.none')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__none__">{t('scriptSelector.none')}</SelectItem>
+              {scripts.map((script) => (
+                <SelectItem key={script.id} value={String(script.id)}>
+                  {script.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {selectedPostScript?.parameters && selectedPostScript.parameters.length > 0 && onPostParametersChange && (
+          <div className="pl-4 pt-1">
+            <ScriptParameterInputs
+              parameters={selectedPostScript.parameters}
+              values={postBackupScriptParameters}
+              onChange={onPostParametersChange}
+              showDescriptions={true}
+            />
+          </div>
+        )}
+
+        {/* Run repo scripts checkbox */}
+        <label className="flex items-start gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={runRepositoryScripts}
+            onChange={(e) => onRunRepoScriptsChange(e.target.checked)}
+            disabled={disabled}
+            className="mt-0.5 rounded border-border"
+          />
+          <div>
+            <p className="text-sm">{t('scriptSelector.runRepoScripts')}</p>
+            <p className="text-xs text-muted-foreground">{t('scriptSelector.runRepoScriptsDesc')}</p>
+          </div>
+        </label>
+      </div>
+    </div>
   )
 }
 

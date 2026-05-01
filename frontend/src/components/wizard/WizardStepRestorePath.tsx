@@ -1,19 +1,8 @@
-import {
-  Box,
-  TextField,
-  FormControl,
-  FormControlLabel,
-  Radio,
-  RadioGroup,
-  Typography,
-  Alert,
-  Paper,
-  InputAdornment,
-  IconButton,
-} from '@mui/material'
 import { FolderOpen, FileCheck } from 'lucide-react'
-import FolderOpenIcon from '@mui/icons-material/FolderOpen'
 import { useTranslation } from 'react-i18next'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { cn } from '@/lib/utils'
 
 interface ArchiveFile {
   path: string
@@ -57,221 +46,142 @@ export default function WizardStepRestorePath({
   onBrowsePath,
 }: WizardStepRestorePathProps) {
   const { t } = useTranslation()
-  // Get example paths to show
+
   const examplePaths = selectedFiles.slice(0, 3).map((f) => f.path)
   const hasMoreFiles = selectedFiles.length > 3
 
-  // Get SSH connection details
   const sshConnection =
     destinationType === 'ssh' && destinationConnectionId
       ? sshConnections.find((c) => c.id === destinationConnectionId)
       : null
 
-  // Get SSH prefix for displaying paths
   const sshPrefix = sshConnection
     ? `ssh://${sshConnection.username}@${sshConnection.host}:${sshConnection.port}`
     : ''
 
-  // Get destination path with SSH prefix if applicable
   const getCustomDestinationPath = (originalPath: string) => {
     let path: string
     if (data.restoreStrategy === 'custom' && data.customPath) {
-      // Extract filename from original path
       const filename = originalPath.split('/').pop() || ''
       path = `${data.customPath.replace(/\/$/, '')}/${filename}`
     } else {
       path = originalPath
     }
-
-    // Ensure path starts with / for proper SSH URL formatting
-    if (path && !path.startsWith('/')) {
-      path = '/' + path
-    }
-
-    // Add SSH prefix if restoring to SSH destination
+    if (path && !path.startsWith('/')) path = '/' + path
     return sshPrefix ? `${sshPrefix}${path}` : path
   }
 
+
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <div className="flex flex-col gap-5">
       {/* Header */}
-      <Box>
-        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-          {t('wizard.restorePath.title')}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {t('wizard.restorePath.subtitle')}
-        </Typography>
-      </Box>
+      <div>
+        <p className="text-base font-semibold mb-1">{t('wizard.restorePath.title')}</p>
+        <p className="text-sm text-muted-foreground">{t('wizard.restorePath.subtitle')}</p>
+      </div>
 
-      {/* Restore Strategy Selection */}
-      <FormControl>
-        <RadioGroup
-          value={data.restoreStrategy}
-          onChange={(e) => onChange({ restoreStrategy: e.target.value as 'original' | 'custom' })}
+      {/* Strategy Selection */}
+      <div className="flex flex-col gap-3">
+        {/* Original */}
+        <button
+          type="button"
+          onClick={() => onChange({ restoreStrategy: 'original' })}
+          className={cn(
+            'w-full flex items-start gap-3 p-4 rounded-xl border text-left transition-all duration-200',
+            data.restoreStrategy === 'original'
+              ? 'border-2 border-primary bg-primary/5 shadow-sm'
+              : 'border border-border hover:border-foreground/30'
+          )}
         >
-          <Paper
-            variant="outlined"
-            sx={{
-              p: 2,
-              mb: 2,
-              border: data.restoreStrategy === 'original' ? 2 : 1,
-              borderColor: data.restoreStrategy === 'original' ? '#ed6c02' : 'divider',
-              bgcolor:
-                data.restoreStrategy === 'original'
-                  ? (theme) => (theme.palette.mode === 'dark' ? '#ed6c0220' : '#ed6c020d')
-                  : 'background.paper',
-              transition: 'all 0.2s',
-              cursor: 'pointer',
-              '&:hover': {
-                borderColor: data.restoreStrategy === 'original' ? '#ed6c02' : 'text.primary',
-              },
-            }}
-            onClick={() => onChange({ restoreStrategy: 'original' })}
-          >
-            <FormControlLabel
-              value="original"
-              control={<Radio sx={{ color: '#ed6c02', '&.Mui-checked': { color: '#ed6c02' } }} />}
-              label={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <FileCheck size={18} />
-                  <Box>
-                    <Typography variant="body1" fontWeight={600}>
-                      {t('wizard.restorePath.restoreToOriginal')}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('wizard.restorePath.restoreToOriginalDesc')}
-                    </Typography>
-                  </Box>
-                </Box>
-              }
-              sx={{ m: 0, width: '100%' }}
-            />
-          </Paper>
+          <input type="radio" name="restoreStrategy" checked={data.restoreStrategy === 'original'} onChange={() => onChange({ restoreStrategy: 'original' })}  className="mt-0.5 flex-shrink-0" />
+          <div className="flex items-start gap-2">
+            <FileCheck size={18} className="flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold">{t('wizard.restorePath.restoreToOriginal')}</p>
+              <p className="text-sm text-muted-foreground">{t('wizard.restorePath.restoreToOriginalDesc')}</p>
+            </div>
+          </div>
+        </button>
 
-          <Paper
-            variant="outlined"
-            sx={{
-              p: 2,
-              border: data.restoreStrategy === 'custom' ? 2 : 1,
-              borderColor: data.restoreStrategy === 'custom' ? '#ed6c02' : 'divider',
-              bgcolor:
-                data.restoreStrategy === 'custom'
-                  ? (theme) => (theme.palette.mode === 'dark' ? '#ed6c0220' : '#ed6c020d')
-                  : 'background.paper',
-              transition: 'all 0.2s',
-              cursor: 'pointer',
-              '&:hover': {
-                borderColor: data.restoreStrategy === 'custom' ? '#ed6c02' : 'text.primary',
-              },
-            }}
-            onClick={() => onChange({ restoreStrategy: 'custom' })}
-          >
-            <FormControlLabel
-              value="custom"
-              control={<Radio sx={{ color: '#ed6c02', '&.Mui-checked': { color: '#ed6c02' } }} />}
-              label={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <FolderOpen size={18} />
-                  <Box>
-                    <Typography variant="body1" fontWeight={600}>
-                      {t('wizard.restorePath.restoreToCustom')}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('wizard.restorePath.restoreToCustomDesc')}
-                    </Typography>
-                  </Box>
-                </Box>
-              }
-              sx={{ m: 0, width: '100%' }}
-            />
-          </Paper>
-        </RadioGroup>
-      </FormControl>
+        {/* Custom */}
+        <button
+          type="button"
+          onClick={() => onChange({ restoreStrategy: 'custom' })}
+          className={cn(
+            'w-full flex items-start gap-3 p-4 rounded-xl border text-left transition-all duration-200',
+            data.restoreStrategy === 'custom'
+              ? 'border-2 border-primary bg-primary/5 shadow-sm'
+              : 'border border-border hover:border-foreground/30'
+          )}
+        >
+          <input type="radio" name="restoreStrategy" checked={data.restoreStrategy === 'custom'} onChange={() => onChange({ restoreStrategy: 'custom' })}  className="mt-0.5 flex-shrink-0" />
+          <div className="flex items-start gap-2">
+            <FolderOpen size={18} className="flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold">{t('wizard.restorePath.restoreToCustom')}</p>
+              <p className="text-sm text-muted-foreground">{t('wizard.restorePath.restoreToCustomDesc')}</p>
+            </div>
+          </div>
+        </button>
+      </div>
 
       {/* Custom Path Input */}
       {data.restoreStrategy === 'custom' && (
-        <>
-          <TextField
-            label={t('wizard.restorePath.customPathLabel')}
-            value={data.customPath}
-            onChange={(e) => onChange({ customPath: e.target.value })}
-            placeholder="/Users/yourusername/restored"
-            required
-            fullWidth
-            helperText={t('wizard.restorePath.customPathHelper')}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={onBrowsePath}
-                    edge="end"
-                    size="small"
-                    title={t('wizard.restorePath.browseFilesystem')}
-                    disabled={destinationType === 'ssh' && !destinationConnectionId}
-                  >
-                    <FolderOpenIcon fontSize="small" />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-        </>
+        <div>
+          <Label className="text-xs font-semibold mb-1.5 block">{t('wizard.restorePath.customPathLabel')}</Label>
+          <div className="relative">
+            <Input
+              value={data.customPath}
+              onChange={(e) => onChange({ customPath: e.target.value })}
+              placeholder="/Users/yourusername/restored"
+              required
+              className="h-9 text-sm pr-9"
+            />
+            <button
+              type="button"
+              onClick={onBrowsePath}
+              title={t('wizard.restorePath.browseFilesystem')}
+              disabled={destinationType === 'ssh' && !destinationConnectionId}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-40"
+            >
+              <FolderOpen size={16} />
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">{t('wizard.restorePath.customPathHelper')}</p>
+        </div>
       )}
 
-      {/* Preview of destination paths */}
+      {/* Preview */}
       {selectedFiles.length > 0 && (
-        <Box>
-          <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, mb: 1 }}>
-            {t('wizard.restorePath.preview')}
-          </Typography>
-          <Paper
-            variant="outlined"
-            sx={{
-              p: 2,
-              bgcolor: 'background.default',
-              maxHeight: 200,
-              overflow: 'auto',
-            }}
-          >
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <div>
+          <p className="text-sm font-semibold mb-2">{t('wizard.restorePath.preview')}</p>
+          <div className="p-3 rounded-xl border border-border bg-background overflow-auto max-h-48">
+            <div className="flex flex-col gap-3">
               {examplePaths.map((path, index) => (
-                <Box key={index} sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ fontSize: '0.75rem', fontFamily: 'monospace' }}
-                  >
+                <div key={index} className="flex flex-col gap-0.5">
+                  <p className="text-xs text-muted-foreground font-mono">
                     {t('wizard.restorePath.original')} {path}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontSize: '0.8125rem',
-                      fontFamily: 'monospace',
-                      color: '#ed6c02',
-                      fontWeight: 600,
-                    }}
-                  >
+                  </p>
+                  <p className="text-sm font-semibold font-mono text-primary">
                     → {getCustomDestinationPath(path)}
-                  </Typography>
-                </Box>
+                  </p>
+                </div>
               ))}
               {hasMoreFiles && (
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+                <p className="text-xs text-muted-foreground mt-1">
                   {t('wizard.restorePath.andMoreFiles', { count: selectedFiles.length - 3 })}
-                </Typography>
+                </p>
               )}
-            </Box>
-          </Paper>
-        </Box>
+            </div>
+          </div>
+        </div>
       )}
 
       {destinationType === 'ssh' && !destinationConnectionId && (
-        <Alert severity="error">
-          <Typography variant="body2">{t('wizard.restorePath.noSshConnection')}</Typography>
-        </Alert>
+        <div className="flex items-start gap-2 p-3 rounded-xl text-sm border border-destructive/25 bg-destructive/10 text-destructive">
+          {t('wizard.restorePath.noSshConnection')}
+        </div>
       )}
-    </Box>
+    </div>
   )
 }

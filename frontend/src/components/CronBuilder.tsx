@@ -1,25 +1,20 @@
 import React, { useState, useEffect } from 'react'
-import {
-  Box,
-  TextField,
-  Stack,
-  Typography,
-  ToggleButtonGroup,
-  ToggleButton,
-  Select,
-  MenuItem,
-  alpha,
-  Paper,
-  InputAdornment,
-  Divider,
-  Tooltip,
-} from '@mui/material'
 import { Clock, Calendar, CalendarDays, CalendarRange, Code, Timer } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { cn } from '@/lib/utils'
+import { Input } from '@/components/ui/input'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface CronBuilderProps {
-  value: string // Cron expression in LOCAL time
-  onChange: (cronExpression: string) => void // Returns LOCAL cron (parent handles UTC conversion when saving)
+  value: string
+  onChange: (cronExpression: string) => void
   label?: string
   helperText?: string
 }
@@ -46,565 +41,290 @@ const parseCron = (cronExpression: string): CronState => {
   const parts = cronExpression.trim().split(/\s+/)
   if (parts.length !== 5) {
     return {
-      frequency: 'daily',
-      minuteInterval: 5,
-      hourInterval: 6,
-      startingMinute: 0,
-      hour: 2,
-      minute: 0,
-      selectedDays: [true, false, false, false, false, false, false],
-      dayOfMonth: 1,
-      customCron: cronExpression,
+      frequency: 'daily', minuteInterval: 5, hourInterval: 6, startingMinute: 0,
+      hour: 2, minute: 0, selectedDays: [true, false, false, false, false, false, false],
+      dayOfMonth: 1, customCron: cronExpression,
     }
   }
-
   const [minute, hour, day, , dayOfWeek] = parts
 
   if (minute.startsWith('*/') && hour === '*' && day === '*' && dayOfWeek === '*') {
-    return {
-      frequency: 'minute',
-      minuteInterval: parseInt(minute.replace('*/', '')) || 5,
-      hourInterval: 6,
-      startingMinute: 0,
-      hour: 2,
-      minute: 0,
-      selectedDays: [true, false, false, false, false, false, false],
-      dayOfMonth: 1,
-      customCron: cronExpression,
-    }
+    return { frequency: 'minute', minuteInterval: parseInt(minute.replace('*/', '')) || 5, hourInterval: 6, startingMinute: 0, hour: 2, minute: 0, selectedDays: [true, false, false, false, false, false, false], dayOfMonth: 1, customCron: cronExpression }
   }
-
   if (/^\d+$/.test(minute) && hour.startsWith('*/') && day === '*' && dayOfWeek === '*') {
-    return {
-      frequency: 'hourly',
-      minuteInterval: 5,
-      hourInterval: parseInt(hour.replace('*/', '')) || 6,
-      startingMinute: parseInt(minute),
-      hour: 2,
-      minute: 0,
-      selectedDays: [true, false, false, false, false, false, false],
-      dayOfMonth: 1,
-      customCron: cronExpression,
-    }
+    return { frequency: 'hourly', minuteInterval: 5, hourInterval: parseInt(hour.replace('*/', '')) || 6, startingMinute: parseInt(minute), hour: 2, minute: 0, selectedDays: [true, false, false, false, false, false, false], dayOfMonth: 1, customCron: cronExpression }
   }
-
   if (/^\d+$/.test(minute) && /^\d+$/.test(hour) && day === '*' && dayOfWeek === '*') {
-    return {
-      frequency: 'daily',
-      minuteInterval: 5,
-      hourInterval: 6,
-      startingMinute: 0,
-      hour: parseInt(hour),
-      minute: parseInt(minute),
-      selectedDays: [true, false, false, false, false, false, false],
-      dayOfMonth: 1,
-      customCron: cronExpression,
-    }
+    return { frequency: 'daily', minuteInterval: 5, hourInterval: 6, startingMinute: 0, hour: parseInt(hour), minute: parseInt(minute), selectedDays: [true, false, false, false, false, false, false], dayOfMonth: 1, customCron: cronExpression }
   }
-
   if (/^\d+$/.test(minute) && /^\d+$/.test(hour) && day === '*' && /^[\d,]+$/.test(dayOfWeek)) {
     const selectedDayNums = dayOfWeek.split(',').map((d) => parseInt(d))
-    const selectedDays = DAY_NUMBERS.map((dayNum) => selectedDayNums.includes(dayNum))
-
-    return {
-      frequency: 'weekly',
-      minuteInterval: 5,
-      hourInterval: 6,
-      startingMinute: 0,
-      hour: parseInt(hour),
-      minute: parseInt(minute),
-      selectedDays,
-      dayOfMonth: 1,
-      customCron: cronExpression,
-    }
+    return { frequency: 'weekly', minuteInterval: 5, hourInterval: 6, startingMinute: 0, hour: parseInt(hour), minute: parseInt(minute), selectedDays: DAY_NUMBERS.map((dayNum) => selectedDayNums.includes(dayNum)), dayOfMonth: 1, customCron: cronExpression }
   }
-
   if (/^\d+$/.test(minute) && /^\d+$/.test(hour) && /^\d+$/.test(day) && dayOfWeek === '*') {
-    return {
-      frequency: 'monthly',
-      minuteInterval: 5,
-      hourInterval: 6,
-      startingMinute: 0,
-      hour: parseInt(hour),
-      minute: parseInt(minute),
-      selectedDays: [true, false, false, false, false, false, false],
-      dayOfMonth: parseInt(day),
-      customCron: cronExpression,
-    }
+    return { frequency: 'monthly', minuteInterval: 5, hourInterval: 6, startingMinute: 0, hour: parseInt(hour), minute: parseInt(minute), selectedDays: [true, false, false, false, false, false, false], dayOfMonth: parseInt(day), customCron: cronExpression }
   }
-
-  return {
-    frequency: 'custom',
-    minuteInterval: 5,
-    hourInterval: 6,
-    startingMinute: 0,
-    hour: 2,
-    minute: 0,
-    selectedDays: [true, false, false, false, false, false, false],
-    dayOfMonth: 1,
-    customCron: cronExpression,
-  }
+  return { frequency: 'custom', minuteInterval: 5, hourInterval: 6, startingMinute: 0, hour: 2, minute: 0, selectedDays: [true, false, false, false, false, false, false], dayOfMonth: 1, customCron: cronExpression }
 }
 
 const buildCron = (state: CronState): string => {
   switch (state.frequency) {
-    case 'minute':
-      return `*/${state.minuteInterval} * * * *`
-    case 'hourly':
-      return `${state.startingMinute} */${state.hourInterval} * * *`
-    case 'daily':
-      return `${state.minute} ${state.hour} * * *`
+    case 'minute': return `*/${state.minuteInterval} * * * *`
+    case 'hourly': return `${state.startingMinute} */${state.hourInterval} * * *`
+    case 'daily': return `${state.minute} ${state.hour} * * *`
     case 'weekly': {
-      const selectedDayNums = state.selectedDays
-        .map((selected, idx) => (selected ? DAY_NUMBERS[idx] : null))
-        .filter((d) => d !== null)
-      if (selectedDayNums.length === 0) return `${state.minute} ${state.hour} * * 1`
-      return `${state.minute} ${state.hour} * * ${selectedDayNums.join(',')}`
+      const nums = state.selectedDays.map((s, i) => (s ? DAY_NUMBERS[i] : null)).filter((d) => d !== null)
+      if (nums.length === 0) return `${state.minute} ${state.hour} * * 1`
+      return `${state.minute} ${state.hour} * * ${nums.join(',')}`
     }
-    case 'monthly':
-      return `${state.minute} ${state.hour} ${state.dayOfMonth} * *`
-    case 'custom':
-      return state.customCron
-    default:
-      return '0 2 * * *'
+    case 'monthly': return `${state.minute} ${state.hour} ${state.dayOfMonth} * *`
+    case 'custom': return state.customCron
+    default: return '0 2 * * *'
   }
 }
 
-const generatePreview = (
-  state: CronState,
-  t: (key: string, opts?: Record<string, unknown>) => string
-): string => {
+const generatePreview = (state: CronState, t: (key: string, opts?: Record<string, unknown>) => string): string => {
   switch (state.frequency) {
-    case 'minute':
-      return t('cronBuilder.everyMinutes', { count: state.minuteInterval })
-    case 'hourly':
-      return t('cronBuilder.everyHours', { count: state.hourInterval })
+    case 'minute': return t('cronBuilder.everyMinutes', { count: state.minuteInterval })
+    case 'hourly': return t('cronBuilder.everyHours', { count: state.hourInterval })
     case 'daily': {
       const hour12 = state.hour === 0 ? 12 : state.hour > 12 ? state.hour - 12 : state.hour
       const ampm = state.hour >= 12 ? t('cronBuilder.pm') : t('cronBuilder.am')
-      const minuteStr = state.minute.toString().padStart(2, '0')
-      return t('cronBuilder.dailyAt', { time: `${hour12}:${minuteStr} ${ampm}` })
+      return t('cronBuilder.dailyAt', { time: `${hour12}:${state.minute.toString().padStart(2, '0')} ${ampm}` })
     }
     case 'weekly': {
-      // Re-enable DAY_FULL mapping if needed or use shorter
       const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-      const selectedDayNames = dayNames.filter((_, idx) => state.selectedDays[idx])
+      const selectedDayNames = dayNames.filter((_, i) => state.selectedDays[i])
       if (selectedDayNames.length === 0) return t('cronBuilder.noDaysSelected')
       const hour12 = state.hour === 0 ? 12 : state.hour > 12 ? state.hour - 12 : state.hour
       const ampm = state.hour >= 12 ? t('cronBuilder.pm') : t('cronBuilder.am')
-      const minuteStr = state.minute.toString().padStart(2, '0')
-      const daysStr =
-        selectedDayNames.length === 7 ? t('cronBuilder.daily') : selectedDayNames.join(', ')
-      return t('cronBuilder.weeklyAt', { days: daysStr, time: `${hour12}:${minuteStr} ${ampm}` })
+      const daysStr = selectedDayNames.length === 7 ? t('cronBuilder.daily') : selectedDayNames.join(', ')
+      return t('cronBuilder.weeklyAt', { days: daysStr, time: `${hour12}:${state.minute.toString().padStart(2, '0')} ${ampm}` })
     }
     case 'monthly': {
       const hour12 = state.hour === 0 ? 12 : state.hour > 12 ? state.hour - 12 : state.hour
       const ampm = state.hour >= 12 ? t('cronBuilder.pm') : t('cronBuilder.am')
-      const minuteStr = state.minute.toString().padStart(2, '0')
-      const suffix =
-        state.dayOfMonth === 1
-          ? 'st'
-          : state.dayOfMonth === 2
-            ? 'nd'
-            : state.dayOfMonth === 3
-              ? 'rd'
-              : 'th'
-      return t('cronBuilder.monthlyOn', {
-        day: `${state.dayOfMonth}${suffix}`,
-        time: `${hour12}:${minuteStr} ${ampm}`,
-      })
+      const suffix = state.dayOfMonth === 1 ? 'st' : state.dayOfMonth === 2 ? 'nd' : state.dayOfMonth === 3 ? 'rd' : 'th'
+      return t('cronBuilder.monthlyOn', { day: `${state.dayOfMonth}${suffix}`, time: `${hour12}:${state.minute.toString().padStart(2, '0')} ${ampm}` })
     }
-    case 'custom':
-      return t('cronBuilder.customSchedule', { cron: state.customCron })
-    default:
-      return ''
+    case 'custom': return t('cronBuilder.customSchedule', { cron: state.customCron })
+    default: return ''
   }
 }
 
+const TABS: { value: Frequency; icon: React.ReactNode; key: string }[] = [
+  { value: 'minute', icon: <Timer size={13} />, key: 'cronBuilder.tabs.minutes' },
+  { value: 'hourly', icon: <Clock size={13} />, key: 'cronBuilder.tabs.hourly' },
+  { value: 'daily', icon: <Calendar size={13} />, key: 'cronBuilder.tabs.daily' },
+  { value: 'weekly', icon: <CalendarDays size={13} />, key: 'cronBuilder.tabs.weekly' },
+  { value: 'monthly', icon: <CalendarRange size={13} />, key: 'cronBuilder.tabs.monthly' },
+  { value: 'custom', icon: <Code size={13} />, key: 'cronBuilder.tabs.custom' },
+]
+
 export default function CronBuilder({ value, onChange, label, helperText }: CronBuilderProps) {
   const { t } = useTranslation()
-  // value is already in local time, no conversion needed
   const [state, setState] = useState<CronState>(parseCron(value))
 
-  useEffect(() => {
-    // value is already in local time, no conversion needed
-    setState(parseCron(value))
-  }, [value])
+  useEffect(() => { setState(parseCron(value)) }, [value])
 
   const handleStateChange = (newState: Partial<CronState>) => {
-    const updatedState = { ...state, ...newState }
-    setState(updatedState)
-
-    const localCron = buildCron(updatedState)
-    // CronBuilder works entirely in local time - parent handles UTC conversion
-    onChange(localCron)
+    const updated = { ...state, ...newState }
+    setState(updated)
+    onChange(buildCron(updated))
   }
 
   const hour12 = state.hour === 0 ? 12 : state.hour > 12 ? state.hour - 12 : state.hour
   const ampm = state.hour >= 12 ? 'PM' : 'AM'
 
-  const handleTimeChange = (hour12: number, minute: number, ampm: 'AM' | 'PM') => {
-    let hour24 = hour12
-    if (ampm === 'AM' && hour12 === 12) hour24 = 0
-    else if (ampm === 'PM' && hour12 !== 12) hour24 = hour12 + 12
-    handleStateChange({ hour: hour24, minute })
+  const handleTimeChange = (h12: number, min: number, ap: 'AM' | 'PM') => {
+    let hour24 = h12
+    if (ap === 'AM' && h12 === 12) hour24 = 0
+    else if (ap === 'PM' && h12 !== 12) hour24 = h12 + 12
+    handleStateChange({ hour: hour24, minute: min })
   }
 
-  const handleFrequencyChange = (
-    _: React.SyntheticEvent | null,
-    newFrequency: Frequency | null
-  ) => {
-    if (newFrequency !== null) {
-      handleStateChange({ frequency: newFrequency })
-    }
-  }
-
-  // Common time input component
   const TimeInput = () => (
-    <Stack direction="row" spacing={0.5} alignItems="center">
-      <TextField
+    <div className="flex items-center gap-1">
+      <Input
         type="number"
         value={hour12}
-        onChange={(e) => {
-          const newHour12 = Math.max(1, Math.min(12, parseInt(e.target.value) || 1))
-          handleTimeChange(newHour12, state.minute, ampm)
-        }}
-        inputProps={{ min: 1, max: 12 }}
-        variant="outlined"
-        size="small"
-        sx={{
-          width: 50,
-          '& .MuiInputBase-input': { p: '6px', textAlign: 'center', fontSize: '0.875rem' },
-        }}
+        onChange={(e) => handleTimeChange(Math.max(1, Math.min(12, parseInt(e.target.value) || 1)), state.minute, ampm as 'AM' | 'PM')}
+        min={1} max={12}
+        className="w-12 text-center text-sm px-1.5 py-1 h-8"
       />
-      <Typography variant="body2" color="text.secondary" fontWeight={500}>
-        :
-      </Typography>
-      <TextField
+      <span className="text-sm text-muted-foreground font-medium">:</span>
+      <Input
         type="number"
         value={state.minute.toString().padStart(2, '0')}
-        onChange={(e) => {
-          const newMinute = Math.max(0, Math.min(59, parseInt(e.target.value) || 0))
-          handleTimeChange(hour12, newMinute, ampm)
-        }}
-        inputProps={{ min: 0, max: 59 }}
-        variant="outlined"
-        size="small"
-        sx={{
-          width: 50,
-          '& .MuiInputBase-input': { p: '6px', textAlign: 'center', fontSize: '0.875rem' },
-        }}
+        onChange={(e) => handleTimeChange(hour12, Math.max(0, Math.min(59, parseInt(e.target.value) || 0)), ampm as 'AM' | 'PM')}
+        min={0} max={59}
+        className="w-12 text-center text-sm px-1.5 py-1 h-8"
       />
-      <Select
-        value={ampm}
-        onChange={(e) => handleTimeChange(hour12, state.minute, e.target.value as 'AM' | 'PM')}
-        variant="outlined"
-        size="small"
-        sx={{
-          width: 65,
-          '& .MuiSelect-select': { p: '6px 24px 6px 8px !important', fontSize: '0.875rem' },
-        }}
-      >
-        <MenuItem value="AM" sx={{ fontSize: '0.875rem' }}>
-          {t('cronBuilder.am')}
-        </MenuItem>
-        <MenuItem value="PM" sx={{ fontSize: '0.875rem' }}>
-          {t('cronBuilder.pm')}
-        </MenuItem>
+      <Select value={ampm} onValueChange={(v) => handleTimeChange(hour12, state.minute, v as 'AM' | 'PM')}>
+        <SelectTrigger className="w-16 h-8 text-sm px-2">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="AM">{t('cronBuilder.am')}</SelectItem>
+          <SelectItem value="PM">{t('cronBuilder.pm')}</SelectItem>
+        </SelectContent>
       </Select>
-    </Stack>
+    </div>
   )
 
   return (
-    <Stack spacing={1.5}>
-      {label && (
-        <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-          {label}
-        </Typography>
-      )}
+    <div className="flex flex-col gap-1.5">
+      {label && <p className="text-xs text-muted-foreground ml-1">{label}</p>}
 
-      <Paper
-        variant="outlined"
-        sx={{
-          p: 0,
-          overflow: 'hidden',
-          borderRadius: 2,
-          borderColor: (theme) => alpha(theme.palette.divider, 0.6),
-        }}
-      >
-        {/* Frequency Selector */}
-        <Box
-          sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.default', p: 0.5 }}
-        >
-          <ToggleButtonGroup
-            value={state.frequency}
-            exclusive
-            onChange={handleFrequencyChange}
-            fullWidth
-            size="small"
-            sx={{
-              '& .MuiToggleButton-root': {
-                border: 0,
-                borderRadius: 1,
-                mx: 0.5,
-                py: 0.5,
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                color: 'text.secondary',
-                textTransform: 'none',
-                height: 28, // Fixed height for tabs
-                '&.Mui-selected': {
-                  bgcolor: 'background.paper',
-                  color: 'primary.main',
-                  boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)',
-                  '&:hover': {
-                    bgcolor: 'background.paper',
-                  },
-                },
-              },
-            }}
-          >
-            <ToggleButton value="minute">
-              <Stack direction="row" spacing={0.5} alignItems="center">
-                <Timer size={14} /> <span>{t('cronBuilder.tabs.minutes')}</span>
-              </Stack>
-            </ToggleButton>
-            <ToggleButton value="hourly">
-              <Stack direction="row" spacing={0.5} alignItems="center">
-                <Clock size={14} /> <span>{t('cronBuilder.tabs.hourly')}</span>
-              </Stack>
-            </ToggleButton>
-            <ToggleButton value="daily">
-              <Stack direction="row" spacing={0.5} alignItems="center">
-                <Calendar size={14} /> <span>{t('cronBuilder.tabs.daily')}</span>
-              </Stack>
-            </ToggleButton>
-            <ToggleButton value="weekly">
-              <Stack direction="row" spacing={0.5} alignItems="center">
-                <CalendarDays size={14} /> <span>{t('cronBuilder.tabs.weekly')}</span>
-              </Stack>
-            </ToggleButton>
-            <ToggleButton value="monthly">
-              <Stack direction="row" spacing={0.5} alignItems="center">
-                <CalendarRange size={14} /> <span>{t('cronBuilder.tabs.monthly')}</span>
-              </Stack>
-            </ToggleButton>
-            <ToggleButton value="custom">
-              <span>{t('cronBuilder.tabs.custom')}</span>
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </Box>
+      <div className="rounded-lg border border-border overflow-hidden">
+        {/* Frequency tabs */}
+        <div className="border-b border-border bg-muted/30 p-1">
+          <div className="flex w-full gap-0.5">
+            {TABS.map((tab) => (
+              <button
+                key={tab.value}
+                type="button"
+                onClick={() => handleStateChange({ frequency: tab.value })}
+                className={cn(
+                  'flex-1 flex items-center justify-center gap-1 h-7 px-1 rounded text-xs font-semibold transition-colors',
+                  state.frequency === tab.value
+                    ? 'bg-background text-primary shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                {tab.icon}
+                <span className="hidden sm:inline">{t(tab.key)}</span>
+              </button>
+            ))}
+          </div>
+        </div>
 
-        {/* Configuration Area */}
-        <Box
-          sx={{
-            p: 2,
-            height: 85, // Fixed height to prevent shifting layout
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center', // Center content vertically and horizontally
-          }}
-        >
+        {/* Configuration area — fixed height */}
+        <div className="px-4 flex items-center justify-center" style={{ height: 85 }}>
           {state.frequency === 'minute' && (
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Typography variant="body2">{t('cronBuilderComponent.runEvery')}</Typography>
-              <TextField
+            <div className="flex items-center gap-2">
+              <span className="text-sm">{t('cronBuilderComponent.runEvery')}</span>
+              <Input
                 type="number"
                 value={state.minuteInterval}
-                onChange={(e) =>
-                  handleStateChange({ minuteInterval: Math.max(1, parseInt(e.target.value) || 1) })
-                }
-                inputProps={{ min: 1, max: 59 }}
-                variant="outlined"
-                size="small"
-                sx={{ width: 60, '& input': { textAlign: 'center', p: '6px' } }}
+                onChange={(e) => handleStateChange({ minuteInterval: Math.max(1, parseInt(e.target.value) || 1) })}
+                min={1} max={59}
+                className="w-16 text-center text-sm h-8"
               />
-              <Typography variant="body2">{t('cronBuilderComponent.minutesSuffix')}</Typography>
-            </Stack>
+              <span className="text-sm">{t('cronBuilderComponent.minutesSuffix')}</span>
+            </div>
           )}
 
           {state.frequency === 'hourly' && (
-            <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-              <Typography variant="body2">{t('cronBuilderComponent.runEvery')}</Typography>
-              <TextField
+            <div className="flex items-center gap-2 flex-wrap justify-center">
+              <span className="text-sm">{t('cronBuilderComponent.runEvery')}</span>
+              <Input
                 type="number"
                 value={state.hourInterval}
-                onChange={(e) =>
-                  handleStateChange({ hourInterval: Math.max(1, parseInt(e.target.value) || 1) })
-                }
-                inputProps={{ min: 1, max: 23 }}
-                variant="outlined"
-                size="small"
-                sx={{ width: 60, '& input': { textAlign: 'center', p: '6px' } }}
+                onChange={(e) => handleStateChange({ hourInterval: Math.max(1, parseInt(e.target.value) || 1) })}
+                min={1} max={23}
+                className="w-16 text-center text-sm h-8"
               />
-              <Typography variant="body2">{t('cronBuilderComponent.hoursAtMinute')}</Typography>
-              <TextField
+              <span className="text-sm">{t('cronBuilderComponent.hoursAtMinute')}</span>
+              <Input
                 type="number"
                 value={state.startingMinute}
-                onChange={(e) =>
-                  handleStateChange({
-                    startingMinute: Math.max(0, Math.min(59, parseInt(e.target.value) || 0)),
-                  })
-                }
-                inputProps={{ min: 0, max: 59 }}
-                variant="outlined"
-                size="small"
-                sx={{ width: 60, '& input': { textAlign: 'center', p: '6px' } }}
+                onChange={(e) => handleStateChange({ startingMinute: Math.max(0, Math.min(59, parseInt(e.target.value) || 0)) })}
+                min={0} max={59}
+                className="w-16 text-center text-sm h-8"
               />
-              <Typography variant="body2">{t('cronBuilderComponent.pastTheHour')}</Typography>
-            </Stack>
+              <span className="text-sm">{t('cronBuilderComponent.pastTheHour')}</span>
+            </div>
           )}
 
           {state.frequency === 'daily' && (
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Typography variant="body2">{t('cronBuilderComponent.runDailyAt')}</Typography>
+            <div className="flex items-center gap-2">
+              <span className="text-sm">{t('cronBuilderComponent.runDailyAt')}</span>
               <TimeInput />
-            </Stack>
+            </div>
           )}
 
           {state.frequency === 'weekly' && (
-            <Stack spacing={1} width="100%" alignItems="center">
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Typography variant="body2">{t('cronBuilderComponent.runOn')}</Typography>
-
-                {/* ... inside component ... */}
-
-                <ToggleButtonGroup
-                  value={state.selectedDays
-                    .map((s, i) => (s ? i.toString() : null))
-                    .filter(Boolean)}
-                  onChange={(_, newValues: string[]) => {
-                    const newIndices = newValues.map((v) => parseInt(v))
-                    const newSelected = DAYS.map((_, i) => newIndices.includes(i))
-                    handleStateChange({ selectedDays: newSelected })
-                  }}
-                  size="small"
-                >
+            <div className="flex flex-col items-center gap-2 w-full">
+              <div className="flex items-center gap-2">
+                <span className="text-sm">{t('cronBuilderComponent.runOn')}</span>
+                <div className="flex gap-0.5">
                   {DAYS.map((d, i) => (
-                    <Tooltip key={i} title={DAY_NAMES[i]} arrow>
-                      <ToggleButton
-                        value={i.toString()}
-                        sx={{
-                          width: 24,
-                          height: 24,
-                          p: 0,
-                          borderRadius: '50% !important',
-                          border: 'none',
-                          ml: 0.25,
-                          fontSize: '0.7rem',
-                          '&.Mui-selected': {
-                            bgcolor: 'primary.main',
-                            color: 'white',
-                            '&:hover': { bgcolor: 'primary.dark' },
-                          },
-                        }}
-                      >
-                        {d}
-                      </ToggleButton>
+                    <Tooltip key={i}>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newSelected = [...state.selectedDays]
+                            newSelected[i] = !newSelected[i]
+                            handleStateChange({ selectedDays: newSelected })
+                          }}
+                          className={cn(
+                            'w-6 h-6 rounded-full text-[0.7rem] font-semibold transition-colors border',
+                            state.selectedDays[i]
+                              ? 'bg-primary text-primary-foreground border-primary'
+                              : 'bg-transparent text-muted-foreground border-border hover:border-primary/50'
+                          )}
+                        >
+                          {d}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>{DAY_NAMES[i]}</TooltipContent>
                     </Tooltip>
                   ))}
-                </ToggleButtonGroup>
-              </Stack>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Typography variant="body2">{t('cronBuilderComponent.at')}</Typography>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm">{t('cronBuilderComponent.at')}</span>
                 <TimeInput />
-              </Stack>
-            </Stack>
+              </div>
+            </div>
           )}
 
           {state.frequency === 'monthly' && (
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Typography variant="body2">{t('cronBuilderComponent.runOnDay')}</Typography>
+            <div className="flex items-center gap-2">
+              <span className="text-sm">{t('cronBuilderComponent.runOnDay')}</span>
               <Select
-                value={state.dayOfMonth}
-                onChange={(e) => handleStateChange({ dayOfMonth: e.target.value as number })}
-                variant="outlined"
-                size="small"
-                sx={{
-                  mx: 1,
-                  width: 60,
-                  '& .MuiSelect-select': {
-                    p: '6px 24px 6px 8px !important',
-                    textAlign: 'center',
-                    fontSize: '0.875rem',
-                  },
-                }}
-                MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
+                value={String(state.dayOfMonth)}
+                onValueChange={(v) => handleStateChange({ dayOfMonth: parseInt(v) })}
               >
-                {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
-                  <MenuItem key={d} value={d} sx={{ fontSize: '0.875rem' }}>
-                    {d}
-                  </MenuItem>
-                ))}
+                <SelectTrigger className="w-16 h-8 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px]">
+                  {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                    <SelectItem key={d} value={String(d)} className="text-sm">{d}</SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
-              <Typography variant="body2">{t('cronBuilderComponent.at')}</Typography>
+              <span className="text-sm">{t('cronBuilderComponent.at')}</span>
               <TimeInput />
-            </Stack>
+            </div>
           )}
 
           {state.frequency === 'custom' && (
-            <TextField
-              value={state.customCron}
-              onChange={(e) => handleStateChange({ customCron: e.target.value })}
-              fullWidth
-              placeholder="* * * * *"
-              variant="outlined"
-              size="small"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Code size={16} />
-                  </InputAdornment>
-                ),
-                sx: { fontFamily: 'monospace', fontSize: '0.875rem' },
-              }}
-            />
+            <div className="relative w-full">
+              <Code size={15} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={state.customCron}
+                onChange={(e) => handleStateChange({ customCron: e.target.value })}
+                placeholder="* * * * *"
+                className="pl-8 font-mono text-sm"
+              />
+            </div>
           )}
-        </Box>
+        </div>
 
-        {/* Preview Footer */}
-        <Divider />
-        <Box
-          sx={{
-            px: 2,
-            py: 1,
-            bgcolor: (theme) => alpha(theme.palette.primary.main, 0.04),
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Typography
-              variant="body2"
-              color="primary"
-              sx={{ fontSize: '0.8125rem', fontWeight: 500 }}
-            >
-              {generatePreview(state, t)}
-            </Typography>
-          </Stack>
-          <Box
-            component="span"
-            sx={{
-              fontFamily: 'monospace',
-              bgcolor: 'background.paper',
-              px: 1,
-              py: 0.5,
-              borderRadius: 1,
-              border: 1,
-              borderColor: 'divider',
-              fontSize: '0.7rem',
-            }}
-          >
+        {/* Preview footer */}
+        <div className="border-t border-border px-4 py-2 bg-primary/5 flex items-center justify-between gap-2">
+          <span className="text-[0.8125rem] font-medium text-primary">{generatePreview(state, t)}</span>
+          <span className="font-mono text-[0.7rem] bg-background px-2 py-1 rounded border border-border">
             {buildCron(state)}
-          </Box>
-        </Box>
-      </Paper>
-      {helperText && (
-        <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-          {helperText}
-        </Typography>
-      )}
-    </Stack>
+          </span>
+        </div>
+      </div>
+
+      {helperText && <p className="text-xs text-muted-foreground ml-1">{helperText}</p>}
+    </div>
   )
 }

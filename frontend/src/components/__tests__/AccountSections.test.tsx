@@ -200,9 +200,9 @@ describe('AccountTabNavigation', () => {
 
     renderWithProviders(<AccountTabNavigation value="profile" onChange={onChange} />)
 
-    expect(screen.getByRole('tab', { name: /security/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /security/i })).toBeInTheDocument()
 
-    await user.click(screen.getByRole('tab', { name: /access/i }))
+    await user.click(screen.getByRole('button', { name: /access/i }))
 
     expect(onChange).toHaveBeenCalledWith('access')
   })
@@ -212,7 +212,7 @@ describe('AccountTabNavigation', () => {
       <AccountTabNavigation value="profile" onChange={vi.fn()} showSecurityTab={false} />
     )
 
-    expect(screen.queryByRole('tab', { name: /security/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /security/i })).not.toBeInTheDocument()
   })
 })
 

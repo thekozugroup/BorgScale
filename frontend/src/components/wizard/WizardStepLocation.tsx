@@ -105,7 +105,7 @@ export default function WizardStepLocation({
           </div>
           {(data.borgVersion ?? 1) === 2 && (
             <span
-              className="text-xs font-semibold border border-amber-500/50 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 rounded"
+              className="text-xs font-semibold border border-border text-muted-foreground px-1.5 py-0.5 rounded"
               title={t('wizard.location.borgV2Warning')}
             >
               Beta
@@ -278,7 +278,7 @@ export default function WizardStepLocation({
                         </div>
                         {conn.status === 'connected' && (
                           <span
-                            className="w-2 h-2 rounded-full bg-green-500 shrink-0"
+                            className="w-2 h-2 rounded-full bg-primary shrink-0"
                             title={t('wizard.location.connected')}
                           />
                         )}
