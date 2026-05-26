@@ -122,6 +122,31 @@ vi.mock('../../services/api', () => ({
     refreshConnectionStorage: vi.fn(() => Promise.resolve({ data: {} })),
     deleteSSHKey: vi.fn(() => Promise.resolve({ data: {} })),
     redeployKeyToConnection: vi.fn(() => Promise.resolve({ data: { success: true } })),
+    manualPairInit: vi.fn(() =>
+      Promise.resolve({
+        data: {
+          ssh_key_id: 7,
+          name: 'borgscale-default',
+          key_type: 'ed25519',
+          public_key: 'ssh-ed25519 AAAA',
+          created: false,
+          suggested_command: 'echo ...',
+        },
+      })
+    ),
+    manualPairVerify: vi.fn(() =>
+      Promise.resolve({
+        data: {
+          success: true,
+          borg_version: '1.2.7',
+          stderr_raw: '',
+          stdout: '',
+          hint_key: null,
+          connection_id: 99,
+          return_code: 0,
+        },
+      })
+    ),
   },
 }))
 
@@ -172,6 +197,11 @@ describe('SSHConnectionsSingleKey', () => {
     }
   })
 
+  it('renders the Quick connect primary CTA', async () => {
+    renderWithProviders(<SSHConnectionsSingleKey />)
+    expect(await screen.findByTestId('quick-connect-button')).toBeInTheDocument()
+  })
+
   it('redirects when the user lacks SSH management permission', async () => {
     mockState.canManageSsh = false
 
@@ -210,6 +240,7 @@ describe('SSHConnectionsSingleKey', () => {
     renderWithProviders(<SSHConnectionsSingleKey />)
 
     await screen.findByText('Remote Machines')
+    await user.click(screen.getByTestId('ssh-advanced-setup').querySelector('button')!)
     await user.click(
       screen.getByRole('button', {
         name: /automatically deploy ssh key using password authentication/i,
@@ -245,6 +276,7 @@ describe('SSHConnectionsSingleKey', () => {
     renderWithProviders(<SSHConnectionsSingleKey />)
 
     await screen.findByText('Remote Machines')
+    await user.click(screen.getByTestId('ssh-advanced-setup').querySelector('button')!)
     await user.click(
       screen.getByRole('button', {
         name: /add a connection for a manually deployed ssh key/i,

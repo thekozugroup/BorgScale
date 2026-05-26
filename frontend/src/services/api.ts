@@ -516,6 +516,39 @@ export const sshKeysAPI = {
   redeployKeyToConnection: (connectionId: number, password: string) =>
     api.post(`/ssh-keys/connections/${connectionId}/redeploy`, { password }),
   importSSHKey: (data: ApiData) => api.post('/ssh-keys/import', data),
+
+  // Manual pair (Quick connect) — key-based, no password required
+  manualPairInit: (
+    body: { name?: string; key_type?: 'ed25519' | 'rsa'; description?: string } = {}
+  ) =>
+    api.post('/ssh-keys/manual-pair/init', body) as Promise<{
+      data: {
+        ssh_key_id: number
+        name: string
+        key_type: string
+        public_key: string
+        created: boolean
+        suggested_command: string
+      }
+    }>,
+  manualPairVerify: (body: {
+    ssh_key_id: number
+    host: string
+    username: string
+    port?: number
+    save_connection?: boolean
+  }) =>
+    api.post('/ssh-keys/manual-pair/verify', body) as Promise<{
+      data: {
+        success: boolean
+        borg_version: string | null
+        stderr_raw: string
+        stdout: string
+        hint_key: string | null
+        connection_id: number | null
+        return_code: number
+      }
+    }>,
 }
 
 // Schedule API

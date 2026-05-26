@@ -32,11 +32,14 @@ import {
   Info,
   Eye,
   EyeOff,
+  Zap,
 } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { getApiErrorDetail } from '../utils/apiErrors'
 import { translateBackendKey } from '../utils/translateBackendKey'
 import RemoteMachineCard from '../components/RemoteMachineCard'
+import QuickConnectModal from '../components/ssh/QuickConnectModal'
+import AdvancedDisclosure from '../components/wizard/AdvancedDisclosure'
 import { useAnalytics } from '../hooks/useAnalytics'
 import { useAuth } from '../hooks/useAuth'
 
@@ -120,6 +123,7 @@ export default function SSHConnectionsSingleKey() {
   const [generateDialogOpen, setGenerateDialogOpen] = useState(false)
   const [importDialogOpen, setImportDialogOpen] = useState(false)
   const [deployDialogOpen, setDeployDialogOpen] = useState(false)
+  const [quickConnectOpen, setQuickConnectOpen] = useState(false)
   const [testConnectionDialogOpen, setTestConnectionDialogOpen] = useState(false)
   const [editConnectionDialogOpen, setEditConnectionDialogOpen] = useState(false)
   const [deleteConnectionDialogOpen, setDeleteConnectionDialogOpen] = useState(false)
@@ -737,19 +741,39 @@ export default function SSHConnectionsSingleKey() {
 
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-3">
-              <Button size="lg" onClick={() => setDeployDialogOpen(true)} className="w-full sm:w-auto gap-1.5" aria-label="Automatically deploy SSH key using password authentication" title="Automatically deploy SSH key using password authentication">
-                <Plus size={18} />
-                {t('sshConnections.systemKey.actions.deploy')}
-              </Button>
-              <Button size="lg" variant="outline" onClick={() => setTestConnectionDialogOpen(true)} className="w-full sm:w-auto gap-1.5" aria-label="Add a connection for a manually deployed SSH key" title="Add a connection for a manually deployed SSH key">
-                <Wifi size={18} />
-                {t('sshConnections.systemKey.actions.addManual')}
+              <Button
+                size="lg"
+                onClick={() => setQuickConnectOpen(true)}
+                data-testid="quick-connect-button"
+                className="w-full sm:w-auto gap-1.5"
+                aria-label={t('ssh.manualPair.quickConnectButton')}
+                title={t('ssh.manualPair.quickConnectButton')}
+              >
+                <Zap size={18} />
+                {t('ssh.manualPair.quickConnectButton')}
               </Button>
               <Button size="lg" variant="outline" onClick={() => setDeleteKeyDialogOpen(true)} className="w-full sm:w-auto gap-1.5 text-destructive border-destructive/40 hover:bg-destructive/10" title="Delete system SSH key (connections will be preserved)">
                 <Trash2 size={18} />
                 {t('sshConnections.systemKey.actions.delete')}
               </Button>
             </div>
+
+            {/* Advanced setup — password-based deploy + manual add */}
+            <AdvancedDisclosure
+              label={t('ssh.manualPair.advancedSetupLabel')}
+              testId="ssh-advanced-setup"
+            >
+              <div className="flex flex-wrap gap-3">
+                <Button size="lg" variant="outline" onClick={() => setDeployDialogOpen(true)} className="w-full sm:w-auto gap-1.5" aria-label="Automatically deploy SSH key using password authentication" title="Automatically deploy SSH key using password authentication">
+                  <Plus size={18} />
+                  {t('sshConnections.systemKey.actions.deploy')}
+                </Button>
+                <Button size="lg" variant="outline" onClick={() => setTestConnectionDialogOpen(true)} className="w-full sm:w-auto gap-1.5" aria-label="Add a connection for a manually deployed SSH key" title="Add a connection for a manually deployed SSH key">
+                  <Wifi size={18} />
+                  {t('sshConnections.systemKey.actions.addManual')}
+                </Button>
+              </div>
+            </AdvancedDisclosure>
           </div>
         )}
       </div>
@@ -1090,6 +1114,13 @@ export default function SSHConnectionsSingleKey() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Quick Connect Modal */}
+      <QuickConnectModal
+        open={quickConnectOpen}
+        onOpenChange={setQuickConnectOpen}
+        onSuccess={() => queryClient.invalidateQueries({ queryKey: ['ssh-connections'] })}
+      />
     </div>
   )
 }
