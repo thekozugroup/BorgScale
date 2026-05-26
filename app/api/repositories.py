@@ -657,6 +657,16 @@ class QuickImportRequest(BaseModel):
     source_directories: Optional[List[str]] = None
 
 
+class TestBackupResponse(BaseModel):
+    would_back_up_bytes: Optional[int] = None
+    files_count: Optional[int] = None
+    sample_paths: List[str] = []
+    elapsed_ms: int
+    timed_out: bool = False
+    error_message: Optional[str] = None
+    raw_output_tail: Optional[str] = None  # last ~30 lines of stderr/stdout for debug
+
+
 class RepositoryUpdate(BaseModel):
     name: Optional[str] = None
     path: Optional[str] = None
@@ -2433,6 +2443,185 @@ async def get_repository_statistics(
         raise HTTPException(
             status_code=500, detail={"key": "backend.errors.repo.failedToGetStatistics"}
         )
+
+
+def _parse_human_size(num_str: str, unit: str) -> Optional[int]:
+    """Convert a borg --stats human-readable size like ("1.23", "GB") to bytes.
+
+    Borg emits decimal-prefixed units (kB/MB/GB/TB) by default but some
+    versions emit binary (KiB/MiB/GiB/TiB). Handle both.
+    """
+    try:
+        value = float(num_str.replace(",", ""))
+    except ValueError:
+        return None
+    multipliers = {
+        "B": 1,
+        "kB": 1000,
+        "KB": 1000,
+        "MB": 1000**2,
+        "GB": 1000**3,
+        "TB": 1000**4,
+        "PB": 1000**5,
+        "KiB": 1024,
+        "MiB": 1024**2,
+        "GiB": 1024**3,
+        "TiB": 1024**4,
+        "PiB": 1024**5,
+    }
+    return int(value * multipliers.get(unit, 1))
+
+
+@router.post("/{repo_id}/test-backup", response_model=TestBackupResponse)
+async def test_backup(
+    repo_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Run `borg create --dry-run --stats --list` against the repository's
+    configured source_directories and report what would be backed up.
+
+    Nothing is written to the repository. Used by the first-run wizard to
+    prove the configured paths are readable before committing to a schedule.
+    """
+    import re as _re
+
+    started = time.monotonic()
+
+    repository = db.query(Repository).filter(Repository.id == repo_id).first()
+    if repository is None:
+        raise HTTPException(
+            status_code=404,
+            detail={"key": "backend.errors.repo.notFound", "params": {"id": repo_id}},
+        )
+    _require_repository_access(db, current_user, repository, "operator")
+
+    if repository.mode == "observe":
+        raise HTTPException(
+            status_code=400,
+            detail={"key": "backend.errors.repo.observeNoDryRun"},
+        )
+
+    # Remote repos require the full SSH/backup-service pipeline. Out of scope
+    # for this dry-run helper — refuse loudly with a friendly i18n key.
+    if repository.connection_id is not None:
+        raise HTTPException(
+            status_code=400,
+            detail={"key": "backend.errors.repo.dryRunRemoteUnsupported"},
+        )
+
+    # source_directories is stored as a JSON-encoded list in TEXT.
+    srcs_raw = repository.source_directories or "[]"
+    try:
+        srcs = json.loads(srcs_raw) if isinstance(srcs_raw, str) else srcs_raw
+        if not isinstance(srcs, list):
+            srcs = []
+    except (ValueError, TypeError):
+        srcs = []
+
+    if not srcs:
+        raise HTTPException(
+            status_code=400,
+            detail={"key": "backend.errors.repo.noSourceDirs"},
+        )
+
+    archive_name = f"test-dryrun-{int(time.time())}"
+    flags = ["create", "--dry-run", "--stats", "--list"]
+    if repository.bypass_lock:
+        flags.append("--bypass-lock")
+    archive_ref = f"{repository.path}::{archive_name}"
+    cmd = ["borg", *flags, archive_ref, *srcs]
+
+    env = os.environ.copy()
+    if repository.passphrase:
+        try:
+            env["BORG_PASSPHRASE"] = decrypt_secret(repository.passphrase)
+        except Exception:
+            env["BORG_PASSPHRASE"] = ""
+    env["BORG_RELOCATED_REPO_ACCESS_IS_OK"] = "yes"
+
+    logger.info(
+        "Running borg dry-run for test-backup",
+        repo_id=repo_id,
+        source_directories=srcs,
+        bypass_lock=bool(repository.bypass_lock),
+    )
+
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            env=env,
+        )
+    except FileNotFoundError:
+        return TestBackupResponse(
+            elapsed_ms=int((time.monotonic() - started) * 1000),
+            timed_out=False,
+            error_message="borg binary not found on PATH",
+        )
+
+    try:
+        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=60)
+    except asyncio.TimeoutError:
+        try:
+            proc.kill()
+            await proc.communicate()
+        except Exception:
+            pass
+        return TestBackupResponse(
+            elapsed_ms=int((time.monotonic() - started) * 1000),
+            timed_out=True,
+            error_message="dry run exceeded 60s budget",
+        )
+
+    elapsed_ms = int((time.monotonic() - started) * 1000)
+    combined = (stdout + b"\n" + stderr).decode("utf-8", "replace")
+
+    if proc.returncode != 0:
+        tail = "\n".join(combined.splitlines()[-30:])
+        logger.warning(
+            "borg dry-run exited non-zero",
+            repo_id=repo_id,
+            return_code=proc.returncode,
+        )
+        return TestBackupResponse(
+            elapsed_ms=elapsed_ms,
+            timed_out=False,
+            error_message=f"borg exited with code {proc.returncode}",
+            raw_output_tail=tail,
+        )
+
+    # Parse `--stats` output. Borg writes a line like:
+    #   "Original size:           1.23 GB"
+    bytes_value: Optional[int] = None
+    size_match = _re.search(
+        r"Original size:\s+([\d.,]+)\s+(B|kB|KB|MB|GB|TB|PB|KiB|MiB|GiB|TiB|PiB)",
+        combined,
+    )
+    if size_match:
+        bytes_value = _parse_human_size(size_match.group(1), size_match.group(2))
+
+    files_match = _re.search(r"Number of files:\s+(\d+)", combined)
+    files_count: Optional[int] = int(files_match.group(1)) if files_match else None
+
+    # `--list` lines are prefixed by a one-char status code + space:
+    #   A /path  (added), M /path (modified), U /path (unchanged),
+    #   I /path  (ignored/included), x /path (excluded), d /path (deleted)
+    sample_paths: List[str] = []
+    for line in combined.splitlines():
+        if len(line) >= 2 and line[1] == " " and line[0] in "AMUI":
+            sample_paths.append(line[2:].strip())
+            if len(sample_paths) >= 10:
+                break
+
+    return TestBackupResponse(
+        would_back_up_bytes=bytes_value,
+        files_count=files_count,
+        sample_paths=sample_paths,
+        elapsed_ms=elapsed_ms,
+        timed_out=False,
+    )
 
 
 async def check_remote_borg_installation(
