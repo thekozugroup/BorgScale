@@ -5,6 +5,8 @@ import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Dashboard from './pages/DashboardV3'
+import FirstRunWelcome from './pages/FirstRunWelcome'
+import { useFirstRun } from './hooks/useFirstRun'
 import Backup from './pages/Backup'
 import Archives from './pages/Archives'
 import Schedule from './pages/Schedule'
@@ -13,6 +15,14 @@ import SSHConnectionsSingleKey from './pages/SSHConnectionsSingleKey'
 import Activity from './pages/Activity'
 import Settings from './pages/Settings'
 import AuthLayout from './components/AuthLayout'
+
+function DashboardOrWelcome() {
+  const { showWelcome } = useFirstRun()
+  if (showWelcome) {
+    return <Navigate to="/welcome" replace />
+  }
+  return <Dashboard />
+}
 
 function App() {
   const {
@@ -126,7 +136,8 @@ function App() {
         {insecureNoAuthEnabled ? (
           <Route path="/login" element={<Navigate to="/dashboard" replace />} />
         ) : null}
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<DashboardOrWelcome />} />
+        <Route path="/welcome" element={<FirstRunWelcome />} />
         <Route
           path="/backup"
           element={

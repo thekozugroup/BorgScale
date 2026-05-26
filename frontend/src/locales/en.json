@@ -58,6 +58,67 @@
       "unexpectedError": "An unexpected error occurred"
     }
   },
+  "firstRun": {
+    "title": "Let's set up your first backup",
+    "subtitle": "Pick how you want to start. You can always change this later.",
+    "tile": {
+      "new": {
+        "title": "Start fresh",
+        "desc": "Create a brand-new Borg repository on this server or a remote host.",
+        "cta": "Create new"
+      },
+      "discoverLocal": {
+        "title": "Find existing backups on this server",
+        "desc": "Scan local folders for Borg repositories you already have.",
+        "cta": "Scan this server"
+      },
+      "discoverRemote": {
+        "title": "Find backups on another server",
+        "desc": "Connect over SSH and look for Borg repositories on a remote host.",
+        "cta": "Scan a remote host"
+      }
+    },
+    "helpLink": "Need help? See the BorgScale getting-started guide."
+  },
+  "discovery": {
+    "startScan": "Scan for backups",
+    "scanning": "Scanning...",
+    "importing": "Adding...",
+    "foundCount_one": "{{count}} backup found",
+    "foundCount_other": "{{count}} backups found",
+    "noneFound": "No Borg repositories found in the locations scanned.",
+    "partialResults": "Showing partial results - scan stopped at the time limit.",
+    "scannedRoots": "Scanned: {{roots}}",
+    "alreadyImported": "Already added",
+    "importButton": "Add",
+    "passphraseRequired": "Passphrase",
+    "passphraseOptional": "Passphrase (optional)",
+    "passphrasePlaceholder": "Enter the repository passphrase",
+    "modePickerObserve": "Watch only (read repos, don't write)",
+    "modePickerFull": "Back up and manage",
+    "localHeading": "Find existing backups on this server",
+    "remoteHeading": "Find backups on a remote server",
+    "pickConnection": "SSH connection:",
+    "pickConnectionPlaceholder": "Select an SSH connection",
+    "noConnections": "No SSH connections configured yet.",
+    "addConnection": "Add one",
+    "guess": {
+      "encrypted": "Encrypted",
+      "unencrypted": "Not encrypted",
+      "unknown": "Encryption: unknown"
+    },
+    "importDialog": {
+      "title": "Add this backup",
+      "nameLabel": "Friendly name",
+      "modeLabel": "How should BorgScale use this repo?"
+    },
+    "importSuccess": "Added to BorgScale",
+    "importFailed": "Could not add - check the passphrase or path",
+    "errors": {
+      "noConnection": "Pick an SSH connection first",
+      "scanFailed": "Scan failed - please try again"
+    }
+  },
   "login": {
     "title": "BorgScale",
     "subtitle": "Enter your credentials to continue",
@@ -2116,6 +2177,30 @@
     "borgUiServer": "BorgScale Server",
     "remoteClient": "Remote Client",
     "noSshConnections": "No SSH connections configured. Please configure SSH connections in the SSH Keys page first.",
+    "advanced": {
+      "label": "Advanced settings",
+      "openHint": "Click to see less-common options"
+    },
+    "backup": {
+      "compression": {
+        "balanced": {
+          "title": "Balanced (recommended)",
+          "desc": "Fast, modest space savings."
+        },
+        "smaller": {
+          "title": "Smaller files",
+          "desc": "Slower but stores more history per gigabyte."
+        },
+        "none": {
+          "title": "No compression",
+          "desc": "Maximum speed, more disk usage."
+        }
+      },
+      "advanced": {
+        "compression": "Advanced compression settings",
+        "power": "Power-user settings"
+      }
+    },
     "backupFlowPreview": {
       "localToLocal": "Back up local data to local repository",
       "localToRemote": "Back up local data to remote repository",
@@ -2164,7 +2249,18 @@
       "repositoryPathHelper": "Path where the repository will be stored",
       "borgV2Warning": "Borg 2 support is still in beta. Do not use it for production data yet. It is currently intended for enthusiasts and testing, and requires the borg2 binary on any remote hosts.",
       "connected": "Connected",
-      "browseFilesystem": "Browse filesystem"
+      "browseFilesystem": "Browse filesystem",
+      "mode": {
+        "full": {
+          "title": "Back up and manage",
+          "desc": "Run scheduled backups and maintenance from BorgScale."
+        },
+        "observe": {
+          "title": "Watch only",
+          "desc": "Read-only view of a repository another tool is writing to."
+        }
+      },
+      "advanced": "Advanced location options"
     },
     "restoreDestination": {
       "title": "Where should files be restored?",
@@ -2273,7 +2369,13 @@
       "customFlags": "Custom Flags",
       "repositoryInitialized": "Repository will be initialized",
       "repositoryImportNote": "Repository will be verified before import. Ensure the passphrase is correct.",
-      "repositoryEditNote": "Changes will be saved to the repository configuration."
+      "repositoryEditNote": "Changes will be saved to the repository configuration.",
+      "advancedUsed": "Advanced settings used",
+      "preBackupScript": "Pre-backup script",
+      "postBackupScript": "Post-backup script",
+      "preHookTimeout": "Pre-hook timeout",
+      "postHookTimeout": "Post-hook timeout",
+      "enabled": "Enabled"
     },
     "security": {
       "encryptionMethodLabel": "Encryption Method",
@@ -2301,7 +2403,23 @@
       "keyfileUploadNote": "Keyfile will be uploaded after import",
       "keyfileContentNote": "Keyfile content will be saved after import",
       "remoteBorgPath": "Remote Borg Path (Optional)",
-      "remoteBorgPathHelper": "Path to borg executable on remote (if not in PATH)"
+      "remoteBorgPathHelper": "Path to borg executable on remote (if not in PATH)",
+      "tile": {
+        "encrypted": {
+          "title": "Encrypted (recommended)",
+          "desc": "Strong encryption using your passphrase. Key is stored with the backups."
+        },
+        "keyfile": {
+          "title": "Encrypted, key stored separately",
+          "desc": "Use this only if you'll save the key yourself. If you lose the key, your backups are gone."
+        },
+        "none": {
+          "title": "No encryption",
+          "desc": "Backups are stored as-is. Only use on trusted local storage."
+        }
+      },
+      "advanced": "Advanced encryption options",
+      "noneWarning": "Without encryption, anyone with access to the backup storage can read every file."
     },
     "scheduleWizard": {
       "basicInfo": {

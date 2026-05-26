@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAnalytics } from '../hooks/useAnalytics'
 import { Plus, HardDrive, Upload, Search, Filter } from 'lucide-react'
@@ -19,6 +19,8 @@ import CompactWarningDialog from '../components/CompactWarningDialog'
 import RepositoryCard from '../components/RepositoryCard'
 import RepositoryCardSkeleton from '../components/RepositoryCardSkeleton'
 import RepositoryWizard from '../components/RepositoryWizard'
+import DiscoveryPicker from '../components/discovery/DiscoveryPicker'
+import { sshKeysAPI } from '../services/api'
 import PruneRepositoryDialog from '../components/PruneRepositoryDialog'
 import RepositoryInfoDialog from '../components/RepositoryInfoDialog'
 import { getJobDurationSeconds } from '../utils/analyticsProperties'
@@ -99,6 +101,8 @@ export default function Repositories() {
   const queryClient = useQueryClient()
   const appState = useAppState()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const wizardParam = searchParams.get('wizard')
   const { trackMaintenance, trackRepository, EventAction } = useAnalytics()
   const maintenanceTrackingRef = useRef<Map<number, { operation: 'Check' | 'Compact' | 'Prune' }>>(
     new Map()
@@ -442,6 +446,32 @@ export default function Repositories() {
     return compression || 'lz4'
   }
 
+  // First-run wizard deep-link: ?wizard=new auto-opens the create wizard.
+  // ?wizard=discover-local | discover-remote leaves the discovery picker rendered below.
+  React.useEffect(() => {
+    if (wizardParam === 'new' && !showWizard) {
+      setWizardMode('create')
+      setWizardRepository(null)
+      setShowWizard(true)
+      // Clear the query param so the wizard doesn't reopen on close
+      const next = new URLSearchParams(searchParams)
+      next.delete('wizard')
+      setSearchParams(next, { replace: true })
+    }
+  }, [wizardParam, showWizard, searchParams, setSearchParams])
+
+  // Connections list for the remote-discovery picker (only fetched when needed).
+  const { data: discoveryConnectionsData } = useQuery({
+    queryKey: ['ssh-connections'],
+    queryFn: sshKeysAPI.getSSHConnections,
+    enabled: wizardParam === 'discover-remote' && canManageRepositoriesGlobally,
+  })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const discoveryConnections: any[] =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (discoveryConnectionsData as any)?.data?.connections || []
+  const [selectedDiscoveryConnId, setSelectedDiscoveryConnId] = React.useState<number | null>(null)
+
   // Save preferences to localStorage
   React.useEffect(() => {
     localStorage.setItem('repos_sort', sortBy)
@@ -607,6 +637,78 @@ export default function Repositories() {
           )}
         </div>
       </div>
+
+      {/* Discovery picker (deep-linked from first-run welcome) */}
+      {wizardParam === 'discover-local' && canManageRepositoriesGlobally && (
+        <div className="mb-6" data-testid="discovery-local-wrapper">
+          <h2 className="mb-3 text-lg font-semibold">
+            {t('discovery.localHeading', 'Find existing backups on this server')}
+          </h2>
+          <DiscoveryPicker
+            mode="local"
+            onImported={() => {
+              const next = new URLSearchParams(searchParams)
+              next.delete('wizard')
+              setSearchParams(next, { replace: true })
+            }}
+          />
+        </div>
+      )}
+      {wizardParam === 'discover-remote' && canManageRepositoriesGlobally && (
+        <div className="mb-6" data-testid="discovery-remote-wrapper">
+          <h2 className="mb-3 text-lg font-semibold">
+            {t('discovery.remoteHeading', 'Find backups on a remote server')}
+          </h2>
+          {discoveryConnections.length === 0 ? (
+            <div className="rounded-xl border bg-card p-6 text-sm text-muted-foreground">
+              {t('discovery.noConnections')}{' '}
+              <button
+                type="button"
+                className="text-primary underline"
+                onClick={() => navigate('/ssh-connections')}
+              >
+                {t('discovery.addConnection')}
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="mb-3 flex items-center gap-2 text-sm">
+                <label htmlFor="discovery-conn" className="text-muted-foreground">
+                  {t('discovery.pickConnection')}
+                </label>
+                <select
+                  id="discovery-conn"
+                  className="rounded-md border bg-background px-3 py-1.5"
+                  value={selectedDiscoveryConnId ?? ''}
+                  onChange={(e) =>
+                    setSelectedDiscoveryConnId(
+                      e.target.value ? Number(e.target.value) : null
+                    )
+                  }
+                >
+                  <option value="">{t('discovery.pickConnectionPlaceholder')}</option>
+                  {discoveryConnections.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name || `${c.username}@${c.host}`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {selectedDiscoveryConnId != null && (
+                <DiscoveryPicker
+                  mode="remote"
+                  connectionId={selectedDiscoveryConnId}
+                  onImported={() => {
+                    const next = new URLSearchParams(searchParams)
+                    next.delete('wizard')
+                    setSearchParams(next, { replace: true })
+                  }}
+                />
+              )}
+            </>
+          )}
+        </div>
+      )}
 
       {/* Filter, Sort, and Search Bar */}
       {(isLoading || repositories.length > 0) && (
