@@ -4,9 +4,12 @@ from typing import Optional, Dict, Any
 from datetime import datetime
 import structlog
 import os
+import re
 import subprocess
 import asyncio
 import tempfile
+
+DEFAULT_SYSTEM_KEY_NAME = "borgscale-default"
 
 from app.database.database import get_db
 from app.database.models import (
@@ -36,6 +39,112 @@ def format_bytes(bytes_size: int) -> str:
             return f"{bytes_size:.2f} {unit}"
         bytes_size /= 1024.0
     return f"{bytes_size:.2f} EB"
+
+
+def _redact_secrets(blob: str) -> str:
+    """Best-effort redaction of obvious secret-shaped substrings in SSH output.
+
+    Strips long base64 blobs and explicit password=/passphrase= occurrences.
+    Not security-critical (the SSH session never sees secrets on stdout in
+    practice), but prevents accidental display of an authorized_keys line.
+    """
+    if not blob:
+        return blob
+    redacted = re.sub(r"(?i)(pass(?:word|phrase)\s*[:=]\s*)\S+", r"\1[redacted]", blob)
+    redacted = re.sub(r"[A-Za-z0-9+/]{60,}={0,2}", "[redacted-base64]", redacted)
+    return redacted
+
+
+_HINT_PATTERNS: tuple = (
+    ("Permission denied (publickey)", "backend.ssh.hint.publicKeyNotAuthorized"),
+    ("Permission denied (publickey",  "backend.ssh.hint.publicKeyNotAuthorized"),
+    ("command not found",             "backend.ssh.hint.borgNotInstalled"),
+    ("borg: not found",               "backend.ssh.hint.borgNotInstalled"),
+    ("Connection refused",            "backend.ssh.hint.connectionRefused"),
+    ("Connection timed out",          "backend.ssh.hint.timeout"),
+    ("Host key verification failed",  "backend.ssh.hint.hostKeyFailed"),
+    ("No route to host",              "backend.ssh.hint.noRoute"),
+    ("Could not resolve hostname",    "backend.ssh.hint.dnsFailed"),
+    ("Operation timed out",           "backend.ssh.hint.timeout"),
+)
+
+
+def _classify_hint(stderr_blob: str):
+    """Return a translation-key hint matching the first known SSH failure pattern."""
+    if not stderr_blob:
+        return None
+    for needle, key in _HINT_PATTERNS:
+        if needle in stderr_blob:
+            return key
+    return None
+
+
+def _build_authorize_command(public_key: str) -> str:
+    """Build a paste-ready shell command to append the public key to authorized_keys."""
+    safe = public_key.replace('"', '\\"').strip()
+    return (
+        "mkdir -p ~/.ssh && chmod 700 ~/.ssh && "
+        f"echo \"{safe}\" >> ~/.ssh/authorized_keys && "
+        "chmod 600 ~/.ssh/authorized_keys"
+    )
+
+
+async def _ssh_run_command(
+    *,
+    host: str,
+    username: str,
+    port: int,
+    private_key_pem: str,
+    command: str,
+    connect_timeout: int = 10,
+):
+    """Run a single SSH command using a tmp private-key file.
+
+    Returns (return_code, stdout, stderr). Honors BatchMode so no prompt ever
+    blocks the worker.
+    """
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".key", delete=False
+    ) as keyfile:
+        keyfile.write(private_key_pem)
+        keyfile_path = keyfile.name
+    try:
+        os.chmod(keyfile_path, 0o600)
+        argv = [
+            "ssh",
+            "-o", "BatchMode=yes",
+            "-o", f"ConnectTimeout={connect_timeout}",
+            "-o", "StrictHostKeyChecking=accept-new",
+            "-o", "UserKnownHostsFile=/dev/null",
+            "-o", "LogLevel=ERROR",
+            "-i", keyfile_path,
+            "-p", str(port),
+            f"{username}@{host}",
+            command,
+        ]
+        proc = await asyncio.create_subprocess_exec(
+            *argv,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        try:
+            stdout, stderr = await asyncio.wait_for(
+                proc.communicate(), timeout=connect_timeout + 15
+            )
+        except asyncio.TimeoutError:
+            proc.kill()
+            await proc.communicate()
+            return 124, "", "Operation timed out"
+        return (
+            proc.returncode or 0,
+            stdout.decode("utf-8", "replace"),
+            stderr.decode("utf-8", "replace"),
+        )
+    finally:
+        try:
+            os.unlink(keyfile_path)
+        except OSError:
+            pass
 
 
 async def _run_df_command(
@@ -240,6 +349,20 @@ class SSHQuickSetup(BaseModel):
         default=True,
         description="Use SFTP mode for ssh-copy-id (required by Hetzner, disable for Synology/older systems)",
     )
+
+
+class ManualPairInitRequest(BaseModel):
+    name: str = DEFAULT_SYSTEM_KEY_NAME
+    key_type: str = "ed25519"  # ed25519 | rsa
+    description: Optional[str] = None
+
+
+class ManualPairVerifyRequest(BaseModel):
+    ssh_key_id: int
+    host: str
+    username: str
+    port: int = 22
+    save_connection: bool = True
 
 
 class SSHConnectionCreate(BaseModel):
@@ -910,6 +1033,171 @@ async def quick_ssh_setup(
                 "params": {"error": str(e)},
             },
         )
+
+
+@router.post("/manual-pair/init")
+async def manual_pair_init(
+    req: ManualPairInitRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Ensure a default system SSH key exists and return its public key.
+
+    Idempotent: if a key with the requested `name` already exists, return its
+    existing public key (do not generate a new keypair — that would orphan
+    deployments on remote hosts).
+    """
+    if req.key_type not in ("ed25519", "rsa"):
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "key": "backend.errors.ssh.invalidKeyType",
+                "params": {"type": req.key_type},
+            },
+        )
+
+    existing = db.query(SSHKey).filter(SSHKey.name == req.name).first()
+    if existing is not None:
+        return {
+            "ssh_key_id": existing.id,
+            "name": existing.name,
+            "key_type": existing.key_type,
+            "public_key": existing.public_key,
+            "created": False,
+            "suggested_command": _build_authorize_command(existing.public_key),
+        }
+
+    key_result = await generate_ssh_key_pair(req.key_type)
+    if not key_result.get("success"):
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "key": "backend.errors.ssh.failedGenerateKey",
+                "params": {"error": key_result.get("error", "unknown")},
+            },
+        )
+
+    encrypted_private = encrypt_secret(key_result["private_key"])
+    ssh_key = SSHKey(
+        name=req.name,
+        description=req.description or "BorgScale default key (manual-paste pairing)",
+        key_type=req.key_type,
+        public_key=key_result["public_key"],
+        private_key=encrypted_private,
+        is_active=True,
+    )
+    db.add(ssh_key)
+    db.commit()
+    db.refresh(ssh_key)
+
+    logger.info(
+        "manual_pair_init_generated_key",
+        name=ssh_key.name,
+        key_id=ssh_key.id,
+        user=current_user.username,
+    )
+
+    return {
+        "ssh_key_id": ssh_key.id,
+        "name": ssh_key.name,
+        "key_type": ssh_key.key_type,
+        "public_key": ssh_key.public_key,
+        "created": True,
+        "suggested_command": _build_authorize_command(ssh_key.public_key),
+    }
+
+
+@router.post("/manual-pair/verify")
+async def manual_pair_verify(
+    req: ManualPairVerifyRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Attempt a passwordless SSH connection and run `borg --version`.
+
+    On success, optionally upserts an SSHConnection row so subsequent
+    discovery flows can target this host.
+    """
+    ssh_key = db.query(SSHKey).filter(SSHKey.id == req.ssh_key_id).first()
+    if ssh_key is None:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "key": "backend.errors.ssh.keyNotFound",
+                "params": {"id": req.ssh_key_id},
+            },
+        )
+
+    private_key_pem = decrypt_secret(ssh_key.private_key)
+    rc, stdout, stderr = await _ssh_run_command(
+        host=req.host,
+        username=req.username,
+        port=req.port,
+        private_key_pem=private_key_pem,
+        command="borg --version 2>&1 || echo BORG_MISSING",
+        connect_timeout=10,
+    )
+
+    stderr_redacted = _redact_secrets(stderr)
+    stdout_redacted = _redact_secrets(stdout)
+    hint = _classify_hint(stderr) or (_classify_hint(stdout) if rc != 0 else None)
+
+    borg_version = None
+    if rc == 0 and "borg" in stdout.lower():
+        m = re.search(r"borg\s+([0-9][0-9a-zA-Z.\-]*)", stdout)
+        if m:
+            borg_version = m.group(1)
+
+    # If borg is missing, classify hint even if rc==0 (script returns 0 with BORG_MISSING)
+    if borg_version is None and hint is None:
+        if "BORG_MISSING" in stdout or "command not found" in stdout or "borg: not found" in stdout:
+            hint = "backend.ssh.hint.borgNotInstalled"
+
+    success = rc == 0 and borg_version is not None
+
+    connection_id = None
+    if success and req.save_connection:
+        existing_conn = (
+            db.query(SSHConnection)
+            .filter(
+                SSHConnection.host == req.host,
+                SSHConnection.username == req.username,
+                SSHConnection.port == req.port,
+                SSHConnection.ssh_key_id == ssh_key.id,
+            )
+            .first()
+        )
+        if existing_conn is None:
+            connection = SSHConnection(
+                ssh_key_id=ssh_key.id,
+                host=req.host,
+                username=req.username,
+                port=req.port,
+                status="connected",
+                last_test=datetime.utcnow(),
+                last_success=datetime.utcnow(),
+            )
+            db.add(connection)
+            db.commit()
+            db.refresh(connection)
+            connection_id = connection.id
+        else:
+            existing_conn.status = "connected"
+            existing_conn.last_test = datetime.utcnow()
+            existing_conn.last_success = datetime.utcnow()
+            existing_conn.error_message = None
+            db.commit()
+            connection_id = existing_conn.id
+
+    return {
+        "success": success,
+        "borg_version": borg_version,
+        "stderr_raw": stderr_redacted,
+        "stdout": stdout_redacted,
+        "hint_key": hint,
+        "connection_id": connection_id,
+        "return_code": rc,
+    }
 
 
 @router.post("/{key_id}/deploy")
