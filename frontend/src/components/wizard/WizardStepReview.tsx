@@ -17,6 +17,7 @@ import {
 import { useTranslation } from 'react-i18next'
 import CommandPreview from '../CommandPreview'
 import BackupFlowPreview from './BackupFlowPreview'
+import AdvancedDisclosure from './AdvancedDisclosure'
 import { cn } from '@/lib/utils'
 
 interface SSHConnection {
@@ -45,6 +46,11 @@ export interface WizardReviewData {
   excludePatterns: string[]
   customFlags: string
   remotePath: string
+  bypassLock?: boolean
+  preBackupScript?: string
+  postBackupScript?: string
+  preHookTimeout?: number
+  postHookTimeout?: number
 }
 
 interface WizardStepReviewProps {
@@ -375,15 +381,75 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
             <AttrRow label={t('wizard.review.compression')}>
               <CodePill>{data.compression}</CodePill>
             </AttrRow>
-
-            {data.customFlags && (
-              <AttrRow label={t('wizard.review.customFlags')}>
-                <CodePill>{data.customFlags}</CodePill>
-              </AttrRow>
-            )}
           </SectionCard>
         )}
       </div>
+
+      {/* Advanced settings — only shown when any field is non-default */}
+      {(() => {
+        const hasCustomFlags = !!data.customFlags
+        const hasPreScript = !!data.preBackupScript
+        const hasPostScript = !!data.postBackupScript
+        const hasRemotePath = !!data.remotePath
+        const hasBypassLock = data.bypassLock === true
+        const hasPreTimeout =
+          data.preHookTimeout !== undefined && data.preHookTimeout !== 300
+        const hasPostTimeout =
+          data.postHookTimeout !== undefined && data.postHookTimeout !== 300
+        const anyAdvanced =
+          hasCustomFlags ||
+          hasPreScript ||
+          hasPostScript ||
+          hasRemotePath ||
+          hasBypassLock ||
+          hasPreTimeout ||
+          hasPostTimeout
+        if (!anyAdvanced) return null
+        return (
+          <AdvancedDisclosure
+            labelKey="wizard.review.advancedUsed"
+            testId="review-advanced"
+          >
+            <div className="flex flex-col gap-1.5">
+              {hasCustomFlags && (
+                <AttrRow label={t('wizard.review.customFlags')}>
+                  <CodePill>{data.customFlags}</CodePill>
+                </AttrRow>
+              )}
+              {hasRemotePath && (
+                <AttrRow label={t('wizard.security.remoteBorgPath')}>
+                  <CodePill>{data.remotePath}</CodePill>
+                </AttrRow>
+              )}
+              {hasPreScript && (
+                <AttrRow label={t('wizard.review.preBackupScript')}>
+                  <CodePill>{data.preBackupScript}</CodePill>
+                </AttrRow>
+              )}
+              {hasPostScript && (
+                <AttrRow label={t('wizard.review.postBackupScript')}>
+                  <CodePill>{data.postBackupScript}</CodePill>
+                </AttrRow>
+              )}
+              {hasPreTimeout && (
+                <AttrRow label={t('wizard.review.preHookTimeout')}>
+                  <CodePill>{String(data.preHookTimeout)}</CodePill>
+                </AttrRow>
+              )}
+              {hasPostTimeout && (
+                <AttrRow label={t('wizard.review.postHookTimeout')}>
+                  <CodePill>{String(data.postHookTimeout)}</CodePill>
+                </AttrRow>
+              )}
+              {hasBypassLock && (
+                <AttrRow label={t('wizard.location.readOnlyStorageLabel')}>
+                  <span className="text-sm">{t('wizard.review.enabled')}</span>
+                </AttrRow>
+              )}
+            </div>
+          </AdvancedDisclosure>
+        )
+      })()}
 
       {/* Import / edit notes */}
       {mode === 'import' && (

@@ -2164,7 +2164,18 @@
       "repositoryPathHelper": "Ruta donde se almacenará el repositorio",
       "borgV2Warning": "La compatibilidad con Borg 2 sigue en beta. No la uses todavía para datos de producción. Por ahora está pensada para entusiastas y pruebas, y requiere el binario borg2 en cualquier host remoto.",
       "connected": "Conectado",
-      "browseFilesystem": "Explorar sistema de archivos"
+      "browseFilesystem": "Explorar sistema de archivos",
+      "mode": {
+        "full": {
+          "title": "Back up and manage",
+          "desc": "Run scheduled backups and maintenance from BorgScale."
+        },
+        "observe": {
+          "title": "Watch only",
+          "desc": "Read-only view of a repository another tool is writing to."
+        }
+      },
+      "advanced": "Advanced location options"
     },
     "restoreDestination": {
       "title": "¿Dónde deben restaurarse los archivos?",
@@ -2273,7 +2284,13 @@
       "customFlags": "Indicadores personalizados",
       "repositoryInitialized": "El repositorio será inicializado",
       "repositoryImportNote": "El repositorio será verificado antes de importar. Asegúrate de que la frase de contraseña sea correcta.",
-      "repositoryEditNote": "Los cambios se guardarán en la configuración del repositorio."
+      "repositoryEditNote": "Los cambios se guardarán en la configuración del repositorio.",
+      "advancedUsed": "Advanced settings used",
+      "preBackupScript": "Pre-backup script",
+      "postBackupScript": "Post-backup script",
+      "preHookTimeout": "Pre-hook timeout",
+      "postHookTimeout": "Post-hook timeout",
+      "enabled": "Enabled"
     },
     "security": {
       "encryptionMethodLabel": "Método de cifrado",
@@ -2301,7 +2318,23 @@
       "keyfileUploadNote": "El archivo de clave se subirá después de importar",
       "keyfileContentNote": "El contenido del archivo de clave se guardará después de importar",
       "remoteBorgPath": "Ruta Borg remota (Opcional)",
-      "remoteBorgPathHelper": "Ruta al ejecutable borg en remoto (si no está en PATH)"
+      "remoteBorgPathHelper": "Ruta al ejecutable borg en remoto (si no está en PATH)",
+      "tile": {
+        "encrypted": {
+          "title": "Encrypted (recommended)",
+          "desc": "Strong encryption using your passphrase. Key is stored with the backups."
+        },
+        "keyfile": {
+          "title": "Encrypted, key stored separately",
+          "desc": "Use this only if you'll save the key yourself. If you lose the key, your backups are gone."
+        },
+        "none": {
+          "title": "No encryption",
+          "desc": "Backups are stored as-is. Only use on trusted local storage."
+        }
+      },
+      "advanced": "Advanced encryption options",
+      "noneWarning": "Without encryption, anyone with access to the backup storage can read every file."
     },
     "scheduleWizard": {
       "basicInfo": {
@@ -2352,6 +2385,30 @@
       "scripts": {
         "scheduleLevelNote": "Nivel de programación: se ejecuta una vez por programación. Nivel de repositorio: se ejecuta para cada repositorio.",
         "selectRepoFirst": "Selecciona al menos un repositorio en el Paso 1 para configurar scripts."
+      }
+    },
+    "advanced": {
+      "label": "Advanced settings",
+      "openHint": "Click to see less-common options"
+    },
+    "backup": {
+      "compression": {
+        "balanced": {
+          "title": "Balanced (recommended)",
+          "desc": "Fast, modest space savings."
+        },
+        "smaller": {
+          "title": "Smaller files",
+          "desc": "Slower but stores more history per gigabyte."
+        },
+        "none": {
+          "title": "No compression",
+          "desc": "Maximum speed, more disk usage."
+        }
+      },
+      "advanced": {
+        "compression": "Advanced compression settings",
+        "power": "Power-user settings"
       }
     }
   },

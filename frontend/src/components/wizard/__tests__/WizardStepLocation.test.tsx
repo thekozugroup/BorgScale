@@ -173,7 +173,7 @@ describe('WizardStepLocation', () => {
   })
 
   describe('Import Mode', () => {
-    it('shows Repository Mode selector', () => {
+    it('shows Repository Mode radio cards', () => {
       renderWithProviders(
         <WizardStepLocation
           mode="import"
@@ -184,11 +184,18 @@ describe('WizardStepLocation', () => {
         />
       )
 
-      expect(screen.getByText('Full Repository')).toBeInTheDocument()
+      expect(screen.getByTestId('mode-card-full')).toBeInTheDocument()
+      expect(screen.getByTestId('mode-card-observe')).toBeInTheDocument()
     })
 
-    it('shows bypass lock checkbox when observe mode is selected', () => {
-      const observeData = { ...defaultData, repositoryMode: 'observe' as const }
+    it('shows bypass lock checkbox inside advanced disclosure when observe mode is selected', () => {
+      // bypassLock=true so the disclosure is collapsed by default, but the
+      // toggle should still be present.
+      const observeData = {
+        ...defaultData,
+        repositoryMode: 'observe' as const,
+        bypassLock: true,
+      }
 
       renderWithProviders(
         <WizardStepLocation
@@ -200,6 +207,28 @@ describe('WizardStepLocation', () => {
         />
       )
 
+      // The advanced disclosure exists, click it open to reveal the checkbox.
+      expect(screen.getByTestId('location-advanced')).toBeInTheDocument()
+    })
+
+    it('force-opens the advanced disclosure when bypassLock is false in observe mode', () => {
+      const observeData = {
+        ...defaultData,
+        repositoryMode: 'observe' as const,
+        bypassLock: false,
+      }
+
+      renderWithProviders(
+        <WizardStepLocation
+          mode="import"
+          data={observeData}
+          sshConnections={[]}
+          onChange={vi.fn()}
+          onBrowsePath={vi.fn()}
+        />
+      )
+
+      // Disclosure should be force-open so the checkbox is visible.
       expect(screen.getByText(/Read-only storage access/i)).toBeInTheDocument()
     })
 
@@ -215,6 +244,28 @@ describe('WizardStepLocation', () => {
       )
 
       expect(screen.queryByText(/Read-only storage access/i)).not.toBeInTheDocument()
+      expect(screen.queryByTestId('location-advanced')).not.toBeInTheDocument()
+    })
+
+    it('switching to observe mode also sets bypassLock=true', async () => {
+      const user = userEvent.setup()
+      const onChange = vi.fn()
+
+      renderWithProviders(
+        <WizardStepLocation
+          mode="import"
+          data={defaultData}
+          sshConnections={[]}
+          onChange={onChange}
+          onBrowsePath={vi.fn()}
+        />
+      )
+
+      await user.click(screen.getByTestId('mode-card-observe'))
+
+      expect(onChange).toHaveBeenCalledWith(
+        expect.objectContaining({ repositoryMode: 'observe', bypassLock: true })
+      )
     })
   })
 

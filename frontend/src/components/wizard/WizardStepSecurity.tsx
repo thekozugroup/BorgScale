@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select'
 import { cn } from '@/lib/utils'
 import { Textarea } from '@/components/ui/textarea'
+import AdvancedDisclosure from './AdvancedDisclosure'
 
 export interface SecurityStepData {
   encryption: string
@@ -81,6 +82,13 @@ export default function WizardStepSecurity({
     borgVersion === 2 ? BORG2_ENCRYPTION_OPTIONS : BORG1_ENCRYPTION_OPTIONS
   const isKeyfileEncryption = data.encryption.includes('keyfile')
 
+  // Recommended tile selections per borg version. The underlying form value
+  // stays a free-form Borg encryption string — only the UI is simplified.
+  const recommendedEncrypted = borgVersion === 2 ? 'repokey-aes-ocb' : 'repokey-blake2'
+  const recommendedKeyfile = borgVersion === 2 ? 'keyfile-aes-ocb' : 'keyfile-blake2'
+  const tileValues = [recommendedEncrypted, recommendedKeyfile, 'none']
+  const isCustomEncryption = !tileValues.includes(data.encryption)
+
   return (
     <div className="flex flex-col gap-4">
       {/* Encryption Selection - create and import mode */}
@@ -88,28 +96,40 @@ export default function WizardStepSecurity({
         <>
           <div className="flex flex-col gap-1.5">
             {mode === 'create' && (
-              <Label htmlFor="encryption-method">
-                {t('wizard.security.encryptionMethodLabel')}
-              </Label>
+              <Label>{t('wizard.security.encryptionMethodLabel')}</Label>
             )}
-            <Select
-              value={data.encryption}
-              onValueChange={(v) => onChange({ encryption: v })}
+            <div
+              role="radiogroup"
+              aria-label={t('wizard.security.encryptionMethodLabel')}
+              className="grid gap-3 md:grid-cols-3"
             >
-              <SelectTrigger id={mode === 'create' ? 'encryption-method' : undefined} className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {encryptionOptions.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    <div>
-                      <div className="text-sm font-semibold">{opt.label}</div>
-                      <div className="text-xs text-muted-foreground">{opt.desc}</div>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <EncryptionTile
+                value="encrypted"
+                selected={data.encryption === recommendedEncrypted}
+                onSelect={() => onChange({ encryption: recommendedEncrypted })}
+                titleKey="wizard.security.tile.encrypted.title"
+                descKey="wizard.security.tile.encrypted.desc"
+              />
+              <EncryptionTile
+                value="keyfile"
+                selected={data.encryption === recommendedKeyfile}
+                onSelect={() => onChange({ encryption: recommendedKeyfile })}
+                titleKey="wizard.security.tile.keyfile.title"
+                descKey="wizard.security.tile.keyfile.desc"
+              />
+              <EncryptionTile
+                value="none"
+                selected={data.encryption === 'none'}
+                onSelect={() => onChange({ encryption: 'none' })}
+                titleKey="wizard.security.tile.none.title"
+                descKey="wizard.security.tile.none.desc"
+              />
+            </div>
+            {data.encryption === 'none' && (
+              <p className="text-xs text-destructive mt-1">
+                {t('wizard.security.noneWarning')}
+              </p>
+            )}
           </div>
 
           {data.encryption === 'none' && (
@@ -118,6 +138,36 @@ export default function WizardStepSecurity({
               <AlertDescription>{t('wizard.security.securityWarningBody')}</AlertDescription>
             </Alert>
           )}
+
+          <AdvancedDisclosure
+            labelKey="wizard.security.advanced"
+            forceOpen={isCustomEncryption ? true : undefined}
+            testId="security-advanced"
+          >
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="encryption-method">
+                {t('wizard.security.encryptionMethodLabel')}
+              </Label>
+              <Select
+                value={data.encryption}
+                onValueChange={(v) => onChange({ encryption: v })}
+              >
+                <SelectTrigger id="encryption-method" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {encryptionOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      <div>
+                        <div className="text-sm font-semibold">{opt.label}</div>
+                        <div className="text-xs text-muted-foreground">{opt.desc}</div>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </AdvancedDisclosure>
         </>
       )}
 
@@ -276,5 +326,38 @@ export default function WizardStepSecurity({
         <p className="text-xs text-muted-foreground">{t('wizard.security.remoteBorgPathHelper')}</p>
       </div>
     </div>
+  )
+}
+
+function EncryptionTile({
+  selected,
+  onSelect,
+  titleKey,
+  descKey,
+  value,
+}: {
+  selected: boolean
+  onSelect: () => void
+  titleKey: string
+  descKey: string
+  value: string
+}) {
+  const { t } = useTranslation()
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={selected}
+      data-testid={`encryption-tile-${value}`}
+      onClick={onSelect}
+      className={cn(
+        'text-left rounded-lg border p-3 transition',
+        'hover:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+        selected && 'border-primary ring-1 ring-primary'
+      )}
+    >
+      <div className="text-sm font-medium">{t(titleKey)}</div>
+      <div className="mt-1 text-xs text-muted-foreground">{t(descKey)}</div>
+    </button>
   )
 }

@@ -2164,7 +2164,18 @@
       "repositoryPathHelper": "Pfad, unter dem das Repository gespeichert wird",
       "borgV2Warning": "Die Borg-2-Unterstützung ist noch in der Beta. Verwende sie noch nicht für Produktionsdaten. Sie ist derzeit für Enthusiasten und Tests gedacht und erfordert das borg2-Binary auf allen Remote-Hosts.",
       "connected": "Verbunden",
-      "browseFilesystem": "Dateisystem durchsuchen"
+      "browseFilesystem": "Dateisystem durchsuchen",
+      "mode": {
+        "full": {
+          "title": "Back up and manage",
+          "desc": "Run scheduled backups and maintenance from BorgScale."
+        },
+        "observe": {
+          "title": "Watch only",
+          "desc": "Read-only view of a repository another tool is writing to."
+        }
+      },
+      "advanced": "Advanced location options"
     },
     "restoreDestination": {
       "title": "Wohin sollen Dateien wiederhergestellt werden?",
@@ -2273,7 +2284,13 @@
       "customFlags": "Benutzerdefinierte Flags",
       "repositoryInitialized": "Repository wird initialisiert",
       "repositoryImportNote": "Das Repository wird vor dem Import überprüft. Stelle sicher, dass die Passphrase korrekt ist.",
-      "repositoryEditNote": "Änderungen werden in der Repository-Konfiguration gespeichert."
+      "repositoryEditNote": "Änderungen werden in der Repository-Konfiguration gespeichert.",
+      "advancedUsed": "Advanced settings used",
+      "preBackupScript": "Pre-backup script",
+      "postBackupScript": "Post-backup script",
+      "preHookTimeout": "Pre-hook timeout",
+      "postHookTimeout": "Post-hook timeout",
+      "enabled": "Enabled"
     },
     "security": {
       "encryptionMethodLabel": "Verschlüsselungsmethode",
@@ -2301,7 +2318,23 @@
       "keyfileUploadNote": "Schlüsseldatei wird nach dem Import hochgeladen",
       "keyfileContentNote": "Schlüsseldatei-Inhalt wird nach dem Import gespeichert",
       "remoteBorgPath": "Remote-Borg-Pfad (Optional)",
-      "remoteBorgPathHelper": "Pfad zur borg-Ausführungsdatei auf dem Remote (falls nicht im PATH)"
+      "remoteBorgPathHelper": "Pfad zur borg-Ausführungsdatei auf dem Remote (falls nicht im PATH)",
+      "tile": {
+        "encrypted": {
+          "title": "Encrypted (recommended)",
+          "desc": "Strong encryption using your passphrase. Key is stored with the backups."
+        },
+        "keyfile": {
+          "title": "Encrypted, key stored separately",
+          "desc": "Use this only if you'll save the key yourself. If you lose the key, your backups are gone."
+        },
+        "none": {
+          "title": "No encryption",
+          "desc": "Backups are stored as-is. Only use on trusted local storage."
+        }
+      },
+      "advanced": "Advanced encryption options",
+      "noneWarning": "Without encryption, anyone with access to the backup storage can read every file."
     },
     "scheduleWizard": {
       "basicInfo": {
@@ -2352,6 +2385,30 @@
       "scripts": {
         "scheduleLevelNote": "Zeitplanebene: läuft einmal pro Zeitplan. Repository-Ebene: läuft für jedes Repository.",
         "selectRepoFirst": "Wähle mindestens ein Repository in Schritt 1 aus, um Skripte zu konfigurieren."
+      }
+    },
+    "advanced": {
+      "label": "Advanced settings",
+      "openHint": "Click to see less-common options"
+    },
+    "backup": {
+      "compression": {
+        "balanced": {
+          "title": "Balanced (recommended)",
+          "desc": "Fast, modest space savings."
+        },
+        "smaller": {
+          "title": "Smaller files",
+          "desc": "Slower but stores more history per gigabyte."
+        },
+        "none": {
+          "title": "No compression",
+          "desc": "Maximum speed, more disk usage."
+        }
+      },
+      "advanced": {
+        "compression": "Advanced compression settings",
+        "power": "Power-user settings"
       }
     }
   },

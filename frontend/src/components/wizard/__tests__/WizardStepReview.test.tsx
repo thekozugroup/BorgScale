@@ -292,7 +292,9 @@ describe('WizardStepReview', () => {
       expect(screen.getByText('lz4')).toBeInTheDocument()
     })
 
-    it('shows custom flags when set', () => {
+    it('hides custom flags in the primary view but shows them under Advanced when set', async () => {
+      const { default: userEvent } = await import('@testing-library/user-event')
+      const user = userEvent.setup()
       const customFlagsData = { ...defaultData, customFlags: '--stats --progress' }
 
       renderWithProviders(
@@ -303,7 +305,27 @@ describe('WizardStepReview', () => {
         />
       )
 
+      // Not in primary view — only inside the collapsed Advanced disclosure.
+      expect(screen.queryByText('--stats --progress')).not.toBeInTheDocument()
+      // Disclosure container exists.
+      const disclosure = screen.getByTestId('review-advanced')
+      expect(disclosure).toBeInTheDocument()
+      const trigger = disclosure.querySelector('button')
+      if (!trigger) throw new Error('review-advanced trigger missing')
+      await user.click(trigger)
       expect(screen.getByText('--stats --progress')).toBeInTheDocument()
+    })
+
+    it('does not render the Advanced disclosure when no advanced fields are set', () => {
+      renderWithProviders(
+        <WizardStepReview
+          mode="create"
+          data={defaultData}
+          sshConnections={mockSshConnections}
+        />
+      )
+
+      expect(screen.queryByTestId('review-advanced')).not.toBeInTheDocument()
     })
   })
 

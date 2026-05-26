@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { cn } from '@/lib/utils'
+import AdvancedDisclosure from './AdvancedDisclosure'
 
 interface SSHConnection {
   id: number
@@ -114,38 +115,30 @@ export default function WizardStepLocation({
         </div>
       )}
 
-      {/* Repository Mode for Import */}
+      {/* Repository Mode for Import — two radio cards */}
       {mode === 'import' && (
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="repo-mode">{t('wizard.location.repositoryModeLabel')}</Label>
-          <Select
-            value={data.repositoryMode}
-            onValueChange={(v) => onChange({ repositoryMode: v as 'full' | 'observe' })}
+          <Label>{t('wizard.location.repositoryModeLabel')}</Label>
+          <div
+            role="radiogroup"
+            aria-label={t('wizard.location.repositoryModeLabel')}
+            className="grid gap-3 md:grid-cols-2"
           >
-            <SelectTrigger id="repo-mode" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="full">
-                <div>
-                  <div className="text-sm font-semibold">{t('wizard.location.fullRepository')}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {t('wizard.location.fullRepositoryDesc')}
-                  </div>
-                </div>
-              </SelectItem>
-              <SelectItem value="observe">
-                <div>
-                  <div className="text-sm font-semibold">
-                    {t('wizard.location.observabilityOnly')}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {t('wizard.location.observabilityOnlyDesc')}
-                  </div>
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
+            <ModeRadioCard
+              value="full"
+              selected={data.repositoryMode === 'full'}
+              onSelect={() => onChange({ repositoryMode: 'full' })}
+              titleKey="wizard.location.mode.full.title"
+              descKey="wizard.location.mode.full.desc"
+            />
+            <ModeRadioCard
+              value="observe"
+              selected={data.repositoryMode === 'observe'}
+              onSelect={() => onChange({ repositoryMode: 'observe', bypassLock: true })}
+              titleKey="wizard.location.mode.observe.title"
+              descKey="wizard.location.mode.observe.desc"
+            />
+          </div>
         </div>
       )}
 
@@ -153,21 +146,27 @@ export default function WizardStepLocation({
         <p className="text-sm text-muted-foreground">{t('wizard.location.observabilityInfo')}</p>
       )}
 
-      {/* Read-only storage access option for observe mode */}
+      {/* Read-only storage access option for observe mode — moved under Advanced */}
       {data.repositoryMode === 'observe' && (
-        <div className="flex items-start gap-2">
-          <Checkbox
-            id="bypass-lock"
-            checked={data.bypassLock}
-            onCheckedChange={(checked) => onChange({ bypassLock: !!checked })}
-          />
-          <label htmlFor="bypass-lock" className="flex flex-col cursor-pointer">
-            <span className="text-sm">{t('wizard.location.readOnlyStorageLabel')}</span>
-            <span className="text-xs text-muted-foreground">
-              {t('wizard.location.readOnlyStorageDesc')}
-            </span>
-          </label>
-        </div>
+        <AdvancedDisclosure
+          labelKey="wizard.location.advanced"
+          forceOpen={data.bypassLock !== true && data.repositoryMode === 'observe' ? true : undefined}
+          testId="location-advanced"
+        >
+          <div className="flex items-start gap-2">
+            <Checkbox
+              id="bypass-lock"
+              checked={data.bypassLock}
+              onCheckedChange={(checked) => onChange({ bypassLock: !!checked })}
+            />
+            <label htmlFor="bypass-lock" className="flex flex-col cursor-pointer">
+              <span className="text-sm">{t('wizard.location.readOnlyStorageLabel')}</span>
+              <span className="text-xs text-muted-foreground">
+                {t('wizard.location.readOnlyStorageDesc')}
+              </span>
+            </label>
+          </div>
+        </AdvancedDisclosure>
       )}
 
       {/* Location Selection Cards */}
@@ -321,5 +320,38 @@ export default function WizardStepLocation({
         <p className="text-xs text-muted-foreground">{t('wizard.location.repositoryPathHelper')}</p>
       </div>
     </div>
+  )
+}
+
+function ModeRadioCard({
+  selected,
+  onSelect,
+  titleKey,
+  descKey,
+  value,
+}: {
+  selected: boolean
+  onSelect: () => void
+  titleKey: string
+  descKey: string
+  value: string
+}) {
+  const { t } = useTranslation()
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={selected}
+      data-testid={`mode-card-${value}`}
+      onClick={onSelect}
+      className={cn(
+        'text-left rounded-lg border p-4 transition',
+        'hover:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+        selected && 'border-primary ring-1 ring-primary'
+      )}
+    >
+      <div className="font-medium text-sm">{t(titleKey)}</div>
+      <div className="mt-1 text-xs text-muted-foreground">{t(descKey)}</div>
+    </button>
   )
 }

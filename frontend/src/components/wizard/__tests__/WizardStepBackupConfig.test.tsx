@@ -73,35 +73,54 @@ const defaultData: BackupConfigStepData = {
 
 describe('WizardStepBackupConfig', () => {
   describe('Compression Settings', () => {
-    it('renders compression settings component', () => {
+    it('renders three compression tiles', () => {
       renderWithProviders(
         <WizardStepBackupConfig
           dataSource="local"
           repositoryMode="full"
           data={defaultData}
+          onChange={vi.fn()}
+          onBrowseExclude={vi.fn()}
+        />
+      )
+
+      expect(screen.getByTestId('compression-tile-balanced')).toBeInTheDocument()
+      expect(screen.getByTestId('compression-tile-smaller')).toBeInTheDocument()
+      expect(screen.getByTestId('compression-tile-none')).toBeInTheDocument()
+    })
+
+    it('hides the advanced compression settings by default when value matches a tile', () => {
+      renderWithProviders(
+        <WizardStepBackupConfig
+          dataSource="local"
+          repositoryMode="full"
+          data={defaultData}
+          onChange={vi.fn()}
+          onBrowseExclude={vi.fn()}
+        />
+      )
+
+      // CompressionSettings mock is inside the advanced disclosure — collapsed.
+      expect(screen.queryByTestId('compression-settings')).not.toBeInTheDocument()
+    })
+
+    it('force-opens the advanced compression settings for non-tile values', () => {
+      const customData = { ...defaultData, compression: 'zstd,22' }
+      renderWithProviders(
+        <WizardStepBackupConfig
+          dataSource="local"
+          repositoryMode="full"
+          data={customData}
           onChange={vi.fn()}
           onBrowseExclude={vi.fn()}
         />
       )
 
       expect(screen.getByTestId('compression-settings')).toBeInTheDocument()
+      expect(screen.getByText('Compression: zstd,22')).toBeInTheDocument()
     })
 
-    it('shows current compression value', () => {
-      renderWithProviders(
-        <WizardStepBackupConfig
-          dataSource="local"
-          repositoryMode="full"
-          data={defaultData}
-          onChange={vi.fn()}
-          onBrowseExclude={vi.fn()}
-        />
-      )
-
-      expect(screen.getByText('Compression: lz4')).toBeInTheDocument()
-    })
-
-    it('calls onChange when compression changes', async () => {
+    it('clicking a compression tile calls onChange with the right value', async () => {
       const { userEvent } = await import('@testing-library/user-event')
       const user = userEvent.setup()
       const onChange = vi.fn()
@@ -116,9 +135,9 @@ describe('WizardStepBackupConfig', () => {
         />
       )
 
-      await user.click(screen.getByText('Change Compression'))
+      await user.click(screen.getByTestId('compression-tile-smaller'))
 
-      expect(onChange).toHaveBeenCalledWith({ compression: 'zstd' })
+      expect(onChange).toHaveBeenCalledWith({ compression: 'zstd,3' })
     })
   })
 
@@ -230,7 +249,18 @@ describe('WizardStepBackupConfig', () => {
   })
 
   describe('Advanced Options', () => {
-    it('renders advanced repository options', () => {
+    async function openPowerAdvanced() {
+      const { userEvent } = await import('@testing-library/user-event')
+      const user = userEvent.setup()
+      const trigger = screen
+        .getByTestId('power-advanced')
+        .querySelector('button')
+      if (!trigger) throw new Error('power-advanced trigger not found')
+      await user.click(trigger)
+      return user
+    }
+
+    it('mounts the advanced repository options disclosure (collapsed by default)', () => {
       renderWithProviders(
         <WizardStepBackupConfig
           dataSource="local"
@@ -241,10 +271,12 @@ describe('WizardStepBackupConfig', () => {
         />
       )
 
-      expect(screen.getByTestId('advanced-options')).toBeInTheDocument()
+      expect(screen.getByTestId('power-advanced')).toBeInTheDocument()
+      // Body is collapsed — mock should not be visible.
+      expect(screen.queryByTestId('advanced-options')).not.toBeInTheDocument()
     })
 
-    it('passes remote path to advanced options', () => {
+    it('passes remote path to advanced options when expanded', async () => {
       const dataWithRemotePath = { ...defaultData, remotePath: '/usr/local/bin/borg' }
 
       renderWithProviders(
@@ -257,10 +289,11 @@ describe('WizardStepBackupConfig', () => {
         />
       )
 
+      await openPowerAdvanced()
       expect(screen.getByText('Remote Path: /usr/local/bin/borg')).toBeInTheDocument()
     })
 
-    it('passes custom flags to advanced options', () => {
+    it('passes custom flags to advanced options when expanded', async () => {
       const dataWithFlags = { ...defaultData, customFlags: '--stats --progress' }
 
       renderWithProviders(
@@ -273,10 +306,11 @@ describe('WizardStepBackupConfig', () => {
         />
       )
 
+      await openPowerAdvanced()
       expect(screen.getByText('Custom Flags: --stats --progress')).toBeInTheDocument()
     })
 
-    it('passes hook scripts to advanced options', () => {
+    it('passes hook scripts to advanced options when expanded', async () => {
       const dataWithScripts = {
         ...defaultData,
         preBackupScript: 'echo "starting"',
@@ -293,13 +327,12 @@ describe('WizardStepBackupConfig', () => {
         />
       )
 
+      await openPowerAdvanced()
       expect(screen.getByText('Pre Script: echo "starting"')).toBeInTheDocument()
       expect(screen.getByText('Post Script: echo "done"')).toBeInTheDocument()
     })
 
     it('calls onChange when remote path changes', async () => {
-      const { userEvent } = await import('@testing-library/user-event')
-      const user = userEvent.setup()
       const onChange = vi.fn()
 
       renderWithProviders(
@@ -312,14 +345,13 @@ describe('WizardStepBackupConfig', () => {
         />
       )
 
+      const user = await openPowerAdvanced()
       await user.click(screen.getByText('Set Remote Path'))
 
       expect(onChange).toHaveBeenCalledWith({ remotePath: '/usr/bin/borg' })
     })
 
     it('calls onChange when custom flags change', async () => {
-      const { userEvent } = await import('@testing-library/user-event')
-      const user = userEvent.setup()
       const onChange = vi.fn()
 
       renderWithProviders(
@@ -332,6 +364,7 @@ describe('WizardStepBackupConfig', () => {
         />
       )
 
+      const user = await openPowerAdvanced()
       await user.click(screen.getByText('Set Custom Flags'))
 
       expect(onChange).toHaveBeenCalledWith({ customFlags: '--stats' })
@@ -339,7 +372,7 @@ describe('WizardStepBackupConfig', () => {
   })
 
   describe('Repository ID', () => {
-    it('passes repository ID to advanced options when editing', () => {
+    it('passes repository ID to advanced options when editing (disclosure mounted)', () => {
       renderWithProviders(
         <WizardStepBackupConfig
           repositoryId={42}
@@ -351,10 +384,10 @@ describe('WizardStepBackupConfig', () => {
         />
       )
 
-      expect(screen.getByTestId('advanced-options')).toBeInTheDocument()
+      expect(screen.getByTestId('power-advanced')).toBeInTheDocument()
     })
 
-    it('handles null repository ID', () => {
+    it('handles null repository ID (disclosure mounted)', () => {
       renderWithProviders(
         <WizardStepBackupConfig
           repositoryId={null}
@@ -366,7 +399,7 @@ describe('WizardStepBackupConfig', () => {
         />
       )
 
-      expect(screen.getByTestId('advanced-options')).toBeInTheDocument()
+      expect(screen.getByTestId('power-advanced')).toBeInTheDocument()
     })
   })
 })

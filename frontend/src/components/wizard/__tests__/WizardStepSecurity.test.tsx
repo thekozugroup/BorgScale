@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { screen, within, renderWithProviders } from '../../../test/test-utils'
+import { screen, renderWithProviders } from '../../../test/test-utils'
 import WizardStepSecurity from '../WizardStepSecurity'
 
 const defaultData = {
@@ -12,10 +12,29 @@ const defaultData = {
 
 describe('WizardStepSecurity', () => {
   describe('Create Mode', () => {
-    it('renders encryption method dropdown', () => {
+    it('renders encryption tiles', () => {
       renderWithProviders(<WizardStepSecurity mode="create" data={defaultData} onChange={vi.fn()} />)
 
-      expect(screen.getByText('Repository Key')).toBeInTheDocument()
+      expect(screen.getByTestId('encryption-tile-encrypted')).toBeInTheDocument()
+      expect(screen.getByTestId('encryption-tile-keyfile')).toBeInTheDocument()
+      expect(screen.getByTestId('encryption-tile-none')).toBeInTheDocument()
+    })
+
+    it('keeps the advanced dropdown hidden by default when encryption matches a tile', () => {
+      const tileMatchData = { ...defaultData, encryption: 'repokey-blake2' }
+      renderWithProviders(<WizardStepSecurity mode="create" data={tileMatchData} onChange={vi.fn()} />)
+
+      // Advanced disclosure container exists but the select is collapsed.
+      expect(screen.getByTestId('security-advanced')).toBeInTheDocument()
+      expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    })
+
+    it('force-opens the advanced disclosure for non-tile encryption values', () => {
+      const customData = { ...defaultData, encryption: 'repokey-chacha20-poly1305' }
+      renderWithProviders(<WizardStepSecurity mode="create" data={customData} onChange={vi.fn()} />)
+
+      // Force-open: the Select trigger is now in the DOM.
+      expect(screen.getByRole('combobox')).toBeInTheDocument()
     })
 
     it('renders passphrase input', () => {
@@ -99,10 +118,15 @@ describe('WizardStepSecurity', () => {
   })
 
   describe('Import Mode', () => {
-    it('does NOT render encryption method dropdown', () => {
-      renderWithProviders(<WizardStepSecurity mode="import" data={defaultData} onChange={vi.fn()} />)
+    it('hides the Encryption Method dropdown by default when value matches a tile', () => {
+      const tileMatchData = { ...defaultData, encryption: 'repokey-blake2' }
+      renderWithProviders(
+        <WizardStepSecurity mode="import" data={tileMatchData} onChange={vi.fn()} />
+      )
 
-      expect(screen.queryByLabelText(/Encryption Method/i)).not.toBeInTheDocument()
+      // Tiles are present; the original Select is collapsed under Advanced.
+      expect(screen.getByTestId('encryption-tile-encrypted')).toBeInTheDocument()
+      expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
     })
 
     it('does NOT show encryption settings warning', () => {
@@ -146,47 +170,54 @@ describe('WizardStepSecurity', () => {
   })
 
   describe('Encryption Selection', () => {
-    it('can select keyfile encryption', async () => {
+    it('can select keyfile encryption via tile', async () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
 
       renderWithProviders(<WizardStepSecurity mode="create" data={defaultData} onChange={onChange} />)
 
-      // Click on the select trigger to open dropdown
-      const selectButton = screen.getByRole('combobox')
-      await user.click(selectButton)
-
-      // Find and click keyfile option in the listbox
-      const listbox = await screen.findByRole('listbox')
-      const keyfileOption = within(listbox).getByText('Key File')
-      await user.click(keyfileOption)
+      await user.click(screen.getByTestId('encryption-tile-keyfile'))
 
       expect(onChange).toHaveBeenCalledWith(
         expect.objectContaining({
-          encryption: 'keyfile',
+          // Borg v1 default keyfile variant
+          encryption: 'keyfile-blake2',
         })
       )
     })
 
-    it('can select no encryption', async () => {
+    it('can select no encryption via tile', async () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
 
       renderWithProviders(<WizardStepSecurity mode="create" data={defaultData} onChange={onChange} />)
 
-      // Click on the select trigger to open dropdown
-      const selectButton = screen.getByRole('combobox')
-      await user.click(selectButton)
-
-      // Find and click none option in the listbox
-      const listbox = await screen.findByRole('listbox')
-      const noneOption = within(listbox).getByText('None')
-      await user.click(noneOption)
+      await user.click(screen.getByTestId('encryption-tile-none'))
 
       expect(onChange).toHaveBeenCalledWith(
         expect.objectContaining({
           encryption: 'none',
         })
+      )
+    })
+
+    it('selects the borg v2 recommended encryption when borgVersion=2', async () => {
+      const user = userEvent.setup()
+      const onChange = vi.fn()
+
+      renderWithProviders(
+        <WizardStepSecurity
+          mode="create"
+          borgVersion={2}
+          data={defaultData}
+          onChange={onChange}
+        />
+      )
+
+      await user.click(screen.getByTestId('encryption-tile-encrypted'))
+
+      expect(onChange).toHaveBeenCalledWith(
+        expect.objectContaining({ encryption: 'repokey-aes-ocb' })
       )
     })
   })

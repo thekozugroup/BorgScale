@@ -560,13 +560,13 @@ describe('RepositoryWizard', () => {
         // Step 4
         await waitFor(
           () => {
-            expect(screen.getByTestId('compression-settings')).toBeInTheDocument()
+            expect(screen.getByTestId('compression-tile-balanced')).toBeInTheDocument()
           },
           { timeout: 5000 }
         )
       }
 
-      it('shows compression settings', async () => {
+      it('shows compression tiles', async () => {
         const user = userEvent.setup()
         renderWizard('create')
 
@@ -576,7 +576,9 @@ describe('RepositoryWizard', () => {
 
         await goToStep4(user)
 
-        expect(screen.getByTestId('compression-settings')).toBeInTheDocument()
+        expect(screen.getByTestId('compression-tile-balanced')).toBeInTheDocument()
+        expect(screen.getByTestId('compression-tile-smaller')).toBeInTheDocument()
+        expect(screen.getByTestId('compression-tile-none')).toBeInTheDocument()
       })
 
       it('shows exclude patterns section', async () => {
@@ -592,7 +594,7 @@ describe('RepositoryWizard', () => {
         expect(screen.getByTestId('exclude-patterns')).toBeInTheDocument()
       })
 
-      it('shows Custom Borg Flags input', async () => {
+      it('shows Custom Borg Flags input inside the power-user disclosure', async () => {
         const user = userEvent.setup()
         renderWizard('create')
 
@@ -602,6 +604,12 @@ describe('RepositoryWizard', () => {
 
         await goToStep4(user)
 
+        // Custom Borg Flags lives inside the power-user disclosure on this step.
+        expect(screen.queryByLabelText(/Custom Borg Flags/i)).not.toBeInTheDocument()
+        const power = screen.getByTestId('power-advanced')
+        const trigger = power.querySelector('button')
+        if (!trigger) throw new Error('power-advanced trigger missing')
+        await user.click(trigger)
         expect(screen.getByLabelText(/Custom Borg Flags/i)).toBeInTheDocument()
       })
 
@@ -657,7 +665,7 @@ describe('RepositoryWizard', () => {
         // Step 4
         await waitFor(
           () => {
-            expect(screen.getByTestId('compression-settings')).toBeInTheDocument()
+            expect(screen.getByTestId('compression-tile-balanced')).toBeInTheDocument()
           },
           { timeout: 5000 }
         )
@@ -743,20 +751,20 @@ describe('RepositoryWizard', () => {
         })
       })
 
-      it('shows Repository Mode selector (Full/Observe)', async () => {
+      it('shows Repository Mode radio cards (Full/Observe)', async () => {
         renderWizard('import')
 
         await waitFor(() => {
-          // MUI Select shows the selected value "Full Repository" and the label
-          expect(screen.getByText('Full Repository')).toBeInTheDocument()
+          expect(screen.getByTestId('mode-card-full')).toBeInTheDocument()
         })
+        expect(screen.getByTestId('mode-card-observe')).toBeInTheDocument()
       })
 
-      it('shows Full Repository option text', async () => {
+      it('shows Full Repository tile copy', async () => {
         renderWizard('import')
 
         await waitFor(() => {
-          expect(screen.getByText('Full Repository')).toBeInTheDocument()
+          expect(screen.getByText(/Back up and manage/i)).toBeInTheDocument()
         })
       })
 
@@ -764,21 +772,21 @@ describe('RepositoryWizard', () => {
         renderWizard('import')
 
         await waitFor(() => {
-          expect(screen.getByText('Full Repository')).toBeInTheDocument()
+          expect(screen.getByTestId('mode-card-full')).toBeInTheDocument()
         })
 
-        // The "Full Repository" text should be visible as the selected option
-        expect(screen.getByText(/Create backups and browse archives/i)).toBeInTheDocument()
+        expect(screen.getByTestId('mode-card-full')).toHaveAttribute('aria-checked', 'true')
       })
 
       it('does NOT show bypass lock checkbox when Full mode is selected', async () => {
         renderWizard('import')
 
         await waitFor(() => {
-          expect(screen.getByText('Full Repository')).toBeInTheDocument()
+          expect(screen.getByTestId('mode-card-full')).toBeInTheDocument()
         })
 
         expect(screen.queryByText(/Read-only storage access/i)).not.toBeInTheDocument()
+        expect(screen.queryByTestId('location-advanced')).not.toBeInTheDocument()
       })
     })
 
@@ -852,7 +860,7 @@ describe('RepositoryWizard', () => {
 
         // Step 4
         await waitFor(() => {
-          expect(screen.getByTestId('compression-settings')).toBeInTheDocument()
+          expect(screen.getByTestId('compression-tile-balanced')).toBeInTheDocument()
         })
         await user.click(screen.getByRole('button', { name: /Next/i }))
 
@@ -918,7 +926,7 @@ describe('RepositoryWizard', () => {
         await user.click(screen.getByRole('button', { name: /Next/i }))
 
         await waitFor(() => {
-          expect(screen.getByTestId('compression-settings')).toBeInTheDocument()
+          expect(screen.getByTestId('compression-tile-balanced')).toBeInTheDocument()
         })
         await user.click(screen.getByRole('button', { name: /Next/i }))
 
@@ -985,7 +993,7 @@ describe('RepositoryWizard', () => {
         await user.click(screen.getByRole('button', { name: /Next/i }))
 
         await waitFor(() => {
-          expect(screen.getByTestId('compression-settings')).toBeInTheDocument()
+          expect(screen.getByTestId('compression-tile-balanced')).toBeInTheDocument()
         })
         await user.click(screen.getByRole('button', { name: /Next/i }))
 
@@ -1008,27 +1016,24 @@ describe('RepositoryWizard', () => {
   // ============================================================
   describe('Import Mode (Observability Only)', () => {
     const selectObserveMode = async (user: ReturnType<typeof userEvent.setup>) => {
-      // MUI Select renders a hidden native select and a visible button
-      // The button has the displayed value and opens the dropdown
-      // We need to find the MUI Select's button element by locating the parent FormControl
-      // and clicking the select within it
-
       // Wait for the component to render
       await waitFor(() => {
         expect(screen.getByLabelText(/Repository Name/i)).toBeInTheDocument()
       })
 
-      // Find the repository mode select trigger and click it
-      const selectButton = screen.getByRole('combobox', { name: /Repository Mode/i })
+      // The new UI shows two radio cards instead of a Select.
+      const observeCard = screen.getByTestId('mode-card-observe')
+      await user.click(observeCard)
+    }
 
-      await user.click(selectButton)
-
-      // Wait for the listbox to appear
-      const listbox = await screen.findByRole('listbox', {}, { timeout: 3000 })
-
-      // Find and click the Observability Only option
-      const observeOption = within(listbox).getByText('Observability Only')
-      await user.click(observeOption)
+    const openLocationAdvanced = async (user: ReturnType<typeof userEvent.setup>) => {
+      const disclosure = screen.getByTestId('location-advanced')
+      const trigger = disclosure.querySelector('button')
+      if (!trigger) throw new Error('location-advanced trigger missing')
+      // If aria-expanded is already true (force-open), the click is a no-op.
+      if (trigger.getAttribute('aria-expanded') !== 'true') {
+        await user.click(trigger)
+      }
     }
 
     describe('Step 1: Repository Location', () => {
@@ -1053,7 +1058,7 @@ describe('RepositoryWizard', () => {
         )
       })
 
-      it('shows bypass lock checkbox when Observe mode is selected', async () => {
+      it('shows bypass lock checkbox under Advanced when Observe mode is selected', async () => {
         const user = userEvent.setup()
         renderWizard('import')
 
@@ -1063,15 +1068,19 @@ describe('RepositoryWizard', () => {
 
         await selectObserveMode(user)
 
+        // bypassLock is set to true when clicking the observe tile, so the
+        // disclosure is collapsed by default. Expand it to see the checkbox.
         await waitFor(
           () => {
-            expect(screen.getByText(/Read-only storage access/i)).toBeInTheDocument()
+            expect(screen.getByTestId('location-advanced')).toBeInTheDocument()
           },
           { timeout: 5000 }
         )
+        await openLocationAdvanced(user)
+        expect(screen.getByText(/Read-only storage access/i)).toBeInTheDocument()
       })
 
-      it('bypass lock checkbox is unchecked by default', async () => {
+      it('bypass lock checkbox is checked by default in observe mode', async () => {
         const user = userEvent.setup()
         renderWizard('import')
 
@@ -1083,16 +1092,18 @@ describe('RepositoryWizard', () => {
 
         await waitFor(
           () => {
-            expect(screen.getByText(/Read-only storage access/i)).toBeInTheDocument()
+            expect(screen.getByTestId('location-advanced')).toBeInTheDocument()
           },
           { timeout: 5000 }
         )
+        await openLocationAdvanced(user)
 
         const checkbox = screen.getByRole('checkbox')
-        expect(checkbox).not.toBeChecked()
+        // Selecting the observe tile flips bypassLock to true automatically.
+        expect(checkbox).toBeChecked()
       })
 
-      it('can check bypass lock checkbox', async () => {
+      it('can toggle the bypass lock checkbox off', async () => {
         const user = userEvent.setup()
         renderWizard('import')
 
@@ -1104,14 +1115,16 @@ describe('RepositoryWizard', () => {
 
         await waitFor(
           () => {
-            expect(screen.getByText(/Read-only storage access/i)).toBeInTheDocument()
+            expect(screen.getByTestId('location-advanced')).toBeInTheDocument()
           },
           { timeout: 5000 }
         )
+        await openLocationAdvanced(user)
 
-        await user.click(screen.getByRole('checkbox'))
-
-        expect(screen.getByRole('checkbox')).toBeChecked()
+        const checkbox = screen.getByRole('checkbox')
+        expect(checkbox).toBeChecked()
+        await user.click(checkbox)
+        expect(checkbox).not.toBeChecked()
       })
     })
 
@@ -1123,9 +1136,11 @@ describe('RepositoryWizard', () => {
 
         await selectObserveMode(user)
 
+        // The advanced disclosure is mounted but collapsed because clicking
+        // the observe tile auto-enables bypassLock.
         await waitFor(
           () => {
-            expect(screen.getByText(/Read-only storage access/i)).toBeInTheDocument()
+            expect(screen.getByTestId('location-advanced')).toBeInTheDocument()
           },
           { timeout: 5000 }
         )
@@ -1197,15 +1212,14 @@ describe('RepositoryWizard', () => {
           expect(screen.getByLabelText(/Repository Name/i)).toBeInTheDocument()
         })
 
-        // Step 1 - Select observe mode and enable bypass lock
+        // Step 1 - Select observe mode (this auto-enables bypass lock)
         await selectObserveMode(user)
         await waitFor(
           () => {
-            expect(screen.getByRole('checkbox')).toBeInTheDocument()
+            expect(screen.getByTestId('location-advanced')).toBeInTheDocument()
           },
           { timeout: 5000 }
         )
-        await user.click(screen.getByRole('checkbox'))
 
         setInputValue(screen.getByLabelText(/Repository Name/i), 'Read Only Repo')
         setInputValue(screen.getByLabelText(/Repository Path/i), '/backup/readonly')
@@ -1259,14 +1273,22 @@ describe('RepositoryWizard', () => {
           expect(screen.getByLabelText(/Repository Name/i)).toBeInTheDocument()
         })
 
-        // Step 1
+        // Step 1 — select observe, then toggle bypass lock off via Advanced
         await selectObserveMode(user)
         await waitFor(
           () => {
-            expect(screen.getByText(/Read-only storage access/i)).toBeInTheDocument()
+            expect(screen.getByTestId('location-advanced')).toBeInTheDocument()
           },
           { timeout: 5000 }
         )
+        const disclosure = screen.getByTestId('location-advanced')
+        const advancedTrigger = disclosure.querySelector('button')
+        if (!advancedTrigger) throw new Error('location-advanced trigger missing')
+        // bypassLock starts true → disclosure collapsed → click to expand.
+        if (advancedTrigger.getAttribute('aria-expanded') !== 'true') {
+          await user.click(advancedTrigger)
+        }
+        await user.click(screen.getByRole('checkbox'))
 
         setInputValue(screen.getByLabelText(/Repository Name/i), 'Observe With Dirs')
         setInputValue(screen.getByLabelText(/Repository Path/i), '/backup/observe')
@@ -1388,7 +1410,7 @@ describe('RepositoryWizard', () => {
       await user.click(screen.getByRole('button', { name: /Next/i }))
       await waitFor(
         () => {
-          expect(screen.getByTestId('compression-settings')).toBeInTheDocument()
+          expect(screen.getByTestId('compression-tile-balanced')).toBeInTheDocument()
         },
         { timeout: 5000 }
       )
@@ -1451,11 +1473,7 @@ describe('RepositoryWizard', () => {
       setInputValue(screen.getByLabelText(/Repository Name/i), 'Imported Repo')
       setInputValue(screen.getByLabelText(/Repository Path/i), '/backups/imported')
 
-      const selectButton = screen.getByRole('combobox', { name: /Repository Mode/i })
-      await user.click(selectButton)
-
-      const listbox = await screen.findByRole('listbox', {}, { timeout: 3000 })
-      await user.click(within(listbox).getByText('Observability Only'))
+      await user.click(screen.getByTestId('mode-card-observe'))
 
       await user.click(screen.getByRole('button', { name: /Next/i }))
       await waitFor(() => {
@@ -1854,7 +1872,7 @@ describe('RepositoryWizard', () => {
 
       // Step 4 - Config
       await waitFor(() => {
-        expect(screen.getByTestId('compression-settings')).toBeInTheDocument()
+        expect(screen.getByTestId('compression-tile-balanced')).toBeInTheDocument()
       })
       await user.click(screen.getByRole('button', { name: /Next/i }))
 
@@ -1997,7 +2015,7 @@ describe('RepositoryWizard', () => {
 
       // Step 4 - Config (exclude patterns hidden for remote source)
       await waitFor(() => {
-        expect(screen.getByTestId('compression-settings')).toBeInTheDocument()
+        expect(screen.getByTestId('compression-tile-balanced')).toBeInTheDocument()
       })
       await user.click(screen.getByRole('button', { name: /Next/i }))
 
@@ -2306,7 +2324,7 @@ describe('RepositoryWizard', () => {
       await user.click(screen.getByRole('button', { name: /Next/i }))
 
       await waitFor(() => {
-        expect(screen.getByTestId('compression-settings')).toBeInTheDocument()
+        expect(screen.getByTestId('compression-tile-balanced')).toBeInTheDocument()
       })
       await user.click(screen.getByRole('button', { name: /Next/i }))
 
