@@ -55,7 +55,39 @@
     "undoneWarning": "This action cannot be undone.",
     "version": "Version",
     "errors": {
-      "unexpectedError": "An unexpected error occurred"
+      "unexpectedError": "An unexpected error occurred",
+      "clipboardFailed": "Could not copy to clipboard"
+    }
+  },
+  "ssh": {
+    "manualPair": {
+      "title": "Quick connect",
+      "quickConnectButton": "Quick connect",
+      "advancedSetupLabel": "Advanced setup (password deploy / manual add)",
+      "intro": "Add a remote host by pasting a key into ~/.ssh/authorized_keys. No password required.",
+      "hostLabel": "Host",
+      "userLabel": "Username",
+      "portLabel": "Port",
+      "preparing": "Preparing key...",
+      "continue": "Continue",
+      "pasteIntro": "Paste this public key into ~/.ssh/authorized_keys on {{user}}@{{host}}, then click Test connection.",
+      "publicKey": "Public key",
+      "step1": "SSH into {{target}} using any method you already have.",
+      "step2": "Run this command (it appends the key safely):",
+      "step3": "Click Test connection below.",
+      "testConnection": "Test connection",
+      "verifying": "Connecting to {{target}}...",
+      "connectedTitle": "Connected!",
+      "connected": "BorgScale can now reach this host.",
+      "connectedWithVersion": "BorgScale found Borg {{version}} on the remote.",
+      "successToast": "SSH connection saved",
+      "failedTitle": "Could not connect",
+      "failedGeneric": "Verification failed. Check the steps above and try again.",
+      "rawErrorToggle": "Show raw error from SSH",
+      "retryTest": "Retry test",
+      "copiedKey": "Public key copied",
+      "copiedCommand": "Command copied",
+      "initFailed": "Could not prepare a key — please try again"
     }
   },
   "firstRun": {
@@ -1906,7 +1938,7 @@
     "parametersUpdatedSuccessfully": "Parameters updated successfully"
   },
   "cronBuilder": {
-    "title": "Cron Expression Builder",
+    "title": "Schedule Builder",
     "minutes": "Minutes",
     "hours": "Hours",
     "dayOfMonth": "Day of Month",
@@ -1958,18 +1990,19 @@
     "add": "Add"
   },
   "pruneSettings": {
-    "keepHourly": "Keep Hourly",
-    "keepHourlyHint": "Hourly backups to keep (0 = disabled)",
-    "keepDaily": "Keep Daily",
-    "keepDailyHint": "Daily backups to keep",
-    "keepWeekly": "Keep Weekly",
-    "keepWeeklyHint": "Weekly backups to keep",
-    "keepMonthly": "Keep Monthly",
-    "keepMonthlyHint": "Monthly backups to keep",
-    "keepQuarterly": "Keep Quarterly",
-    "keepQuarterlyHint": "Quarterly backups to keep (0 = disabled)",
-    "keepYearly": "Keep Yearly",
-    "keepYearlyHint": "Yearly backups to keep"
+    "keepHourly": "Keep hourly backups for",
+    "keepHourlyHint": "Number of hourly snapshots to retain. Set 0 to disable.",
+    "keepDaily": "Keep daily backups for",
+    "keepDailyHint": "Number of daily snapshots to retain.",
+    "keepWeekly": "Keep weekly backups for",
+    "keepWeeklyHint": "Number of weekly snapshots to retain.",
+    "keepMonthly": "Keep monthly backups for",
+    "keepMonthlyHint": "Number of monthly snapshots to retain.",
+    "keepQuarterly": "Keep quarterly backups for",
+    "keepQuarterlyHint": "Number of quarterly snapshots (every 3 months).",
+    "keepYearly": "Keep yearly backups for",
+    "keepYearlyHint": "Number of yearly snapshots to retain.",
+    "suffix": "snapshots"
   },
   "compressionSettings": {
     "title": "Compression Settings",
@@ -2002,7 +2035,9 @@
   "archiveNameTemplate": {
     "label": "Archive Name Template",
     "hint": "Customize archive naming. Available placeholders: {job_name}, {now}, {date}, {time}, {timestamp}",
-    "preview": "Preview:"
+    "preview": "Preview:",
+    "advancedLabel": "Customize archive naming (advanced)",
+    "previewIntro": "Files will be named:"
   },
   "remoteMachineCard": {
     "status": {
@@ -2444,7 +2479,7 @@
         "compactInfo": "Compact reclaims disk space after prune. May take time on large repositories."
       },
       "config": {
-        "scheduleLabel": "Schedule (Cron Expression)",
+        "scheduleLabel": "Backup schedule",
         "scheduleHelper": "Click the clock icon to use the visual builder.",
         "nextRunTimes": "Next 3 Run Times:"
       },
@@ -2804,7 +2839,10 @@
     }
   },
   "cronExpressionInput": {
-    "label": "Schedule"
+    "label": "Schedule",
+    "advancedLabel": "Custom schedule (cron syntax)",
+    "nextRuns": "Next runs",
+    "description": "{{description}}"
   },
   "pathSelectorField": {
     "browseFilesystem": "Browse filesystem",
@@ -3057,7 +3095,7 @@
         "failedToGetCheckJobs": "Failed to get check jobs",
         "failedToGetCompactJobs": "Failed to get compact jobs",
         "failedToGetRunningJobs": "Failed to get running jobs",
-        "invalidCronExpression": "Invalid cron expression",
+        "invalidCronExpression": "Schedule is not valid. Use the preset picker or check the custom syntax.",
         "failedToUpdateCheckSchedule": "Failed to update check schedule",
         "failedToGetCheckSchedule": "Failed to get check schedule",
         "failedParseArchiveList": "Failed to parse archive list",
@@ -3096,7 +3134,9 @@
       "schedule": {
         "adminAccessRequired": "Admin access required",
         "operatorAccessRequired": "Operator or admin access required",
-        "invalidCronExpression": "Invalid cron expression",
+        "invalidCronExpression": "Schedule is not valid. Use the preset picker or check the custom syntax.",
+        "invalidCron": "Schedule is not valid. Use the preset picker or check the custom syntax.",
+        "previewCountOutOfRange": "Preview count must be between 1 and 12.",
         "jobNameExists": "Job name already exists",
         "noRepositoriesConfigured": "Scheduled job has no repositories configured",
         "observabilityOnlyRepo": "Cannot schedule backups for watch-only repositories",
@@ -3112,7 +3152,7 @@
         "failedToggleScheduledJob": "Failed to toggle scheduled job: {{error}}",
         "failedDuplicateScheduledJob": "Failed to duplicate scheduled job: {{error}}",
         "failedRunScheduledJob": "Failed to run scheduled job: {{error}}",
-        "failedValidateCronExpression": "Failed to validate cron expression: {{error}}"
+        "failedValidateCronExpression": "Could not validate the schedule: {{error}}"
       },
       "ssh": {
         "adminAccessRequired": "Admin access required",
@@ -3398,6 +3438,18 @@
     "messages": {
       "repo": {
         "repositoryLocked": "Repository is locked by another process or has a stale lock"
+      }
+    },
+    "ssh": {
+      "hint": {
+        "publicKeyNotAuthorized": "The remote host rejected the key. Make sure you appended the public key to ~/.ssh/authorized_keys for the right user.",
+        "borgNotInstalled": "Connected, but Borg is not installed on the remote. Install borgbackup on that host first.",
+        "connectionRefused": "Nothing is listening on that port. Check the host, port, and firewall.",
+        "timeout": "The connection timed out. Check the hostname and firewall.",
+        "hostKeyFailed": "The remote host's identity changed. Manually clear it from known_hosts and retry.",
+        "noRoute": "No network route to the host. Check VPN/Tailscale.",
+        "dnsFailed": "DNS could not resolve the hostname.",
+        "unknownFailure": "Connection failed for an unknown reason. See the raw error below."
       }
     }
   },

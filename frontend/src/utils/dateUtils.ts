@@ -1,4 +1,5 @@
 import { formatDistance, intervalToDuration } from 'date-fns'
+import cronstrue from 'cronstrue'
 
 /**
  * Format a date string to a compact, locale-aware format.
@@ -129,6 +130,35 @@ export const formatCronHuman = (cronExpression: string): string => {
   }
 
   return cronExpression
+}
+
+/**
+ * Produce a richer plain-English description for a cron expression using
+ * cronstrue, falling back to the hand-rolled {@link formatCronHuman}
+ * when cronstrue cannot parse the value.
+ */
+export const describeCronHuman = (
+  cronExpression: string,
+  locale?: string,
+): string => {
+  if (!cronExpression || !cronExpression.trim()) return ''
+  try {
+    const description = cronstrue.toString(cronExpression, {
+      locale: locale ?? 'en',
+      throwExceptionOnParseError: false,
+      verbose: false,
+    })
+    if (
+      !description ||
+      description.toLowerCase().startsWith('unknown') ||
+      description.toLowerCase().includes('error')
+    ) {
+      return formatCronHuman(cronExpression)
+    }
+    return description
+  } catch {
+    return formatCronHuman(cronExpression)
+  }
 }
 
 /**

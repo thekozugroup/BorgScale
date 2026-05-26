@@ -12,35 +12,35 @@ describe('PruneSettingsInput', () => {
     keepYearly: 1,
   }
 
-  it('renders all six input fields', () => {
+  it('renders all six input fields with plain-English labels', () => {
     const onChange = vi.fn()
     renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
 
-    expect(screen.getByLabelText(/Keep Hourly/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/Keep Daily/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/Keep Weekly/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/Keep Monthly/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/Keep Quarterly/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/Keep Yearly/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/Keep hourly backups for/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/Keep daily backups for/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/Keep weekly backups for/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/Keep monthly backups for/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/Keep quarterly backups for/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/Keep yearly backups for/i)).toBeInTheDocument()
   })
 
   it('displays correct initial values', () => {
     const onChange = vi.fn()
     renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
 
-    expect(screen.getByLabelText(/Keep Hourly/i)).toHaveValue(0)
-    expect(screen.getByLabelText(/Keep Daily/i)).toHaveValue(7)
-    expect(screen.getByLabelText(/Keep Weekly/i)).toHaveValue(4)
-    expect(screen.getByLabelText(/Keep Monthly/i)).toHaveValue(6)
-    expect(screen.getByLabelText(/Keep Quarterly/i)).toHaveValue(0)
-    expect(screen.getByLabelText(/Keep Yearly/i)).toHaveValue(1)
+    expect(screen.getByLabelText(/Keep hourly backups for/i)).toHaveValue(0)
+    expect(screen.getByLabelText(/Keep daily backups for/i)).toHaveValue(7)
+    expect(screen.getByLabelText(/Keep weekly backups for/i)).toHaveValue(4)
+    expect(screen.getByLabelText(/Keep monthly backups for/i)).toHaveValue(6)
+    expect(screen.getByLabelText(/Keep quarterly backups for/i)).toHaveValue(0)
+    expect(screen.getByLabelText(/Keep yearly backups for/i)).toHaveValue(1)
   })
 
   it('calls onChange when hourly value changes', () => {
     const onChange = vi.fn()
     renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
 
-    const hourlyInput = screen.getByLabelText(/Keep Hourly/i)
+    const hourlyInput = screen.getByLabelText(/Keep hourly backups for/i)
     fireEvent.change(hourlyInput, { target: { value: '24' } })
 
     expect(onChange).toHaveBeenCalledWith({
@@ -53,7 +53,7 @@ describe('PruneSettingsInput', () => {
     const onChange = vi.fn()
     renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
 
-    const dailyInput = screen.getByLabelText(/Keep Daily/i)
+    const dailyInput = screen.getByLabelText(/Keep daily backups for/i)
     fireEvent.change(dailyInput, { target: { value: '14' } })
 
     expect(onChange).toHaveBeenCalledWith({
@@ -66,7 +66,7 @@ describe('PruneSettingsInput', () => {
     const onChange = vi.fn()
     renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
 
-    const dailyInput = screen.getByLabelText(/Keep Daily/i)
+    const dailyInput = screen.getByLabelText(/Keep daily backups for/i)
     fireEvent.change(dailyInput, { target: { value: '-5' } })
 
     expect(onChange).toHaveBeenCalledWith({
@@ -79,7 +79,7 @@ describe('PruneSettingsInput', () => {
     const onChange = vi.fn()
     renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
 
-    const weeklyInput = screen.getByLabelText(/Keep Weekly/i)
+    const weeklyInput = screen.getByLabelText(/Keep weekly backups for/i)
     fireEvent.change(weeklyInput, { target: { value: 'invalid' } })
 
     expect(onChange).toHaveBeenCalledWith({
@@ -92,24 +92,32 @@ describe('PruneSettingsInput', () => {
     const onChange = vi.fn()
     renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} disabled={true} />)
 
-    expect(screen.getByLabelText(/Keep Hourly/i)).toBeDisabled()
-    expect(screen.getByLabelText(/Keep Daily/i)).toBeDisabled()
-    expect(screen.getByLabelText(/Keep Weekly/i)).toBeDisabled()
-    expect(screen.getByLabelText(/Keep Monthly/i)).toBeDisabled()
-    expect(screen.getByLabelText(/Keep Quarterly/i)).toBeDisabled()
-    expect(screen.getByLabelText(/Keep Yearly/i)).toBeDisabled()
+    expect(screen.getByLabelText(/Keep hourly backups for/i)).toBeDisabled()
+    expect(screen.getByLabelText(/Keep daily backups for/i)).toBeDisabled()
+    expect(screen.getByLabelText(/Keep weekly backups for/i)).toBeDisabled()
+    expect(screen.getByLabelText(/Keep monthly backups for/i)).toBeDisabled()
+    expect(screen.getByLabelText(/Keep quarterly backups for/i)).toBeDisabled()
+    expect(screen.getByLabelText(/Keep yearly backups for/i)).toBeDisabled()
   })
 
   it('displays helper text for each field', () => {
     const onChange = vi.fn()
     renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
 
-    expect(screen.getByText(/Hourly backups to keep/i)).toBeInTheDocument()
-    expect(screen.getByText(/Daily backups to keep/i)).toBeInTheDocument()
-    expect(screen.getByText(/Weekly backups to keep/i)).toBeInTheDocument()
-    expect(screen.getByText(/Monthly backups to keep/i)).toBeInTheDocument()
-    expect(screen.getByText(/Quarterly backups to keep/i)).toBeInTheDocument()
-    expect(screen.getByText(/Yearly backups to keep/i)).toBeInTheDocument()
+    expect(screen.getByText(/Number of hourly snapshots to retain/i)).toBeInTheDocument()
+    expect(screen.getByText(/Number of daily snapshots to retain/i)).toBeInTheDocument()
+    expect(screen.getByText(/Number of weekly snapshots to retain/i)).toBeInTheDocument()
+    expect(screen.getByText(/Number of monthly snapshots to retain/i)).toBeInTheDocument()
+    expect(screen.getByText(/Number of quarterly snapshots/i)).toBeInTheDocument()
+    expect(screen.getByText(/Number of yearly snapshots to retain/i)).toBeInTheDocument()
+  })
+
+  it('renders the "snapshots" suffix next to each input', () => {
+    const onChange = vi.fn()
+    renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
+
+    // Six fields, each with the suffix
+    expect(screen.getAllByText('snapshots').length).toBe(6)
   })
 
   it('handles zero values correctly', () => {
@@ -134,7 +142,7 @@ describe('PruneSettingsInput', () => {
     const onChange = vi.fn()
     renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} />)
 
-    const yearlyInput = screen.getByLabelText(/Keep Yearly/i)
+    const yearlyInput = screen.getByLabelText(/Keep yearly backups for/i)
     fireEvent.change(yearlyInput, { target: { value: '999' } })
 
     expect(onChange).toHaveBeenCalledWith({

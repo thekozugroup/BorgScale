@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders, screen } from '../../test/test-utils'
 import ScheduleJobCard from '../ScheduleJobCard'
-import { convertCronToLocal, formatCronHuman } from '../../utils/dateUtils'
+import { convertCronToLocal, describeCronHuman } from '../../utils/dateUtils'
 
 const { entityCardMock } = vi.hoisted(() => ({
   entityCardMock: vi.fn(),
@@ -59,7 +59,7 @@ describe('ScheduleJobCard', () => {
     expect(screen.getByTestId('entity-card')).toBeInTheDocument()
 
     const expectedLocalCron = convertCronToLocal(baseJob.cron_expression)
-    const expectedSchedule = formatCronHuman(expectedLocalCron)
+    const expectedSchedule = describeCronHuman(expectedLocalCron, 'en')
     const props = entityCardMock.mock.lastCall?.[0] as
       | {
           stats: Array<{ label: string; value: string; tooltip?: string }>
@@ -75,5 +75,7 @@ describe('ScheduleJobCard', () => {
       tooltip: expectedLocalCron,
     })
     expect(scheduleStat?.tooltip).not.toBe(expectedSchedule)
+    // Verify cronstrue-style human description appears (e.g. "At 10:00 AM" or "At 10:00")
+    expect(expectedSchedule).toMatch(/At\s+/i)
   })
 })

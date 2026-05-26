@@ -809,6 +809,36 @@ async def get_cron_presets(current_user: User = Depends(get_current_user)):
     return {"success": True, "presets": presets}
 
 
+@router.get("/preview")
+def preview_schedule(
+    expr: str,
+    count: int = 3,
+    current_user: User = Depends(get_current_user),
+):
+    """Return next N fire times + a human-readable description for a cron
+    expression. Powers the schedule wizard's live preview."""
+    if count < 1 or count > 12:
+        raise HTTPException(
+            status_code=400,
+            detail={"key": "backend.errors.schedule.previewCountOutOfRange"},
+        )
+    if not croniter.croniter.is_valid(expr):
+        raise HTTPException(
+            status_code=400,
+            detail={"key": "backend.errors.schedule.invalidCron"},
+        )
+    base = datetime.now()
+    itr = croniter.croniter(expr, base)
+    runs = []
+    for _ in range(count):
+        nxt = itr.get_next(datetime)
+        runs.append(nxt.isoformat())
+    return {
+        "expression": expr,
+        "next_runs": runs,
+    }
+
+
 @router.get("/upcoming-jobs")
 async def get_upcoming_jobs(
     hours: int = Query(24, description="Hours to look ahead"),

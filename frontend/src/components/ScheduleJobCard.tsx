@@ -15,7 +15,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import {
   formatDateCompact,
   formatDateTimeFull,
-  formatCronHuman,
+  describeCronHuman,
   convertCronToLocal,
 } from '../utils/dateUtils'
 
@@ -92,9 +92,12 @@ export default function ScheduleJobCard({
   isRunNowPending,
   isDuplicatePending,
 }: ScheduleJobCardProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const localCronExpression = convertCronToLocal(job.cron_expression)
-  const scheduleDisplay = formatCronHuman(localCronExpression)
+  const scheduleDisplay = describeCronHuman(
+    localCronExpression,
+    i18n.resolvedLanguage,
+  )
 
   const stats: StatItem[] = [
     {

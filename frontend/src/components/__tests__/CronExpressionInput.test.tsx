@@ -1,6 +1,26 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen, fireEvent, renderWithProviders } from '../../test/test-utils'
+import userEvent from '@testing-library/user-event'
 import CronExpressionInput from '../CronExpressionInput'
+import { cronMatchesPreset } from '../cronPresets'
+
+// Stub the API so the live "next runs" fetch resolves predictably.
+vi.mock('../../services/api', () => ({
+  default: {
+    get: vi.fn(() =>
+      Promise.resolve({
+        data: {
+          expression: '0 2 * * *',
+          next_runs: [
+            '2026-05-27T02:00:00',
+            '2026-05-28T02:00:00',
+            '2026-05-29T02:00:00',
+          ],
+        },
+      }),
+    ),
+  },
+}))
 
 describe('CronExpressionInput', () => {
   const defaultProps = {
@@ -8,116 +28,153 @@ describe('CronExpressionInput', () => {
     onChange: vi.fn(),
   }
 
-  it('renders with default values', () => {
-    renderWithProviders(<CronExpressionInput {...defaultProps} />)
-
-    const input = screen.getByRole('textbox', { name: /Schedule/i })
-    expect(input).toBeInTheDocument()
-    expect(input).toHaveValue('0 2 * * *')
+  beforeEach(() => {
+    defaultProps.onChange = vi.fn()
   })
 
-  it('calls onChange when cron expression changes', () => {
+  it('renders the preset tabs by default (presets-primary UI)', () => {
+    renderWithProviders(<CronExpressionInput {...defaultProps} />)
+
+    expect(screen.getByTestId('cron-preset-tabs')).toBeInTheDocument()
+    expect(screen.getByText('Minutes')).toBeInTheDocument()
+    expect(screen.getByText('Hourly')).toBeInTheDocument()
+    expect(screen.getByText('Daily')).toBeInTheDocument()
+    expect(screen.getByText('Weekly')).toBeInTheDocument()
+    expect(screen.getByText('Monthly')).toBeInTheDocument()
+  })
+
+  it('renders the default Schedule label when none is supplied', () => {
+    renderWithProviders(<CronExpressionInput {...defaultProps} />)
+    expect(screen.getByText(/^Schedule$/)).toBeInTheDocument()
+  })
+
+  it('renders a custom label when provided', () => {
+    renderWithProviders(
+      <CronExpressionInput {...defaultProps} label="Custom Schedule Label" />,
+    )
+    expect(screen.getByText(/Custom Schedule Label/i)).toBeInTheDocument()
+  })
+
+  it('marks the input as required when required is set (raw input visible)', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<CronExpressionInput {...defaultProps} required />)
+    await user.click(screen.getByText(/Custom schedule \(cron syntax\)/i))
+    const raw = screen.getByPlaceholderText('0 2 * * *')
+    expect(raw).toBeRequired()
+  })
+
+  it('disables the raw input when disabled prop is true', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<CronExpressionInput {...defaultProps} disabled />)
+    await user.click(screen.getByText(/Custom schedule \(cron syntax\)/i))
+    const raw = screen.getByPlaceholderText('0 2 * * *')
+    expect(raw).toBeDisabled()
+  })
+
+  it('hides the raw cron text input until the Advanced disclosure is toggled', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<CronExpressionInput {...defaultProps} />)
+
+    expect(screen.queryByPlaceholderText('0 2 * * *')).not.toBeInTheDocument()
+
+    await user.click(screen.getByText(/Custom schedule \(cron syntax\)/i))
+    const raw = screen.getByPlaceholderText('0 2 * * *')
+    expect(raw).toBeInTheDocument()
+    expect(raw).toHaveValue('0 2 * * *')
+  })
+
+  it('force-opens the Advanced disclosure when the value does not match any preset', () => {
+    renderWithProviders(
+      <CronExpressionInput value="0 0 1,15 * *" onChange={vi.fn()} />,
+    )
+    expect(screen.getByPlaceholderText('0 2 * * *')).toBeInTheDocument()
+  })
+
+  it('renders a cronstrue description for the current value', () => {
+    renderWithProviders(<CronExpressionInput {...defaultProps} />)
+    const desc = screen.getByTestId('cron-description')
+    expect(desc.textContent ?? '').toMatch(/02:00|2:00/i)
+  })
+
+  it('shows helper text inside the Advanced disclosure when provided', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(
+      <CronExpressionInput {...defaultProps} helperText="Custom helper text" />,
+    )
+    await user.click(screen.getByText(/Custom schedule \(cron syntax\)/i))
+    expect(screen.getByText(/Custom helper text/i)).toBeInTheDocument()
+  })
+
+  it('calls onChange when the raw input is edited via Advanced', async () => {
+    const user = userEvent.setup()
     const onChange = vi.fn()
     renderWithProviders(<CronExpressionInput {...defaultProps} onChange={onChange} />)
 
-    const input = screen.getByRole('textbox', { name: /Schedule/i })
-    fireEvent.change(input, { target: { value: '0 0 * * 0' } })
+    await user.click(screen.getByText(/Custom schedule \(cron syntax\)/i))
+    const raw = screen.getByPlaceholderText('0 2 * * *')
+    fireEvent.change(raw, { target: { value: '0 0 * * 0' } })
 
     expect(onChange).toHaveBeenCalledWith('0 0 * * 0')
   })
 
-  it('displays custom label when provided', () => {
-    renderWithProviders(<CronExpressionInput {...defaultProps} label="Custom Schedule Label" />)
-
-    expect(screen.getByRole('textbox', { name: /Custom Schedule Label/i })).toBeInTheDocument()
-  })
-
-  it('displays helper text when provided', () => {
-    renderWithProviders(<CronExpressionInput {...defaultProps} helperText="Custom helper text" />)
-
-    expect(screen.getByText(/Custom helper text/i)).toBeInTheDocument()
-  })
-
-  it('shows placeholder text', () => {
-    renderWithProviders(<CronExpressionInput value="" onChange={vi.fn()} />)
-
-    const input = screen.getByPlaceholderText('0 2 * * *')
-    expect(input).toBeInTheDocument()
-  })
-
-  it('displays required indicator when required prop is true', () => {
-    renderWithProviders(<CronExpressionInput {...defaultProps} required />)
-
-    const input = screen.getByRole('textbox', { name: /Schedule/i })
-    expect(input).toBeRequired()
-  })
-
-  it('disables input when disabled prop is true', () => {
-    renderWithProviders(<CronExpressionInput {...defaultProps} disabled />)
-
-    const input = screen.getByRole('textbox', { name: /Schedule/i })
-    expect(input).toBeDisabled()
-  })
-
-  it('renders CronBuilderDialog button', () => {
-    renderWithProviders(<CronExpressionInput {...defaultProps} />)
-
-    // CronBuilderDialog renders an IconButton - look for it
-    const buttons = screen.getAllByRole('button')
-    expect(buttons.length).toBeGreaterThan(0)
-  })
-
-  it('applies small size styling when size is small', () => {
-    renderWithProviders(<CronExpressionInput {...defaultProps} size="small" />)
-
-    const input = screen.getByRole('textbox', { name: /Schedule/i })
-    expect(input).toBeInTheDocument()
-    // Small size is applied via TextField size prop
-  })
-
-  it('applies medium size styling by default', () => {
-    renderWithProviders(<CronExpressionInput {...defaultProps} />)
-
-    const input = screen.getByRole('textbox', { name: /Schedule/i })
-    expect(input).toBeInTheDocument()
-    // Default size should be medium
-  })
-
-  it('applies monospace font styling', () => {
-    renderWithProviders(<CronExpressionInput {...defaultProps} />)
-
-    const input = screen.getByRole('textbox', { name: /Schedule/i })
-    expect(input).toBeInTheDocument()
-    expect(input).toHaveClass('font-mono')
-  })
-
-  it('handles empty string value', () => {
+  it('handles complex cron expressions via the Advanced raw input', () => {
     const onChange = vi.fn()
-    renderWithProviders(<CronExpressionInput value="" onChange={onChange} />)
-
-    const input = screen.getByRole('textbox', { name: /Schedule/i })
-    expect(input).toHaveValue('')
-
-    fireEvent.change(input, { target: { value: '* * * * *' } })
-    expect(onChange).toHaveBeenCalledWith('* * * * *')
-  })
-
-  it('handles complex cron expressions', () => {
-    const onChange = vi.fn()
-    renderWithProviders(<CronExpressionInput {...defaultProps} onChange={onChange} />)
-
-    const input = screen.getByRole('textbox', { name: /Schedule/i })
-    fireEvent.change(input, { target: { value: '*/15 9-17 * * 1-5' } })
-
+    renderWithProviders(<CronExpressionInput value="0 0 1,15 * *" onChange={onChange} />)
+    // Force-open because the value is non-preset
+    const raw = screen.getByPlaceholderText('0 2 * * *')
+    fireEvent.change(raw, { target: { value: '*/15 9-17 * * 1-5' } })
     expect(onChange).toHaveBeenCalledWith('*/15 9-17 * * 1-5')
   })
 
-  it('allows fullWidth prop to be applied', () => {
-    renderWithProviders(<CronExpressionInput {...defaultProps} />)
+  it('handles empty string value gracefully', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+    renderWithProviders(<CronExpressionInput value="" onChange={onChange} />)
+    // Empty value is treated as "matching a preset" so disclosure is closed
+    await user.click(screen.getByText(/Custom schedule \(cron syntax\)/i))
+    const raw = screen.getByPlaceholderText('0 2 * * *')
+    expect(raw).toHaveValue('')
+    fireEvent.change(raw, { target: { value: '* * * * *' } })
+    expect(onChange).toHaveBeenCalledWith('* * * * *')
+  })
 
-    const input = screen.getByRole('textbox', { name: /Schedule/i })
-    // shadcn Input is wrapped in a w-full div
-    const wrapper = input.closest('.w-full')
-    expect(wrapper).toBeInTheDocument()
+  it('applies the small font size class when size="small"', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<CronExpressionInput {...defaultProps} size="small" />)
+    await user.click(screen.getByText(/Custom schedule \(cron syntax\)/i))
+    const raw = screen.getByPlaceholderText('0 2 * * *')
+    expect(raw.className).toContain('text-sm')
+  })
+
+  it('applies the medium font size class by default', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<CronExpressionInput {...defaultProps} />)
+    await user.click(screen.getByText(/Custom schedule \(cron syntax\)/i))
+    const raw = screen.getByPlaceholderText('0 2 * * *')
+    expect(raw.className).toContain('text-lg')
+  })
+
+  it('applies monospace font styling to the raw input', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<CronExpressionInput {...defaultProps} />)
+    await user.click(screen.getByText(/Custom schedule \(cron syntax\)/i))
+    const raw = screen.getByPlaceholderText('0 2 * * *')
+    expect(raw).toHaveClass('font-mono')
+  })
+
+  it('wraps the whole control in a full-width container', () => {
+    const { container } = renderWithProviders(<CronExpressionInput {...defaultProps} />)
+    expect(container.querySelector('.w-full')).toBeInTheDocument()
+  })
+
+  it('exposes cronMatchesPreset helper that recognises preset shapes', () => {
+    expect(cronMatchesPreset('0 2 * * *')).toBe(true) // daily
+    expect(cronMatchesPreset('*/5 * * * *')).toBe(true) // every-N-minutes
+    expect(cronMatchesPreset('0 3 * * 1,3,5')).toBe(true) // weekly
+    expect(cronMatchesPreset('0 3 15 * *')).toBe(true) // monthly
+    expect(cronMatchesPreset('30 */6 * * *')).toBe(true) // hourly
+    expect(cronMatchesPreset('0 0 1,15 * *')).toBe(false) // complex day list
+    expect(cronMatchesPreset('not a cron')).toBe(false)
+    expect(cronMatchesPreset('')).toBe(true)
   })
 })

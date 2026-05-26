@@ -1,8 +1,27 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen, fireEvent, renderWithProviders } from '../../../../test/test-utils'
+import userEvent from '@testing-library/user-event'
 import WizardStepScheduleConfig from '../WizardStepScheduleConfig'
 
-// Mock cron-parser
+// Mock the live preview API used by CronExpressionInput
+vi.mock('../../../../services/api', () => ({
+  default: {
+    get: vi.fn(() =>
+      Promise.resolve({
+        data: {
+          expression: '0 2 * * *',
+          next_runs: [
+            '2026-05-27T02:00:00',
+            '2026-05-28T02:00:00',
+            '2026-05-29T02:00:00',
+          ],
+        },
+      }),
+    ),
+  },
+}))
+
+// Mock cron-parser used by the wizard for its inline tooltip
 vi.mock('cron-parser', () => ({
   default: {
     parse: vi.fn((expr: string) => {
@@ -34,184 +53,156 @@ describe('WizardStepScheduleConfig', () => {
     vi.clearAllMocks()
   })
 
-  it('renders CronExpressionInput', () => {
+  it('renders the preset tabs (presets-primary UI) by default', () => {
     renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
-
-    expect(screen.getByLabelText(/Schedule \(Cron Expression\)/i)).toBeInTheDocument()
+    expect(screen.getByTestId('cron-preset-tabs')).toBeInTheDocument()
+    expect(screen.getByText('Daily')).toBeInTheDocument()
+    expect(screen.getByText('Weekly')).toBeInTheDocument()
   })
 
-  it('renders ArchiveNameTemplateInput', () => {
+  it('renders the Backup schedule label', () => {
     renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
-
-    expect(screen.getByLabelText(/Archive Name Template/i)).toBeInTheDocument()
+    expect(screen.getByText(/Backup schedule/i)).toBeInTheDocument()
   })
 
-  it('displays cron expression value', () => {
+  it('hides the raw cron text input behind the Advanced disclosure', () => {
     renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
-
-    const cronInput = screen.getByLabelText(/Schedule \(Cron Expression\)/i) as HTMLInputElement
-    expect(cronInput.value).toBe('0 2 * * *')
+    expect(screen.queryByPlaceholderText('0 2 * * *')).not.toBeInTheDocument()
+    expect(
+      screen.getByText(/Custom schedule \(cron syntax\)/i),
+    ).toBeInTheDocument()
   })
 
-  it('displays archive name template value', () => {
+  it('exposes the raw cron input only after opening the Advanced disclosure', async () => {
+    const user = userEvent.setup()
     renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
 
-    const templateInput = screen.getByLabelText(/Archive Name Template/i) as HTMLInputElement
-    expect(templateInput.value).toBe('{job_name}-{now}')
+    await user.click(screen.getByText(/Custom schedule \(cron syntax\)/i))
+    const raw = screen.getByPlaceholderText('0 2 * * *')
+    expect(raw).toBeInTheDocument()
+    expect((raw as HTMLInputElement).value).toBe('0 2 * * *')
   })
 
-  it('calls onChange when cron expression changes', () => {
+  it('calls onChange when the raw cron input is edited via Advanced', async () => {
+    const user = userEvent.setup()
     const onChange = vi.fn()
     renderWithProviders(<WizardStepScheduleConfig {...defaultProps} onChange={onChange} />)
 
-    const cronInput = screen.getByLabelText(/Schedule \(Cron Expression\)/i)
-    fireEvent.change(cronInput, { target: { value: '0 0 * * 0' } })
-
+    await user.click(screen.getByText(/Custom schedule \(cron syntax\)/i))
+    const raw = screen.getByPlaceholderText('0 2 * * *')
+    fireEvent.change(raw, { target: { value: '0 0 * * 0' } })
     expect(onChange).toHaveBeenCalledWith({ cronExpression: '0 0 * * 0' })
   })
 
-  it('calls onChange when archive name template changes', () => {
+  it('renders the archive-name "Files will be named:" preview by default', () => {
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
+    expect(
+      screen.getByTestId('archive-name-preview-intro'),
+    ).toBeInTheDocument()
+  })
+
+  it('hides the archive-name template syntax behind its Advanced disclosure', () => {
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
+    expect(
+      screen.queryByLabelText(/Archive Name Template/i),
+    ).not.toBeInTheDocument()
+  })
+
+  it('opens the archive-name Advanced disclosure when clicked', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
+    await user.click(screen.getByText(/Customize archive naming \(advanced\)/i))
+    const templateInput = screen.getByLabelText(/Archive Name Template/i)
+    expect(templateInput).toBeInTheDocument()
+    expect((templateInput as HTMLInputElement).value).toBe('{job_name}-{now}')
+  })
+
+  it('calls onChange when archive-name template is edited via Advanced', async () => {
+    const user = userEvent.setup()
     const onChange = vi.fn()
     renderWithProviders(<WizardStepScheduleConfig {...defaultProps} onChange={onChange} />)
 
+    await user.click(screen.getByText(/Customize archive naming \(advanced\)/i))
     const templateInput = screen.getByLabelText(/Archive Name Template/i)
     fireEvent.change(templateInput, { target: { value: '{job_name}-{date}' } })
-
     expect(onChange).toHaveBeenCalledWith({ archiveNameTemplate: '{job_name}-{date}' })
   })
 
-  it('displays next run times preview for valid cron expression', () => {
+  it('displays "Next 3 Run Times" tooltip text for a valid cron expression', () => {
     renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
-
     expect(screen.getByText(/Next 3 Run Times:/i)).toBeInTheDocument()
   })
 
-  it('does not display next run times for invalid cron expression', () => {
-    const invalidData = {
-      ...defaultData,
-      cronExpression: 'invalid',
-    }
-
+  it('does not display the wizard tooltip for an invalid cron expression', () => {
+    const invalidData = { ...defaultData, cronExpression: 'invalid' }
     renderWithProviders(<WizardStepScheduleConfig {...defaultProps} data={invalidData} />)
-
     expect(screen.queryByText(/Next 3 Run Times:/i)).not.toBeInTheDocument()
   })
 
-  it('displays helper text for cron expression', () => {
-    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
-
-    expect(screen.getByText(/Click the clock icon to use the visual builder/i)).toBeInTheDocument()
+  it('uses jobName in the archive-name preview', () => {
+    renderWithProviders(
+      <WizardStepScheduleConfig {...defaultProps} jobName="my-custom-job" />,
+    )
+    expect(screen.getByText(/my-custom-job/)).toBeInTheDocument()
   })
 
-  it('passes jobName to ArchiveNameTemplateInput', () => {
-    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} jobName="my-custom-job" />)
-
-    // Check if the preview uses the custom job name
-    const preview = screen.getByText(/my-custom-job/)
-    expect(preview).toBeInTheDocument()
-  })
-
-  it('uses default job name when jobName is empty', () => {
+  it('falls back to example-job when jobName is empty', () => {
     renderWithProviders(<WizardStepScheduleConfig {...defaultProps} jobName="" />)
-
-    // Check if the preview uses the default job name
-    const preview = screen.getByText(/example-job/)
-    expect(preview).toBeInTheDocument()
+    expect(screen.getByText(/example-job/)).toBeInTheDocument()
   })
 
-  it('handles empty cron expression', () => {
-    const emptyData = {
-      ...defaultData,
-      cronExpression: '',
-    }
-
+  it('handles empty cron expression by closing the disclosure (empty matches preset)', () => {
+    const emptyData = { ...defaultData, cronExpression: '' }
     renderWithProviders(<WizardStepScheduleConfig {...defaultProps} data={emptyData} />)
-
-    const cronInput = screen.getByLabelText(/Schedule \(Cron Expression\)/i) as HTMLInputElement
-    expect(cronInput.value).toBe('')
+    // Empty value is treated as preset-matching
+    expect(screen.queryByPlaceholderText('0 2 * * *')).not.toBeInTheDocument()
   })
 
-  it('handles empty archive name template', () => {
-    const emptyData = {
-      ...defaultData,
-      archiveNameTemplate: '',
-    }
-
+  it('handles empty archive name template by still rendering preview', () => {
+    const emptyData = { ...defaultData, archiveNameTemplate: '' }
     renderWithProviders(<WizardStepScheduleConfig {...defaultProps} data={emptyData} />)
-
-    const templateInput = screen.getByLabelText(/Archive Name Template/i) as HTMLInputElement
-    expect(templateInput.value).toBe('')
+    expect(
+      screen.getByTestId('archive-name-preview-intro'),
+    ).toBeInTheDocument()
   })
 
-  it('applies medium size to inputs', () => {
+  it('shows the inline info icon tooltip for next run times', () => {
     renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
-
-    const cronInput = screen.getByLabelText(/Schedule \(Cron Expression\)/i)
-    expect(cronInput).toBeInTheDocument()
-  })
-
-  it('displays first run time inline with next run times label', () => {
-    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
-
-    // First run time is shown inline as text next to the info icon
-    expect(screen.getByText(/Next 3 Run Times:/i)).toBeInTheDocument()
-    // Info icon tooltip is accessible
     const tooltip = screen.getByLabelText(/Next 3 Run Times:/i)
     expect(tooltip).toBeInTheDocument()
   })
 
   it('formats first run time with localeString inline', () => {
     renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
-
-    // First run time is shown inline
     const dates = screen.getAllByText(/1\/1\/2024/i)
     expect(dates.length).toBeGreaterThanOrEqual(1)
   })
 
-  it('updates preview when cron expression changes', () => {
-    const { rerender } = renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
-
+  it('updates the wizard tooltip when cron expression becomes invalid', () => {
+    const { rerender } = renderWithProviders(
+      <WizardStepScheduleConfig {...defaultProps} />,
+    )
     expect(screen.getByText(/Next 3 Run Times:/i)).toBeInTheDocument()
 
-    const newData = {
-      ...defaultData,
-      cronExpression: 'invalid',
-    }
-
+    const newData = { ...defaultData, cronExpression: 'invalid' }
     rerender(<WizardStepScheduleConfig {...defaultProps} data={newData} />)
-
     expect(screen.queryByText(/Next 3 Run Times:/i)).not.toBeInTheDocument()
   })
 
-  it('handles multiple onChange calls', () => {
+  it('supports multiple onChange calls in sequence', async () => {
+    const user = userEvent.setup()
     const onChange = vi.fn()
     renderWithProviders(<WizardStepScheduleConfig {...defaultProps} onChange={onChange} />)
 
-    const cronInput = screen.getByLabelText(/Schedule \(Cron Expression\)/i)
-    fireEvent.change(cronInput, { target: { value: '0 3 * * *' } })
+    await user.click(screen.getByText(/Custom schedule \(cron syntax\)/i))
+    const raw = screen.getByPlaceholderText('0 2 * * *')
+    fireEvent.change(raw, { target: { value: '0 3 * * *' } })
 
+    await user.click(screen.getByText(/Customize archive naming \(advanced\)/i))
     const templateInput = screen.getByLabelText(/Archive Name Template/i)
     fireEvent.change(templateInput, { target: { value: '{date}-backup' } })
 
-    expect(onChange).toHaveBeenCalledTimes(2)
-    expect(onChange).toHaveBeenNthCalledWith(1, { cronExpression: '0 3 * * *' })
-    expect(onChange).toHaveBeenNthCalledWith(2, { archiveNameTemplate: '{date}-backup' })
-  })
-
-  it('renders cron expression as required', () => {
-    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
-
-    const cronInput = screen.getByLabelText(/Schedule \(Cron Expression\)/i)
-    expect(cronInput).toBeRequired()
-  })
-
-  it('displays next run times inline with info tooltip', () => {
-    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
-
-    // First run time shown inline as text
-    expect(screen.getByText(/Next 3 Run Times:/i)).toBeInTheDocument()
-    // Icon tooltip is accessible via aria-label
-    const tooltip = screen.getByLabelText(/Next 3 Run Times:/i)
-    expect(tooltip).toBeInTheDocument()
+    expect(onChange).toHaveBeenCalledWith({ cronExpression: '0 3 * * *' })
+    expect(onChange).toHaveBeenCalledWith({ archiveNameTemplate: '{date}-backup' })
   })
 })

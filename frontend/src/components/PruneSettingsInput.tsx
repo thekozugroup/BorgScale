@@ -39,19 +39,26 @@ const PruneSettingsInput: React.FC<PruneSettingsInputProps> = ({
     { key: 'keepYearly', label: t('pruneSettings.keepYearly'), hint: t('pruneSettings.keepYearlyHint') },
   ]
 
+  const suffix = t('pruneSettings.suffix')
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {fields.map(({ key, label, hint }) => (
         <div key={key} className="flex flex-col gap-1">
           <Label htmlFor={`prune-${key}`}>{label}</Label>
-          <Input
-            id={`prune-${key}`}
-            type="number"
-            value={values[key]}
-            onChange={(e) => handleChange(key, e.target.value)}
-            min={0}
-            disabled={disabled}
-          />
+          <div className="flex items-center gap-2">
+            <Input
+              id={`prune-${key}`}
+              type="number"
+              value={values[key]}
+              onChange={(e) => handleChange(key, e.target.value)}
+              min={0}
+              disabled={disabled}
+            />
+            <span className="text-sm text-muted-foreground whitespace-nowrap">
+              {suffix}
+            </span>
+          </div>
           <p className="text-xs text-muted-foreground">{hint}</p>
         </div>
       ))}
