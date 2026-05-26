@@ -60,8 +60,8 @@ const ExportImportTab: React.FC = () => {
       return response
     },
     onSuccess: (response) => {
-      const contentType = response.headers['content-type'] || 'application/octet-stream'
-      const contentDisposition = response.headers['content-disposition'] || ''
+      const contentType = String(response.headers['content-type'] || 'application/octet-stream')
+      const contentDisposition = String(response.headers['content-disposition'] || '')
       let filename = 'borgscale-export.yaml'
       const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)
       if (filenameMatch && filenameMatch[1]) filename = filenameMatch[1].replace(/['"]/g, '')
