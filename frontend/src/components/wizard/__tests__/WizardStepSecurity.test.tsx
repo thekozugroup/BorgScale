@@ -140,8 +140,8 @@ describe('WizardStepSecurity', () => {
       const keyfileData = { ...defaultData, encryption: 'keyfile' }
       renderWithProviders(<WizardStepSecurity mode="import" data={keyfileData} onChange={vi.fn()} />)
 
-      expect(screen.getByText(/Borg Keyfile \(Optional\)/i)).toBeInTheDocument()
-      expect(screen.getByText(/Choose Keyfile/i)).toBeInTheDocument()
+      expect(screen.getByText(/Encryption key file \(optional\)/i)).toBeInTheDocument()
+      expect(screen.getByText(/Choose key file/i)).toBeInTheDocument()
     })
 
     it('shows selected keyfile name', () => {
@@ -165,7 +165,7 @@ describe('WizardStepSecurity', () => {
 
       renderWithProviders(<WizardStepSecurity mode="import" data={dataWithKeyfile} onChange={vi.fn()} />)
 
-      expect(screen.getByText(/Keyfile will be uploaded after import/i)).toBeInTheDocument()
+      expect(screen.getByText(/Your key file will be uploaded after import/i)).toBeInTheDocument()
     })
   })
 

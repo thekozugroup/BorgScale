@@ -327,7 +327,7 @@ describe('DashboardV3', () => {
     it('shows observe-only badge and monitoring dimensions for observe repositories', async () => {
       mockFetchSuccess(makeOverview())
       renderDashboard()
-      await waitFor(() => expect(screen.getAllByText('Observe Only').length).toBeGreaterThan(0))
+      await waitFor(() => expect(screen.getAllByText('Watch only').length).toBeGreaterThan(0))
       expect(screen.getByText('Fresh')).toBeInTheDocument()
       expect(screen.getByText('Archives')).toBeInTheDocument()
     })

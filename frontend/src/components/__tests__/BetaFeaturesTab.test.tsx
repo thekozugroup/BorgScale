@@ -71,7 +71,7 @@ describe('BetaFeaturesTab', () => {
       renderWithProviders(<BetaFeaturesTab />)
       await waitFor(() => {
         expect(
-          screen.getByText('Enable bypass-lock for all borg info commands')
+          screen.getByText('Allow read operations during another tool\'s lock')
         ).toBeInTheDocument()
       })
     })
@@ -80,7 +80,7 @@ describe('BetaFeaturesTab', () => {
       renderWithProviders(<BetaFeaturesTab />)
       await waitFor(() => {
         expect(
-          screen.getByText('Enable bypass-lock for all borg list commands')
+          screen.getByText('Allow browsing during another tool\'s lock')
         ).toBeInTheDocument()
       })
     })
@@ -102,8 +102,8 @@ describe('BetaFeaturesTab', () => {
     it('renders section headers', async () => {
       renderWithProviders(<BetaFeaturesTab />)
       await waitFor(() => {
-        expect(screen.getByText('Bypass Locks for Info Commands')).toBeInTheDocument()
-        expect(screen.getByText('Bypass Locks for List Commands')).toBeInTheDocument()
+        expect(screen.getByText('Allow concurrent reads (info)')).toBeInTheDocument()
+        expect(screen.getByText('Allow concurrent reads (browse)')).toBeInTheDocument()
         expect(screen.getByText('Fast Borg 2 Archive Browse')).toBeInTheDocument()
         expect(screen.getByText('MQTT Integration')).toBeInTheDocument()
       })
@@ -116,7 +116,7 @@ describe('BetaFeaturesTab', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Enable bypass-lock for all borg info commands')
+          screen.getByText('Allow read operations during another tool\'s lock')
         ).toBeInTheDocument()
       })
 
@@ -133,13 +133,13 @@ describe('BetaFeaturesTab', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Enable bypass-lock for all borg info commands')
+          screen.getByText('Allow read operations during another tool\'s lock')
         ).toBeInTheDocument()
       })
 
       const switches = screen.getAllByRole('switch')
       const infoSwitch = switches.find((sw) =>
-        sw.parentElement?.textContent?.includes('Enable bypass-lock for all borg info commands')
+        sw.parentElement?.textContent?.includes('Allow read operations during another tool\'s lock')
       )
 
       if (infoSwitch) {
@@ -162,13 +162,13 @@ describe('BetaFeaturesTab', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Enable bypass-lock for all borg info commands')
+          screen.getByText('Allow read operations during another tool\'s lock')
         ).toBeInTheDocument()
       })
 
       const switches = screen.getAllByRole('switch')
       const infoSwitch = switches.find((sw) =>
-        sw.parentElement?.textContent?.includes('Enable bypass-lock for all borg info commands')
+        sw.parentElement?.textContent?.includes('Allow read operations during another tool\'s lock')
       )
 
       if (infoSwitch) {
@@ -189,13 +189,13 @@ describe('BetaFeaturesTab', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Enable bypass-lock for all borg info commands')
+          screen.getByText('Allow read operations during another tool\'s lock')
         ).toBeInTheDocument()
       })
 
       const switches = screen.getAllByRole('switch')
       const infoSwitch = switches.find((sw) =>
-        sw.parentElement?.textContent?.includes('Enable bypass-lock for all borg info commands')
+        sw.parentElement?.textContent?.includes('Allow read operations during another tool\'s lock')
       )
 
       if (infoSwitch) {
@@ -233,7 +233,7 @@ describe('BetaFeaturesTab', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Enable bypass-lock for all borg list commands')
+          screen.getByText('Allow browsing during another tool\'s lock')
         ).toBeInTheDocument()
       })
 
@@ -250,13 +250,13 @@ describe('BetaFeaturesTab', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Enable bypass-lock for all borg list commands')
+          screen.getByText('Allow browsing during another tool\'s lock')
         ).toBeInTheDocument()
       })
 
       const switches = screen.getAllByRole('switch')
       const listSwitch = switches.find((sw) =>
-        sw.parentElement?.textContent?.includes('Enable bypass-lock for all borg list commands')
+        sw.parentElement?.textContent?.includes('Allow browsing during another tool\'s lock')
       )
 
       if (listSwitch) {
@@ -398,13 +398,13 @@ describe('BetaFeaturesTab', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Enable bypass-lock for all borg info commands')
+          screen.getByText('Allow read operations during another tool\'s lock')
         ).toBeInTheDocument()
       })
 
       const switches = screen.getAllByRole('switch')
       const infoSwitch = switches.find((sw) =>
-        sw.parentElement?.textContent?.includes('Enable bypass-lock for all borg info commands')
+        sw.parentElement?.textContent?.includes('Allow read operations during another tool\'s lock')
       )
 
       if (infoSwitch) {
@@ -473,16 +473,16 @@ describe('BetaFeaturesTab', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Enable bypass-lock for all borg info commands')
+          screen.getByText('Allow read operations during another tool\'s lock')
         ).toBeInTheDocument()
       })
 
       const switches = screen.getAllByRole('switch')
       const infoSwitch = switches.find((sw) =>
-        sw.parentElement?.textContent?.includes('Enable bypass-lock for all borg info commands')
+        sw.parentElement?.textContent?.includes('Allow read operations during another tool\'s lock')
       )
       const listSwitch = switches.find((sw) =>
-        sw.parentElement?.textContent?.includes('Enable bypass-lock for all borg list commands')
+        sw.parentElement?.textContent?.includes('Allow browsing during another tool\'s lock')
       )
 
       if (infoSwitch && listSwitch) {

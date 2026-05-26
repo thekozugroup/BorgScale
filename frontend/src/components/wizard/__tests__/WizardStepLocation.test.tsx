@@ -229,7 +229,7 @@ describe('WizardStepLocation', () => {
       )
 
       // Disclosure should be force-open so the checkbox is visible.
-      expect(screen.getByText(/Read-only storage access/i)).toBeInTheDocument()
+      expect(screen.getByText(/Allow access during another tool's writes/i)).toBeInTheDocument()
     })
 
     it('does NOT show bypass lock checkbox in full mode', () => {
@@ -243,7 +243,7 @@ describe('WizardStepLocation', () => {
         />
       )
 
-      expect(screen.queryByText(/Read-only storage access/i)).not.toBeInTheDocument()
+      expect(screen.queryByText(/Allow access during another tool's writes/i)).not.toBeInTheDocument()
       expect(screen.queryByTestId('location-advanced')).not.toBeInTheDocument()
     })
 

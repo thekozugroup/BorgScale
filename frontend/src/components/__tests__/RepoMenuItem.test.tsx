@@ -26,26 +26,26 @@ describe('RepoMenuItem', () => {
     it('shows Observe Only chip for observe mode', () => {
       renderWithProviders(<RepoMenuItem name="My Repo" path="/data/backups" mode="observe" />)
 
-      expect(screen.getByText('Observe Only')).toBeInTheDocument()
+      expect(screen.getByText('Watch only')).toBeInTheDocument()
     })
 
     it('does not show Observe Only chip for full mode', () => {
       renderWithProviders(<RepoMenuItem name="My Repo" path="/data/backups" mode="full" />)
 
-      expect(screen.queryByText('Observe Only')).not.toBeInTheDocument()
+      expect(screen.queryByText('Watch only')).not.toBeInTheDocument()
     })
 
     it('does not show Observe Only chip when mode is not set', () => {
       renderWithProviders(<RepoMenuItem name="My Repo" path="/data/backups" />)
 
-      expect(screen.queryByText('Observe Only')).not.toBeInTheDocument()
+      expect(screen.queryByText('Watch only')).not.toBeInTheDocument()
     })
 
     it('can show both v2 and Observe Only chips simultaneously', () => {
       renderWithProviders(<RepoMenuItem name="My Repo" path="/data/backups" borgVersion={2} mode="observe" />)
 
       expect(screen.getByText('v2')).toBeInTheDocument()
-      expect(screen.getByText('Observe Only')).toBeInTheDocument()
+      expect(screen.getByText('Watch only')).toBeInTheDocument()
     })
   })
 

@@ -1,4 +1,5 @@
 import { Database } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import BorgVersionChip from './BorgVersionChip'
 
@@ -22,6 +23,7 @@ export default function RepoMenuItem({
   maintenanceLabel = 'maintenance running',
   hidePath = false,
 }: RepoMenuItemProps) {
+  const { t } = useTranslation()
   return (
     <div className="flex flex-row gap-2 items-center min-w-0 overflow-hidden">
       <Database size={16} className="flex-shrink-0" />
@@ -34,7 +36,7 @@ export default function RepoMenuItem({
               variant="secondary"
               className="h-4 text-2xs font-semibold px-1 border-none"
             >
-              Observe Only
+              {t('repositories.observeOnly')}
             </Badge>
           )}
           {hasRunningMaintenance && (

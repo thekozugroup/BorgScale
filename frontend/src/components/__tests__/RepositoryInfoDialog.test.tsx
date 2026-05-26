@@ -411,7 +411,7 @@ describe('RepositoryInfoDialog', () => {
           onClose={vi.fn()}
         />
       )
-      expect(screen.getByRole('button', { name: /export keyfile/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /export this key file/i })).toBeInTheDocument()
     })
 
     it('does not show export button when has_keyfile is false', () => {
@@ -424,7 +424,7 @@ describe('RepositoryInfoDialog', () => {
           onClose={vi.fn()}
         />
       )
-      expect(screen.queryByRole('button', { name: /export keyfile/i })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /export this key file/i })).not.toBeInTheDocument()
     })
 
     it('calls repositoriesAPI.downloadKeyfile with correct repo id on click', async () => {
@@ -445,7 +445,7 @@ describe('RepositoryInfoDialog', () => {
         />
       )
 
-      fireEvent.click(screen.getByRole('button', { name: /export keyfile/i }))
+      fireEvent.click(screen.getByRole('button', { name: /export this key file/i }))
 
       await waitFor(() => {
         expect(repositoriesAPI.downloadKeyfile).toHaveBeenCalledWith(keyfileRepo.id)

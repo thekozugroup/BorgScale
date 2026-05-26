@@ -92,7 +92,7 @@ describe('WizardStepReview', () => {
         <WizardStepReview mode="create" data={observeData} sshConnections={mockSshConnections} />
       )
 
-      expect(screen.getByText('Observe Only')).toBeInTheDocument()
+      expect(screen.getByText('Watch only')).toBeInTheDocument()
     })
 
     it('shows BorgScale Server for local location', () => {

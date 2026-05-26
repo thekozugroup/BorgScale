@@ -331,7 +331,7 @@ describe('RepositoryCard', () => {
         />
       )
 
-      expect(screen.getByText('Observe Only')).toBeInTheDocument()
+      expect(screen.getByText('Watch only')).toBeInTheDocument()
     })
 
     it('does not display "Observe Only" chip for full mode repositories', () => {
@@ -345,7 +345,7 @@ describe('RepositoryCard', () => {
         />
       )
 
-      expect(screen.queryByText('Observe Only')).not.toBeInTheDocument()
+      expect(screen.queryByText('Watch only')).not.toBeInTheDocument()
     })
 
     it('does not show "Backup Now" button for observe mode', () => {
@@ -936,7 +936,7 @@ describe('RepositoryCard', () => {
 
       // Header elements
       expect(screen.getByText('Test Repository')).toBeInTheDocument()
-      expect(screen.getByText('Observe Only')).toBeInTheDocument()
+      expect(screen.getByText('Watch only')).toBeInTheDocument()
 
       // No Edit button
       expect(screen.queryByRole('button', { name: /Edit/i })).not.toBeInTheDocument()

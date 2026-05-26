@@ -24,28 +24,40 @@ export interface SecurityStepData {
 
 const BORG1_ENCRYPTION_OPTIONS = [
   { value: 'repokey', label: 'Repository Key', desc: 'Key stored in repository (recommended)' },
-  { value: 'repokey-blake2', label: 'Repository Key (BLAKE2)', desc: 'Faster hashing variant' },
+  {
+    value: 'repokey-blake2',
+    label: 'Repository Key (fast variant)',
+    desc: 'Faster hashing variant (blake2)',
+  },
   { value: 'keyfile', label: 'Key File', desc: 'Key stored in a separate file' },
-  { value: 'keyfile-blake2', label: 'Key File (BLAKE2)', desc: 'Key file with faster hashing' },
+  {
+    value: 'keyfile-blake2',
+    label: 'Key File (fast variant)',
+    desc: 'Key file with faster hashing (blake2)',
+  },
   { value: 'none', label: 'None', desc: 'No encryption (not recommended)' },
 ]
 
 const BORG2_ENCRYPTION_OPTIONS = [
   {
     value: 'repokey-aes-ocb',
-    label: 'Repository Key (AES-OCB)',
-    desc: 'Default for Borg 2 · recommended',
+    label: 'Repository Key (modern, recommended)',
+    desc: 'Default for Borg 2 (aes-ocb)',
   },
   {
     value: 'repokey-chacha20-poly1305',
-    label: 'Repository Key (ChaCha20)',
-    desc: 'Alternative AEAD cipher',
+    label: 'Repository Key (alternative cipher)',
+    desc: 'Alternative authenticated cipher (chacha20-poly1305)',
   },
-  { value: 'keyfile-aes-ocb', label: 'Key File (AES-OCB)', desc: 'Key stored in a separate file' },
+  {
+    value: 'keyfile-aes-ocb',
+    label: 'Key File (modern)',
+    desc: 'Key stored in a separate file (aes-ocb)',
+  },
   {
     value: 'keyfile-chacha20-poly1305',
-    label: 'Key File (ChaCha20)',
-    desc: 'Key file with ChaCha20',
+    label: 'Key File (alternative cipher)',
+    desc: 'Key file with alternative authenticated cipher (chacha20-poly1305)',
   },
   { value: 'none', label: 'None', desc: 'No encryption (not recommended)' },
 ]

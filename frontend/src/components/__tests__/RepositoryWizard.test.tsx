@@ -191,7 +191,7 @@ describe('RepositoryWizard', () => {
 
         expect(screen.queryByLabelText(/Repository Mode/i)).not.toBeInTheDocument()
         expect(screen.queryByText('Full Repository')).not.toBeInTheDocument()
-        expect(screen.queryByText('Observability Only')).not.toBeInTheDocument()
+        expect(screen.queryByText('Watch only')).not.toBeInTheDocument()
       })
 
       it('Next button is disabled when name is empty', async () => {
@@ -785,7 +785,7 @@ describe('RepositoryWizard', () => {
           expect(screen.getByTestId('mode-card-full')).toBeInTheDocument()
         })
 
-        expect(screen.queryByText(/Read-only storage access/i)).not.toBeInTheDocument()
+        expect(screen.queryByText(/Allow access during another tool's writes/i)).not.toBeInTheDocument()
         expect(screen.queryByTestId('location-advanced')).not.toBeInTheDocument()
       })
     })
@@ -920,7 +920,7 @@ describe('RepositoryWizard', () => {
         fireEvent.change(fileInput, { target: { files: [uploadedKeyfile] } })
 
         expect(await screen.findByText(/Selected: imported.key/i)).toBeInTheDocument()
-        expect(screen.getByText(/Keyfile will be uploaded after import/i)).toBeInTheDocument()
+        expect(screen.getByText(/Your key file will be uploaded after import/i)).toBeInTheDocument()
 
         setInputValue(screen.getByPlaceholderText(/Enter passphrase/i), 'importpass')
         await user.click(screen.getByRole('button', { name: /Next/i }))
@@ -986,7 +986,7 @@ describe('RepositoryWizard', () => {
         setInputValue(screen.getByPlaceholderText(/BORG_KEY/i), 'BORG_KEY pasted content')
 
         expect(
-          await screen.findByText(/Keyfile content will be saved after import/i)
+          await screen.findByText(/Your key file content will be saved after import/i)
         ).toBeInTheDocument()
 
         setInputValue(screen.getByPlaceholderText(/Enter passphrase/i), 'pastepass')
@@ -1051,7 +1051,7 @@ describe('RepositoryWizard', () => {
         await waitFor(
           () => {
             expect(
-              screen.getByText(/Observability-only repositories can browse and restore/i)
+              screen.getByText(/Watch-only repositories can browse and restore/i)
             ).toBeInTheDocument()
           },
           { timeout: 5000 }
@@ -1077,7 +1077,7 @@ describe('RepositoryWizard', () => {
           { timeout: 5000 }
         )
         await openLocationAdvanced(user)
-        expect(screen.getByText(/Read-only storage access/i)).toBeInTheDocument()
+        expect(screen.getByText(/Allow access during another tool's writes/i)).toBeInTheDocument()
       })
 
       it('bypass lock checkbox is checked by default in observe mode', async () => {
