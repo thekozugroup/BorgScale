@@ -8,6 +8,7 @@ import structlog
 import os
 import asyncio
 import json
+import time
 
 from app.database.database import get_db, SessionLocal
 from app.database.models import (
@@ -632,6 +633,28 @@ class RepositoryImport(BaseModel):
     keyfile_content: Optional[str] = (
         None  # Content of borg keyfile for keyfile/keyfile-blake2 encryption
     )
+
+
+class DiscoveryRequest(BaseModel):
+    roots: Optional[List[str]] = None
+    max_depth: int = 8
+    budget_seconds: float = 30.0
+
+
+class RemoteDiscoveryRequest(BaseModel):
+    connection_id: int
+    roots: Optional[List[str]] = None
+    max_depth: int = 6
+    budget_seconds: float = 30.0
+
+
+class QuickImportRequest(BaseModel):
+    path: str
+    name: Optional[str] = None
+    connection_id: Optional[int] = None
+    passphrase: Optional[str] = None
+    mode: str = "observe"  # observe | full
+    source_directories: Optional[List[str]] = None
 
 
 class RepositoryUpdate(BaseModel):
@@ -1429,6 +1452,107 @@ async def import_repository(
             status_code=500,
             detail={"key": "backend.errors.repo.failedToImportRepository"},
         )
+
+
+@router.post("/discover/local")
+async def discover_local_repositories(
+    req: DiscoveryRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Scan the server's local filesystem for existing Borg repositories.
+
+    Read-only: never writes to disk, never invokes borg. Discovery is
+    signature-based (config file + data/ dir + [repository] INI section).
+    """
+    from app.services.repository_discovery import scan_for_repos, DEFAULT_LOCAL_ROOTS
+
+    roots = req.roots if req.roots else list(DEFAULT_LOCAL_ROOTS)
+    started = time.monotonic()
+    results, partial = await asyncio.to_thread(
+        scan_for_repos,
+        roots,
+        req.max_depth,
+        None,
+        req.budget_seconds,
+    )
+    # mark already_imported using a single DB query against Repository.path
+    existing_paths = {p for (p,) in db.query(Repository.path).all()}
+
+    payload = []
+    for f in results:
+        f.already_imported = f.path in existing_paths
+        payload.append(f.to_dict())
+
+    elapsed_ms = int((time.monotonic() - started) * 1000)
+    return {
+        "found": payload,
+        "scanned_roots": roots,
+        "elapsed_ms": elapsed_ms,
+        "partial": partial,
+    }
+
+
+@router.post("/discover/remote")
+async def discover_remote_repositories(
+    req: RemoteDiscoveryRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """SSH into a registered connection and discover Borg repos remotely."""
+    from app.services.repository_discovery import scan_remote_for_repos
+
+    try:
+        results, partial = await scan_remote_for_repos(
+            req.connection_id, db, req.roots, req.max_depth, req.budget_seconds
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "key": "backend.errors.ssh.connectionNotFound",
+                "params": {"error": str(exc)},
+            },
+        )
+
+    existing_paths = {p for (p,) in db.query(Repository.path).all()}
+    payload = []
+    for f in results:
+        f.already_imported = f.path in existing_paths
+        payload.append(f.to_dict())
+
+    return {
+        "found": payload,
+        "scanned_roots": req.roots,
+        "partial": partial,
+    }
+
+
+@router.post("/quick-import")
+async def quick_import_repository(
+    req: QuickImportRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """One-shot import using friendly defaults from a discovery result.
+
+    Delegates to the existing import_repository flow. Encryption is inferred
+    from whether a passphrase was provided.
+    """
+    encryption = "repokey-blake2" if req.passphrase else "none"
+    mode = req.mode if req.mode in ("full", "observe") else "observe"
+    payload = RepositoryImport(
+        name=req.name or os.path.basename(req.path.rstrip("/")) or "imported-repo",
+        path=req.path,
+        encryption=encryption,
+        passphrase=req.passphrase,
+        compression="lz4",
+        mode=mode,
+        source_directories=req.source_directories,
+        connection_id=req.connection_id,
+        bypass_lock=(mode == "observe"),
+    )
+    return await import_repository(payload, current_user, db)
 
 
 @router.post("/{repo_id}/keyfile")
