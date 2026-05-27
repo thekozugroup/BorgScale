@@ -134,10 +134,31 @@ describe('DiscoveryPicker', () => {
       expect(importCall).toBeDefined()
       expect(importCall![1]).toMatchObject({
         path: '/srv/borg/a',
-        mode: 'observe',
+        mode: 'full',
         passphrase: 'secret',
       })
     })
+  })
+
+  it('defaults the import dialog to full mode', async () => {
+    const { default: api } = await import('../../../services/api')
+    vi.mocked(api.post).mockResolvedValueOnce({
+      data: {
+        found: sampleFound,
+        scanned_roots: ['/srv'],
+        elapsed_ms: 60,
+        partial: false,
+      },
+    } as never)
+
+    renderWithProviders(<DiscoveryPicker mode="local" />)
+    fireEvent.click(screen.getByTestId('discovery-scan-button'))
+
+    fireEvent.click(await screen.findByTestId('import-/srv/borg/a'))
+
+    const modeSelect = document.getElementById('qi-mode') as HTMLSelectElement
+    expect(modeSelect).not.toBeNull()
+    expect(modeSelect.value).toBe('full')
   })
 
   it('requires connectionId before scanning in remote mode', async () => {

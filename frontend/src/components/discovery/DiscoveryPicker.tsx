@@ -49,7 +49,7 @@ export default function DiscoveryPicker({ mode, connectionId, defaultRoots, onIm
   const [scanning, setScanning] = useState(false)
   const [target, setTarget] = useState<FoundRepo | null>(null)
   const [passphrase, setPassphrase] = useState('')
-  const [importMode, setImportMode] = useState<'observe' | 'full'>('observe')
+  const [importMode, setImportMode] = useState<'observe' | 'full'>('full')
   const [name, setName] = useState('')
 
   async function runScan() {
@@ -158,7 +158,7 @@ export default function DiscoveryPicker({ mode, connectionId, defaultRoots, onIm
                   onClick={() => {
                     setTarget(r)
                     setName(r.path.split('/').filter(Boolean).pop() ?? '')
-                    setImportMode('observe')
+                    setImportMode('full')
                     setPassphrase('')
                   }}
                   data-testid={`import-${r.path}`}
@@ -202,8 +202,8 @@ export default function DiscoveryPicker({ mode, connectionId, defaultRoots, onIm
                   value={importMode}
                   onChange={(e) => setImportMode(e.target.value as 'observe' | 'full')}
                 >
-                  <option value="observe">{t('discovery.modePickerObserve')}</option>
                   <option value="full">{t('discovery.modePickerFull')}</option>
+                  <option value="observe">{t('discovery.modePickerObserve')}</option>
                 </select>
               </div>
               {target.encryption_guess === 'encrypted' ? (
