@@ -3466,5 +3466,97 @@
       "migration_notice": "Migration notice",
       "custom_announcement": "Announcement"
     }
+  },
+  "guidedSetup": {
+    "title": "Set up backups",
+    "subtitle": "We'll get you running in under a minute.",
+    "step": {
+      "destination": {
+        "title": "Where should backups live?",
+        "subtitle": "Pick a safe place to store your backups."
+      },
+      "sources": {
+        "title": "What should we back up?",
+        "subtitle": "Add folders you want protected."
+      },
+      "encryption": {
+        "title": "Lock it down",
+        "subtitle": "Pick how BorgScale protects your data."
+      },
+      "schedule": {
+        "title": "How often?",
+        "subtitle": "BorgScale will run quietly in the background."
+      }
+    },
+    "stepBadge": "Step {{current}} of {{total}}",
+    "destination": {
+      "localTile": {
+        "title": "On this server",
+        "desc": "Store backups on the same machine BorgScale runs on."
+      },
+      "sshTile": {
+        "title": "On another machine",
+        "desc": "Send backups to a remote server over SSH."
+      },
+      "pathLabel": "Where to store backups",
+      "pathHelper": "We'll create this folder if it doesn't exist.",
+      "pathStatusOk": "Looks good — empty folder, ready for borg init.",
+      "pathStatusExisting": "This folder already contains a Borg repository.",
+      "pathStatusNotEmpty": "This folder is not empty. Pick a fresh path.",
+      "pathStatusMissing": "Folder doesn't exist yet — BorgScale will create it.",
+      "sshConnection": "Pick the remote machine",
+      "manageSshLink": "Set up SSH first"
+    },
+    "sources": {
+      "addFolder": "Add folder",
+      "suggestHome": "Use my home folder",
+      "noneAdded": "No folders added yet. Add at least one to continue.",
+      "removeFolder": "Remove"
+    },
+    "encryption": {
+      "tileEncrypted": {
+        "title": "Encrypted (recommended)",
+        "desc": "Strong protection with a passphrase only you know."
+      },
+      "tileNone": {
+        "title": "No encryption",
+        "desc": "Faster and simpler — use only on storage you fully trust."
+      },
+      "passphrase": "Passphrase",
+      "confirm": "Confirm passphrase",
+      "passphraseMismatch": "Passphrases don't match.",
+      "passphraseShort": "Use at least 12 characters for a passphrase.",
+      "lossWarning": "If you lose this passphrase, your backups can never be opened. There is no recovery.",
+      "savedConfirm": "I've saved this passphrase somewhere safe."
+    },
+    "schedule": {
+      "presetDaily": {
+        "title": "Every night at 3 AM",
+        "desc": "Most people want this."
+      },
+      "presetWeekly": {
+        "title": "Every Sunday at 3 AM",
+        "desc": "For machines that don't run nightly."
+      },
+      "presetHourly": {
+        "title": "Every hour",
+        "desc": "For systems that change often."
+      },
+      "nextRunsLabel": "Next backups will run on:",
+      "autoStartLabel": "Run my first backup right now",
+      "autoStartHelper": "Recommended — confirms everything is wired up.",
+      "advancedCron": "Custom schedule (cron syntax)"
+    },
+    "confirm": {
+      "summary": "Ready to roll",
+      "submitButton": "Start my first backup",
+      "submitting": "Setting things up…",
+      "successToast": "Backups configured. Your first backup is queued.",
+      "partialToast": "Repository and schedule saved — first backup didn't start. You can run it manually from the dashboard.",
+      "failureToast": "Setup failed. {{error}}"
+    },
+    "back": "Back",
+    "continue": "Continue",
+    "skip": "Skip"
   }
 }

@@ -24,10 +24,10 @@ describe('FirstRunWelcome', () => {
     expect(screen.getByTestId('firstrun-tile-discover-remote')).toBeInTheDocument()
   })
 
-  it('navigates to /repositories?wizard=new on tile click', () => {
+  it('navigates to /guided-setup on tile click', () => {
     renderWithProviders(<FirstRunWelcome />)
     fireEvent.click(screen.getByTestId('firstrun-tile-new'))
-    expect(navigateMock).toHaveBeenCalledWith('/repositories?wizard=new')
+    expect(navigateMock).toHaveBeenCalledWith('/guided-setup')
   })
 
   it('navigates to discover-local', () => {
@@ -46,6 +46,6 @@ describe('FirstRunWelcome', () => {
     renderWithProviders(<FirstRunWelcome />)
     const tile = screen.getByTestId('firstrun-tile-new')
     fireEvent.keyDown(tile, { key: 'Enter' })
-    expect(navigateMock).toHaveBeenCalledWith('/repositories?wizard=new')
+    expect(navigateMock).toHaveBeenCalledWith('/guided-setup')
   })
 })

@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Dashboard from './pages/DashboardV3'
 import FirstRunWelcome from './pages/FirstRunWelcome'
+import GuidedSetup from './pages/GuidedSetup'
 import { useFirstRun } from './hooks/useFirstRun'
 import Backup from './pages/Backup'
 import Archives from './pages/Archives'
@@ -138,6 +139,7 @@ function App() {
         ) : null}
         <Route path="/dashboard" element={<DashboardOrWelcome />} />
         <Route path="/welcome" element={<FirstRunWelcome />} />
+        <Route path="/guided-setup" element={<GuidedSetup />} />
         <Route
           path="/backup"
           element={

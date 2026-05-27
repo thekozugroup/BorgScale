@@ -20,7 +20,7 @@ const TILES: Tile[] = [
     titleKey: 'firstRun.tile.new.title',
     descKey: 'firstRun.tile.new.desc',
     ctaKey: 'firstRun.tile.new.cta',
-    to: '/repositories?wizard=new',
+    to: '/guided-setup',
     testId: 'firstrun-tile-new',
   },
   {
