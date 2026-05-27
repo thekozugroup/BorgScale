@@ -657,6 +657,39 @@ class QuickImportRequest(BaseModel):
     source_directories: Optional[List[str]] = None
 
 
+class GuidedSetupRepositoryPart(BaseModel):
+    name: str
+    path: str
+    mode: str = "full"  # full | observe
+    source_directories: List[str] = []
+    encryption: str = "repokey-blake2"
+    passphrase: Optional[str] = None
+    compression: str = "lz4"
+    connection_id: Optional[int] = None
+    borg_version: int = 1
+
+
+class GuidedSetupSchedulePart(BaseModel):
+    name: str
+    cron_expression: str
+    archive_name_template: str = "{job_name}-{now}"
+    run_prune_after: bool = False
+    run_compact_after: bool = False
+
+
+class GuidedSetupRequest(BaseModel):
+    repository: GuidedSetupRepositoryPart
+    schedule: GuidedSetupSchedulePart
+    auto_start_backup: bool = True
+
+
+class GuidedSetupResponse(BaseModel):
+    repository_id: int
+    scheduled_job_id: int
+    backup_job_id: Optional[int] = None
+    stage: str
+
+
 class TestBackupResponse(BaseModel):
     would_back_up_bytes: Optional[int] = None
     files_count: Optional[int] = None
@@ -3465,3 +3498,292 @@ async def get_check_schedule(
             status_code=500,
             detail={"key": "backend.errors.repo.failedToGetCheckSchedule"},
         )
+
+
+# ---------------------------------------------------------------------------
+# Guided setup — one-shot composite endpoint that creates a repository,
+# attaches a scheduled backup job, and optionally queues the first backup.
+# ---------------------------------------------------------------------------
+
+# Imported at module scope so tests can patch
+# `app.api.repositories.create_scheduled_job` (the actual call site below).
+from app.api.schedule import (
+    ScheduledJobCreate as _ScheduledJobCreate,
+    create_scheduled_job as create_scheduled_job,
+)
+from app.api.backup import (
+    BackupRequest as _BackupRequest,
+    _start_backup_impl as _start_backup_impl,
+)
+
+
+async def _compensate_delete_repo(repo_id: int, db: Session) -> None:
+    """Best-effort rollback: delete DB row + remove repo dir on disk."""
+    import shutil
+
+    try:
+        repo = db.query(Repository).filter(Repository.id == repo_id).first()
+        if repo is None:
+            return
+        if not repo.connection_id and repo.path and os.path.isdir(repo.path):
+            try:
+                shutil.rmtree(repo.path)
+            except OSError as exc:
+                logger.warning(
+                    "guided_setup rollback: could not rm -rf repo dir",
+                    path=repo.path,
+                    error=str(exc),
+                )
+        db.delete(repo)
+        db.commit()
+    except Exception as exc:
+        logger.warning(
+            "guided_setup rollback failed", repo_id=repo_id, error=str(exc)
+        )
+        try:
+            db.rollback()
+        except Exception:
+            pass
+
+
+@router.post("/guided-setup", response_model=GuidedSetupResponse)
+async def guided_setup(
+    req: GuidedSetupRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create repository, scheduled job, and (optionally) queue the first
+    backup in a single atomic call.
+
+    On failure of the schedule stage the partially-created repository (DB row
+    and on-disk directory) is removed via a compensating rollback. A failure
+    of the optional first-backup stage is treated as non-fatal: the repo and
+    schedule are kept and the caller receives ``stage="schedule_created_backup_failed"``.
+    """
+    import croniter as _croniter
+
+    # 1. Field validation (cheap, before any side-effects)
+    if req.repository.mode not in ("full", "observe"):
+        raise HTTPException(
+            status_code=400,
+            detail={"key": "backend.errors.repo.invalidMode"},
+        )
+    if req.repository.encryption != "none" and (
+        not req.repository.passphrase or not req.repository.passphrase.strip()
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail={"key": "backend.errors.repo.passphraseRequired"},
+        )
+    if req.repository.mode == "full" and not req.repository.source_directories:
+        raise HTTPException(
+            status_code=400,
+            detail={"key": "backend.errors.repo.noSourceDirs"},
+        )
+    if not _croniter.croniter.is_valid(req.schedule.cron_expression):
+        raise HTTPException(
+            status_code=400,
+            detail={"key": "backend.errors.schedule.invalidCron"},
+        )
+
+    # 2. Path collision pre-check (local only — SSH layer handles remote)
+    if not req.repository.connection_id:
+        candidate_path = req.repository.path.strip()
+        if candidate_path and not candidate_path.startswith("ssh://"):
+            if not os.path.isabs(candidate_path):
+                candidate_path = os.path.join(settings.data_dir, candidate_path)
+            candidate_path = os.path.abspath(candidate_path)
+            if os.path.exists(candidate_path):
+                if not os.path.isdir(candidate_path):
+                    raise HTTPException(
+                        status_code=409,
+                        detail={"key": "backend.errors.repo.pathNotDirectory"},
+                    )
+                try:
+                    with os.scandir(candidate_path) as _entries:
+                        has_entries = any(True for _ in _entries)
+                except OSError:
+                    has_entries = False
+                if has_entries:
+                    from app.services.repository_discovery import is_borg_repo
+
+                    try:
+                        result = is_borg_repo(candidate_path)
+                        is_repo = bool(result[0]) if isinstance(result, tuple) else bool(result)
+                    except Exception:
+                        is_repo = False
+                    if is_repo:
+                        raise HTTPException(
+                            status_code=409,
+                            detail={
+                                "key": "backend.errors.repo.pathAlreadyBorgRepo"
+                            },
+                        )
+                    raise HTTPException(
+                        status_code=409,
+                        detail={"key": "backend.errors.repo.pathNotEmpty"},
+                    )
+
+    # 3. Name uniqueness pre-check
+    if (
+        db.query(Repository)
+        .filter(Repository.name == req.repository.name)
+        .first()
+        is not None
+    ):
+        raise HTTPException(
+            status_code=409,
+            detail={"key": "backend.errors.repo.nameTaken"},
+        )
+
+    # 4. Stage 1 — create repository via the existing handler.
+    create_payload = RepositoryCreate(
+        name=req.repository.name,
+        path=req.repository.path,
+        mode=req.repository.mode,
+        encryption=req.repository.encryption,
+        passphrase=req.repository.passphrase,
+        compression=req.repository.compression,
+        source_directories=req.repository.source_directories or None,
+        connection_id=req.repository.connection_id,
+        borg_version=req.repository.borg_version,
+    )
+    try:
+        repo_result = await create_repository(create_payload, current_user, db)
+    except HTTPException:
+        # Repo creation already cleaned up after itself; bubble up.
+        raise
+    except Exception as exc:
+        logger.error("guided_setup repository stage failed", error=str(exc))
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "key": "backend.errors.guidedSetup.repoStageFailed",
+                "params": {"error": str(exc)[:200]},
+            },
+        )
+
+    repo_id = _extract_id(repo_result, "repository")
+    if repo_id is None:
+        # Defensive: shape changed unexpectedly. Nothing to roll back because we
+        # don't have an id to address.
+        raise HTTPException(
+            status_code=500,
+            detail={"key": "backend.errors.guidedSetup.repoStageFailed"},
+        )
+
+    # 5. Stage 2 — create scheduled job. On failure, compensate.
+    try:
+        sched_payload = _ScheduledJobCreate(
+            name=req.schedule.name,
+            cron_expression=req.schedule.cron_expression,
+            archive_name_template=req.schedule.archive_name_template,
+            run_prune_after=req.schedule.run_prune_after,
+            run_compact_after=req.schedule.run_compact_after,
+            repository_ids=[repo_id],
+        )
+        sched_result = await create_scheduled_job(sched_payload, current_user, db)
+        scheduled_job_id = _extract_id(sched_result, "job")
+        if scheduled_job_id is None:
+            raise RuntimeError("schedule handler returned no job id")
+    except HTTPException as exc:
+        logger.warning(
+            "guided_setup schedule stage rejected; rolling back repo",
+            repo_id=repo_id,
+            status=exc.status_code,
+            detail=exc.detail,
+        )
+        await _compensate_delete_repo(repo_id, db)
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "key": "backend.errors.guidedSetup.scheduleStageFailed",
+                "params": {"error": str(exc.detail)[:200]},
+            },
+        )
+    except Exception as exc:
+        logger.warning(
+            "guided_setup schedule stage failed; rolling back repo",
+            repo_id=repo_id,
+            error=str(exc),
+        )
+        await _compensate_delete_repo(repo_id, db)
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "key": "backend.errors.guidedSetup.scheduleStageFailed",
+                "params": {"error": str(exc)[:200]},
+            },
+        )
+
+    # 6. Stage 3 — optionally enqueue first backup. Non-fatal on failure.
+    backup_job_id: Optional[int] = None
+    if req.auto_start_backup and req.repository.mode == "full":
+        try:
+            # Look up the persisted repository to get its canonical path
+            # (path normalisation happens inside create_repository).
+            repo_row = (
+                db.query(Repository).filter(Repository.id == repo_id).first()
+            )
+            backup_target = repo_row.path if repo_row is not None else None
+            backup_result = await _start_backup_impl(
+                _BackupRequest(repository=backup_target), current_user, db
+            )
+            backup_job_id = _extract_id(backup_result, "job", id_key="job_id")
+        except HTTPException as exc:
+            logger.warning(
+                "guided_setup backup stage rejected (non-fatal)",
+                repo_id=repo_id,
+                status=exc.status_code,
+                detail=exc.detail,
+            )
+            return GuidedSetupResponse(
+                repository_id=repo_id,
+                scheduled_job_id=scheduled_job_id,
+                backup_job_id=None,
+                stage="schedule_created_backup_failed",
+            )
+        except Exception as exc:
+            logger.warning(
+                "guided_setup backup stage failed (non-fatal)",
+                repo_id=repo_id,
+                error=str(exc),
+            )
+            return GuidedSetupResponse(
+                repository_id=repo_id,
+                scheduled_job_id=scheduled_job_id,
+                backup_job_id=None,
+                stage="schedule_created_backup_failed",
+            )
+
+    return GuidedSetupResponse(
+        repository_id=repo_id,
+        scheduled_job_id=scheduled_job_id,
+        backup_job_id=backup_job_id,
+        stage="ready",
+    )
+
+
+def _extract_id(
+    result: Any, nested_key: Optional[str] = None, id_key: str = "id"
+) -> Optional[int]:
+    """Pull an integer id out of one of the handler return shapes.
+
+    Handles: bare model with .id, dict with top-level id, or dict with a
+    nested object (e.g. {"repository": {"id": N}} or {"job": {"id": N}}).
+    """
+    if result is None:
+        return None
+    direct = getattr(result, id_key, None)
+    if isinstance(direct, int):
+        return direct
+    if isinstance(result, dict):
+        if isinstance(result.get(id_key), int):
+            return result[id_key]
+        if nested_key and isinstance(result.get(nested_key), dict):
+            inner = result[nested_key]
+            if isinstance(inner.get(id_key), int):
+                return inner[id_key]
+            if isinstance(inner.get("id"), int):
+                return inner["id"]
+    return None

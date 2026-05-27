@@ -84,6 +84,9 @@ ENDPOINT_POLICIES: Dict[Tuple[str, str], EndpointPolicy] = {
     ("POST", "/api/repositories/import"): EndpointPolicy(
         ("admin",), "backend.errors.repo.adminAccessRequired"
     ),
+    ("POST", "/api/repositories/guided-setup"): EndpointPolicy(
+        ("admin",), "backend.errors.repo.adminAccessRequired"
+    ),
     ("POST", "/api/repositories/{repo_id}/keyfile"): EndpointPolicy(
         ("admin",), "backend.errors.repo.adminAccessRequired"
     ),
