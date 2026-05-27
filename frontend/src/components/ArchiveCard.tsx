@@ -42,7 +42,7 @@ export default function ArchiveCard({
         className={cn(
           'grid items-center gap-2 px-4 py-[9px]',
           'border-b border-b-border',
-          'transition-all duration-150 hover:bg-foreground/[0.02]',
+          'transition-colors hover:bg-foreground/[0.02]',
           // Desktop: 4-col grid; Mobile: 2-col 2-row
           'md:grid-cols-[minmax(0,1fr)_76px_minmax(180px,220px)_132px]',
           'grid-cols-[1fr_auto] grid-rows-[auto_auto]'

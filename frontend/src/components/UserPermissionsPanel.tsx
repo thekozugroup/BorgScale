@@ -371,7 +371,7 @@ export default function UserPermissionsPanel({
                           type="button"
                           onClick={() => removeMutation.mutate(perm.repository_id)}
                           disabled={removeMutation.isPending}
-                          className="flex items-center justify-center w-7 h-7 rounded flex-shrink-0 opacity-45 hover:opacity-100 hover:bg-destructive/12 text-destructive transition-opacity duration-150 disabled:opacity-20"
+                          className="flex items-center justify-center w-7 h-7 rounded flex-shrink-0 hover:bg-destructive/12 text-destructive disabled:opacity-20"
                         >
                           <Trash2 size={14} />
                         </button>

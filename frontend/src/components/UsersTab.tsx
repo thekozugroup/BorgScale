@@ -519,7 +519,7 @@ const UsersTab: React.FC = () => {
                       type="button"
                       onClick={() => setRoleFilter(opt.value)}
                       className={cn(
-                        'text-xs font-normal rounded-full border px-2.5 py-0.5 transition-all',
+                        'text-xs font-normal rounded-full border px-2.5 py-0.5 transition-colors',
                         isSelected
                           ? 'font-semibold bg-foreground/10 border-foreground/20'
                           : 'bg-transparent border-foreground/10 text-muted-foreground hover:bg-foreground/5 hover:border-foreground/20'
@@ -542,7 +542,7 @@ const UsersTab: React.FC = () => {
                       type="button"
                       onClick={() => setStatusFilter(opt.value)}
                       className={cn(
-                        'text-xs font-normal rounded-full border px-2.5 py-0.5 transition-all flex items-center gap-1.5',
+                        'text-xs font-normal rounded-full border px-2.5 py-0.5 transition-colors flex items-center gap-1.5',
                         isSelected
                           ? 'font-semibold bg-foreground/10 border-foreground/20'
                           : 'bg-transparent border-foreground/10 text-muted-foreground hover:bg-foreground/5'

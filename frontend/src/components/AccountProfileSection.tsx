@@ -141,7 +141,7 @@ export default function AccountProfileSection({
             type="button"
             onClick={onOpenEditProfile}
             aria-label={t('settings.account.editProfile')}
-            className="w-full flex items-center justify-between gap-4 px-5 py-4 rounded-2xl cursor-pointer transition-all duration-150 border border-border hover:border-border/80 hover:bg-muted/20"
+            className="w-full flex items-center justify-between gap-4 px-5 py-4 rounded-2xl cursor-pointer transition-colors border border-border hover:border-border/80 hover:bg-muted/20"
           >
             <div className="flex items-center gap-4 min-w-0">
               <div className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center border border-border bg-muted/30">
@@ -195,7 +195,7 @@ export default function AccountProfileSection({
                       type="button"
                       key={option.key}
                       onClick={() => onDeploymentFormChange({ deployment_type: option.key })}
-                      className={`p-4 rounded-2xl text-left transition-all duration-150 border ${isSelected ? 'border-border bg-primary/5' : 'border-border'}`}
+                      className={`p-4 rounded-2xl text-left border ${isSelected ? 'border-border bg-primary/5' : 'border-border'}`}
                     >
                       <div className="flex items-center gap-3 mb-2">
                         <div className={`w-8 h-8 rounded-xl flex items-center justify-center border border-border ${isSelected ? 'bg-primary/10' : 'bg-muted/30'}`}>

@@ -93,7 +93,7 @@ export default function WizardStepLocation({
                   type="button"
                   onClick={() => onChange({ borgVersion: v })}
                   className={cn(
-                    'px-3 py-1 rounded-md text-xs font-mono transition-all',
+                    'px-3 py-1 rounded-md text-xs font-mono transition-colors',
                     selected
                       ? 'bg-background text-foreground shadow font-bold'
                       : 'text-muted-foreground hover:text-foreground'
@@ -178,15 +178,15 @@ export default function WizardStepLocation({
             type="button"
             onClick={() => handleLocationChange('local')}
             className={cn(
-              'flex-1 flex items-center gap-3 p-4 rounded-lg border-2 text-left transition-all',
+              'flex-1 flex items-center gap-3 p-4 rounded-lg border text-left',
               data.repositoryLocation === 'local'
-                ? 'border-primary bg-primary/5 shadow-sm -translate-y-0.5'
-                : 'border-border hover:border-foreground/30 hover:bg-muted/30 hover:-translate-y-0.5'
+                ? 'border-primary ring-1 ring-primary bg-primary/5'
+                : 'border-border'
             )}
           >
             <div
               className={cn(
-                'flex items-center justify-center w-12 h-12 rounded-xl shrink-0 transition-all',
+                'flex items-center justify-center w-12 h-12 rounded-xl shrink-0 transition-colors',
                 data.repositoryLocation === 'local'
                   ? 'bg-primary text-primary-foreground shadow-md'
                   : 'bg-muted text-muted-foreground'
@@ -208,16 +208,16 @@ export default function WizardStepLocation({
             onClick={() => handleLocationChange('ssh')}
             disabled={isRemoteLocationDisabled}
             className={cn(
-              'flex-1 flex items-center gap-3 p-4 rounded-lg border-2 text-left transition-all',
+              'flex-1 flex items-center gap-3 p-4 rounded-lg border text-left',
               data.repositoryLocation === 'ssh'
-                ? 'border-primary bg-primary/5 shadow-sm -translate-y-0.5'
-                : 'border-border hover:border-foreground/30 hover:bg-muted/30 hover:-translate-y-0.5',
+                ? 'border-primary ring-1 ring-primary bg-primary/5'
+                : 'border-border',
               isRemoteLocationDisabled && 'opacity-50 cursor-not-allowed'
             )}
           >
             <div
               className={cn(
-                'flex items-center justify-center w-12 h-12 rounded-xl shrink-0 transition-all',
+                'flex items-center justify-center w-12 h-12 rounded-xl shrink-0 transition-colors',
                 data.repositoryLocation === 'ssh'
                   ? 'bg-primary text-primary-foreground shadow-md'
                   : 'bg-muted text-muted-foreground'

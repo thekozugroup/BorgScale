@@ -68,7 +68,7 @@ export default function FirstRunWelcome() {
                     navigate(tile.to)
                   }
                 }}
-                className="cursor-pointer transition hover:ring-primary hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                className="cursor-pointer hover:bg-accent/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 data-testid={tile.testId}
               >
                 <CardHeader className="pb-2">

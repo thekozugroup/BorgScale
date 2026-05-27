@@ -73,13 +73,13 @@ export default function WizardStepRestoreDestination({
           type="button"
           onClick={() => handleLocationChange('local')}
           className={cn(
-            'flex-1 min-w-[200px] flex items-center gap-3 p-4 rounded-xl border text-left transition-all duration-200 cursor-pointer',
+            'flex-1 min-w-[200px] flex items-center gap-3 p-4 rounded-xl border text-left cursor-pointer',
             isLocalSelected
-              ? 'border-2 border-primary bg-primary/8 shadow-md -translate-y-0.5'
-              : 'border border-border hover:-translate-y-0.5 hover:shadow-sm'
+              ? 'border-primary ring-1 ring-primary bg-primary/8'
+              : 'border-border'
           )}
         >
-          <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all', isLocalSelected ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground')}>
+          <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors', isLocalSelected ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground')}>
             <Server size={24} />
           </div>
           <div>
@@ -93,13 +93,13 @@ export default function WizardStepRestoreDestination({
             type="button"
             onClick={() => handleLocationChange('ssh')}
             className={cn(
-              'flex-1 min-w-[200px] flex items-center gap-3 p-4 rounded-xl border text-left transition-all duration-200 cursor-pointer',
+              'flex-1 min-w-[200px] flex items-center gap-3 p-4 rounded-xl border text-left cursor-pointer',
               isSSHSelected
-                ? 'border-2 border-primary bg-primary/8 shadow-md -translate-y-0.5'
-                : 'border border-border hover:-translate-y-0.5 hover:shadow-sm'
+                ? 'border-primary ring-1 ring-primary bg-primary/8'
+                : 'border-border'
             )}
           >
-            <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all', isSSHSelected ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground')}>
+            <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors', isSSHSelected ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground')}>
               <Cloud size={24} />
             </div>
             <div>
@@ -160,8 +160,8 @@ export default function WizardStepRestoreDestination({
                 type="button"
                 onClick={() => onChange({ restoreStrategy: value })}
                 className={cn(
-                  'w-full flex items-start gap-3 p-4 rounded-xl border text-left transition-all duration-200',
-                  isSelected ? 'border-2 border-primary bg-primary/8 shadow-sm' : 'border border-border hover:border-foreground/30'
+                  'w-full flex items-start gap-3 p-4 rounded-xl border text-left',
+                  isSelected ? 'border-primary ring-1 ring-primary bg-primary/8' : 'border-border'
                 )}
               >
                 <input type="radio" name="restoreStrategy" checked={isSelected} onChange={() => onChange({ restoreStrategy: value })} className="mt-0.5 flex-shrink-0" />

@@ -84,7 +84,7 @@ export default function AnnouncementModal({
           becomes null before the Radix exit transition completes, intercepting all
           pointer events and blocking sidebar navigation. */}
       <DialogContent
-        className="sm:max-w-md p-0 overflow-hidden gap-0 bg-card text-card-foreground border-border rounded-3xl shadow-xl"
+        className="sm:max-w-md p-0 overflow-hidden gap-0 bg-card text-card-foreground border-border rounded-3xl shadow-md"
       >
         {announcement && (
           <>

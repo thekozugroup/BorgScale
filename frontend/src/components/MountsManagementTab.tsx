@@ -238,7 +238,7 @@ export default function MountsManagementTab() {
         <Tooltip>
           <TooltipTrigger asChild>
             <div
-              className="flex items-center text-muted-foreground opacity-60 hover:opacity-100 transition-opacity duration-150 cursor-help"
+              className="flex items-center text-muted-foreground cursor-help"
             >
               <Info size={15} />
             </div>

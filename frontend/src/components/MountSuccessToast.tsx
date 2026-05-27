@@ -20,7 +20,7 @@ export default function MountSuccessToast({ toastId, command }: MountSuccessToas
   }
 
   return (
-    <div className="flex flex-col gap-3 p-3 rounded-lg max-w-[480px] w-full border border-border bg-background shadow-lg">
+    <div className="flex flex-col gap-3 p-3 rounded-lg max-w-[480px] w-full border border-border bg-background">
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="w-7 h-7 rounded flex items-center justify-center flex-shrink-0 bg-primary/10 text-primary">

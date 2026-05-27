@@ -78,14 +78,13 @@ export default function AppearanceTab() {
                     trackSettings(EventAction.EDIT, { section: 'appearance', setting: 'theme', theme })
                   }}
                   className={cn(
-                    'p-3 rounded-2xl border text-left cursor-pointer transition-all duration-150',
+                    'p-3 rounded-2xl border text-left cursor-pointer',
                     'focus-visible:outline-2 focus-visible:outline-offset-2',
-                    isSelected ? 'shadow-lg' : 'hover:-translate-y-0.5'
+                    isSelected && 'ring-2 ring-primary'
                   )}
                   style={{
                     borderColor: isSelected ? appearanceAccent : undefined,
                     background: isSelected ? `${appearanceAccent}14` : undefined,
-                    boxShadow: isSelected ? `0 10px 24px ${appearanceAccent}29` : undefined,
                   }}
                 >
                   <div className="flex items-center gap-2 mb-3">

@@ -864,8 +864,8 @@ export default function DashboardV3() {
                       }
                     }}
                     className={cn(
-                      'rounded-lg border p-3 cursor-pointer transition-all duration-150',
-                      'hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                      'rounded-lg border p-3 cursor-pointer',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                       cls.card,
                       cls.border
                     )}

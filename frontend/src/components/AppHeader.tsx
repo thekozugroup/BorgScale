@@ -126,7 +126,7 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
         <PopoverContent
           align="end"
           sideOffset={8}
-          className="w-[300px] gap-0 overflow-hidden rounded-2xl p-0 shadow-xl ring-1 ring-border/20"
+          className="w-[300px] gap-0 overflow-hidden rounded-2xl p-0 shadow-md ring-1 ring-border/20"
         >
           {/* ── 1. Hero header ── */}
           <div className="flex items-center gap-3 border-b border-border/10 bg-primary/5 px-3.5 py-3">

@@ -715,7 +715,7 @@ export default function SSHConnectionsSingleKey() {
                     {fingerprintVisible ? <EyeOff size={13} /> : <Eye size={13} />}
                   </button>
                 </div>
-                <p className="text-sm font-medium font-mono break-all transition-all" style={{ filter: fingerprintVisible ? 'none' : 'blur(4px)', userSelect: fingerprintVisible ? 'auto' : 'none' }}>
+                <p className="text-sm font-medium font-mono break-all" style={{ filter: fingerprintVisible ? 'none' : 'blur(4px)', userSelect: fingerprintVisible ? 'auto' : 'none' }}>
                   {systemKey.fingerprint}
                 </p>
               </div>
@@ -730,7 +730,7 @@ export default function SSHConnectionsSingleKey() {
                 </button>
               </div>
               <div className="relative bg-muted/30 p-3 pr-10 rounded-lg border border-border">
-                <p className="text-xs font-mono break-all max-h-24 overflow-auto transition-all" style={{ filter: keyVisible ? 'none' : 'blur(4px)', userSelect: keyVisible ? 'auto' : 'none' }}>
+                <p className="text-xs font-mono break-all max-h-24 overflow-auto" style={{ filter: keyVisible ? 'none' : 'blur(4px)', userSelect: keyVisible ? 'auto' : 'none' }}>
                   {systemKey?.public_key || 'N/A'}
                 </p>
                 <button type="button" onClick={handleCopyPublicKey} title="Copy to clipboard" className="absolute top-2 right-2 p-1 text-muted-foreground hover:text-foreground transition-colors">

@@ -65,7 +65,7 @@ export default function WizardStepIndicator({
                 data-testid={`step-circle-${step.key}`}
                 aria-label={`Go to step ${index + 1}: ${step.label}`}
                 className={[
-                  'flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200 cursor-pointer',
+                  'flex items-center justify-center w-10 h-10 rounded-full transition-colors cursor-pointer',
                   isActive
                     ? 'bg-primary text-primary-foreground scale-110 shadow-md'
                     : 'bg-muted text-muted-foreground hover:bg-muted/80',
@@ -92,7 +92,7 @@ export default function WizardStepIndicator({
             type="button"
             onClick={() => onStepClick?.(index)}
             className={[
-              'relative flex-1 flex items-center justify-center gap-2 py-3 px-2 cursor-pointer transition-all duration-200',
+              'relative flex-1 flex items-center justify-center gap-2 py-3 px-2 cursor-pointer transition-colors',
               isActive
                 ? 'bg-muted/80 text-foreground after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary after:content-[""]'
                 : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground',
@@ -101,7 +101,7 @@ export default function WizardStepIndicator({
             {/* Step icon circle */}
             <span
               className={[
-                'flex items-center justify-center w-7 h-7 rounded-full shrink-0 transition-all duration-200',
+                'flex items-center justify-center w-7 h-7 rounded-full shrink-0 transition-colors',
                 isActive
                   ? 'bg-primary text-primary-foreground scale-105 shadow-sm'
                   : 'bg-muted text-muted-foreground',

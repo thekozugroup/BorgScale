@@ -334,7 +334,7 @@ export default function DataTable<T>({
                       e.stopPropagation()
                       action.onClick(row)
                     }}
-                    className={`w-7 h-7 rounded flex items-center justify-center transition-all duration-150 disabled:opacity-20 disabled:cursor-not-allowed hover:opacity-100 ${actionClass ? `${actionClass.text} ${actionClass.hover}` : 'text-muted-foreground hover:bg-foreground/[0.06]'}`}
+                    className={`w-7 h-7 rounded flex items-center justify-center disabled:opacity-20 disabled:cursor-not-allowed ${actionClass ? `${actionClass.text} ${actionClass.hover}` : 'text-muted-foreground hover:bg-foreground/[0.06]'}`}
                     style={{ opacity: isDisabled ? 0.2 : iconOpacity }}
                   >
                     {action.icon}

@@ -11,13 +11,11 @@ export default function ArchiveCardSkeleton({ index = 0 }: ArchiveCardSkeletonPr
   return (
     <div
       className={cn(
-        'border-b border-border opacity-0',
+        'border-b border-border',
         // Desktop: 4-col grid; mobile: flex-wrap
         'md:grid md:grid-cols-[minmax(0,1fr)_76px_minmax(180px,220px)_132px] md:items-center md:gap-2 md:px-4 md:py-[9px]',
         'flex flex-wrap gap-1.5 px-[14px] py-[10px]',
-        'animate-[archiveSkeletonFadeIn_0.35s_ease_forwards]',
       )}
-      style={{ animationDelay: `${index * 40}ms` }}
     >
       <Skeleton
         className="h-4 rounded-sm"

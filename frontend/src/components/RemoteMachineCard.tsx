@@ -99,7 +99,7 @@ export default function RemoteMachineCard({
 
   return (
     <div
-      className="w-full flex flex-col rounded-2xl border border-border bg-card shadow-sm hover:shadow-md hover:-translate-y-0.5 transition"
+      className="w-full flex flex-col rounded-2xl border border-border bg-card shadow-sm"
     >
       <div className="flex-1 flex flex-col px-4 sm:px-5 pt-4 sm:pt-5 pb-3.5 sm:pb-4">
 

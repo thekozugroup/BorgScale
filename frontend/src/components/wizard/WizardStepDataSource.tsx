@@ -85,17 +85,17 @@ export default function WizardStepDataSource({
           onClick={() => handleDataSourceChange('local')}
           disabled={hasRemoteDirs}
           className={cn(
-            'flex-1 flex flex-col text-left p-4 rounded-lg border-2 transition-all',
+            'flex-1 flex flex-col text-left p-4 rounded-lg border',
             data.dataSource === 'local'
-              ? 'border-primary bg-primary/5 shadow-sm -translate-y-0.5'
-              : 'border-border hover:border-foreground/30 hover:bg-muted/30 hover:-translate-y-0.5',
+              ? 'border-primary ring-1 ring-primary bg-primary/5'
+              : 'border-border',
             hasRemoteDirs && 'opacity-50 cursor-not-allowed'
           )}
         >
           <div className="flex items-center gap-3 mb-2">
             <div
               className={cn(
-                'flex items-center justify-center w-12 h-12 rounded-xl shrink-0 transition-all',
+                'flex items-center justify-center w-12 h-12 rounded-xl shrink-0 transition-colors',
                 data.dataSource === 'local'
                   ? 'bg-primary text-primary-foreground shadow-md'
                   : 'bg-muted text-muted-foreground'
@@ -123,17 +123,17 @@ export default function WizardStepDataSource({
             onClick={() => handleDataSourceChange('remote')}
             disabled={hasLocalDirs || isRemoteToRemoteDisabled}
             className={cn(
-              'w-full flex flex-col text-left p-4 rounded-lg border-2 transition-all h-full',
+              'w-full flex flex-col text-left p-4 rounded-lg border h-full',
               data.dataSource === 'remote'
-                ? 'border-primary bg-primary/5 shadow-sm -translate-y-0.5'
-                : 'border-border hover:border-foreground/30 hover:bg-muted/30 hover:-translate-y-0.5',
+                ? 'border-primary ring-1 ring-primary bg-primary/5'
+                : 'border-border',
               (hasLocalDirs || isRemoteToRemoteDisabled) && 'opacity-50 cursor-not-allowed'
             )}
           >
             <div className="flex items-center gap-3 mb-2">
               <div
                 className={cn(
-                  'flex items-center justify-center w-12 h-12 rounded-xl shrink-0 transition-all',
+                  'flex items-center justify-center w-12 h-12 rounded-xl shrink-0 transition-colors',
                   data.dataSource === 'remote' && !isRemoteToRemoteDisabled
                     ? 'bg-primary text-primary-foreground shadow-md'
                     : 'bg-muted text-muted-foreground'

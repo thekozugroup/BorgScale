@@ -263,7 +263,7 @@ export default function QuickConnectModal({ open, onOpenChange, onSuccess }: Pro
 
         {step === 'success' && (
           <div className="py-8 flex flex-col items-center gap-3" data-testid="qc-success">
-            <Check className="h-12 w-12 text-green-500" />
+            <Check className="h-12 w-12 text-primary" />
             <div className="text-center">
               <p className="font-medium">{t('ssh.manualPair.connectedTitle')}</p>
               <p className="text-sm text-muted-foreground mt-1">

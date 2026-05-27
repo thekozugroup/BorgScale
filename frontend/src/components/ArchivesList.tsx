@@ -229,7 +229,7 @@ export default function ArchivesList({
   // Pill button helper
   const pillCls = (active: boolean, colorActive?: string) =>
     cn(
-      'flex items-center gap-1 px-3 py-1 rounded-xl border cursor-pointer select-none text-xs font-semibold transition-all duration-150',
+      'flex items-center gap-1 px-3 py-1 rounded-xl border cursor-pointer select-none text-xs font-semibold transition-colors',
       active
         ? colorActive
           ? colorActive

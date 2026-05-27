@@ -156,8 +156,8 @@ export default function RepositoryInfoDialog({
                                 aria-label={t('dialogs.repositoryInfo.exportKeyfileTooltip')}
                                 className={cn(
                                   'inline-flex size-7.5 items-center justify-center rounded-md',
-                                  'bg-primary text-primary-foreground transition-transform',
-                                  'hover:scale-110 hover:bg-primary/90'
+                                  'bg-primary text-primary-foreground',
+                                  'hover:bg-primary/90'
                                 )}
                               >
                                 <Download size={14} />

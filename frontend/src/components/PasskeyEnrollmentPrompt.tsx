@@ -102,8 +102,7 @@ export default function PasskeyEnrollmentPrompt({
         <div className="relative mb-5 flex items-center justify-center">
           <div
             aria-hidden="true"
-            className="absolute w-24 h-24 rounded-full border border-border animate-ping"
-            style={{ animationDuration: '2.4s' }}
+            className="absolute w-24 h-24 rounded-full border border-border"
           />
           <div
             aria-hidden="true"

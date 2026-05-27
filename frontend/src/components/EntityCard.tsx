@@ -70,7 +70,7 @@ export default function EntityCard({
 }: EntityCardProps) {
   return (
     <div
-      className="relative rounded-lg border border-border bg-card text-card-foreground overflow-hidden max-w-full min-w-0 transition-shadow duration-200 hover:shadow-md shadow-sm"
+      className="relative rounded-lg border border-border bg-card text-card-foreground overflow-hidden max-w-full min-w-0 shadow-sm"
     >
       <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3.5 sm:pb-4">
         {/* Header */}

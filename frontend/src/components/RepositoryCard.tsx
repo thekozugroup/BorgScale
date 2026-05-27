@@ -200,14 +200,8 @@ export default function RepositoryCard({
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-xl bg-card',
-        isMaintenanceRunning
-          ? 'shadow-[0_0_0_1px_theme(colors.border),0_4px_16px_theme(colors.black/20)] ring-1 ring-border'
-          : 'shadow-[0_0_0_1px_theme(colors.border),0_2px_8px_theme(colors.black/7%)] dark:shadow-[0_0_0_1px_theme(colors.border),0_4px_16px_theme(colors.black/25%)]',
-        'transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5',
-        isMaintenanceRunning
-          ? 'hover:shadow-[0_0_0_1px_theme(colors.border),0_8px_24px_theme(colors.black/28)]'
-          : 'hover:shadow-[0_0_0_1px_theme(colors.border),0_8px_24px_theme(colors.black/12)]'
+        'relative overflow-hidden rounded-xl border border-border bg-card shadow-sm',
+        isMaintenanceRunning && 'ring-1 ring-border'
       )}
     >
       {/* Ambient glow when maintenance running */}

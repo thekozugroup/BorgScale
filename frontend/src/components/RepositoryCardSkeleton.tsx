@@ -15,12 +15,8 @@ export default function RepositoryCardSkeleton({ index = 0 }: RepositoryCardSkel
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-xl border bg-card',
-        'shadow-[0_0_0_1px_theme(colors.border),0_2px_8px_theme(colors.black/7%)] dark:shadow-[0_0_0_1px_theme(colors.border),0_4px_16px_theme(colors.black/25%)]',
-        'opacity-0 animate-[skeletonFadeIn_0.4s_ease_forwards]',
-        '[animation-delay:var(--delay)]'
+        'relative overflow-hidden rounded-xl border bg-card shadow-sm',
       )}
-      style={{ '--delay': `${index * 80}ms` } as React.CSSProperties}
     >
       <div className="px-4 pb-3.5 pt-4 sm:px-5">
         {/* ── Header ── */}

@@ -65,7 +65,7 @@ export default function ResponsiveDialog({
             onClick={handleClose}
           >
             <div
-              className="w-full bg-background rounded-t-2xl max-h-[90vh] flex flex-col shadow-2xl"
+              className="w-full bg-background rounded-t-2xl max-h-[90vh] flex flex-col shadow-lg"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Drag handle row */}

@@ -259,7 +259,7 @@ export default function WizardStepSecurity({
                   onChange({ selectedKeyfile: null })
                 }}
                 className={cn(
-                  'flex items-center gap-1.5 px-3 py-1 rounded-md text-xs transition-all',
+                  'flex items-center gap-1.5 px-3 py-1 rounded-md text-xs transition-colors',
                   keyfileMode === m
                     ? 'bg-background text-foreground shadow font-semibold'
                     : 'text-muted-foreground hover:text-foreground'
@@ -283,7 +283,7 @@ export default function WizardStepSecurity({
           {keyfileMode === 'file' ? (
             <label
               className={cn(
-                'flex items-center gap-2 px-3 py-3 border-2 border-dashed rounded-lg cursor-pointer text-sm',
+                'flex items-center gap-2 px-3 py-3 border border-dashed rounded-lg cursor-pointer text-sm',
                 'text-muted-foreground hover:border-foreground/30 hover:text-foreground transition-colors'
               )}
             >

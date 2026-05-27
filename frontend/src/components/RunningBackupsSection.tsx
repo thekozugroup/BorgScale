@@ -90,7 +90,7 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
             return (
               <div
                 key={job.id}
-                className="relative rounded-lg overflow-hidden bg-primary/5 shadow-[inset_0_0_0_1px_theme(colors.border)]"
+                className="relative rounded-lg overflow-hidden bg-primary/5 border border-border"
               >
                 {/* Ambient glow blob */}
                 <div

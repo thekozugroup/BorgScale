@@ -87,10 +87,10 @@ export default function WizardStepRestorePath({
           type="button"
           onClick={() => onChange({ restoreStrategy: 'original' })}
           className={cn(
-            'w-full flex items-start gap-3 p-4 rounded-xl border text-left transition-all duration-200',
+            'w-full flex items-start gap-3 p-4 rounded-xl border text-left',
             data.restoreStrategy === 'original'
-              ? 'border-2 border-primary bg-primary/5 shadow-sm'
-              : 'border border-border hover:border-foreground/30'
+              ? 'border-primary ring-1 ring-primary bg-primary/5'
+              : 'border-border'
           )}
         >
           <input type="radio" name="restoreStrategy" checked={data.restoreStrategy === 'original'} onChange={() => onChange({ restoreStrategy: 'original' })}  className="mt-0.5 flex-shrink-0" />
@@ -108,10 +108,10 @@ export default function WizardStepRestorePath({
           type="button"
           onClick={() => onChange({ restoreStrategy: 'custom' })}
           className={cn(
-            'w-full flex items-start gap-3 p-4 rounded-xl border text-left transition-all duration-200',
+            'w-full flex items-start gap-3 p-4 rounded-xl border text-left',
             data.restoreStrategy === 'custom'
-              ? 'border-2 border-primary bg-primary/5 shadow-sm'
-              : 'border border-border hover:border-foreground/30'
+              ? 'border-primary ring-1 ring-primary bg-primary/5'
+              : 'border-border'
           )}
         >
           <input type="radio" name="restoreStrategy" checked={data.restoreStrategy === 'custom'} onChange={() => onChange({ restoreStrategy: 'custom' })}  className="mt-0.5 flex-shrink-0" />

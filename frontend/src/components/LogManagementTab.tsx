@@ -269,7 +269,7 @@ const LogManagementTab: React.FC = () => {
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all duration-300 ${isHighUsage ? 'bg-destructive' : 'bg-primary'}`}
+                      className={`h-full rounded-full ${isHighUsage ? 'bg-destructive' : 'bg-primary'}`}
                       style={{ width: `${Math.min(usagePercent, 100)}%` }}
                     />
                   </div>

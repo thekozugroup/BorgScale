@@ -32,7 +32,7 @@ function StatCard({ label, value, icon, bgOpacity = '10', tooltip }: StatCardPro
 
   const card = (
     <div
-      className={`rounded-lg px-4 py-3.5 transition-all duration-200 hover:-translate-y-px ${bgClass} border border-primary/20 hover:border-primary/40`}
+      className={`rounded-lg px-4 py-3.5 ${bgClass} border border-primary/20`}
     >
       <div className="flex justify-between items-start">
         <div>

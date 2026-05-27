@@ -71,7 +71,7 @@ function SidebarBrandMark() {
   return (
     <Link
       to="/dashboard"
-      className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sidebar-foreground no-underline transition-opacity hover:opacity-80"
+      className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sidebar-foreground no-underline hover:bg-accent"
       aria-label="BorgScale"
     >
       <Boxes size={24} className="shrink-0" />

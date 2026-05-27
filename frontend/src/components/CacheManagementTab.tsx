@@ -226,7 +226,7 @@ const CacheManagementTab: React.FC = () => {
               <p className="text-sm text-muted-foreground">{t('cache.cacheUsageDetail', { used: sizeMb.toFixed(1), max: maxSizeFromStats, percent: usagePercent.toFixed(1) })}</p>
             </div>
             <div className="h-2 rounded-full overflow-hidden bg-muted">
-              <div className={`h-full rounded-full transition-all ${usagePercent >= 80 ? 'bg-destructive' : 'bg-primary'}`} style={{ width: `${Math.min(usagePercent, 100)}%` }} />
+              <div className={`h-full rounded-full ${usagePercent >= 80 ? 'bg-destructive' : 'bg-primary'}`} style={{ width: `${Math.min(usagePercent, 100)}%` }} />
             </div>
           </div>
 

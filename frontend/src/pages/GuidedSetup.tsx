@@ -610,10 +610,10 @@ function DestinationTile({
       onClick={onSelect}
       data-testid={testId}
       className={cn(
-        'flex items-start gap-3 p-4 rounded-lg border-2 text-left transition-all',
+        'flex items-start gap-3 p-4 rounded-lg border text-left',
         selected
-          ? 'border-primary bg-primary/5 shadow-sm'
-          : 'border-border hover:border-foreground/30 hover:bg-muted/30'
+          ? 'border-primary ring-1 ring-primary bg-primary/5'
+          : 'border-border'
       )}
     >
       <div
@@ -1012,10 +1012,10 @@ function PresetCard({
       onClick={onSelect}
       data-testid={testId}
       className={cn(
-        'flex flex-col items-start gap-1 p-4 rounded-lg border-2 text-left transition-all',
+        'flex flex-col items-start gap-1 p-4 rounded-lg border text-left',
         selected
-          ? 'border-primary bg-primary/5 shadow-sm'
-          : 'border-border hover:border-foreground/30 hover:bg-muted/30'
+          ? 'border-primary ring-1 ring-primary bg-primary/5'
+          : 'border-border'
       )}
     >
       <div

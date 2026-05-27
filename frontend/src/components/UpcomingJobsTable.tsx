@@ -56,7 +56,7 @@ const UpcomingJobsTable: React.FC<UpcomingJobsTableProps> = ({
         {upcomingJobs.slice(0, 5).map((job) => (
           <Tooltip key={job.id}>
             <TooltipTrigger asChild>
-              <div className="flex items-center gap-4 px-4 py-3 rounded-lg border border-border bg-muted/30 transition-all duration-150 cursor-default hover:bg-muted/50">
+              <div className="flex items-center gap-4 px-4 py-3 rounded-lg border border-border bg-muted/30 transition-colors cursor-default hover:bg-muted/50">
                 {/* Left accent bar */}
                 <div className="w-0.5 h-8 rounded-full flex-shrink-0 bg-primary" />
 
