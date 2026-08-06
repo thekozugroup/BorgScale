@@ -126,7 +126,7 @@ class TestProcessUtils:
         # Verify SSH setup
         env = mock_run.call_args[1]["env"]
         assert "BORG_RSH" in env
-        assert "ssh -o StrictHostKeyChecking=no" in env["BORG_RSH"]
+        assert "StrictHostKeyChecking=accept-new" in env["BORG_RSH"]
 
     def test_cleanup_orphaned_jobs(self):
         """Test cleanup of orphaned jobs"""

@@ -11,9 +11,9 @@ from pydantic import BaseModel
 import structlog
 
 from app.database.database import get_db
-from app.database.models import User
+from app.database.models import Repository, User
 from app.core.authorization import authorize_request
-from app.core.security import get_current_user
+from app.core.security import check_repo_access, get_current_user
 from app.services.mount_service import mount_service, MountType, MountUnavailableError
 from app.utils.datetime_utils import serialize_datetime
 
@@ -104,6 +104,18 @@ async def mount_borg_archive(
             mount_point=request.mount_point,
         )
 
+        # Mounting exposes the archive's entire contents on the filesystem, so
+        # it carries the same per-repository requirement as reading it.
+        repository = (
+            db.query(Repository).filter(Repository.id == request.repository_id).first()
+        )
+        if not repository:
+            raise HTTPException(
+                status_code=404,
+                detail={"key": "backend.errors.restore.repositoryNotFound"},
+            )
+        check_repo_access(db, current_user, repository, "operator")
+
         # Mount the archive
         mount_point, mount_id = await mount_service.mount_borg_archive(
             repository_id=request.repository_id,
@@ -143,6 +155,10 @@ async def mount_borg_archive(
         raise HTTPException(
             status_code=503, detail={"key": e.error_key, "params": {"error": str(e)}}
         )
+    except HTTPException:
+        # A deliberate 403 or 404 must reach the client as itself; the catch-all
+        # below would relabel an authorization denial as a server error.
+        raise
     except Exception as e:
         logger.error(
             "Failed to mount Borg archive",

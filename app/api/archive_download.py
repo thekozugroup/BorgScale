@@ -41,6 +41,10 @@ async def extract_file_download(
             media_type="application/octet-stream",
             background=BackgroundTask(shutil.rmtree, temp_dir, ignore_errors=True),
         )
+    except HTTPException:
+        # A deliberate 4xx must reach the client as itself; the
+        # catch-all below would relabel it as a server error.
+        raise
     except Exception:
         shutil.rmtree(temp_dir, ignore_errors=True)
         raise

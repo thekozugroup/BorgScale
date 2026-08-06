@@ -13,6 +13,16 @@ from app.services.mount_service import MountInfo, MountType
 from app.database.models import Repository
 
 
+@pytest.fixture
+def mountable_repository(test_db):
+    """Mounting now authorizes against a real repository, so one must exist."""
+    repo = Repository(name="mountable", path="/backup/mountable", encryption="none")
+    test_db.add(repo)
+    test_db.commit()
+    test_db.refresh(repo)
+    return repo
+
+
 @pytest.mark.unit
 class TestMountArchiveEndpoints:
     def test_mount_borg_archive_success(
@@ -20,6 +30,7 @@ class TestMountArchiveEndpoints:
         test_client: TestClient,
         admin_headers,
         monkeypatch,
+        mountable_repository,
     ):
         mount_info = MountInfo(
             mount_id="mount-1",
@@ -41,7 +52,7 @@ class TestMountArchiveEndpoints:
 
         response = test_client.post(
             "/api/mounts/borg",
-            json={"repository_id": 1, "archive_name": "archive"},
+            json={"repository_id": mountable_repository.id, "archive_name": "archive"},
             headers=admin_headers,
         )
 
@@ -57,6 +68,7 @@ class TestMountArchiveEndpoints:
         test_client: TestClient,
         admin_headers,
         monkeypatch,
+        mountable_repository,
     ):
         monkeypatch.setattr(
             mounts.mount_service,
@@ -72,9 +84,12 @@ class TestMountArchiveEndpoints:
         )
 
         assert response.status_code == 500
+        # The specific cause now reaches the client. It used to be swallowed by
+        # the catch-all and relabelled as the generic failedMountArchive, which
+        # also turned deliberate 403s and 404s into 500s.
         assert (
             response.json()["detail"]["key"]
-            == "backend.errors.mounts.failedMountArchive"
+            == "backend.errors.mounts.mountInfoNotFound"
         )
 
     def test_mount_borg_archive_returns_503_when_fuse_unavailable(
@@ -82,6 +97,7 @@ class TestMountArchiveEndpoints:
         test_client: TestClient,
         admin_headers,
         monkeypatch,
+        mountable_repository,
     ):
         monkeypatch.setattr(
             mounts.mount_service,
@@ -109,6 +125,7 @@ class TestMountArchiveEndpoints:
         test_client: TestClient,
         admin_headers,
         monkeypatch,
+        mountable_repository,
     ):
         mount_info = MountInfo(
             mount_id="mount-1",
@@ -140,6 +157,7 @@ class TestMountArchiveEndpoints:
         test_client: TestClient,
         admin_headers,
         monkeypatch,
+        mountable_repository,
     ):
         monkeypatch.setattr(mounts.mount_service, "get_mount", lambda mount_id: None)
 
@@ -156,6 +174,7 @@ class TestMountArchiveEndpoints:
         test_client: TestClient,
         admin_headers,
         monkeypatch,
+        mountable_repository,
     ):
         mount_info = MountInfo(
             mount_id="mount-sshfs",
@@ -236,6 +255,7 @@ class TestMountListingAndInfo:
         test_client: TestClient,
         admin_headers,
         monkeypatch,
+        mountable_repository,
     ):
         mount_info = MountInfo(
             mount_id="mount-1",
@@ -263,6 +283,7 @@ class TestMountListingAndInfo:
         test_client: TestClient,
         admin_headers,
         monkeypatch,
+        mountable_repository,
     ):
         monkeypatch.setattr(mounts.mount_service, "get_mount", lambda mount_id: None)
 

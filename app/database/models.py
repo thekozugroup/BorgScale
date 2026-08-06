@@ -14,8 +14,55 @@ from sqlalchemy import (
     JSON,
 )
 from sqlalchemy.orm import relationship
+from sqlalchemy.types import TypeDecorator
 from datetime import datetime, timezone
+import structlog
 from app.database.database import Base
+
+logger = structlog.get_logger()
+
+
+class EncryptedString(TypeDecorator):
+    """A String column that is Fernet-encrypted at rest.
+
+    SSH private keys and TOTP secrets were already encrypted this way, but
+    repository passphrases were not, so anyone holding the SQLite file — a
+    backup of it, a mounted volume, a host snapshot — could read every
+    passphrase and therefore open every repository.
+
+    Reads tolerate a plaintext value so an instance keeps working before, during
+    and after the migration that re-encrypts existing rows: the value is
+    returned as-is when it does not decrypt. Writes always encrypt.
+    """
+
+    impl = String
+    cache_ok = True
+
+    def process_bind_param(self, value, dialect):
+        if value is None or value == "":
+            return value
+
+        from app.core.security import encrypt_secret
+
+        try:
+            return encrypt_secret(value)
+        except Exception:
+            # Never lose a credential to an encryption failure; a readable
+            # passphrase beats a repository nobody can open.
+            logger.error("Failed to encrypt secret column, storing as-is")
+            return value
+
+    def process_result_value(self, value, dialect):
+        if value is None or value == "":
+            return value
+
+        from app.core.security import decrypt_secret
+
+        try:
+            return decrypt_secret(value)
+        except Exception:
+            # Written before this column was encrypted.
+            return value
 
 
 # Helper function for timezone-aware UTC timestamps
@@ -118,8 +165,8 @@ class Repository(Base):
     encryption = Column(String, default="repokey")
     compression = Column(String, default="lz4")
     passphrase = Column(
-        String, nullable=True
-    )  # Borg repository passphrase (for encrypted repos)
+        EncryptedString, nullable=True
+    )  # Borg repository passphrase (for encrypted repos), encrypted at rest
     has_keyfile = Column(
         Boolean, default=False
     )  # Whether repository has a keyfile (keyfile/keyfile-blake2 encryption)
@@ -751,7 +798,7 @@ class SystemSettings(Base):
     )  # MQTT broker URL (e.g., mqtt://broker.example.com)
     mqtt_broker_port = Column(Integer, default=1883, nullable=False)  # MQTT broker port
     mqtt_username = Column(String, nullable=True)  # MQTT username
-    mqtt_password = Column(String, nullable=True)  # MQTT password
+    mqtt_password = Column(EncryptedString, nullable=True)  # MQTT password
     mqtt_client_id = Column(
         String, default="borgscale", nullable=False
     )  # MQTT client ID

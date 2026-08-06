@@ -6,6 +6,7 @@ import asyncio
 import re
 import structlog
 from typing import Optional
+from app.utils.ssh_host_keys import ssh_host_key_options
 
 logger = structlog.get_logger()
 
@@ -97,10 +98,7 @@ async def _du_ssh(
         cmd.extend(["-i", key_file])
     cmd.extend(
         [
-            "-o",
-            "StrictHostKeyChecking=no",
-            "-o",
-            "UserKnownHostsFile=/dev/null",
+            *ssh_host_key_options(),
             "-o",
             "LogLevel=ERROR",
             "-o",

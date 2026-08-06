@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 import structlog
 
+from app.core.rate_limit import check_rate_limit, record_failure, record_success
 from app.database.database import get_db
 from app.database.models import PasskeyCredential, User, SystemSettings
 from app.core.security import (
@@ -347,17 +348,24 @@ async def get_authorization_model():
 
 @router.post("/login", response_model=Token)
 async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+    request: Request,
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
 ):
     """Authenticate user and return access token"""
+    check_rate_limit(request, form_data.username)
+
     user = await authenticate_user(db, form_data.username, form_data.password)
     if not user:
+        record_failure(request, form_data.username)
         logger.warning("Failed login attempt", username=form_data.username)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={"key": "backend.errors.auth.incorrectCredentials"},
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    record_success(request, form_data.username)
 
     if not user.is_active:
         raise HTTPException(
@@ -394,8 +402,14 @@ async def login(
 
 @router.post("/login/totp", response_model=Token)
 async def complete_login_with_totp(
-    payload: TotpLoginVerification, db: Session = Depends(get_db)
+    request: Request,
+    payload: TotpLoginVerification,
+    db: Session = Depends(get_db),
 ):
+    # A TOTP code is six digits. Without a limit the whole space is reachable
+    # within the validity window of a single challenge token.
+    check_rate_limit(request)
+
     username = verify_login_challenge_token(payload.login_challenge_token)
     if not username:
         raise HTTPException(
@@ -412,11 +426,13 @@ async def complete_login_with_totp(
 
     if not _verify_totp_or_recovery_code(user, payload.code):
         db.commit()
+        record_failure(request, username)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={"key": "backend.errors.auth.invalidTotpCode"},
         )
 
+    record_success(request, username)
     user.last_login = datetime.now(timezone.utc)
     db.commit()
 

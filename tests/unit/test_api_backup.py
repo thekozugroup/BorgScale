@@ -472,7 +472,9 @@ class TestBackupStatus:
         response = test_client.get("/api/backup/status/99999", headers=admin_headers)
 
         # The except Exception block catches HTTPException and converts to 500
-        assert response.status_code == 500
+        # A missing job is a 404. It used to surface as a 500 because the
+        # handler's catch-all swallowed its own HTTPException.
+        assert response.status_code == 404
 
     def test_get_backup_status_unauthorized(self, test_client: TestClient):
         """Test getting backup status without auth returns 403"""
@@ -774,7 +776,9 @@ class TestBackupLogs:
         )
 
         # The except Exception block catches HTTPException and converts to 500
-        assert response.status_code == 500
+        # A missing job is a 404. It used to surface as a 500 because the
+        # handler's catch-all swallowed its own HTTPException.
+        assert response.status_code == 404
 
     def test_stream_backup_logs_unauthorized(self, test_client: TestClient):
         """Test streaming logs without auth returns 403"""

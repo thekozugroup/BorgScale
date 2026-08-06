@@ -112,6 +112,10 @@ async def export_borgmatic_config(
             media_type="application/zip",
             headers={"Content-Disposition": f"attachment; filename={filename}"},
         )
+    except HTTPException:
+        # A deliberate 4xx must reach the client as itself; the
+        # catch-all below would relabel it as a server error.
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Export failed: {str(e)}")
 
@@ -274,6 +278,10 @@ async def import_borgmatic_config(
 
     except UnicodeDecodeError:
         raise HTTPException(status_code=400, detail="File must be UTF-8 encoded")
+    except HTTPException:
+        # A deliberate 4xx must reach the client as itself; the
+        # catch-all below would relabel it as a server error.
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Import failed: {str(e)}")
 

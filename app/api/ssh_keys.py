@@ -26,6 +26,7 @@ from app.core.security import get_current_user, encrypt_secret, decrypt_secret
 from app.config import settings
 from app.utils.datetime_utils import serialize_datetime
 import hashlib
+from app.utils.ssh_host_keys import ssh_host_key_options
 
 logger = structlog.get_logger()
 router = APIRouter(tags=["ssh-keys"], dependencies=[Depends(authorize_request)])
@@ -165,10 +166,7 @@ async def _run_df_command(
         "ssh",
         "-i",
         temp_key_file,
-        "-o",
-        "StrictHostKeyChecking=no",
-        "-o",
-        "UserKnownHostsFile=/dev/null",
+        *ssh_host_key_options(),
         "-o",
         "LogLevel=ERROR",
         "-o",

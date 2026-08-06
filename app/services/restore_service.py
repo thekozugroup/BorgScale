@@ -12,6 +12,7 @@ from app.database.database import SessionLocal
 from app.core.borg_router import BorgRouter
 from app.services.notification_service import notification_service
 from app.utils.borg_env import build_repository_borg_env, cleanup_temp_key_file
+from app.utils.ssh_host_keys import ssh_host_key_args
 
 logger = structlog.get_logger()
 
@@ -202,7 +203,8 @@ class RestoreService:
                     env["BORG_UNKNOWN_UNENCRYPTED_REPO_ACCESS_IS_OK"] = "yes"
                     env["BORG_RELOCATED_REPO_ACCESS_IS_OK"] = "yes"
                     env["BORG_RSH"] = (
-                        "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o RequestTTY=no -o PermitLocalCommand=no"
+                        f"ssh {ssh_host_key_args()} -o LogLevel=ERROR "
+                        "-o RequestTTY=no -o PermitLocalCommand=no"
                     )
 
                 logger.info(
@@ -843,7 +845,8 @@ class RestoreService:
                 env["BORG_UNKNOWN_UNENCRYPTED_REPO_ACCESS_IS_OK"] = "yes"
                 env["BORG_RELOCATED_REPO_ACCESS_IS_OK"] = "yes"
                 env["BORG_RSH"] = (
-                    "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o RequestTTY=no -o PermitLocalCommand=no"
+                    f"ssh {ssh_host_key_args()} -o LogLevel=ERROR "
+                    "-o RequestTTY=no -o PermitLocalCommand=no"
                 )
 
             logger.info(

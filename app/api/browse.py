@@ -6,6 +6,7 @@ import structlog
 from app.database.models import User, Repository, SystemSettings
 from app.database.database import get_db
 from app.api.auth import get_current_user
+from app.core.security import check_repo_access
 from app.core.borg_router import BorgRouter
 from app.services.archive_browse_service import build_browse_items, parse_archive_items
 from app.services.cache_service import archive_cache
@@ -82,6 +83,10 @@ async def browse_archive_contents(
                 status_code=404,
                 detail={"key": "backend.errors.restore.repositoryNotFound"},
             )
+
+        # Archive contents are repository data; without this a user scoped to
+        # one repository could read the file listing of every other one.
+        check_repo_access(db, current_user, repository, "viewer")
 
         # Get memory limit settings from database
         settings = db.query(SystemSettings).first()

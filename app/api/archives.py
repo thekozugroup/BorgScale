@@ -473,6 +473,10 @@ async def cancel_delete_job(
         return {"message": "backend.success.archives.deletionCancelled"}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        # A deliberate 4xx must reach the client as itself; the
+        # catch-all below would relabel it as a server error.
+        raise
     except Exception as e:
         logger.error("Failed to cancel delete job", error=str(e), job_id=job_id)
         raise HTTPException(

@@ -7,6 +7,7 @@ import structlog
 from typing import Dict, List
 from datetime import datetime, timezone
 from app.config import settings
+from app.utils.ssh_host_keys import ssh_host_key_options
 
 logger = structlog.get_logger()
 
@@ -192,10 +193,7 @@ class BorgInterface:
         exec_env["BORG_HOSTNAME_IS_UNIQUE"] = "yes"
 
         ssh_opts = [
-            "-o",
-            "StrictHostKeyChecking=no",
-            "-o",
-            "UserKnownHostsFile=/dev/null",
+            *ssh_host_key_options(),
             "-o",
             "LogLevel=ERROR",
         ]

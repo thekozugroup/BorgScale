@@ -11,6 +11,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 from app.config import settings
 from app.core.borg_router import BorgRouter
+from app.utils.ssh_host_keys import ssh_host_key_options
 from app.database.models import (
     CheckJob,
     CompactJob,
@@ -132,10 +133,7 @@ def break_repository_lock(repository: Repository) -> bool:
         # For remote repos, add SSH options
         if repository.connection_id:
             ssh_opts = [
-                "-o",
-                "StrictHostKeyChecking=no",
-                "-o",
-                "UserKnownHostsFile=/dev/null",
+                *ssh_host_key_options(),
                 "-o",
                 "LogLevel=ERROR",
             ]

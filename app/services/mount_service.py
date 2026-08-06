@@ -29,6 +29,7 @@ from app.core.borg_router import BorgRouter
 from app.core.security import decrypt_secret
 from app.database.database import SessionLocal
 from app.database.models import SSHConnection, SSHKey, Repository, SystemSettings
+from app.utils.ssh_host_keys import ssh_host_key_args, ssh_host_key_options
 
 logger = structlog.get_logger()
 
@@ -888,10 +889,7 @@ class MountService:
 
                 # Handle SSH repositories
                 if repository.connection_id:
-                    # Always disable strict host key checking for SSH repos
-                    ssh_opts = (
-                        "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
-                    )
+                    ssh_opts = ssh_host_key_args()
 
                     if repository.connection_id:
                         # Repository linked to SSH connection
@@ -1318,10 +1316,7 @@ class MountService:
                 "ssh",
                 "-i",
                 temp_key_file,
-                "-o",
-                "StrictHostKeyChecking=no",
-                "-o",
-                "UserKnownHostsFile=/dev/null",
+                *ssh_host_key_options(),
                 "-o",
                 "ConnectTimeout=10",
                 "-p",
@@ -1400,10 +1395,7 @@ class MountService:
             "sftp",
             "-i",
             temp_key_file,
-            "-o",
-            "StrictHostKeyChecking=no",
-            "-o",
-            "UserKnownHostsFile=/dev/null",
+            *ssh_host_key_options(),
             "-o",
             "ConnectTimeout=10",
             "-P",
@@ -1509,10 +1501,7 @@ class MountService:
                     "ssh",
                     "-i",
                     temp_key_file,
-                    "-o",
-                    "StrictHostKeyChecking=no",
-                    "-o",
-                    "UserKnownHostsFile=/dev/null",
+                    *ssh_host_key_options(),
                     "-o",
                     "ConnectTimeout=10",
                     "-p",
@@ -1571,10 +1560,7 @@ class MountService:
             str(connection.port),
             "-o",
             f"IdentityFile={temp_key_file}",  # CRITICAL: SSH key auth
-            "-o",
-            "StrictHostKeyChecking=no",
-            "-o",
-            "UserKnownHostsFile=/dev/null",
+            *ssh_host_key_options(),
             "-o",
             "ConnectTimeout=30",
             "-o",

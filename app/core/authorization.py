@@ -223,7 +223,14 @@ ENDPOINT_POLICIES: Dict[Tuple[str, str], EndpointPolicy] = {
     ("POST", "/api/scripts/cleanup-orphans"): EndpointPolicy(
         ("admin",), "backend.errors.scripts.adminAccessRequired"
     ),
-    # Writes to the host filesystem outside any repository.
+    # The filesystem browser enumerates the host outside any repository, so a
+    # viewer scoped to one repository could otherwise map the whole machine.
+    ("GET", "/api/filesystem/browse"): EndpointPolicy(
+        ("admin", "operator"), "backend.errors.filesystem.operatorAccessRequired"
+    ),
+    ("POST", "/api/filesystem/validate-path"): EndpointPolicy(
+        ("admin", "operator"), "backend.errors.filesystem.operatorAccessRequired"
+    ),
     ("POST", "/api/filesystem/create-folder"): EndpointPolicy(
         ("admin", "operator"), "backend.errors.filesystem.operatorAccessRequired"
     ),

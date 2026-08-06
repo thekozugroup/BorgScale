@@ -21,6 +21,7 @@ from app.database.database import SessionLocal
 from app.config import settings
 from app.services.notification_service import notification_service
 from app.utils.ssh_utils import write_ssh_key_to_tempfile
+from app.utils.ssh_host_keys import ssh_host_key_options
 
 logger = structlog.get_logger()
 
@@ -302,10 +303,7 @@ class RemoteBackupService:
                     "ssh",
                     "-i",
                     key_file_path,
-                    "-o",
-                    "StrictHostKeyChecking=no",
-                    "-o",
-                    "UserKnownHostsFile=/dev/null",
+                    *ssh_host_key_options(),
                     "-o",
                     "ServerAliveInterval=60",
                     "-o",
@@ -484,10 +482,7 @@ class RemoteBackupService:
                     "ssh",
                     "-i",
                     key_file_path,
-                    "-o",
-                    "StrictHostKeyChecking=no",
-                    "-o",
-                    "UserKnownHostsFile=/dev/null",
+                    *ssh_host_key_options(),
                     "-p",
                     str(ssh_connection.port),
                     f"{ssh_connection.username}@{ssh_connection.host}",

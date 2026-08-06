@@ -2045,6 +2045,10 @@ async def update_repository(
                             new_path=repository.path,
                             borg_version=repository.borg_version or 1,
                         )
+                except HTTPException:
+                    # A deliberate 4xx must reach the client as itself; the
+                    # catch-all below would relabel it as a server error.
+                    raise
                 except Exception as e:
                     logger.info(
                         "Could not verify borg repository - attempting initialization",

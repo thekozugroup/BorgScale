@@ -17,6 +17,7 @@ from app.database.database import get_db
 from sqlalchemy.orm import Session
 from app.database.models import SSHKey
 from app.config import settings
+from app.utils.ssh_host_keys import ssh_host_key_options
 
 logger = structlog.get_logger()
 
@@ -109,10 +110,7 @@ def is_borg_repository_ssh(
             ssh_key_path,
             "-p",
             str(port),
-            "-o",
-            "StrictHostKeyChecking=no",
-            "-o",
-            "UserKnownHostsFile=/dev/null",
+            *ssh_host_key_options(),
             "-o",
             "ConnectTimeout=5",
             f"{username}@{host}",
@@ -362,10 +360,7 @@ async def browse_ssh_filesystem(
                 temp_key_file,
                 "-P",
                 str(port),
-                "-o",
-                "StrictHostKeyChecking=no",
-                "-o",
-                "UserKnownHostsFile=/dev/null",
+                *ssh_host_key_options(),
                 "-o",
                 "ConnectTimeout=10",
                 f"{username}@{host}",
@@ -626,10 +621,7 @@ async def validate_path(
                     temp_key_file,
                     "-p",
                     str(port),
-                    "-o",
-                    "StrictHostKeyChecking=no",
-                    "-o",
-                    "UserKnownHostsFile=/dev/null",
+                    *ssh_host_key_options(),
                     "-o",
                     "ConnectTimeout=5",
                     f"{username}@{host}",
@@ -808,10 +800,7 @@ async def create_folder(
                     temp_key_file,
                     "-P",
                     str(port),
-                    "-o",
-                    "StrictHostKeyChecking=no",
-                    "-o",
-                    "UserKnownHostsFile=/dev/null",
+                    *ssh_host_key_options(),
                     "-o",
                     "ConnectTimeout=10",
                     f"{username}@{host}",

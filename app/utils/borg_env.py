@@ -5,6 +5,7 @@ import os
 from typing import Iterator, Optional
 
 from app.utils.ssh_utils import resolve_repo_ssh_key_file, resolve_ssh_key_file_by_id
+from app.utils.ssh_host_keys import ssh_host_key_options
 
 
 def get_standard_ssh_opts(
@@ -20,10 +21,7 @@ def get_standard_ssh_opts(
 
     opts.extend(
         [
-            "-o",
-            "StrictHostKeyChecking=no",
-            "-o",
-            "UserKnownHostsFile=/dev/null",
+            *ssh_host_key_options(),
             "-o",
             "LogLevel=ERROR",
         ]

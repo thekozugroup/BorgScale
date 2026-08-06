@@ -37,6 +37,7 @@ import structlog
 from typing import Dict, List, Optional
 
 from app.config import settings
+from app.utils.ssh_host_keys import ssh_host_key_options
 
 logger = structlog.get_logger()
 
@@ -117,10 +118,7 @@ class Borg2Interface:
         env["BORG_UNKNOWN_UNENCRYPTED_REPO_ACCESS_IS_OK"] = "yes"
         env["BORG_RELOCATED_REPO_ACCESS_IS_OK"] = "yes"
         ssh_opts = [
-            "-o",
-            "StrictHostKeyChecking=no",
-            "-o",
-            "UserKnownHostsFile=/dev/null",
+            *ssh_host_key_options(),
             "-o",
             "LogLevel=ERROR",
         ]

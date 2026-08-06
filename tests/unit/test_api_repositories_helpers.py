@@ -42,15 +42,20 @@ class TestRepositoryHelperFunctions:
         opts = get_standard_ssh_opts()
 
         assert "-i" not in opts
-        assert "StrictHostKeyChecking=no" in opts
-        assert "UserKnownHostsFile=/dev/null" in opts
+        assert "StrictHostKeyChecking=accept-new" in opts
+        assert not any(o.endswith("/dev/null") for o in opts), (
+            "host keys must persist, or a changed key can never be detected"
+        )
         assert "RequestTTY=no" in opts
 
     def test_get_standard_ssh_opts_with_key(self):
         opts = get_standard_ssh_opts("/tmp/test-key")
 
         assert opts[:2] == ["-i", "/tmp/test-key"]
-        assert "StrictHostKeyChecking=no" in opts
+        assert "StrictHostKeyChecking=accept-new" in opts
+        assert not any(o.endswith("/dev/null") for o in opts), (
+            "host keys must persist, or a changed key can never be detected"
+        )
 
     def test_get_operation_timeouts_uses_database_values(self):
         mock_settings = Mock(
