@@ -739,5 +739,5 @@ Currently, notifications are global for all repositories. To achieve per-reposit
 
 - **Full Apprise Documentation**: [Apprise Wiki](https://github.com/caronc/apprise/wiki)
 - **Service-Specific Guides**: [Apprise Notifications](https://github.com/caronc/apprise/wiki#notification-services)
-- **GitHub Issues**: [Report problems](https://github.com/karanhudia/borgscale/issues)
-- **GitHub Discussions**: [Ask questions](https://github.com/karanhudia/borgscale/discussions)
+- **GitHub Issues**: [Report problems](https://github.com/thekozugroup/BorgScale/issues)
+- **GitHub Discussions**: [Ask questions](https://github.com/thekozugroup/BorgScale/discussions)

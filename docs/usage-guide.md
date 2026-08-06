@@ -83,7 +83,7 @@ Before creating backups, ensure:
 
 1. **BorgScale is running**: `http://localhost:8081`
 2. **You're logged in** (default: `admin` / `admin123`)
-3. **Container has proper permissions**: Set `PUID`/`PGID` if needed (see [Troubleshooting > Permission Issues](https://github.com/karanhudia/borgscale#permission-issues))
+3. **Container has proper permissions**: Set `PUID`/`PGID` if needed (see [Troubleshooting > Permission Issues](https://github.com/thekozugroup/BorgScale#permission-issues))
 
 ---
 
@@ -139,7 +139,7 @@ sudo chown -R $(id -u):$(id -g) /mnt/usb-drive
 ls -la /mnt/usb-drive
 ```
 
-**Tip:** Ensure `PUID`/`PGID` in docker-compose matches your user ID. See [Troubleshooting > Permission Issues](https://github.com/karanhudia/borgscale#permission-issues).
+**Tip:** Ensure `PUID`/`PGID` in docker-compose matches your user ID. See [Troubleshooting > Permission Issues](https://github.com/thekozugroup/BorgScale#permission-issues).
 
 ---
 
@@ -811,10 +811,10 @@ Restart container: `docker compose down && docker compose up -d`
 
 ## Next Steps
 
-- **[Scheduling Guide](https://github.com/karanhudia/borgscale#scheduling)** - Automate your backups
-- **[Archives Browser](https://github.com/karanhudia/borgscale#archive-browser)** - Browse and restore files
+- **[Scheduling Guide](https://github.com/thekozugroup/BorgScale#scheduling)** - Automate your backups
+- **[Archives Browser](https://github.com/thekozugroup/BorgScale#archive-browser)** - Browse and restore files
 - **[API Documentation](http://localhost:8081/api/docs)** - Integrate with other tools
-- **[Troubleshooting Guide](https://github.com/karanhudia/borgscale#troubleshooting)** - Common issues
+- **[Troubleshooting Guide](https://github.com/thekozugroup/BorgScale#troubleshooting)** - Common issues
 
 ---
 
@@ -841,5 +841,5 @@ Restart container: `docker compose down && docker compose up -d`
 
 **Need Help?**
 - 📖 [Full Documentation](https://github.com/thekozugroup/BorgScale
-- 🐛 [Report Issues](https://github.com/karanhudia/borgscale/issues)
-- 💬 [GitHub Discussions](https://github.com/karanhudia/borgscale/discussions)
+- 🐛 [Report Issues](https://github.com/thekozugroup/BorgScale/issues)
+- 💬 [GitHub Discussions](https://github.com/thekozugroup/BorgScale/discussions)

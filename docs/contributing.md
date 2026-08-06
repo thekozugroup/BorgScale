@@ -19,7 +19,7 @@ git clone https://github.com/YOUR_USERNAME/borgscale.git
 cd borgscale
 
 # Add upstream remote
-git remote add upstream https://github.com/karanhudia/borgscale.git
+git remote add upstream https://github.com/thekozugroup/BorgScale.git
 ```
 
 ### Create a Branch
@@ -165,7 +165,7 @@ By contributing to BorgScale, you agree that your contributions will be licensed
 
 ## Questions?
 
-- **GitHub Discussions** - [Ask questions](https://github.com/karanhudia/borgscale/discussions)
-- **GitHub Issues** - [Report bugs](https://github.com/karanhudia/borgscale/issues)
+- **GitHub Discussions** - [Ask questions](https://github.com/thekozugroup/BorgScale/discussions)
+- **GitHub Issues** - [Report bugs](https://github.com/thekozugroup/BorgScale/issues)
 
 We appreciate your contributions!

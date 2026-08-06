@@ -1,147 +1,48 @@
-# Analytics & Privacy
+# Privacy
 
-BorgScale collects **anonymous usage statistics** to help improve the product. We believe in **radical transparency**.
+**BorgScale does not collect analytics, telemetry, or usage statistics.**
 
-## Full Transparency
+There is no tracking script, no analytics endpoint, and no phone-home of any
+kind. Nothing about your instance, your repositories, or your usage leaves the
+machine you run it on.
 
-**[View our analytics dashboard publicly](https://analytics.nullcodeai.dev/)** - See exactly what we collect in real-time. No login required.
+This is a change from upstream `borg-ui`, which shipped anonymous usage
+tracking. The Kozu Group fork removed it.
 
-## What We Track
+## What that means concretely
 
-### We DO Collect
+- The frontend loads no third-party scripts. Everything it needs — fonts,
+  icons, the editor — is served from your own instance, so BorgScale works on
+  an air-gapped network.
+- The backend makes no outbound requests except the ones you configure
+  yourself: your Borg repositories over SSH, your notification services, your
+  MQTT broker, and your Redis cache.
+- There is no license check, no activation call, and no update ping.
 
-**Page Views:**
-- Which pages you visit (Dashboard, Repositories, Archives, etc.)
-- Navigation patterns and page transitions
-- Session duration and visit frequency
+## How this is enforced
 
-**Feature Usage:**
-- Button clicks (Backup Now, Create Repository, etc.)
-- Feature interactions (mounting archives, scheduling backups)
-- Settings changes (non-sensitive preferences)
-- Search queries within the app
+Two automated checks keep it that way, and both run in CI.
 
-**Technical Information:**
-- Browser type and version
-- Operating system
-- Screen resolution and device type
-- Language preferences
-- Error rates and crash reports
+`tests/test_no_phone_home.py` starts the application with every outbound HTTP
+call denied at the transport layer and exercises the startup path and the main
+endpoints. Any request to a host the test did not explicitly allow fails the
+suite, with the offending URL reported.
 
-**Events We Track:**
-- Repository actions (create, edit, delete, view info)
-- Backup operations (start, complete, fail)
-- Archive browsing (mount, unmount, file extraction)
-- Schedule operations (create, edit, delete, enable/disable)
-- SSH connection management (create, test, delete)
-- Maintenance tasks (compact, check, prune)
-- Authentication events (login, logout)
+`scripts/security-scan.sh` scans the source tree for outbound URLs and fails on
+any host outside the allowlist.
 
-### We DO NOT Collect
+## Verifying it yourself
 
-- **Passwords** or authentication tokens
-- **Encryption keys** or passphrases
-- **Backup data** or file contents
-- **File paths** or repository names
-- **SSH keys** or connection credentials
-- **IP addresses** - We do NOT collect or store IP addresses. All tracking is done without any IP address logging.
-- **Hostnames** - We do NOT collect computer names or hostnames
-- **User identifiers** - We do NOT track individual users across sessions
-- **Repository URLs** or storage locations
-- **Personal information** beyond voluntary submissions
-- **Archive contents** or file names
-- **Cookies** - We do NOT use cookies for tracking
+The source is AGPL-3.0 and is what runs — see `GET /api/about` on any instance
+for the source pointer. To inspect a running container directly:
 
-## Why We Collect This
+```bash
+# Shows every socket the container has open
+docker exec borg-web-ui ss -tunp
+```
 
-We use analytics data to:
-- **Understand feature usage** - Which features are most valuable
-- **Fix bugs faster** - Identify where users encounter errors
-- **Prioritize development** - Focus on what users need most
-- **Improve UX** - Discover pain points in user workflows
-- **Platform compatibility** - Ensure compatibility across browsers/devices
-- **Measure success** - Track adoption and retention
+## Reporting a concern
 
-## How to Opt-Out
-
-Analytics stays disabled until you respond to the consent banner. After opting in, you can disable it anytime:
-
-1. Open BorgScale
-2. Navigate to **Settings → Preferences**
-3. Toggle off **"Enable anonymous usage analytics"**
-4. Page will reload with tracking disabled
-
-Your preference is stored in the database and respected across all sessions.
-
-## Technical Implementation
-
-**Analytics Platform:** [Umami Cloud](https://umami.is/) (privacy-focused, cookieless analytics)
-- **Instance:** `https://analytics.nullcodeai.dev`
-- **No third-party services** (no Google Analytics, no Mixpanel)
-- **Data stays under our control**
-- **Open source** - You can inspect the code
-
-**Privacy Protections:**
-- **No IP tracking** - We do NOT log or store IP addresses
-- **No cookies** - Tracking is completely cookieless
-- **No user IDs** - We do NOT track individual users
-- **No persistent identifiers** - Each session is anonymous
-- **Respect Do Not Track** - Browser DNT setting is honored
-
-**Tracking Method:**
-- JavaScript tracking code loaded from Umami Cloud only after analytics is enabled
-- Consent and opt-out events are sent directly so accept and decline are both measurable
-- All data is completely anonymous and cannot be tied to individuals
-- User preference checked before every tracking call
-
-**Data Flow:**
-1. User performs action (e.g., clicks "Backup Now")
-2. Frontend checks if analytics is enabled (from database)
-3. If enabled, sends anonymous events to Umami (no IP, no user ID, no cookies)
-4. If disabled, event is discarded client-side (never sent)
-
-## Data Retention
-
-- **Aggregate data:** Kept indefinitely for trend analysis (page view counts, feature usage stats)
-- **No individual-level data:** We do not collect any data that can identify individuals, so there is no individual data to delete
-- **User preferences:** Stored only in your local BorgScale database (not sent to analytics server)
-
-## Privacy Rights
-
-You have the right to:
-- **Opt-out** at any time via Settings → Preferences
-- **View collected data** on the public dashboard (all data is aggregated and anonymous)
-- **Ask questions** about our practices
-- **Provide feedback** on what we track - If you disagree with any data collection, please [open an issue](https://github.com/karanhudia/borgscale/issues) and we will consider adjusting our tracking practices
-
-**Important:** Since we do not collect any personally identifiable information (no IPs, no user IDs, no cookies), there is no individual-level data to delete. All data is anonymous aggregate statistics only.
-
-## Centralized Analytics Model
-
-**Important:** BorgScale uses a **centralized analytics model**:
-- ALL BorgScale installations worldwide send data to ONE Umami instance
-- This allows us to understand global usage patterns
-- Individual installations are not identifiable
-- No tracking between instances (each install is anonymous)
-
-This is different from per-install analytics setups where each user runs their own analytics. We chose centralized analytics to better understand how the product is used globally while maintaining user privacy through anonymization.
-
-## Open Source & Transparency
-
-- All tracking code is open source (inspect `frontend/src/utils/analytics.ts`)
-- Public analytics dashboard (no secrets, no hiding data)
-- Privacy policy available in repository (`PRIVACY.md`)
-- Opt-out mechanism built into the product
-
-## Contact
-
-Questions about analytics or privacy?
-- **Open an issue:** [GitHub Issues](https://github.com/karanhudia/borgscale/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/karanhudia/borgscale/discussions)
-- **View live data:** [Analytics Dashboard](https://analytics.nullcodeai.dev/)
-
----
-
-**Last Updated:** January 18, 2026
-
-**Our Promise:** We collect only what helps us build a better product. No hidden tracking, no selling data, no dark patterns. Just transparent, user-focused analytics.
+If you find anything that contradicts this page, that is a bug and we want to
+know. Open an issue at
+[thekozugroup/BorgScale](https://github.com/thekozugroup/BorgScale/issues).

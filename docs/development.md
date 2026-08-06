@@ -26,7 +26,7 @@ This guide covers setting up a development environment for BorgScale with hot re
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/karanhudia/borgscale.git
+git clone https://github.com/thekozugroup/BorgScale.git
 cd borgscale
 ```
 

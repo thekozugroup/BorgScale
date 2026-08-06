@@ -1,8 +1,8 @@
 <div align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/assets/logo-dark.png" />
-    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/assets/logo-light.png" />
-    <img alt="BorgScale Logo v2" src="https://raw.githubusercontent.com/karanhudia/borgscale/main/assets/logo-light.png" width="360" />
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.png" />
+    <source media="(prefers-color-scheme: light)" srcset="assets/logo-light.png" />
+    <img alt="BorgScale Logo v2" src="assets/logo-light.png" width="360" />
   </picture>
 </div>
 
@@ -22,9 +22,9 @@
 
 [![Docker Hub](https://img.shields.io/docker/pulls/ainullcode/borgscale)](https://hub.docker.com/r/ainullcode/borgscale)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%203.0-blue.svg)](LICENSE)
-[![GitHub Actions](https://github.com/karanhudia/borgscale/workflows/Build%20and%20Publish%20Docker%20Images/badge.svg)](https://github.com/karanhudia/borgscale/actions)
-[![Tests](https://github.com/karanhudia/borgscale/workflows/Tests/badge.svg)](https://github.com/karanhudia/borgscale/actions/workflows/tests.yml)
-[![codecov](https://codecov.io/gh/karanhudia/borgscale/branch/main/graph/badge.svg)](https://codecov.io/gh/karanhudia/borgscale)
+[![GitHub Actions](https://github.com/thekozugroup/BorgScale/workflows/Build%20and%20Publish%20Docker%20Images/badge.svg)](https://github.com/thekozugroup/BorgScale/actions)
+[![Tests](https://github.com/thekozugroup/BorgScale/workflows/Tests/badge.svg)](https://github.com/thekozugroup/BorgScale/actions/workflows/tests.yml)
+[![codecov](https://codecov.io/gh/thekozugroup/BorgScale/branch/main/graph/badge.svg)](https://codecov.io/gh/thekozugroup/BorgScale)
 [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/5KfVa5QkdQ)
 
 </div>
@@ -61,15 +61,15 @@
 Track repository health, recent activity, storage, and day-to-day backup execution from the main product surfaces.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/dashboard-dark.png" />
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/dashboard-light.png" />
-  <img alt="BorgScale dashboard" src="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/dashboard-light.png" width="100%" />
+  <source media="(prefers-color-scheme: dark)" srcset="screenshots/readme/dashboard-dark.png" />
+  <source media="(prefers-color-scheme: light)" srcset="screenshots/readme/dashboard-light.png" />
+  <img alt="BorgScale dashboard" src="screenshots/readme/dashboard-light.png" width="100%" />
 </picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/repositories-dark.png" />
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/repositories-light.png" />
-  <img alt="Repository management" src="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/repositories-light.png" width="100%" />
+  <source media="(prefers-color-scheme: dark)" srcset="screenshots/readme/repositories-dark.png" />
+  <source media="(prefers-color-scheme: light)" srcset="screenshots/readme/repositories-light.png" />
+  <img alt="Repository management" src="screenshots/readme/repositories-light.png" width="100%" />
 </picture>
 
 ### Backup and Restore Workflows
@@ -77,15 +77,15 @@ Track repository health, recent activity, storage, and day-to-day backup executi
 Monitor live backup progress, inspect archives, and work through restore flows without dropping to the CLI.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/backup-progress-dark.png" />
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/backup-progress-light.png" />
-  <img alt="Live backup progress" src="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/backup-progress-light.png" width="100%" />
+  <source media="(prefers-color-scheme: dark)" srcset="screenshots/readme/backup-progress-dark.png" />
+  <source media="(prefers-color-scheme: light)" srcset="screenshots/readme/backup-progress-light.png" />
+  <img alt="Live backup progress" src="screenshots/readme/backup-progress-light.png" width="100%" />
 </picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/archive-browser-dark.png" />
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/archive-browser-light.png" />
-  <img alt="Archive browser" src="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/archive-browser-light.png" width="100%" />
+  <source media="(prefers-color-scheme: dark)" srcset="screenshots/readme/archive-browser-dark.png" />
+  <source media="(prefers-color-scheme: light)" srcset="screenshots/readme/archive-browser-light.png" />
+  <img alt="Archive browser" src="screenshots/readme/archive-browser-light.png" width="100%" />
 </picture>
 
 ### Automation and Integrations
@@ -93,21 +93,21 @@ Monitor live backup progress, inspect archives, and work through restore flows w
 Automate schedules, manage remote machines, and configure notifications for ongoing backup operations.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/schedule-dark.png" />
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/schedule-light.png" />
-  <img alt="Backup schedule management" src="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/schedule-light.png" width="100%" />
+  <source media="(prefers-color-scheme: dark)" srcset="screenshots/readme/schedule-dark.png" />
+  <source media="(prefers-color-scheme: light)" srcset="screenshots/readme/schedule-light.png" />
+  <img alt="Backup schedule management" src="screenshots/readme/schedule-light.png" width="100%" />
 </picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/remote-machines-dark.png" />
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/remote-machines-light.png" />
-  <img alt="Remote machines management" src="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/remote-machines-light.png" width="100%" />
+  <source media="(prefers-color-scheme: dark)" srcset="screenshots/readme/remote-machines-dark.png" />
+  <source media="(prefers-color-scheme: light)" srcset="screenshots/readme/remote-machines-light.png" />
+  <img alt="Remote machines management" src="screenshots/readme/remote-machines-light.png" width="100%" />
 </picture>
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/notifications-dark.png" />
-  <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/notifications-light.png" />
-  <img alt="Notification services" src="https://raw.githubusercontent.com/karanhudia/borgscale/main/screenshots/readme/notifications-light.png" width="100%" />
+  <source media="(prefers-color-scheme: dark)" srcset="screenshots/readme/notifications-dark.png" />
+  <source media="(prefers-color-scheme: light)" srcset="screenshots/readme/notifications-light.png" />
+  <img alt="Notification services" src="screenshots/readme/notifications-light.png" width="100%" />
 </picture>
 
 ## Getting Started
@@ -143,17 +143,17 @@ For teams that need commercial support, larger rollouts, or an enterprise conver
 ## Support
 
 - [Discord community](https://discord.gg/5KfVa5QkdQ)
-- [GitHub issues](https://github.com/karanhudia/borgscale/issues)
+- [GitHub issues](https://github.com/thekozugroup/BorgScale/issues)
 
 ## Star History
 
 <div align="center">
 
-<a href="https://star-history.com/#karanhudia/borgscale&Date">
+<a href="https://star-history.com/#thekozugroup/BorgScale&Date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=karanhudia/borgscale&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=karanhudia/borgscale&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=karanhudia/borgscale&type=Date" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=thekozugroup/BorgScale&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=thekozugroup/BorgScale&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=thekozugroup/BorgScale&type=Date" />
   </picture>
 </a>
 
@@ -161,7 +161,7 @@ For teams that need commercial support, larger rollouts, or an enterprise conver
 
 ## Contributing
 
-See the [contributing guide](.github/CONTRIBUTING.md) and the [development guide](https://github.com/thekozugroup/BorgScale
+See the [contributing guide](.github/CONTRIBUTING.md) and the [development guide](docs/development.md).
 
 ## License
 
@@ -169,6 +169,7 @@ This project is licensed under the GNU Affero General Public License v3.0. See [
 
 <div align="center">
 
-Made with ❤️ by [Karan Hudia](https://github.com/karanhudia)
+Maintained by [The Kozu Group](https://github.com/thekozugroup).
+Forked from [borg-ui](https://github.com/karanhudia/borg-ui) by [Karan Hudia](https://github.com/karanhudia).
 
 </div>

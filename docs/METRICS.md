@@ -65,12 +65,12 @@ scrape_configs:
 
 An example monitoring stack is included in this repository:
 
-- [examples/monitoring/docker-compose.yml](/Users/karanhudia/Documents/Projects/borgscale/examples/monitoring/docker-compose.yml)
-- [examples/monitoring/prometheus.yml](/Users/karanhudia/Documents/Projects/borgscale/examples/monitoring/prometheus.yml)
-- [examples/monitoring/grafana/provisioning/datasources/prometheus.yml](/Users/karanhudia/Documents/Projects/borgscale/examples/monitoring/grafana/provisioning/datasources/prometheus.yml)
-- [examples/monitoring/grafana/provisioning/dashboards/dashboards.yml](/Users/karanhudia/Documents/Projects/borgscale/examples/monitoring/grafana/provisioning/dashboards/dashboards.yml)
-- [examples/monitoring/grafana/provisioning/dashboards/json/borgscale-overview.json](/Users/karanhudia/Documents/Projects/borgscale/examples/monitoring/grafana/provisioning/dashboards/json/borgscale-overview.json)
-- [examples/monitoring/grafana/provisioning/dashboards/json/borgscale-jobs.json](/Users/karanhudia/Documents/Projects/borgscale/examples/monitoring/grafana/provisioning/dashboards/json/borgscale-jobs.json)
+- [examples/monitoring/docker-compose.yml](/examples/monitoring/docker-compose.yml)
+- [examples/monitoring/prometheus.yml](/examples/monitoring/prometheus.yml)
+- [examples/monitoring/grafana/provisioning/datasources/prometheus.yml](/examples/monitoring/grafana/provisioning/datasources/prometheus.yml)
+- [examples/monitoring/grafana/provisioning/dashboards/dashboards.yml](/examples/monitoring/grafana/provisioning/dashboards/dashboards.yml)
+- [examples/monitoring/grafana/provisioning/dashboards/json/borgscale-overview.json](/examples/monitoring/grafana/provisioning/dashboards/json/borgscale-overview.json)
+- [examples/monitoring/grafana/provisioning/dashboards/json/borgscale-jobs.json](/examples/monitoring/grafana/provisioning/dashboards/json/borgscale-jobs.json)
 
 Bring it up with:
 

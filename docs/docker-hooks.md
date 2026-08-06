@@ -609,7 +609,7 @@ If you encounter issues with Docker hooks:
 1. Check the backup job logs in the UI
 2. Test your scripts manually in the container
 3. Review the [troubleshooting section](#troubleshooting)
-4. Open an issue on [GitHub](https://github.com/karanhudia/borgscale/issues) with:
+4. Open an issue on [GitHub](https://github.com/thekozugroup/BorgScale/issues) with:
    - Your docker-compose.yml (sanitized)
    - Your pre/post backup scripts
    - Relevant log output

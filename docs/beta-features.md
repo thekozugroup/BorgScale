@@ -135,7 +135,7 @@ A redesigned step-based repository wizard with improved UX, validation, and mobi
 To help test beta features:
 
 1. Enable the feature via Settings UI
-2. Report issues at https://github.com/karanhudia/borgscale/issues
+2. Report issues at https://github.com/thekozugroup/BorgScale/issues
 3. Test thoroughly before using in production
 4. You can switch back to stable anytime via Settings
 

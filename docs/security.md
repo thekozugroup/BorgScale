@@ -822,7 +822,7 @@ docker compose up -d
 ### Subscribe to Security Announcements
 
 - Watch GitHub repository for security releases
-- Check [GitHub Security Advisories](https://github.com/karanhudia/borgscale/security/advisories)
+- Check [GitHub Security Advisories](https://github.com/thekozugroup/BorgScale/security/advisories)
 - Review release notes for security fixes
 
 ---

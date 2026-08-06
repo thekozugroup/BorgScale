@@ -69,11 +69,11 @@ with `bind.propagation: shared` as shown below.
 ### Development Compose
 
 There is a Linux-only development override in
-[`docker-compose.dev.mount.yml`](/Users/karanhudia/Documents/Projects/borgscale/docker-compose.dev.mount.yml).
+[`docker-compose.dev.mount.yml`](/docker-compose.dev.mount.yml).
 To test archive mounting in development:
 
 1. Start the normal dev stack. It now goes through the same
-   [`entrypoint.sh`](/Users/karanhudia/Documents/Projects/borgscale/entrypoint.sh)
+   [`entrypoint.sh`](/entrypoint.sh)
    runtime setup as the regular compose path, while still enabling code reload.
 2. On a **native Linux Docker host**, add the FUSE override:
    `docker compose -f docker-compose.dev.yml -f docker-compose.dev.mount.yml up`

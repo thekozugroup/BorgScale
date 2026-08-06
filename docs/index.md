@@ -10,7 +10,7 @@ permalink: /
 
 A modern web interface for [Borg Backup](https://borgbackup.readthedocs.io/). Manage backups through a clean UI instead of complex terminal commands.
 
-**[GitHub](https://github.com/karanhudia/borgscale)** • **[Docker Hub](https://hub.docker.com/r/ainullcode/borgscale)** • **[Latest Release](https://github.com/karanhudia/borgscale/releases)**
+**[GitHub](https://github.com/thekozugroup/BorgScale)** • **[Docker Hub](https://hub.docker.com/r/ainullcode/borgscale)** • **[Latest Release](https://github.com/thekozugroup/BorgScale/releases)**
 
 ---
 
@@ -229,15 +229,15 @@ See [Notifications Setup](notifications) for detailed configuration.
 
 **Documentation:** You're reading it!
 
-**Issues:** [GitHub Issues](https://github.com/karanhudia/borgscale/issues)
+**Issues:** [GitHub Issues](https://github.com/thekozugroup/BorgScale/issues)
 
-**Discussions:** [GitHub Discussions](https://github.com/karanhudia/borgscale/discussions)
+**Discussions:** [GitHub Discussions](https://github.com/thekozugroup/BorgScale/discussions)
 
 ---
 
 ## License
 
-GNU Affero General Public License v3.0 - See [LICENSE](https://github.com/karanhudia/borgscale/blob/main/LICENSE)
+GNU Affero General Public License v3.0 - See [LICENSE](https://github.com/thekozugroup/BorgScale/blob/main/LICENSE)
 
 ---
 
