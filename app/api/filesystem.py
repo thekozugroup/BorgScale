@@ -5,6 +5,7 @@ Filesystem browsing API endpoints
 from fastapi import APIRouter, HTTPException, Depends, Query
 from pydantic import BaseModel
 from typing import List, Optional
+import asyncio
 import os
 import subprocess
 import structlog
@@ -208,6 +209,12 @@ async def browse_filesystem(
 
 async def browse_local_filesystem(path: str) -> BrowseResponse:
     """Browse local filesystem"""
+    # Directory scans hit disk (possibly slow network mounts), so run them in
+    # a worker thread to keep the event loop responsive.
+    return await asyncio.to_thread(_browse_local_filesystem_sync, path)
+
+
+def _browse_local_filesystem_sync(path: str) -> BrowseResponse:
     # Security: Prevent directory traversal attacks
     path = os.path.abspath(path)
 
@@ -364,8 +371,10 @@ async def browse_ssh_filesystem(
                 f"{username}@{host}",
             ]
 
-            result = subprocess.run(
-                sftp_cmd, capture_output=True, text=True, timeout=30
+            # Run in a worker thread so the SSH round-trip does not block the
+            # event loop for every other request.
+            result = await asyncio.to_thread(
+                subprocess.run, sftp_cmd, capture_output=True, text=True, timeout=30
             )
         finally:
             # Clean up SFTP batch file
@@ -468,8 +477,13 @@ async def browse_ssh_filesystem(
                 # Check if directory is a Borg repository
                 is_borg = False
                 if is_dir:
-                    is_borg = is_borg_repository_ssh(
-                        host, username, temp_key_file, full_path, port
+                    is_borg = await asyncio.to_thread(
+                        is_borg_repository_ssh,
+                        host,
+                        username,
+                        temp_key_file,
+                        full_path,
+                        port,
                     )
 
                 item = FileSystemItem(
@@ -559,9 +573,11 @@ async def validate_path(
     """
     try:
         if connection_type == "local":
-            exists = os.path.exists(path)
-            is_dir = os.path.isdir(path) if exists else False
-            is_borg = is_borg_repository(path) if is_dir else False
+            exists = await asyncio.to_thread(os.path.exists, path)
+            is_dir = await asyncio.to_thread(os.path.isdir, path) if exists else False
+            is_borg = (
+                await asyncio.to_thread(is_borg_repository, path) if is_dir else False
+            )
 
             return {
                 "exists": exists,
@@ -620,8 +636,8 @@ async def validate_path(
                     check_cmd,
                 ]
 
-                result = subprocess.run(
-                    ssh_cmd, capture_output=True, text=True, timeout=10
+                result = await asyncio.to_thread(
+                    subprocess.run, ssh_cmd, capture_output=True, text=True, timeout=10
                 )
 
                 # Parse stat output to determine if path exists and is a directory
@@ -633,7 +649,9 @@ async def validate_path(
                     output_lower = result.stdout.lower()
                     is_dir = "directory" in output_lower or "dir" in output_lower
                 is_borg = (
-                    is_borg_repository_ssh(host, username, temp_key_file, path, port)
+                    await asyncio.to_thread(
+                        is_borg_repository_ssh, host, username, temp_key_file, path, port
+                    )
                     if is_dir
                     else False
                 )
@@ -706,7 +724,7 @@ async def create_folder(
         if connection_type == "local":
             # Create local folder
             try:
-                os.makedirs(full_path, exist_ok=False)
+                await asyncio.to_thread(os.makedirs, full_path, exist_ok=False)
                 logger.info(
                     "Created local folder", path=full_path, user=current_user.username
                 )
@@ -794,8 +812,8 @@ async def create_folder(
                     f"{username}@{host}",
                 ]
 
-                result = subprocess.run(
-                    sftp_cmd, capture_output=True, text=True, timeout=30
+                result = await asyncio.to_thread(
+                    subprocess.run, sftp_cmd, capture_output=True, text=True, timeout=30
                 )
 
                 if result.returncode == 0 or "File exists" not in result.stderr:

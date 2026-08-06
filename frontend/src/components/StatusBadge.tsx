@@ -1,4 +1,5 @@
 import React from 'react'
+import { CheckCircle2, XCircle, Loader2, Clock, AlertTriangle, MinusCircle } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
@@ -9,34 +10,50 @@ interface StatusBadgeProps {
   variant?: 'filled' | 'outlined'
 }
 
+type StatusTone = {
+  classes: string
+  Icon: React.ComponentType<{ className?: string }>
+  spin?: boolean
+}
+
 /**
- * Standardized status badge component used across Activity, Schedule, and Dashboard views
- * Shows consistent color and label representation for all job statuses (no icon)
+ * Standardized status badge used across Activity, Schedule, and Dashboard.
+ *
+ * Every status carries both a colour and a distinct icon. Colour alone would
+ * fail WCAG 1.4.1, and more practically, "finished with warnings" and
+ * "cancelled" are different enough that a glance should tell them apart.
  */
+const STATUS_TONES: Record<string, StatusTone> = {
+  completed: { classes: 'bg-success-subtle text-success border-success/25', Icon: CheckCircle2 },
+  success: { classes: 'bg-success-subtle text-success border-success/25', Icon: CheckCircle2 },
+  completed_with_warnings: {
+    classes: 'bg-warning-subtle text-warning border-warning/25',
+    Icon: AlertTriangle,
+  },
+  failed: {
+    classes: 'bg-destructive-subtle text-destructive border-destructive/25',
+    Icon: XCircle,
+  },
+  error: {
+    classes: 'bg-destructive-subtle text-destructive border-destructive/25',
+    Icon: XCircle,
+  },
+  running: { classes: 'bg-info-subtle text-info border-info/25', Icon: Loader2, spin: true },
+  in_progress: { classes: 'bg-info-subtle text-info border-info/25', Icon: Loader2, spin: true },
+  pending: { classes: 'bg-muted text-muted-foreground border-border', Icon: Clock },
+  cancelled: { classes: 'bg-muted text-muted-foreground border-border', Icon: MinusCircle },
+}
+
+const DEFAULT_TONE: StatusTone = {
+  classes: 'bg-muted text-muted-foreground border-border',
+  Icon: MinusCircle,
+}
+
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   const { t } = useTranslation()
 
-  const getStatusClasses = (status: string): string => {
-    switch (status.toLowerCase()) {
-      case 'completed':
-      case 'success':
-        return 'bg-primary/10 text-primary border-primary/20'
-      case 'completed_with_warnings':
-        return 'bg-muted text-muted-foreground border-border'
-      case 'failed':
-      case 'error':
-        return 'bg-destructive/10 text-destructive border-destructive/20'
-      case 'running':
-      case 'in_progress':
-        return 'bg-secondary text-secondary-foreground border-border'
-      case 'pending':
-        return 'bg-muted text-muted-foreground border-border'
-      case 'cancelled':
-        return 'bg-muted text-muted-foreground border-border'
-      default:
-        return 'bg-muted text-muted-foreground border-border'
-    }
-  }
+  const tone = STATUS_TONES[status.toLowerCase()] ?? DEFAULT_TONE
+  const { Icon } = tone
 
   const getStatusLabel = (status: string): string => {
     switch (status.toLowerCase()) {
@@ -59,10 +76,11 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   }
 
   return (
-    <Badge
-      className={cn('font-medium border', getStatusClasses(status))}
-      variant="outline"
-    >
+    <Badge className={cn('gap-1 border font-medium', tone.classes)} variant="outline">
+      <Icon
+        className={cn('size-3 shrink-0', tone.spin && 'motion-safe:animate-spin')}
+        aria-hidden="true"
+      />
       {getStatusLabel(status)}
     </Badge>
   )

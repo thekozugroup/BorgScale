@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { HardDrive, Lock, Calendar, Download, Info, AlertCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { formatDateShort } from '../utils/dateUtils'
 import { repositoriesAPI } from '../services/api'
 import RepositoryStatsV1 from './RepositoryStatsV1'

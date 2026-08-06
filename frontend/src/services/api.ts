@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { BASE_PATH } from '@/utils/basePath'
 import { API_BASE_URL, buildDownloadUrl } from '@/utils/downloadUrl'
 import { attachAccessTokenHeader } from './authHeaders'

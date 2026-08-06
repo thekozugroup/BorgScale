@@ -466,7 +466,7 @@ export default function AppSidebar({ mobileOpen, onClose }: AppSidebarProps) {
     <nav aria-label="Application navigation">
       {/* Desktop permanent sidebar */}
       <div className="hidden w-60 shrink-0 sm:block">
-        <div className="fixed inset-y-0 left-0 z-10 flex w-60 flex-col border-r border-sidebar-border bg-sidebar">
+        <div className="surface-frost fixed inset-y-0 left-0 z-10 flex w-60 flex-col border-r">
           <SidebarNavInner {...navProps} />
         </div>
       </div>

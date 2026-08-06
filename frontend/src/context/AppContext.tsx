@@ -75,26 +75,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Check for repositories - only run when authenticated
   const {
-    data: repositories,
+    data: repositoriesResponse,
     isLoading: loadingRepos,
     isFetched: fetchedRepos,
     refetch: refetchRepos,
   } = useQuery({
-    queryKey: ['app-repositories'],
-    queryFn: async () => {
-      try {
-        const response = await repositoriesAPI.getRepositories()
-        // Extract repositories array from response
-        return response.data?.repositories || []
-      } catch {
-        return []
-      }
-    },
+    // Same key and fetcher as every other repository list call site so React
+    // Query serves one shared cache entry instead of a second app-wide poll
+    queryKey: ['repositories'],
+    queryFn: repositoriesAPI.getRepositories,
     enabled: !authLoading && isAuthenticated, // Only run when authenticated
     retry: false,
-    refetchInterval: 30000,
     // Use global defaults for staleTime/cacheTime (SWR strategy)
   })
+
+  const repositories = useMemo(
+    () => repositoriesResponse?.data?.repositories ?? [],
+    [repositoriesResponse]
+  )
 
   // Check for archives - use archive_count from repositories data instead of making API calls
   // This avoids lock errors when a repository is under maintenance

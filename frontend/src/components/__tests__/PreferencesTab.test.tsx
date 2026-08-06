@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders, screen, userEvent } from '../../test/test-utils'
 import PreferencesTab from '../PreferencesTab'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import i18n from '../../i18n'
 
-vi.mock('react-hot-toast', async () => {
-  const actual = await vi.importActual<typeof import('react-hot-toast')>('react-hot-toast')
+vi.mock('sonner', async () => {
+  const actual = await vi.importActual<typeof import('sonner')>('sonner')
   return {
     ...actual,
     toast: {

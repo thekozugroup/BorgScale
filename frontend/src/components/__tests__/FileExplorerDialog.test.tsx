@@ -156,6 +156,7 @@ describe('FileExplorerDialog', () => {
           path: '/',
           connection_type: 'local',
         }),
+        signal: expect.any(AbortSignal),
       })
     })
 
@@ -268,6 +269,7 @@ describe('FileExplorerDialog', () => {
         params: expect.objectContaining({
           path: '/home/user/Documents',
         }),
+        signal: expect.any(AbortSignal),
       })
     })
 
@@ -305,7 +307,66 @@ describe('FileExplorerDialog', () => {
         params: expect.objectContaining({
           path: '/home',
         }),
+        signal: expect.any(AbortSignal),
       })
+    })
+
+    it('ignores a superseded directory response that arrives late', async () => {
+      const user = userEvent.setup()
+      let resolveHome: ((value: unknown) => void) | undefined
+
+      const listing = (currentPath: string, itemName: string) => ({
+        data: {
+          current_path: currentPath,
+          items: [
+            { name: itemName, path: `${currentPath}/${itemName}`, is_directory: true, is_borg_repo: false },
+          ],
+          is_inside_local_mount: false,
+        },
+      })
+
+      vi.mocked(api.get).mockImplementation((_url, config) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const path = (config as any)?.params?.path
+        if (path === '/home') {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          return new Promise((resolve) => { resolveHome = resolve }) as any
+        }
+        if (path === '/') {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          return Promise.resolve(listing('/', 'from-root')) as any
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return Promise.resolve(mockDirectoryResponse) as any
+      })
+
+      renderWithProviders(
+        <FileExplorerDialog
+          open={true}
+          onClose={mockOnClose}
+          onSelect={mockOnSelect}
+          initialPath="/home/user"
+        />
+      )
+
+      await waitFor(() => {
+        expect(screen.getByText('Documents')).toBeInTheDocument()
+      })
+
+      // Navigate to /home (never resolves) and immediately on to / (resolves first)
+      await user.click(screen.getByText('home'))
+      await user.click(screen.getByText('Root'))
+
+      await waitFor(() => {
+        expect(screen.getByText('from-root')).toBeInTheDocument()
+      })
+
+      resolveHome?.(listing('/home', 'from-home'))
+
+      await waitFor(() => {
+        expect(screen.getByText('from-root')).toBeInTheDocument()
+      })
+      expect(screen.queryByText('from-home')).not.toBeInTheDocument()
     })
   })
 
@@ -612,6 +673,7 @@ describe('FileExplorerDialog', () => {
             username: 'user',
             port: 22,
           }),
+          signal: expect.any(AbortSignal),
         })
       })
     })

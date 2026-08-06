@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 import api from '../services/api'
 import React from 'react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import DataTable, { Column, ActionButton } from './DataTable'
 import { formatDateShort } from '../utils/dateUtils'
 import { useTranslation } from 'react-i18next'

@@ -16,7 +16,7 @@ import {
   AlertDialogTitle,
 } from '../components/ui/alert-dialog'
 import { Loader2, Plus, Edit, Trash2, Play, FileCode, Clock, CheckCircle, XCircle } from 'lucide-react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import api from '../services/api'
 import CodeEditor from '../components/CodeEditor'
 import ScriptParameterInputs, { ScriptParameter } from '../components/ScriptParameterInputs'

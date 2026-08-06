@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders, screen, userEvent, waitFor } from '../../test/test-utils'
 import FirstLoginPasswordSetup from '../FirstLoginPasswordSetup'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 const {
   useAuthMock,
@@ -42,8 +42,8 @@ vi.mock('react-router-dom', async () => {
   }
 })
 
-vi.mock('react-hot-toast', async () => {
-  const actual = await vi.importActual<typeof import('react-hot-toast')>('react-hot-toast')
+vi.mock('sonner', async () => {
+  const actual = await vi.importActual<typeof import('sonner')>('sonner')
   return {
     ...actual,
     toast: {

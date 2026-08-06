@@ -14,7 +14,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import { settingsAPI, repositoriesAPI } from '../services/api'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { useAuth } from '../hooks/useAuth'
 import { useAnalytics } from '../hooks/useAnalytics'
 import { useAuthorization } from '../hooks/useAuthorization'

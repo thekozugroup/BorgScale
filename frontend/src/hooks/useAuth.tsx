@@ -1,4 +1,5 @@
 import React, { useState, useEffect, createContext, useContext } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   authAPI,
   setAuthTransportMode,
@@ -52,6 +53,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const queryClient = useQueryClient()
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [proxyAuthEnabled, setProxyAuthEnabled] = useState(false)
@@ -350,6 +352,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     clearRecentPasswordLogin()
     clearRecentPasskeyEnrollmentState()
     setUser(null)
+    // Repositories, jobs and settings are cached per browser, not per account.
+    // Without this the next person to sign in on a shared machine reads the
+    // previous account's data until every query happens to refetch.
+    queryClient.clear()
   }
 
   const hasGlobalPermission = (permission: string) => {

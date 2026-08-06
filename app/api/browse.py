@@ -27,6 +27,11 @@ MAX_ITEMS_IN_MEMORY = 1_000_000  # Maximum number of items to load into memory
 MAX_ESTIMATED_MEMORY_MB = 1024  # Maximum estimated memory usage (1GB)
 ITEM_SIZE_ESTIMATE = 200  # Average bytes per item in memory (conservative estimate)
 
+# Response pagination bounds — a single directory listing should never ship
+# hundreds of thousands of children in one payload.
+DEFAULT_BROWSE_PAGE_SIZE = 10_000
+MAX_BROWSE_PAGE_SIZE = 100_000
+
 
 def _build_repo_env(repo: Repository, db: Session):
     temp_key_file = resolve_repo_ssh_key_file(repo, db)
@@ -48,16 +53,29 @@ def _is_browse_result_payload(items) -> bool:
     )
 
 
+def _paginate_browse_items(items: list, offset: int, limit: int) -> dict:
+    return {
+        "items": items[offset : offset + limit],
+        "total": len(items),
+        "offset": offset,
+        "limit": limit,
+    }
+
+
 @router.get("/{repository_id}/{archive_name}")
 async def browse_archive_contents(
     repository_id: int,
     archive_name: str,
     path: str = Query("", description="Path within archive to browse"),
+    offset: int = 0,
+    limit: int = DEFAULT_BROWSE_PAGE_SIZE,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """Browse contents of an archive at a specific path (directory-by-directory)"""
     try:
+        offset = max(offset, 0)
+        limit = max(1, min(limit, MAX_BROWSE_PAGE_SIZE))
         repository = db.query(Repository).filter(Repository.id == repository_id).first()
         if not repository:
             raise HTTPException(
@@ -88,7 +106,7 @@ async def browse_archive_contents(
                 path=path,
                 items_count=len(cached_result),
             )
-            return {"items": cached_result}
+            return _paginate_browse_items(cached_result, offset, limit)
 
         all_items = await archive_cache.get(repository_id, archive_name)
 
@@ -201,7 +219,7 @@ async def browse_archive_contents(
 
         await archive_cache.set(repository_id, result_cache_key, items)
 
-        return {"items": items}
+        return _paginate_browse_items(items, offset, limit)
     except HTTPException:
         raise
     except Exception as e:

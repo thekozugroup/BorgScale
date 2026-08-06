@@ -403,42 +403,45 @@ function ActivityAreaChart({ activities }: { activities: DashboardOverview['acti
       <AreaChart data={data} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
         <defs>
           <linearGradient id="gradBackups" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="hsl(var(--foreground))" stopOpacity={0.15} />
-            <stop offset="95%" stopColor="hsl(var(--foreground))" stopOpacity={0} />
+            <stop offset="5%" stopColor="var(--success)" stopOpacity={0.22} />
+            <stop offset="95%" stopColor="var(--success)" stopOpacity={0} />
           </linearGradient>
           <linearGradient id="gradFailures" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.2} />
-            <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0} />
+            <stop offset="5%" stopColor="var(--destructive)" stopOpacity={0.2} />
+            <stop offset="95%" stopColor="var(--destructive)" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
         <XAxis
           dataKey="date"
-          tick={{ fill: 'hsl(var(--muted-foreground))' }}
+          tick={{ fill: 'var(--muted-foreground)' }}
           tickLine={false}
           axisLine={false}
           interval={1}
         />
         <YAxis
-          tick={{ fill: 'hsl(var(--muted-foreground))' }}
+          tick={{ fill: 'var(--muted-foreground)' }}
           tickLine={false}
           axisLine={false}
           allowDecimals={false}
         />
         <RechartsTooltip
           contentStyle={{
-            background: 'hsl(var(--card))',
-            border: '1px solid hsl(var(--border))',
-            borderRadius: '8px',
+            background: 'var(--popover)',
+            color: 'var(--popover-foreground)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius)',
+            boxShadow: '0 8px 24px oklch(0 0 0 / 12%)',
           }}
-          labelStyle={{ color: 'hsl(var(--foreground))' }}
+          itemStyle={{ color: 'var(--popover-foreground)' }}
+          labelStyle={{ color: 'var(--foreground)' }}
         />
         <Area
           type="monotone"
           dataKey="backups"
           name={t('dashboard.activityTimeline.jobType.backup', { defaultValue: 'backups' })}
-          stroke="hsl(var(--foreground))"
-          strokeWidth={1.5}
+          stroke="var(--success)"
+          strokeWidth={2}
           fill="url(#gradBackups)"
           dot={false}
         />
@@ -446,8 +449,8 @@ function ActivityAreaChart({ activities }: { activities: DashboardOverview['acti
           type="monotone"
           dataKey="failures"
           name={t('dashboard.activityTimeline.legendFailed', { defaultValue: 'failures' })}
-          stroke="hsl(var(--destructive))"
-          strokeWidth={1.5}
+          stroke="var(--destructive)"
+          strokeWidth={2}
           fill="url(#gradFailures)"
           dot={false}
         />

@@ -105,6 +105,7 @@ export default function FileExplorerDialog({
   const [creatingFolder, setCreatingFolder] = useState(false)
 
   const initialLoadDone = useRef(false)
+  const browseRequestRef = useRef<AbortController | null>(null)
 
   const loadSSHConnections = async () => {
     try {
@@ -119,6 +120,12 @@ export default function FileExplorerDialog({
 
   const loadDirectory = React.useCallback(
     async (path: string, conn?: 'local' | 'ssh', config?: SSHNetworkConfig) => {
+      // Fast directory clicking would otherwise let a slower earlier response
+      // land last and repaint the list with the wrong directory
+      browseRequestRef.current?.abort()
+      const controller = new AbortController()
+      browseRequestRef.current = controller
+
       setLoading(true)
       setError(null)
 
@@ -146,12 +153,14 @@ export default function FileExplorerDialog({
           params.port = useSshConfig.port
         }
 
-        const response = await api.get('/filesystem/browse', { params })
+        const response = await api.get('/filesystem/browse', { params, signal: controller.signal })
+        if (controller.signal.aborted) return
         setItems(response.data.items || [])
         setCurrentPath(response.data.current_path)
         setIsInsideLocalMount(response.data.is_inside_local_mount || false)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
+        if (controller.signal.aborted) return
         const detail = err.response?.data?.detail
         if (detail && typeof detail === 'object' && detail.key) {
           setError(t(detail.key, detail.params) as string)
@@ -160,7 +169,9 @@ export default function FileExplorerDialog({
         }
         setItems([])
       } finally {
-        setLoading(false)
+        if (!controller.signal.aborted) {
+          setLoading(false)
+        }
       }
     },
     [activeConnectionType, activeSshConfig, t]
@@ -187,6 +198,8 @@ export default function FileExplorerDialog({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, initialPath, connectionType, sshConfig])
+
+  useEffect(() => () => browseRequestRef.current?.abort(), [])
 
   const handleItemClick = (item: FileSystemItem) => {
     if (item.is_mount_point && item.ssh_connection) {

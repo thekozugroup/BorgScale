@@ -1,24 +1,54 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders, screen, userEvent, waitFor } from '../../test/test-utils'
 import Login from '../Login'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
-const { loginMock, verifyTotpLoginMock, loginWithPasskeyMock, navigateMock, trackAuthMock } =
-  vi.hoisted(() => ({
-    loginMock: vi.fn(),
-    verifyTotpLoginMock: vi.fn(),
-    loginWithPasskeyMock: vi.fn(),
-    navigateMock: vi.fn(),
-    trackAuthMock: vi.fn(),
-  }))
+const {
+  loginMock,
+  verifyTotpLoginMock,
+  loginWithPasskeyMock,
+  refreshUserMock,
+  navigateMock,
+  trackAuthMock,
+  beginPasskeyAuthenticationMock,
+  finishPasskeyAuthenticationMock,
+  isConditionalMediationAvailableMock,
+  getConditionalPasskeyAssertionMock,
+} = vi.hoisted(() => ({
+  loginMock: vi.fn(),
+  verifyTotpLoginMock: vi.fn(),
+  loginWithPasskeyMock: vi.fn(),
+  refreshUserMock: vi.fn(),
+  navigateMock: vi.fn(),
+  trackAuthMock: vi.fn(),
+  beginPasskeyAuthenticationMock: vi.fn(),
+  finishPasskeyAuthenticationMock: vi.fn(),
+  isConditionalMediationAvailableMock: vi.fn(),
+  getConditionalPasskeyAssertionMock: vi.fn(),
+}))
 
 vi.mock('../../hooks/useAuth.tsx', () => ({
   useAuth: () => ({
     login: loginMock,
     verifyTotpLogin: verifyTotpLoginMock,
     loginWithPasskey: loginWithPasskeyMock,
+    refreshUser: refreshUserMock,
     mustChangePassword: false,
   }),
+}))
+
+vi.mock('../../services/api', () => ({
+  authAPI: {
+    beginPasskeyAuthentication: () => beginPasskeyAuthenticationMock(),
+    finishPasskeyAuthentication: (ceremonyToken: string, credential: unknown) =>
+      finishPasskeyAuthenticationMock(ceremonyToken, credential),
+  },
+}))
+
+vi.mock('../../utils/webauthn', () => ({
+  isConditionalMediationAvailable: () => isConditionalMediationAvailableMock(),
+  getConditionalPasskeyAssertion: (options: unknown, signal?: AbortSignal) =>
+    getConditionalPasskeyAssertionMock(options, signal),
 }))
 
 vi.mock('../FirstLoginPasswordSetup', () => ({
@@ -44,8 +74,8 @@ vi.mock('react-router-dom', async () => {
   }
 })
 
-vi.mock('react-hot-toast', async () => {
-  const actual = await vi.importActual<typeof import('react-hot-toast')>('react-hot-toast')
+vi.mock('sonner', async () => {
+  const actual = await vi.importActual<typeof import('sonner')>('sonner')
   return {
     ...actual,
     toast: {
@@ -59,6 +89,8 @@ describe('Login page', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     localStorage.clear()
+    isConditionalMediationAvailableMock.mockResolvedValue(false)
+    refreshUserMock.mockResolvedValue(undefined)
   })
 
   it('submits credentials, tracks login, and redirects to the dashboard by default', async () => {
@@ -169,5 +201,32 @@ describe('Login page', () => {
         requires_password_setup: false,
       })
     })
+  })
+
+  it('establishes the auth session before navigating after an autofill passkey sign-in', async () => {
+    isConditionalMediationAvailableMock.mockResolvedValue(true)
+    beginPasskeyAuthenticationMock.mockResolvedValue({
+      data: { ceremony_token: 'ceremony-token', options: {} },
+    })
+    getConditionalPasskeyAssertionMock.mockResolvedValue({ id: 'credential-id' })
+    finishPasskeyAuthenticationMock.mockResolvedValue({
+      data: { access_token: 'jwt-token', must_change_password: false },
+    })
+
+    renderWithProviders(<Login />)
+
+    await waitFor(() => {
+      expect(localStorage.getItem('access_token')).toBe('jwt-token')
+      expect(refreshUserMock).toHaveBeenCalled()
+      expect(navigateMock).toHaveBeenCalledWith('/dashboard')
+      expect(trackAuthMock).toHaveBeenCalledWith('Login', {
+        method: 'passkey_autofill',
+        requires_password_setup: false,
+      })
+    })
+
+    expect(refreshUserMock.mock.invocationCallOrder[0]).toBeLessThan(
+      navigateMock.mock.invocationCallOrder[0]
+    )
   })
 })

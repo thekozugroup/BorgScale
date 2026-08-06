@@ -14,7 +14,7 @@ import {
   User,
   FolderOpen,
 } from 'lucide-react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { useQueryClient, useQuery } from '@tanstack/react-query'
 import DataTable, { Column, ActionButton } from './DataTable'
 import StatusBadge from './StatusBadge'

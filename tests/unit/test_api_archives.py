@@ -279,6 +279,116 @@ class TestArchivesSshEnvironment:
 
 
 @pytest.mark.unit
+class TestArchiveContentsPagination:
+    """Test line bounds and pagination for GET /archives/{archive_id}/contents"""
+
+    def _create_repo(self, test_db, path="/tmp/contents-repo"):
+        repo = Repository(
+            name="Contents Repo",
+            path=path,
+            encryption="none",
+            repository_type="local",
+        )
+        test_db.add(repo)
+        test_db.commit()
+        test_db.refresh(repo)
+        return repo
+
+    def test_contents_default_request_keeps_existing_shape(
+        self, test_client: TestClient, admin_headers, test_db
+    ):
+        from app.api.archives import DEFAULT_CONTENTS_LINE_LIMIT
+
+        repo = self._create_repo(test_db)
+        stdout = "\n".join(f"line-{index}" for index in range(3))
+
+        with patch(
+            "app.api.archives.borg.list_archive_contents",
+            new=AsyncMock(return_value={"success": True, "stdout": stdout}),
+        ) as mock_list:
+            response = test_client.get(
+                f"/api/archives/arch1/contents?repository={repo.path}",
+                headers=admin_headers,
+            )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["contents"] == stdout
+        assert data["total_lines"] == 3
+        assert data["truncated"] is False
+        _, kwargs = mock_list.await_args
+        assert kwargs["max_lines"] == DEFAULT_CONTENTS_LINE_LIMIT
+
+    def test_contents_offset_and_limit_slice_lines_and_bound_borg(
+        self, test_client: TestClient, admin_headers, test_db
+    ):
+        repo = self._create_repo(test_db, path="/tmp/contents-repo-slice")
+        stdout = "\n".join(f"line-{index}" for index in range(5))
+
+        with patch(
+            "app.api.archives.borg.list_archive_contents",
+            new=AsyncMock(return_value={"success": True, "stdout": stdout}),
+        ) as mock_list:
+            response = test_client.get(
+                f"/api/archives/arch1/contents?repository={repo.path}&offset=1&limit=2",
+                headers=admin_headers,
+            )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["contents"] == "line-1\nline-2"
+        assert data["offset"] == 1
+        assert data["limit"] == 2
+        _, kwargs = mock_list.await_args
+        assert kwargs["max_lines"] == 3
+
+    def test_contents_truncated_stream_returns_partial_output(
+        self, test_client: TestClient, admin_headers, test_db
+    ):
+        repo = self._create_repo(test_db, path="/tmp/contents-repo-truncated")
+
+        with patch(
+            "app.api.archives.borg.list_archive_contents",
+            new=AsyncMock(
+                return_value={
+                    "success": False,
+                    "stdout": "line-0\nline-1",
+                    "stderr": "",
+                    "line_count_exceeded": True,
+                    "lines_read": 3,
+                }
+            ),
+        ):
+            response = test_client.get(
+                f"/api/archives/arch1/contents?repository={repo.path}&limit=2",
+                headers=admin_headers,
+            )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["contents"] == "line-0\nline-1"
+        assert data["truncated"] is True
+
+    def test_contents_failure_without_truncation_still_errors(
+        self, test_client: TestClient, admin_headers, test_db
+    ):
+        repo = self._create_repo(test_db, path="/tmp/contents-repo-failure")
+
+        with patch(
+            "app.api.archives.borg.list_archive_contents",
+            new=AsyncMock(
+                return_value={"success": False, "stdout": "", "stderr": "boom"}
+            ),
+        ):
+            response = test_client.get(
+                f"/api/archives/arch1/contents?repository={repo.path}",
+                headers=admin_headers,
+            )
+
+        assert response.status_code == 500
+
+
+@pytest.mark.unit
 class TestDownloadFileEndpoint:
     """Test GET /archives/download endpoint validation"""
 

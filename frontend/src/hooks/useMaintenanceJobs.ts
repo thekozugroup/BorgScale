@@ -1,3 +1,4 @@
+import { useRef, useSyncExternalStore } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { repositoriesAPI } from '../services/api'
 
@@ -15,26 +16,52 @@ interface RunningJobsResponse {
   prune_job: MaintenanceJob | null
 }
 
+const ACTIVE_POLL_MS = 3000
+const MAX_FAILURE_BACKOFF_MS = 60000
+
+const subscribeToVisibility = (onStoreChange: () => void) => {
+  document.addEventListener('visibilitychange', onStoreChange)
+  return () => document.removeEventListener('visibilitychange', onStoreChange)
+}
+
+const getDocumentHidden = () => document.hidden
+
 /**
  * Hook to track running maintenance jobs (check/compact/prune) for a repository
- * Polls every 3 seconds when there are active jobs
+ *
+ * Polls every 3 seconds while jobs are running and stops once they finish.
+ * One instance runs per repository card, so repeated failures back off
+ * exponentially and polling pauses entirely while the tab is hidden — a
+ * 20-repository dashboard would otherwise multiply every request.
  */
 export function useMaintenanceJobs(repositoryId: number | null, enabled: boolean = true) {
+  const documentHidden = useSyncExternalStore(subscribeToVisibility, getDocumentHidden)
+  // React Query resets its own failure count on every fetch, so the streak that
+  // drives the backoff is tracked here
+  const failureStreak = useRef(0)
+
   const { data, isLoading } = useQuery({
     queryKey: ['running-jobs', repositoryId],
     queryFn: async () => {
-      const response = await repositoriesAPI.getRunningJobs(repositoryId!)
-      return response.data as RunningJobsResponse
+      try {
+        const response = await repositoriesAPI.getRunningJobs(repositoryId!)
+        failureStreak.current = 0
+        return response.data as RunningJobsResponse
+      } catch (error) {
+        failureStreak.current += 1
+        throw error
+      }
     },
     enabled: enabled && repositoryId !== null,
-    // Poll every 3 seconds when enabled, continue polling if there are running jobs
     refetchInterval: (query) => {
-      if (!enabled) return false
+      if (!enabled || documentHidden) return false
+      if (failureStreak.current > 0) {
+        return Math.min(ACTIVE_POLL_MS * 2 ** failureStreak.current, MAX_FAILURE_BACKOFF_MS)
+      }
       // Keep polling if we have running jobs, or if we haven't fetched data yet
       const data = query.state.data
-      return !data || data?.has_running_jobs ? 3000 : false
+      return !data || data.has_running_jobs ? ACTIVE_POLL_MS : false
     },
-    refetchIntervalInBackground: true,
     refetchOnWindowFocus: true, // Refetch when returning to tab
     refetchOnMount: true, // Refetch when component mounts
     staleTime: 0, // Always consider data stale

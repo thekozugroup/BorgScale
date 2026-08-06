@@ -466,6 +466,122 @@ class TestBrowseArchiveBehavior:
 
 
 @pytest.mark.unit
+class TestBrowseArchivePagination:
+    def _cached_files(self, count):
+        return [
+            {
+                "path": f"file{index:03d}.txt",
+                "type": "f",
+                "size": index,
+                "mtime": "2024-01-01T00:00:00",
+            }
+            for index in range(count)
+        ]
+
+    def test_browse_archive_returns_pagination_metadata_by_default(
+        self, test_client: TestClient, admin_headers, test_db
+    ):
+        repo = _create_repository(test_db, name="Pagination Default Repo")
+
+        with patch.object(
+            browse_api.archive_cache,
+            "get",
+            new=AsyncMock(return_value=self._cached_files(5)),
+        ):
+            response = test_client.get(
+                f"/api/browse/{repo.id}/test-archive",
+                headers=admin_headers,
+            )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["items"]) == 5
+        assert data["total"] == 5
+        assert data["offset"] == 0
+        assert data["limit"] == browse_api.DEFAULT_BROWSE_PAGE_SIZE
+
+    def test_browse_archive_applies_offset_and_limit(
+        self, test_client: TestClient, admin_headers, test_db
+    ):
+        repo = _create_repository(test_db, name="Pagination Slice Repo")
+
+        with patch.object(
+            browse_api.archive_cache,
+            "get",
+            new=AsyncMock(return_value=self._cached_files(10)),
+        ):
+            response = test_client.get(
+                f"/api/browse/{repo.id}/test-archive",
+                params={"offset": 4, "limit": 3},
+                headers=admin_headers,
+            )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert [item["name"] for item in data["items"]] == [
+            "file004.txt",
+            "file005.txt",
+            "file006.txt",
+        ]
+        assert data["total"] == 10
+        assert data["offset"] == 4
+        assert data["limit"] == 3
+
+    def test_browse_archive_clamps_limit_to_maximum(
+        self, test_client: TestClient, admin_headers, test_db
+    ):
+        repo = _create_repository(test_db, name="Pagination Clamp Repo")
+
+        with patch.object(
+            browse_api.archive_cache,
+            "get",
+            new=AsyncMock(return_value=self._cached_files(2)),
+        ):
+            response = test_client.get(
+                f"/api/browse/{repo.id}/test-archive",
+                params={"limit": 10_000_000, "offset": -5},
+                headers=admin_headers,
+            )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["limit"] == browse_api.MAX_BROWSE_PAGE_SIZE
+        assert data["offset"] == 0
+        assert len(data["items"]) == 2
+
+    def test_browse_archive_paginates_cached_browse_result(
+        self, test_client: TestClient, admin_headers, test_db
+    ):
+        repo = _create_repository(test_db, name="Pagination Cached Result Repo")
+        cached_result = [
+            {
+                "name": f"file{index}.txt",
+                "type": "file",
+                "size": index,
+                "mtime": "2024-01-01T00:00:00",
+                "path": f"file{index}.txt",
+            }
+            for index in range(4)
+        ]
+
+        with patch.object(
+            browse_api.archive_cache,
+            "get",
+            new=AsyncMock(return_value=cached_result),
+        ):
+            response = test_client.get(
+                f"/api/browse/{repo.id}/test-archive",
+                params={"offset": 2, "limit": 1},
+                headers=admin_headers,
+            )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert [item["name"] for item in data["items"]] == ["file2.txt"]
+        assert data["total"] == 4
+
+
+@pytest.mark.unit
 class TestFilesystemEndpoints:
     """Test filesystem API endpoints"""
 

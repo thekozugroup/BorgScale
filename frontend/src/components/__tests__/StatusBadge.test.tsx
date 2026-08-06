@@ -63,67 +63,44 @@ describe('StatusBadge', () => {
   })
 
   describe('Status colors', () => {
-    it('renders success color for "completed"', () => {
-      const { container } = render(<StatusBadge status="completed" />)
+    // Each status must be distinguishable from every other one. Colour alone
+    // would fail WCAG 1.4.1, so the badge also carries a status-specific icon;
+    // the svg assertions below are what stop a future refactor dropping it.
+    const CASES: Array<[string, string, string]> = [
+      ['completed', 'bg-success-subtle', 'text-success'],
+      ['success', 'bg-success-subtle', 'text-success'],
+      ['completed_with_warnings', 'bg-warning-subtle', 'text-warning'],
+      ['failed', 'bg-destructive-subtle', 'text-destructive'],
+      ['error', 'bg-destructive-subtle', 'text-destructive'],
+      ['running', 'bg-info-subtle', 'text-info'],
+      ['in_progress', 'bg-info-subtle', 'text-info'],
+      ['pending', 'bg-muted', 'text-muted-foreground'],
+      ['cancelled', 'bg-muted', 'text-muted-foreground'],
+      ['unknown_status', 'bg-muted', 'text-muted-foreground'],
+    ]
+
+    it.each(CASES)('renders %s with its own colour tokens', (status, bg, fg) => {
+      const { container } = render(<StatusBadge status={status} />)
       const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('bg-primary/10')
-      expect(chip.className).toContain('text-primary')
+      expect(chip.className).toContain(bg)
+      expect(chip.className).toContain(fg)
     })
 
-    it('renders success color for "success"', () => {
-      const { container } = render(<StatusBadge status="success" />)
-      const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('bg-primary/10')
-      expect(chip.className).toContain('text-primary')
+    it('does not render warnings identically to cancelled', () => {
+      const warned = render(<StatusBadge status="completed_with_warnings" />).container
+        .firstChild as HTMLElement
+      const cancelled = render(<StatusBadge status="cancelled" />).container
+        .firstChild as HTMLElement
+
+      expect(warned.className).not.toEqual(cancelled.className)
     })
 
-    it('renders warning color for "completed_with_warnings"', () => {
-      const { container } = render(<StatusBadge status="completed_with_warnings" />)
-      const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('bg-muted')
-      expect(chip.className).toContain('text-muted-foreground')
-    })
-
-    it('renders error color for "failed"', () => {
-      const { container } = render(<StatusBadge status="failed" />)
-      const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('bg-destructive/10')
-      expect(chip.className).toContain('text-destructive')
-    })
-
-    it('renders error color for "error"', () => {
-      const { container } = render(<StatusBadge status="error" />)
-      const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('bg-destructive/10')
-      expect(chip.className).toContain('text-destructive')
-    })
-
-    it('renders secondary color for "running"', () => {
-      const { container } = render(<StatusBadge status="running" />)
-      const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('bg-secondary')
-      expect(chip.className).toContain('text-secondary-foreground')
-    })
-
-    it('renders secondary color for "in_progress"', () => {
-      const { container } = render(<StatusBadge status="in_progress" />)
-      const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('bg-secondary')
-      expect(chip.className).toContain('text-secondary-foreground')
-    })
-
-    it('renders muted color for "pending"', () => {
-      const { container } = render(<StatusBadge status="pending" />)
-      const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('bg-muted')
-      expect(chip.className).toContain('text-muted-foreground')
-    })
-
-    it('renders muted color for unknown status', () => {
-      const { container } = render(<StatusBadge status="unknown_status" />)
-      const chip = container.firstChild as HTMLElement
-      expect(chip.className).toContain('bg-muted')
-      expect(chip.className).toContain('text-muted-foreground')
+    it('pairs every status with an icon so colour is never the only signal', () => {
+      for (const [status] of CASES) {
+        const { container } = render(<StatusBadge status={status} />)
+        const chip = container.firstChild as HTMLElement
+        expect(chip.querySelector('svg')).not.toBeNull()
+      }
     })
   })
 

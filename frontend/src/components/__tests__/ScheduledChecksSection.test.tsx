@@ -27,8 +27,8 @@ vi.mock('../../hooks/usePermissions', () => ({
   }),
 }))
 
-vi.mock('react-hot-toast', async () => {
-  const actual = await vi.importActual('react-hot-toast')
+vi.mock('sonner', async () => {
+  const actual = await vi.importActual('sonner')
   return {
     ...actual,
     toast: {

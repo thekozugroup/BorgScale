@@ -52,8 +52,8 @@ vi.mock('../MultiRepositorySelector', () => ({
   default: () => <div>MultiRepositorySelector</div>,
 }))
 
-vi.mock('react-hot-toast', async () => {
-  const actual = await vi.importActual<typeof import('react-hot-toast')>('react-hot-toast')
+vi.mock('sonner', async () => {
+  const actual = await vi.importActual<typeof import('sonner')>('sonner')
   return {
     ...actual,
     toast: {

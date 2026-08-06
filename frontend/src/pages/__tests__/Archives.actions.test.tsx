@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders, screen, userEvent, waitFor } from '../../test/test-utils'
 import Archives from '../Archives'
 import * as apiModule from '../../services/api'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 const trackArchive = vi.fn()
 const borgListArchivesMock = vi.fn()
@@ -172,8 +172,8 @@ vi.mock('react-router-dom', async (importOriginal) => {
   }
 })
 
-vi.mock('react-hot-toast', async () => {
-  const actual = await vi.importActual<typeof import('react-hot-toast')>('react-hot-toast')
+vi.mock('sonner', async () => {
+  const actual = await vi.importActual<typeof import('sonner')>('sonner')
   return {
     ...actual,
     toast: {

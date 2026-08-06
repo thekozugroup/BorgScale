@@ -12,8 +12,8 @@ vi.mock('../../services/api', () => ({
   },
 }))
 
-vi.mock('react-hot-toast', async () => {
-  const actual = await vi.importActual('react-hot-toast')
+vi.mock('sonner', async () => {
+  const actual = await vi.importActual('sonner')
   return {
     ...actual,
     toast: {
@@ -155,7 +155,7 @@ describe('BetaFeaturesTab', () => {
 
     it('shows success toast after enabling', async () => {
       const user = userEvent.setup()
-      const { toast } = await import('react-hot-toast')
+      const { toast } = await import('sonner')
       vi.mocked(settingsAPI.updateSystemSettings).mockResolvedValue({} as AxiosResponse)
 
       renderWithProviders(<BetaFeaturesTab />)
@@ -182,7 +182,7 @@ describe('BetaFeaturesTab', () => {
 
     it('reverts state on error', async () => {
       const user = userEvent.setup()
-      const { toast } = await import('react-hot-toast')
+      const { toast } = await import('sonner')
       vi.mocked(settingsAPI.updateSystemSettings).mockRejectedValue(new Error('API Error'))
 
       renderWithProviders(<BetaFeaturesTab />)

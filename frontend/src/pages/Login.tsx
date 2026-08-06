@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth.tsx'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
@@ -34,7 +34,7 @@ export default function Login() {
   const [pendingChallengeToken, setPendingChallengeToken] = useState<string | null>(null)
   const [pendingUsername, setPendingUsername] = useState<string | null>(null)
   const conditionalPasskeyAbortRef = useRef<AbortController | null>(null)
-  const { login, verifyTotpLogin, loginWithPasskey, mustChangePassword } = useAuth()
+  const { login, verifyTotpLogin, loginWithPasskey, refreshUser, mustChangePassword } = useAuth()
   const navigate = useNavigate()
   const { t } = useTranslation()
   usePageTitle(t('auth.signIn', 'Sign in'))
@@ -62,6 +62,13 @@ export default function Login() {
     },
     [EventAction.LOGIN, navigate, t, trackAuth]
   )
+
+  // AuthProvider rebuilds its context value on every render, so depending on
+  // refreshUser directly would restart the conditional ceremony each time.
+  const refreshUserRef = useRef(refreshUser)
+  useEffect(() => {
+    refreshUserRef.current = refreshUser
+  }, [refreshUser])
 
   useEffect(() => {
     if (pendingChallengeToken) return
@@ -96,6 +103,7 @@ export default function Login() {
           throw new Error('Missing access token')
         }
         localStorage.setItem('access_token', access_token)
+        await refreshUserRef.current()
         handleSuccessfulLogin(null, must_change_password || false, 'passkey_autofill')
       } catch (error: unknown) {
         if (hasErrorName(error, 'AbortError') || cancelled) {

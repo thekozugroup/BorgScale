@@ -21,7 +21,6 @@ from app.core.security import get_current_user, get_current_download_user
 from app.core.borg2 import borg2
 from app.services.archive_browse_service import (
     build_browse_items,
-    collect_browse_paths,
     parse_archive_items,
 )
 from app.services.cache_service import archive_cache
@@ -376,27 +375,16 @@ async def get_archive_contents(
         if not fast_browse:
             await archive_cache.set(repo.id, raw_cache_key, all_items)
 
-    if fast_browse:
-        items = build_browse_items(
-            all_items,
-            path,
-            hide_directory_sizes=True,
-        )
-        await archive_cache.set(repo.id, cache_key, items)
-        return {"items": items}
-
-    result_map = {
-        browse_path: build_browse_items(all_items, browse_path)
-        for browse_path in collect_browse_paths(all_items)
-    }
-    for browse_path, browse_items in result_map.items():
-        await archive_cache.set(
-            repo.id,
-            _get_browse_cache_key(archive_id, browse_path),
-            browse_items,
-        )
-
-    return {"items": result_map.get(path.strip("/"), [])}
+    # Build only the requested directory — precomputing every browse path made
+    # the first request O(directories) borg-item scans and pinned memory on
+    # large archives. Other paths are derived lazily from the cached raw list.
+    items = build_browse_items(
+        all_items,
+        path,
+        hide_directory_sizes=fast_browse,
+    )
+    await archive_cache.set(repo.id, cache_key, items)
+    return {"items": items}
 
 
 # ── Delete archive ─────────────────────────────────────────────────────────────

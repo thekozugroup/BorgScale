@@ -11,7 +11,7 @@ import {
   XCircle,
   Loader2,
 } from 'lucide-react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import api from '../services/api'
 import { translateBackendKey } from '../utils/translateBackendKey'
 import ScriptParameterInputs, { ScriptParameter } from './ScriptParameterInputs'

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Globe } from 'lucide-react'
 import SettingsCard from './SettingsCard'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import i18n from '../i18n'
 import {
   Select,

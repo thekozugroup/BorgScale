@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { renderWithProviders, screen, userEvent, waitFor } from '../../test/test-utils'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { act, renderWithProviders, screen, userEvent, waitFor } from '../../test/test-utils'
 import Backup from '../Backup'
 
 const runBackupMock = vi.fn()
@@ -14,6 +14,10 @@ const { getManualJobsMock, backupJobsTableMock } = vi.hoisted(() => ({
   getManualJobsMock: vi.fn(),
   backupJobsTableMock: vi.fn(),
 }))
+
+function setDocumentHidden(hidden: boolean) {
+  Object.defineProperty(document, 'hidden', { configurable: true, get: () => hidden })
+}
 
 let locationState: Record<string, unknown> | null = null
 let canManageAll = false
@@ -45,8 +49,8 @@ vi.mock('../../hooks/usePermissions', () => ({
   }),
 }))
 
-vi.mock('react-hot-toast', async () => {
-  const actual = await vi.importActual<typeof import('react-hot-toast')>('react-hot-toast')
+vi.mock('sonner', async () => {
+  const actual = await vi.importActual<typeof import('sonner')>('sonner')
   return {
     ...actual,
     toast: {
@@ -271,6 +275,79 @@ describe('Backup page', () => {
 
     expect(screen.queryByRole('button', { name: /choose primary repo/i })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: /start backup/i })).toBeDisabled()
+  })
+
+  describe('job polling', () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+      locationState = { repositoryPath: '/repos/primary' }
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+      setDocumentHidden(false)
+    })
+
+    const advance = async (ms: number) => {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(ms)
+      })
+    }
+
+    it('polls every second while a backup job is running', async () => {
+      manualJobsPayload = [{ id: 42, repository: '/repos/primary', status: 'running' }]
+
+      renderWithProviders(<Backup />)
+
+      await advance(0)
+      expect(getManualJobsMock).toHaveBeenCalledTimes(1)
+
+      await advance(1000)
+      expect(getManualJobsMock).toHaveBeenCalledTimes(2)
+
+      await advance(1000)
+      expect(getManualJobsMock).toHaveBeenCalledTimes(3)
+    })
+
+    it('drops to a slow poll when every job is finished', async () => {
+      manualJobsPayload = [{ id: 42, repository: '/repos/primary', status: 'completed' }]
+
+      renderWithProviders(<Backup />)
+
+      await advance(0)
+      expect(getManualJobsMock).toHaveBeenCalledTimes(1)
+
+      await advance(5000)
+      expect(getManualJobsMock).toHaveBeenCalledTimes(1)
+
+      await advance(30000)
+      expect(getManualJobsMock).toHaveBeenCalledTimes(2)
+    })
+
+    it('stops polling while the tab is hidden', async () => {
+      manualJobsPayload = [{ id: 42, repository: '/repos/primary', status: 'running' }]
+
+      renderWithProviders(<Backup />)
+
+      await advance(0)
+      expect(getManualJobsMock).toHaveBeenCalledTimes(1)
+
+      setDocumentHidden(true)
+      await act(async () => {
+        document.dispatchEvent(new Event('visibilitychange'))
+      })
+
+      await advance(10000)
+      expect(getManualJobsMock).toHaveBeenCalledTimes(1)
+
+      setDocumentHidden(false)
+      await act(async () => {
+        document.dispatchEvent(new Event('visibilitychange'))
+      })
+      await advance(1000)
+
+      expect(getManualJobsMock.mock.calls.length).toBeGreaterThan(1)
+    })
   })
 
   it('shows the generated borg command preview for the selected repository', async () => {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { useAnalytics } from '../hooks/useAnalytics'

@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { useQuery } from '@tanstack/react-query'
 import { renderWithProviders, screen, waitFor } from '../../test/test-utils'
 import { AppProvider, useAppState, useTabEnablement } from '../AppContext'
+import { repositoriesAPI } from '../../services/api'
 
 const { useAuthMock } = vi.hoisted(() => ({
   useAuthMock: vi.fn(),
@@ -41,6 +43,15 @@ function Probe() {
   )
 }
 
+function RepositoriesConsumer() {
+  const { data } = useQuery({
+    queryKey: ['repositories'],
+    queryFn: repositoriesAPI.getRepositories,
+  })
+
+  return <div>consumerRepositories:{data?.data?.repositories?.length ?? 'none'}</div>
+}
+
 describe('AppContext', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -68,6 +79,23 @@ describe('AppContext', () => {
       expect(screen.getByText('schedule:false')).toBeInTheDocument()
       expect(screen.getByText('reason:Please create a repository first')).toBeInTheDocument()
     })
+  })
+
+  it('shares the repository list cache with the other repository call sites', async () => {
+    getRepositoriesMock.mockResolvedValue({
+      data: { repositories: [{ id: 1, archive_count: 2 }] },
+    })
+
+    renderWithProviders(
+      <AppProvider>
+        <Probe />
+        <RepositoriesConsumer />
+      </AppProvider>
+    )
+
+    await screen.findByText('consumerRepositories:1')
+    await screen.findByText('hasRepositories:true')
+    expect(getRepositoriesMock).toHaveBeenCalledTimes(1)
   })
 
   it('enables repository-dependent tabs and derives archive state from repository counts', async () => {

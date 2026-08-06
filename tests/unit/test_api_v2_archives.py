@@ -653,14 +653,57 @@ class TestV2ArchiveRoutes:
             )
 
         assert response.status_code == 200
-        assert mock_cache_set.await_count == 3
+        # Only the raw list plus the requested path get cached — precomputing
+        # every directory made the first browse O(directories) on huge archives.
+        assert mock_cache_set.await_count == 2
         calls = [call.args for call in mock_cache_set.await_args_list]
         assert calls[0] == (repo.id, "archive-1::raw", parse_archive_items(stdout))
         assert calls[1][0] == repo.id
-        assert calls[1][1] == "archive-1"
-        assert calls[2][0] == repo.id
-        assert calls[2][1] == "archive-1::path::docs"
-        assert calls[2][2] == response.json()["items"]
+        assert calls[1][1] == "archive-1::path::docs"
+        assert calls[1][2] == response.json()["items"]
+
+    def test_get_archive_contents_does_not_precompute_other_directories(
+        self, test_client: TestClient, admin_headers, test_db
+    ):
+        _enable_borg_v2(test_db)
+        repo = _create_v2_repo(test_db)
+        stdout = "\n".join(
+            json.dumps(
+                {
+                    "path": f"dir{i}/sub/file.txt",
+                    "type": "f",
+                    "size": 1,
+                    "mtime": "2026-04-04T00:00:00",
+                }
+            )
+            for i in range(50)
+        )
+
+        with (
+            patch(
+                "app.api.v2.archives.archive_cache.get",
+                new=AsyncMock(return_value=None),
+            ),
+            patch(
+                "app.api.v2.archives.borg2.list_archive_contents",
+                new=AsyncMock(
+                    return_value={"success": True, "stdout": stdout, "stderr": ""}
+                ),
+            ),
+            patch(
+                "app.api.v2.archives.archive_cache.set",
+                new=AsyncMock(return_value=True),
+            ) as mock_cache_set,
+        ):
+            response = test_client.get(
+                f"/api/v2/archives/archive-1/contents?repository={repo.path}&path=dir7",
+                headers=admin_headers,
+            )
+
+        assert response.status_code == 200
+        assert [item["name"] for item in response.json()["items"]] == ["sub"]
+        cached_keys = {call.args[1] for call in mock_cache_set.await_args_list}
+        assert cached_keys == {"archive-1::raw", "archive-1::path::dir7"}
 
     def test_download_file_success(
         self, test_client: TestClient, admin_headers, test_db, tmp_path

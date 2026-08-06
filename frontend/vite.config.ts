@@ -35,12 +35,11 @@ export default defineConfig({
       output: {
         // Split rarely-changing vendor code out of the app chunk so a release
         // does not invalidate the browser cache for the whole framework, and so
-        // the heavy editor/chart libraries only download on pages that use them.
+        // the heavy chart library only downloads on pages that use it.
         manualChunks: {
           react: ['react', 'react-dom', 'react-router-dom'],
           query: ['@tanstack/react-query', 'axios'],
           charts: ['recharts'],
-          editor: ['@monaco-editor/react'],
           i18n: ['i18next', 'react-i18next'],
         },
       },

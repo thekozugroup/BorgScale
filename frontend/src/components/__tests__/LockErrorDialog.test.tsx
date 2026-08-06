@@ -3,7 +3,7 @@ import { screen, waitFor, renderWithProviders } from '../../test/test-utils'
 import userEvent from '@testing-library/user-event'
 import LockErrorDialog from '../LockErrorDialog'
 import { repositoriesAPI } from '../../services/api'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { AxiosResponse } from 'axios'
 
 vi.mock('../../services/api', () => ({
@@ -12,7 +12,7 @@ vi.mock('../../services/api', () => ({
   },
 }))
 
-vi.mock('react-hot-toast', () => ({
+vi.mock('sonner', () => ({
   toast: {
     success: vi.fn(),
     error: vi.fn(),

@@ -3,7 +3,7 @@ import { renderWithProviders, screen, userEvent, waitFor, within } from '../../t
 import { ThemeProvider } from '../../context/ThemeContext'
 import Settings from '../Settings'
 import * as apiModule from '../../services/api'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 const trackSettings = vi.fn()
 const { useAuthMock } = vi.hoisted(() => ({
@@ -72,8 +72,8 @@ vi.mock('../../services/api', () => ({
   },
 }))
 
-vi.mock('react-hot-toast', async () => {
-  const actual = await vi.importActual<typeof import('react-hot-toast')>('react-hot-toast')
+vi.mock('sonner', async () => {
+  const actual = await vi.importActual<typeof import('sonner')>('sonner')
   return {
     ...actual,
     toast: {

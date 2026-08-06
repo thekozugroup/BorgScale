@@ -77,7 +77,7 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
   ] as const
 
   return (
-    <header className="fixed top-0 right-0 left-0 z-20 flex h-16 items-center border-b border-border/50 bg-background/85 px-4 backdrop-blur-md sm:left-60 sm:px-6">
+    <header className="fixed top-0 right-0 left-0 z-20 flex h-16 items-center surface-frost border-b px-4 sm:left-60 sm:px-6">
       {/* Mobile hamburger */}
       <Button
         variant="ghost"

@@ -34,7 +34,7 @@ import {
   EyeOff,
   Zap,
 } from 'lucide-react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { getApiErrorDetail } from '../utils/apiErrors'
 import { translateBackendKey } from '../utils/translateBackendKey'
 import RemoteMachineCard from '../components/RemoteMachineCard'

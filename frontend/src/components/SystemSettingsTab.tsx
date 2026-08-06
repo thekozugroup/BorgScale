@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
@@ -14,7 +14,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import SettingsCard from './SettingsCard'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { authAPI, settingsAPI } from '../services/api'
 import { translateBackendKey } from '../utils/translateBackendKey'
 import { useAnalytics } from '../hooks/useAnalytics'
@@ -100,6 +100,7 @@ const SystemSettingsTab: React.FC = () => {
   const [browseChanged, setBrowseChanged] = useState(false)
   const [systemChanged, setSystemChanged] = useState(false)
   const [activeSection, setActiveSection] = useState(0)
+  const statsRefreshPollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   interface CacheStats {
     browse_max_items?: number
@@ -359,6 +360,16 @@ const SystemSettingsTab: React.FC = () => {
     }
   }
 
+  const stopStatsRefreshPoll = () => {
+    if (statsRefreshPollRef.current !== null) {
+      clearInterval(statsRefreshPollRef.current)
+      statsRefreshPollRef.current = null
+    }
+  }
+
+  // The stats refresh poll can outlive the tab by up to five minutes
+  useEffect(() => stopStatsRefreshPoll, [])
+
   const handleRefreshStats = async () => {
     setIsRefreshingStats(true)
     try {
@@ -368,13 +379,14 @@ const SystemSettingsTab: React.FC = () => {
       trackSystem(EventAction.START, { section: 'system_settings', operation: 'refresh_stats' })
       const startTime = Date.now()
       const maxWaitTime = 5 * 60 * 1000
-      const pollInterval = setInterval(async () => {
-        if (Date.now() - startTime > maxWaitTime) { clearInterval(pollInterval); setIsRefreshingStats(false); return }
+      stopStatsRefreshPoll()
+      statsRefreshPollRef.current = setInterval(async () => {
+        if (Date.now() - startTime > maxWaitTime) { stopStatsRefreshPoll(); setIsRefreshingStats(false); return }
         try {
           const settingsResponse = await settingsAPI.getSystemSettings()
           const newLastRefresh = settingsResponse.data?.settings?.last_stats_refresh
           if (newLastRefresh && new Date(newLastRefresh) > new Date(startTime)) {
-            clearInterval(pollInterval)
+            stopStatsRefreshPoll()
             setIsRefreshingStats(false)
             toast.success(t('systemSettings.statsRefreshCompleted'))
             queryClient.invalidateQueries({ queryKey: ['repositories'] })

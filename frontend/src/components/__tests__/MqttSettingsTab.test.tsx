@@ -12,8 +12,8 @@ vi.mock('../../services/api', () => ({
   },
 }))
 
-vi.mock('react-hot-toast', async () => {
-  const actual = await vi.importActual('react-hot-toast')
+vi.mock('sonner', async () => {
+  const actual = await vi.importActual('sonner')
   return {
     ...actual,
     toast: {
@@ -513,7 +513,7 @@ describe('MqttSettingsTab', () => {
   describe('Error Handling', () => {
     it('handles save error with array of errors', async () => {
       const user = userEvent.setup()
-      const { toast } = await import('react-hot-toast')
+      const { toast } = await import('sonner')
 
       vi.mocked(settingsAPI.updateSystemSettings).mockRejectedValue({
         response: {
@@ -539,7 +539,7 @@ describe('MqttSettingsTab', () => {
 
     it('handles save error with detail message', async () => {
       const user = userEvent.setup()
-      const { toast } = await import('react-hot-toast')
+      const { toast } = await import('sonner')
 
       vi.mocked(settingsAPI.updateSystemSettings).mockRejectedValue({
         response: {
@@ -565,7 +565,7 @@ describe('MqttSettingsTab', () => {
 
     it('handles save error with generic message', async () => {
       const user = userEvent.setup()
-      const { toast } = await import('react-hot-toast')
+      const { toast } = await import('sonner')
 
       vi.mocked(settingsAPI.updateSystemSettings).mockRejectedValue(new Error('Network error'))
 

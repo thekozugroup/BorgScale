@@ -18,7 +18,7 @@ import MountArchiveDialog from '../components/MountArchiveDialog'
 import ArchiveContentsDialog from '../components/ArchiveContentsDialog'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../components/ui/dialog'
 import { Button } from '../components/ui/button'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 // MountSuccessToast replaced by inline dialog — import removed
 import { Archive, Repository } from '@/types'
 import LockErrorDialog from '../components/LockErrorDialog'

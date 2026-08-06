@@ -2,7 +2,6 @@ import { ReactElement, ReactNode } from 'react'
 import { render, RenderOptions } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Toaster } from 'react-hot-toast'
 import { I18nextProvider } from 'react-i18next'
 import i18n from '../i18n'
 import { SidebarProvider } from '@/components/ui/sidebar'
@@ -30,7 +29,11 @@ interface AllProvidersProps {
 }
 
 /**
- * Wrapper component that provides all necessary context providers for testing
+ * Wrapper component that provides all necessary context providers for testing.
+ *
+ * Deliberately does not render <Toaster>. Tests assert against a mocked
+ * `toast`, and mounting the real toaster makes every suite that mocks the
+ * `sonner` module fail on the missing Toaster export.
  */
 export function AllProviders({ children, queryClient }: AllProvidersProps) {
   const testQueryClient = queryClient || createTestQueryClient()
@@ -41,10 +44,7 @@ export function AllProviders({ children, queryClient }: AllProvidersProps) {
         <BrowserRouter>
           <ThemeProvider>
             <SidebarProvider defaultOpen>
-              <TooltipProvider>
-                {children}
-                <Toaster position="top-right" />
-              </TooltipProvider>
+              <TooltipProvider>{children}</TooltipProvider>
             </SidebarProvider>
           </ThemeProvider>
         </BrowserRouter>

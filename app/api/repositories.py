@@ -748,6 +748,41 @@ def _uses_borg2_payload(data: Union[RepositoryCreate, RepositoryImport]) -> bool
     return requested_version == 2 or data.encryption in V2_ONLY_ENCRYPTION_MODES
 
 
+def _validate_local_repository_path(repo_path: str) -> None:
+    """Reject local repository paths that borg could never initialise.
+
+    Only structural impossibilities are rejected: a component of the path that
+    is a regular file rather than a directory, or an existing destination that
+    is a file. Whether a directory is writable is deliberately not checked here
+    — the container may adjust ownership via PUID/PGID after this point, so a
+    permission probe now would produce false rejections.
+    """
+    if os.path.isfile(repo_path):
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "key": "backend.errors.repo.pathIsFile",
+                "params": {"path": repo_path},
+            },
+        )
+
+    # Walk up to the first existing ancestor. If it is not a directory, no
+    # amount of mkdir will make this path usable.
+    ancestor = os.path.dirname(repo_path)
+    while ancestor and ancestor != os.path.dirname(ancestor):
+        if os.path.exists(ancestor):
+            if not os.path.isdir(ancestor):
+                raise HTTPException(
+                    status_code=400,
+                    detail={
+                        "key": "backend.errors.repo.parentIsFile",
+                        "params": {"path": ancestor},
+                    },
+                )
+            return
+        ancestor = os.path.dirname(ancestor)
+
+
 def _require_borg2_feature(db: Session) -> None:
     """No-op. Borg 2 support is available to every BorgScale instance.
 
@@ -926,12 +961,22 @@ async def create_repository(
                     detail={"key": "backend.errors.repo.sshUrlWithoutConnectionId"},
                 )
 
+            if not repo_path:
+                raise HTTPException(
+                    status_code=400,
+                    detail={"key": "backend.errors.repo.pathRequired"},
+                )
+
             if not os.path.isabs(repo_path):
                 # If relative path, make it relative to data directory
                 repo_path = os.path.join(settings.data_dir, repo_path)
 
             # Validate that the path is a valid absolute path
             repo_path = os.path.abspath(repo_path)
+
+            # Reject destinations borg could never initialise, so a typo surfaces
+            # here with an actionable message instead of at the first backup.
+            _validate_local_repository_path(repo_path)
         else:
             # Remote repository - get connection details
             connection_details = get_connection_details(repo_data.connection_id, db)

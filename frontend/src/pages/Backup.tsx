@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useLocation, Link } from 'react-router-dom'
@@ -12,7 +12,7 @@ import {
 } from '../components/ui/collapsible'
 import { backupAPI, repositoriesAPI } from '../services/api'
 import { BorgApiClient } from '../services/borgApi'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { translateBackendKey } from '../utils/translateBackendKey'
 import { BackupJob, Repository } from '../types'
 import BackupJobsTable from '../components/BackupJobsTable'
@@ -27,6 +27,19 @@ import { getRepoCapabilities } from '../utils/repoCapabilities'
 import { useTrackedJobOutcomes } from '../hooks/useTrackedJobOutcomes'
 import { getJobDurationSeconds } from '../utils/analyticsProperties'
 
+// Job rows only move while a job is in flight, so second-by-second polling is
+// reserved for that case — an idle page must not hammer a self-hosted backend.
+const ACTIVE_JOBS_POLL_MS = 1000
+const IDLE_JOBS_POLL_MS = 30000
+const ACTIVE_JOB_STATUSES = ['running', 'pending']
+
+const subscribeToVisibility = (onStoreChange: () => void) => {
+  document.addEventListener('visibilitychange', onStoreChange)
+  return () => document.removeEventListener('visibilitychange', onStoreChange)
+}
+
+const getDocumentHidden = () => document.hidden
+
 // Emerald green — matches the "Backup Now" button in RepositoryCard for visual continuity
 const Backup: React.FC = () => {
   const [selectedRepository, setSelectedRepository] = useState<string>('')
@@ -39,6 +52,7 @@ const Backup: React.FC = () => {
   const canManageRepositoryOperations = hasGlobalPermission('repositories.manage_all')
   const permissions = usePermissions()
   const { t } = useTranslation()
+  const documentHidden = useSyncExternalStore(subscribeToVisibility, getDocumentHidden)
   usePageTitle(t('backup.title'))
 
   // Handle incoming navigation state (from "Backup Now" button)
@@ -57,7 +71,12 @@ const Backup: React.FC = () => {
     queryKey: ['backup-status-manual', selectedRepository],
     queryFn: () => backupAPI.getManualJobs(selectedRepository),
     enabled: Boolean(selectedRepository),
-    refetchInterval: 1000, // Poll every 1 second for real-time updates
+    refetchInterval: (query) => {
+      if (documentHidden) return false
+      const jobs = query.state.data?.data?.jobs as BackupJob[] | undefined
+      const hasActiveJob = jobs?.some((job) => ACTIVE_JOB_STATUSES.includes(job.status))
+      return hasActiveJob ? ACTIVE_JOBS_POLL_MS : IDLE_JOBS_POLL_MS
+    },
   })
   const backupStatus = backupStatusResponse?.data?.jobs
 

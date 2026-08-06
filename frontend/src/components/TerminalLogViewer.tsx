@@ -1,6 +1,6 @@
 import React, { useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { Copy, Download, PlayCircle } from 'lucide-react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -70,6 +70,21 @@ function colorizeJsonLine(content: string): React.ReactNode {
   return <>{parts}</>
 }
 
+const RUNNING_POLL_MS = 2000
+
+// A running job re-serves its whole tail buffer on every poll, so keep the
+// previous line objects for lines that did not change: React.memo then skips
+// re-rendering (and re-colourising) everything the user is already looking at.
+function mergeLogLines(prev: LogLine[], next: LogLine[]): LogLine[] {
+  const isSameLine = (a: LogLine | undefined, b: LogLine) =>
+    a !== undefined && a.line_number === b.line_number && a.content === b.content
+
+  if (prev.length === next.length && next.every((line, i) => isSameLine(prev[i], line))) {
+    return prev
+  }
+  return next.map((line, i) => (isSameLine(prev[i], line) ? prev[i] : line))
+}
+
 const MemoizedLogLine = React.memo(({ log }: { log: LogLine }) => (
   <div className="mb-1">
     <span
@@ -113,8 +128,11 @@ export const TerminalLogViewer = React.forwardRef<TerminalLogViewerHandle, Termi
           } else {
             if (result.lines.length > 0) {
               if (status === 'running') {
-                setLogs(result.lines)
-                logsRef.current = result.lines
+                setLogs((prev) => {
+                  const merged = mergeLogLines(prev, result.lines)
+                  logsRef.current = merged
+                  return merged
+                })
               } else {
                 setLogs((prev) => {
                   const newLogs = [...prev, ...result.lines]
@@ -134,7 +152,10 @@ export const TerminalLogViewer = React.forwardRef<TerminalLogViewerHandle, Termi
 
       fetchLogs()
       if (status === 'running') {
-        const interval = setInterval(fetchLogs, 2000)
+        const interval = setInterval(() => {
+          if (document.hidden) return
+          fetchLogs()
+        }, RUNNING_POLL_MS)
         return () => clearInterval(interval)
       }
     }, [status, onFetchLogs])
@@ -285,9 +306,9 @@ export const TerminalLogViewer = React.forwardRef<TerminalLogViewerHandle, Termi
             <div className="flex items-center mt-4">
               <div
                 className="w-2 h-2 rounded-full mr-2 animate-pulse"
-                style={{ background: 'hsl(var(--primary))' }}
+                style={{ background: 'var(--primary)' }}
               />
-              <span className="text-sm" style={{ color: 'hsl(var(--primary))' }}>
+              <span className="text-sm" style={{ color: 'var(--primary)' }}>
                 {t('terminalLog.inProgress', {
                   type: jobType.charAt(0).toUpperCase() + jobType.slice(1),
                 })}

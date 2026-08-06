@@ -1,13 +1,16 @@
-import { useTheme } from "next-themes"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
 import { CircleCheckIcon, InfoIcon, TriangleAlertIcon, OctagonXIcon, Loader2Icon } from "lucide-react"
+import { useTheme } from "@/context/ThemeContext"
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme()
+  // The app drives theming through its own ThemeContext, not next-themes.
+  // Reading from next-themes here left every toast pinned to "system" and
+  // ignoring the in-app theme toggle.
+  const { effectiveMode } = useTheme()
 
   return (
     <Sonner
-      theme={theme as ToasterProps["theme"]}
+      theme={effectiveMode as ToasterProps["theme"]}
       className="toaster group"
       icons={{
         success: (

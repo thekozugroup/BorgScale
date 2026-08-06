@@ -39,29 +39,34 @@ def build_browse_items(
 ) -> List[Dict]:
     """Build immediate children for a browse path from a full/raw item list."""
     normalized_path = path.strip("/")
+    search_prefix = f"{normalized_path}/" if normalized_path else ""
 
-    def calculate_directory_size(dir_path: str) -> int:
-        total_size = 0
-        normalized_dir_path = dir_path.strip("/")
-        search_prefix = f"{normalized_dir_path}/" if normalized_dir_path else ""
-
+    # Accumulate each file's size onto the immediate child it falls under in a
+    # single pass — rescanning the full item list per directory is O(dirs * items).
+    child_sizes: Dict[str, int] = {}
+    if not hide_directory_sizes:
         for item in all_items:
+            if item.get("type") == "d" or item.get("size") is None:
+                continue
+
             item_path = (item.get("path") or "").strip("/")
             if not item_path:
                 continue
 
             if search_prefix:
-                if (
-                    item_path.startswith(search_prefix)
-                    or item_path == normalized_dir_path
-                ):
-                    if item.get("type") != "d" and item.get("size") is not None:
-                        total_size += item.get("size", 0)
+                if not item_path.startswith(search_prefix):
+                    continue
+                relative_path = item_path[len(search_prefix) :]
             else:
-                if item.get("type") != "d" and item.get("size") is not None:
-                    total_size += item.get("size", 0)
+                relative_path = item_path
 
-        return total_size
+            if not relative_path:
+                continue
+
+            child_name = relative_path.split("/", 1)[0]
+            child_sizes[child_name] = child_sizes.get(child_name, 0) + item.get(
+                "size", 0
+            )
 
     items: List[Dict] = []
     seen_paths = set()
@@ -101,7 +106,7 @@ def build_browse_items(
                     "type": "directory",
                     "size": None
                     if hide_directory_sizes
-                    else calculate_directory_size(full_dir_path),
+                    else child_sizes.get(dir_name, 0),
                     "mtime": None,
                     "path": full_dir_path,
                 }
@@ -122,7 +127,7 @@ def build_browse_items(
                     "type": "directory",
                     "size": None
                     if hide_directory_sizes
-                    else calculate_directory_size(full_path),
+                    else child_sizes.get(relative_path, 0),
                     "mtime": item_mtime,
                     "path": full_path,
                 }

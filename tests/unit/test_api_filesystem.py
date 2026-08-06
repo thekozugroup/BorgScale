@@ -4,7 +4,9 @@ Unit tests for filesystem API endpoints and helpers.
 
 from __future__ import annotations
 
+import asyncio
 import base64
+import time
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
@@ -246,6 +248,65 @@ class TestFilesystemBrowseSSH:
         assert response.items[0].is_directory is True
         assert response.items[0].is_borg_repo is True
         assert response.items[1].is_directory is False
+
+    @pytest.mark.asyncio
+    async def test_browse_ssh_filesystem_does_not_block_event_loop(
+        self,
+        test_db,
+        monkeypatch,
+    ):
+        secret_key = "a" * 32
+        monkeypatch.setattr(
+            filesystem.settings, "secret_key", secret_key, raising=False
+        )
+        monkeypatch.setattr(
+            filesystem.settings.__class__, "get_local_mount_points", lambda self: []
+        )
+
+        ssh_key = SSHKey(
+            name="slow-ssh-key",
+            public_key="ssh-rsa AAA",
+            private_key=_encrypt_private_key(secret_key, "PRIVATE KEY"),
+        )
+        test_db.add(ssh_key)
+        test_db.commit()
+        test_db.refresh(ssh_key)
+
+        def slow_run(cmd, *args, **kwargs):
+            # Simulates a slow SSH round-trip; if this ran on the event loop
+            # the heartbeat task below would be starved for the full duration.
+            time.sleep(0.3)
+            return SimpleNamespace(
+                returncode=0,
+                stdout="-rw-r--r-- 1 user group 12 Nov 26 10:31 notes.txt\n",
+                stderr="",
+            )
+
+        monkeypatch.setattr(filesystem.subprocess, "run", slow_run)
+
+        ticks = 0
+
+        async def heartbeat():
+            nonlocal ticks
+            while True:
+                await asyncio.sleep(0.01)
+                ticks += 1
+
+        heartbeat_task = asyncio.create_task(heartbeat())
+        try:
+            response = await filesystem.browse_ssh_filesystem(
+                path="/remote",
+                ssh_key_id=ssh_key.id,
+                host="example.com",
+                username="borg",
+                port=22,
+                db=test_db,
+            )
+        finally:
+            heartbeat_task.cancel()
+
+        assert [item.name for item in response.items] == ["notes.txt"]
+        assert ticks >= 5
 
     @pytest.mark.asyncio
     async def test_browse_ssh_filesystem_missing_key_returns_404(self, test_db):

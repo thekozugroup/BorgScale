@@ -31,6 +31,11 @@ import asyncio
 logger = structlog.get_logger()
 router = APIRouter()
 
+# Line pagination bounds for raw archive contents — without them a single
+# request could buffer and return up to a million borg output lines.
+DEFAULT_CONTENTS_LINE_LIMIT = 100_000
+MAX_CONTENTS_LINE_LIMIT = 1_000_000
+
 
 def _build_repo_env(repo: Repository, db: Session):
     temp_key_file = resolve_repo_ssh_key_file(repo, db)
@@ -208,11 +213,19 @@ async def get_archive_contents(
     repository: str,
     archive_id: str,
     path: str = "",
+    offset: int = 0,
+    limit: int = DEFAULT_CONTENTS_LINE_LIMIT,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """Get contents of an archive"""
     try:
+        offset = max(offset, 0)
+        limit = max(1, min(limit, MAX_CONTENTS_LINE_LIMIT))
+        # Bounding max_lines kills the borg process once the requested page is
+        # covered instead of buffering the entire listing.
+        max_lines = min(offset + limit, MAX_CONTENTS_LINE_LIMIT)
+
         # Validate repository exists
         repo = require_repository_access_by_path(db, current_user, repository, "viewer")
         env, temp_key_file = _build_repo_env(repo, db)
@@ -223,18 +236,29 @@ async def get_archive_contents(
                 path,
                 remote_path=repo.remote_path,
                 passphrase=repo.passphrase,
+                max_lines=max_lines,
                 bypass_lock=repo.bypass_lock,
                 env=env,
             )
         finally:
             cleanup_temp_key_file(temp_key_file)
-        if not result["success"]:
+        truncated = bool(result.get("line_count_exceeded"))
+        if not result.get("success") and not truncated:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to get archive contents: {result['stderr']}",
             )
 
-        return {"contents": result["stdout"]}
+        stdout = result.get("stdout") or ""
+        lines = stdout.split("\n") if stdout else []
+        page = lines[offset : offset + limit]
+        return {
+            "contents": "\n".join(page),
+            "total_lines": len(lines),
+            "offset": offset,
+            "limit": limit,
+            "truncated": truncated,
+        }
     except HTTPException:
         raise
     except Exception as e:

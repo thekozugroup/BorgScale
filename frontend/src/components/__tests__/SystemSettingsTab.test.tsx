@@ -4,7 +4,7 @@ import { AxiosResponse } from 'axios'
 
 import SystemSettingsTab from '../SystemSettingsTab'
 import { authAPI, settingsAPI } from '@/services/api.ts'
-import { renderWithProviders, screen, waitFor } from '../../test/test-utils'
+import { act, fireEvent, renderWithProviders, screen, waitFor } from '../../test/test-utils'
 
 vi.mock('../../services/api', () => ({
   settingsAPI: {
@@ -19,8 +19,8 @@ vi.mock('../../services/api', () => ({
   },
 }))
 
-vi.mock('react-hot-toast', async () => {
-  const actual = await vi.importActual('react-hot-toast')
+vi.mock('sonner', async () => {
+  const actual = await vi.importActual('sonner')
   return {
     ...actual,
     toast: {
@@ -113,5 +113,38 @@ describe('SystemSettingsTab', () => {
         })
       )
     })
+  })
+
+  it('stops the stats refresh poll once the tab unmounts', async () => {
+    vi.useFakeTimers()
+    try {
+      vi.mocked(settingsAPI.refreshAllStats).mockResolvedValue({
+        data: { message: 'Stats refresh started' },
+      } as AxiosResponse)
+
+      const { unmount } = renderWithProviders(<SystemSettingsTab />)
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0)
+      })
+
+      fireEvent.click(screen.getByRole('button', { name: /Repository Monitoring/i }))
+      fireEvent.click(screen.getByRole('button', { name: /Refresh Now/i }))
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(3000)
+      })
+      const callsWhilePolling = vi.mocked(settingsAPI.getSystemSettings).mock.calls.length
+      expect(callsWhilePolling).toBeGreaterThan(1)
+
+      unmount()
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(60000)
+      })
+      expect(settingsAPI.getSystemSettings).toHaveBeenCalledTimes(callsWhilePolling)
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })

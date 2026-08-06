@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Fingerprint, ShieldCheck, Zap, KeyRound, Loader2 } from 'lucide-react'
 import { getApiErrorDetail } from '../utils/apiErrors'
 import { translateBackendKey } from '../utils/translateBackendKey'
