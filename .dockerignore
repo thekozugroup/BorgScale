@@ -1,0 +1,52 @@
+# The build context is sent to the daemon in full before anything runs, and the
+# frontend stage does `COPY frontend/ ./`. Without these exclusions a developer's
+# local node_modules (hundreds of MB, with host-native binaries) is uploaded and
+# baked into the image, and `npm ci` resolves against it instead of the lockfile.
+
+.git
+.github
+.gitignore
+.gitleaks.toml
+.pre-commit-config.yaml
+
+**/node_modules
+frontend/build
+frontend/.vite
+frontend/coverage
+app/static/*
+!app/static/.gitkeep
+
+**/__pycache__
+**/*.py[cod]
+.pytest_cache
+.ruff_cache
+.coverage
+.coverage.*
+htmlcov
+coverage.xml
+*.egg-info
+.venv
+venv
+
+# Local runtime state that must never end up in an image layer.
+*.db
+*.db-wal
+*.db-shm
+.env
+.env.*
+!.env.example
+data/
+logs/
+
+# Documentation and development-only assets. None of it is read at runtime.
+docs
+examples
+screenshots
+tests
+updates-worker
+*.md
+!README.md
+docker-compose*.yml
+dev.sh
+run_tests.sh
+Borg_UI_API.postman_collection.json
