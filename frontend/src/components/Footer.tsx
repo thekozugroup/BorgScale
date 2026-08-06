@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { BASE_PATH } from '@/utils/basePath'
 
 interface AboutPayload {
   name: string
@@ -9,27 +10,54 @@ interface AboutPayload {
   upstream: string
 }
 
+/**
+ * AGPL-3.0 §13 source-disclosure notice.
+ *
+ * A hosted instance must offer its source to everyone who interacts with it
+ * over the network, which includes visitors who never sign in. This renders on
+ * the authenticated shell and on the sign-in and auth-error screens alike.
+ */
 export function Footer() {
   const [info, setInfo] = useState<AboutPayload | null>(null)
+
   useEffect(() => {
-    let alive = true
-    fetch('/api/about')
+    const controller = new AbortController()
+    // BASE_PATH-relative: a sub-path reverse-proxy deployment serves the API
+    // under the prefix, and an absolute /api/about 404s there — which used to
+    // make the whole notice disappear silently.
+    fetch(`${BASE_PATH}/api/about`, { signal: controller.signal })
       .then((r) => (r.ok ? r.json() : null))
-      .then((d) => alive && setInfo(d))
+      .then((d) => d && setInfo(d))
       .catch(() => {})
-    return () => {
-      alive = false
-    }
+    return () => controller.abort()
   }, [])
-  if (!info) return null
+
+  // Never return null: the source link is a licence obligation, so it renders
+  // even when /api/about is unreachable.
+  const source = info?.source ?? 'https://github.com/thekozugroup/BorgScale'
+  const licenseUrl = info?.license_url ?? 'https://www.gnu.org/licenses/agpl-3.0.html'
+  const license = info?.license ?? 'AGPL-3.0'
+
   return (
-    <footer
-      className="border-t border-border text-center px-3 py-2 text-xs opacity-70"
-    >
-      {info.name} v{info.version} ·{' '}
-      <a href={info.source} target="_blank" rel="noreferrer">Source (AGPL)</a>
+    <footer className="border-t border-border px-3 py-2 text-center text-xs text-muted-foreground">
+      {info ? `${info.name} v${info.version} · ` : null}
+      <a
+        className="underline-offset-2 hover:underline"
+        href={source}
+        target="_blank"
+        rel="noreferrer"
+      >
+        Source (AGPL)
+      </a>
       {' · '}
-      <a href={info.license_url} target="_blank" rel="noreferrer">{info.license}</a>
+      <a
+        className="underline-offset-2 hover:underline"
+        href={licenseUrl}
+        target="_blank"
+        rel="noreferrer"
+      >
+        {license}
+      </a>
     </footer>
   )
 }

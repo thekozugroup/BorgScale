@@ -9,6 +9,7 @@ import { useFirstRun } from './hooks/useFirstRun'
 import AuthLayout from './components/AuthLayout'
 import NotFound from './pages/NotFound'
 import PageLoader from './components/PageLoader'
+import { Footer } from './components/Footer'
 
 // Route-level code splitting. Login stays eager because it is the first paint
 // for a signed-out visitor; every other page arrives as its own chunk so the
@@ -23,6 +24,18 @@ const Repositories = lazy(() => import('./pages/Repositories'))
 const SSHConnectionsSingleKey = lazy(() => import('./pages/SSHConnectionsSingleKey'))
 const Activity = lazy(() => import('./pages/Activity'))
 const Settings = lazy(() => import('./pages/Settings'))
+
+function AppSpinner() {
+  return (
+    <div role="status" aria-live="polite">
+      <span className="sr-only">Loading</span>
+      <div
+        aria-hidden="true"
+        className="h-32 w-32 rounded-full border-2 border-primary border-t-transparent motion-safe:animate-spin"
+      />
+    </div>
+  )
+}
 
 function DashboardOrWelcome() {
   const { showWelcome } = useFirstRun()
@@ -65,7 +78,7 @@ function App() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary border-t-transparent"></div>
+        <AppSpinner />
       </div>
     )
   }
@@ -74,7 +87,7 @@ function App() {
     // If proxy auth is enabled, never send users to the local login page.
     if (proxyAuthEnabled) {
       return (
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-6">
           {authError ? (
             <div className="max-w-lg rounded-2xl border border-border bg-background p-8 shadow-sm">
               <div className="flex items-center gap-2.5">
@@ -106,15 +119,18 @@ function App() {
               ) : null}
             </div>
           ) : (
-            <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary border-t-transparent"></div>
+            <AppSpinner />
           )}
+          <div className="w-full max-w-lg">
+            <Footer />
+          </div>
         </div>
       )
     }
 
     if (insecureNoAuthEnabled) {
       return (
-        <div className="min-h-screen flex items-center justify-center">
+        <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-6">
           {authError ? (
             <div className="max-w-lg rounded-2xl border border-border bg-background p-8 shadow-sm">
               <div className="flex items-center gap-2.5">
@@ -126,8 +142,11 @@ function App() {
               <p className="mt-3 text-sm leading-6 text-muted-foreground">{authError}</p>
             </div>
           ) : (
-            <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary border-t-transparent"></div>
+            <AppSpinner />
           )}
+          <div className="w-full max-w-lg">
+            <Footer />
+          </div>
         </div>
       )
     }

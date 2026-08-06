@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Boxes } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Footer } from './Footer'
 
 // ─── Animated background nodes ──────────────────────────────────────────────
 
@@ -16,10 +17,13 @@ interface NodeProps {
 
 const ArchiveNode = ({ x, y, delay, duration, size, opacity }: NodeProps) => {
   const opacityCls =
-    opacity >= 0.65 ? 'bg-foreground/[0.03] border-foreground/[0.18]' :
-    opacity >= 0.55 ? 'bg-foreground/[0.02] border-foreground/[0.14]' :
-    opacity >= 0.45 ? 'bg-foreground/[0.02] border-foreground/[0.12]' :
-    'bg-foreground/[0.01] border-foreground/[0.10]'
+    opacity >= 0.65
+      ? 'bg-foreground/[0.03] border-foreground/[0.18]'
+      : opacity >= 0.55
+        ? 'bg-foreground/[0.02] border-foreground/[0.14]'
+        : opacity >= 0.45
+          ? 'bg-foreground/[0.02] border-foreground/[0.12]'
+          : 'bg-foreground/[0.01] border-foreground/[0.10]'
   return (
     <div
       aria-hidden="true"
@@ -78,7 +82,6 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
     <div className="flex flex-col lg:flex-row lg:h-screen bg-background min-h-screen overflow-hidden">
       {/* ── LEFT: Brand panel ──────────────────────────────────────────────── */}
       <div className="relative flex lg:w-[52%] xl:w-[55%] flex-col items-center justify-center overflow-hidden bg-muted p-6 lg:p-8">
-
         {/* Floating archive nodes */}
         <ArchiveNode x="8%" y="12%" delay="0s" duration="4.2s" size={48} opacity={0.7} />
         <ArchiveNode x="78%" y="8%" delay="1.1s" duration="5.5s" size={32} opacity={0.5} />
@@ -119,11 +122,14 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
       {/* ── RIGHT: Form panel ──────────────────────────────────────────────── */}
       <div className="relative flex flex-1 min-w-0 flex-col items-center justify-start lg:justify-center px-5 lg:px-12 xl:px-16 pb-6 pt-3 lg:pt-6">
-        <div className="w-full max-w-[400px] animate-fade-in-up [animation-delay:0.1s]">
+        <main className="w-full max-w-[400px] animate-fade-in-up [animation-delay:0.1s]">
           {/* Card */}
-          <div className="bg-card/30 border border-foreground/[0.08] backdrop-blur rounded-2xl px-7 py-9">
-            {children}
-          </div>
+          <div className="surface-frost rounded-2xl border px-7 py-9">{children}</div>
+        </main>
+
+        {/* AGPL §13: the source offer must reach visitors who never sign in. */}
+        <div className="mt-6 w-full max-w-[400px]">
+          <Footer />
         </div>
       </div>
     </div>

@@ -3,10 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders, screen, waitFor } from '../test/test-utils'
 import App from '../App'
 
-const {
-  useAuthMock,
-  protectedRouteMock,
-} = vi.hoisted(() => ({
+const { useAuthMock, protectedRouteMock } = vi.hoisted(() => ({
   useAuthMock: vi.fn(),
   protectedRouteMock: vi.fn(),
 }))
@@ -86,7 +83,7 @@ describe('App', () => {
 
     renderWithProviders(<App />)
 
-    expect(document.querySelector('.animate-spin')).toBeInTheDocument()
+    expect(screen.getByRole('status')).toBeInTheDocument()
     expect(screen.queryByText('Login Page')).not.toBeInTheDocument()
   })
 
@@ -105,7 +102,7 @@ describe('App', () => {
 
     renderWithProviders(<App />, { initialRoute: '/login' })
 
-    expect(document.querySelector('.animate-spin')).toBeInTheDocument()
+    expect(screen.getByRole('status')).toBeInTheDocument()
     expect(screen.queryByText('Login Page')).not.toBeInTheDocument()
   })
 

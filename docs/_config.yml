@@ -5,7 +5,7 @@ baseurl: ""
 url: https://github.com/thekozugroup/BorgScale
 
 # GitHub metadata
-repository: karanhudia/borgscale
+repository: thekozugroup/BorgScale
 
 # Color scheme
 color_scheme: dark
@@ -14,7 +14,7 @@ color_scheme: dark
 logo: "/assets/images/logo.png"
 
 # Footer content
-footer_content: "Copyright &copy; 2024 Karan Hudia. Distributed under the AGPL-3.0 License."
+footer_content: "Maintained by The Kozu Group. Forked from borg-ui by Karan Hudia. Distributed under the AGPL-3.0 License."
 
 # Back to top link
 back_to_top: true
@@ -23,7 +23,7 @@ back_to_top_text: "Back to top"
 # Aux links (top right)
 aux_links:
   "GitHub":
-    - "//github.com/karanhudia/borgscale"
+    - "//github.com/thekozugroup/BorgScale"
   "Docker Hub":
     - "//hub.docker.com/r/ainullcode/borgscale"
 

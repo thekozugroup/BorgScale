@@ -181,8 +181,8 @@ Contributors will be recognized in:
 
 ## Need Help?
 
-- **Documentation**: [Full Documentation](https://karanhudia.github.io/borgscale)
-- **Issues**: [GitHub Issues](https://github.com/karanhudia/borgscale/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/karanhudia/borgscale/discussions)
+- **Documentation**: [Full Documentation](https://github.com/thekozugroup/BorgScale/blob/main/docs)
+- **Issues**: [GitHub Issues](https://github.com/thekozugroup/BorgScale/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/thekozugroup/BorgScale/discussions)
 
 Thank you for contributing to BorgScale!
