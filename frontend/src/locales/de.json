@@ -1436,6 +1436,19 @@
     }
   },
   "backupJobsTable": {
+    "actions": {
+      "runNow": "Jetzt ausführen",
+      "edit": "Bearbeiten",
+      "duplicate": "Duplizieren",
+      "delete": "Löschen",
+      "viewLogs": "Protokolle anzeigen",
+      "viewArchive": "Archiv anzeigen",
+      "downloadLogs": "Protokolle herunterladen",
+      "errorDetails": "Fehlerdetails",
+      "cancel": "Abbrechen",
+      "cancelJob": "Aufgabe abbrechen",
+      "breakLock": "Sperre aufheben"
+    },
     "columns": {
       "status": "Status",
       "jobName": "Aufgabenname",
@@ -1450,31 +1463,11 @@
       "started": "Gestartet",
       "duration": "Dauer"
     },
-    "actions": {
-      "runNow": "Jetzt ausführen",
-      "edit": "Bearbeiten",
-      "duplicate": "Duplizieren",
-      "delete": "Löschen",
-      "viewLogs": "Protokolle anzeigen",
-      "viewArchive": "Archiv anzeigen",
-      "downloadLogs": "Protokolle herunterladen",
-      "errorDetails": "Fehlerdetails",
-      "cancel": "Abbrechen",
-      "cancelJob": "Aufgabe abbrechen",
-      "breakLock": "Sperre aufheben"
-    },
-    "never": "Nie",
     "empty": "Keine Sicherungsaufgaben gefunden",
-    "types": {
-      "backup": "Sicherung",
-      "restore": "Wiederherstellung",
-      "check": "Repository-Überprüfung",
-      "compact": "Komprimieren",
-      "prune": "Bereinigen",
-      "package": "Paketinstallation"
-    },
-    "scheduledById": "Geplant (ID: {{id}})",
+    "emptyDescription": "Manuell gestartete Sicherungen erscheinen hier, mit Status und Protokollen.",
     "manual": "Manuell",
+    "never": "Nie",
+    "scheduledById": "Geplant (ID: {{id}})",
     "toasts": {
       "authRequired": "Authentifizierung erforderlich",
       "downloadingLogs": "Protokolle werden heruntergeladen...",
@@ -1483,6 +1476,14 @@
       "failedToDelete": "Aufgabe konnte nicht gelöscht werden",
       "deleteSuccess": "Aufgabe erfolgreich gelöscht",
       "repositoryNotFound": "Repository nicht gefunden"
+    },
+    "types": {
+      "backup": "Sicherung",
+      "restore": "Wiederherstellung",
+      "check": "Repository-Überprüfung",
+      "compact": "Komprimieren",
+      "prune": "Bereinigen",
+      "package": "Paketinstallation"
     }
   },
   "scheduledJobsTable": {

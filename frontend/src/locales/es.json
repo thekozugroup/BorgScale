@@ -1436,6 +1436,19 @@
     }
   },
   "backupJobsTable": {
+    "actions": {
+      "runNow": "Ejecutar ahora",
+      "edit": "Editar",
+      "duplicate": "Duplicar",
+      "delete": "Eliminar",
+      "viewLogs": "Ver registros",
+      "viewArchive": "Ver archivo",
+      "downloadLogs": "Descargar registros",
+      "errorDetails": "Detalles del error",
+      "cancel": "Cancelar",
+      "cancelJob": "Cancelar trabajo",
+      "breakLock": "Forzar desbloqueo"
+    },
     "columns": {
       "status": "Estado",
       "jobName": "Nombre del trabajo",
@@ -1450,31 +1463,11 @@
       "started": "Iniciado",
       "duration": "Duración"
     },
-    "actions": {
-      "runNow": "Ejecutar ahora",
-      "edit": "Editar",
-      "duplicate": "Duplicar",
-      "delete": "Eliminar",
-      "viewLogs": "Ver registros",
-      "viewArchive": "Ver archivo",
-      "downloadLogs": "Descargar registros",
-      "errorDetails": "Detalles del error",
-      "cancel": "Cancelar",
-      "cancelJob": "Cancelar trabajo",
-      "breakLock": "Forzar desbloqueo"
-    },
-    "never": "Nunca",
     "empty": "No se encontraron trabajos de copia de seguridad",
-    "types": {
-      "backup": "Copia de seguridad",
-      "restore": "Restauración",
-      "check": "Verificación del repositorio",
-      "compact": "Compactar",
-      "prune": "Podar",
-      "package": "Instalación de paquete"
-    },
-    "scheduledById": "Programado (ID: {{id}})",
+    "emptyDescription": "Las copias que ejecutes manualmente aparecerán aquí, con su estado y registros.",
     "manual": "Manual",
+    "never": "Nunca",
+    "scheduledById": "Programado (ID: {{id}})",
     "toasts": {
       "authRequired": "Autenticación requerida",
       "downloadingLogs": "Descargando registros...",
@@ -1483,6 +1476,14 @@
       "failedToDelete": "Error al eliminar el trabajo",
       "deleteSuccess": "Trabajo eliminado correctamente",
       "repositoryNotFound": "Repositorio no encontrado"
+    },
+    "types": {
+      "backup": "Copia de seguridad",
+      "restore": "Restauración",
+      "check": "Verificación del repositorio",
+      "compact": "Compactar",
+      "prune": "Podar",
+      "package": "Instalación de paquete"
     }
   },
   "scheduledJobsTable": {

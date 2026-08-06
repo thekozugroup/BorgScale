@@ -32,7 +32,17 @@ export function PaginationBar({
       <div className="flex items-center gap-2">
         <span className="text-xs">{t('dataTable.rowsPerPage')}</span>
         <select
-          className="text-xs bg-background border border-border rounded px-1 py-0.5 focus:outline-none"
+          aria-label={t('dataTable.rowsPerPage')}
+          className="appearance-none rounded border border-input bg-background py-0.5 pl-2 pr-6 text-xs text-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none [&>option]:bg-popover [&>option]:text-popover-foreground"
+          style={{
+            // A chevron the browser cannot restyle, so the control matches the
+            // Radix triggers beside it in both themes.
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23888' stroke-width='1.5'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E\")",
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'right 0.25rem center',
+            backgroundSize: '0.85rem',
+          }}
           value={rowsPerPage}
           onChange={onRowsPerPageChange}
         >

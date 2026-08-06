@@ -612,23 +612,23 @@ export default function Repositories() {
     <div>
       {/* Header */}
       <div className="mb-6">
-        <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-          <div className="flex-1 md:mr-4">
+        <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex-1 lg:mr-4">
             <h1 className="mb-1 text-2xl font-semibold tracking-tight">
               {t('repositories.title')}
             </h1>
             <p className="text-sm text-muted-foreground">{t('repositories.subtitle')}</p>
           </div>
           {canManageRepositoriesGlobally && (
-            <div className="flex flex-col gap-2 md:flex-row">
-              <Button onClick={() => openWizard('create')} size="lg" className="w-full md:w-auto">
+            <div className="flex flex-col gap-2 sm:flex-row lg:shrink-0">
+              <Button onClick={() => openWizard('create')} size="lg" className="w-full sm:w-auto">
                 <Plus size={16} />
                 {t('repositories.createRepository')}
               </Button>
               <Button
                 variant="outline"
                 onClick={() => openWizard('import')}
-                className="w-full md:w-auto"
+                className="w-full sm:w-auto"
               >
                 <Upload size={16} />
                 {t('repositories.importExisting')}

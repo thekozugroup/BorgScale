@@ -1436,6 +1436,19 @@
     }
   },
   "backupJobsTable": {
+    "actions": {
+      "runNow": "Esegui Ora",
+      "edit": "Modifica",
+      "duplicate": "Duplica",
+      "delete": "Elimina",
+      "viewLogs": "Visualizza Log",
+      "viewArchive": "Visualizza Archivio",
+      "downloadLogs": "Scarica Log",
+      "errorDetails": "Dettagli Errore",
+      "cancel": "Annulla",
+      "cancelJob": "Annulla Job",
+      "breakLock": "Rompi Blocco"
+    },
     "columns": {
       "status": "Stato",
       "jobName": "Nome Job",
@@ -1450,31 +1463,11 @@
       "started": "Avviato",
       "duration": "Durata"
     },
-    "actions": {
-      "runNow": "Esegui Ora",
-      "edit": "Modifica",
-      "duplicate": "Duplica",
-      "delete": "Elimina",
-      "viewLogs": "Visualizza Log",
-      "viewArchive": "Visualizza Archivio",
-      "downloadLogs": "Scarica Log",
-      "errorDetails": "Dettagli Errore",
-      "cancel": "Annulla",
-      "cancelJob": "Annulla Job",
-      "breakLock": "Rompi Blocco"
-    },
-    "never": "Mai",
     "empty": "Nessun job di backup trovato",
-    "types": {
-      "backup": "Backup",
-      "restore": "Ripristino",
-      "check": "Controllo Repository",
-      "compact": "Compattazione",
-      "prune": "Pulizia",
-      "package": "Installazione Pacchetto"
-    },
-    "scheduledById": "Pianificato (ID: {{id}})",
+    "emptyDescription": "I backup che avvii manualmente compaiono qui, con stato e log.",
     "manual": "Manuale",
+    "never": "Mai",
+    "scheduledById": "Pianificato (ID: {{id}})",
     "toasts": {
       "authRequired": "Autenticazione richiesta",
       "downloadingLogs": "Download log in corso...",
@@ -1483,6 +1476,14 @@
       "failedToDelete": "Impossibile eliminare il job",
       "deleteSuccess": "Job eliminato con successo",
       "repositoryNotFound": "Repository non trovato"
+    },
+    "types": {
+      "backup": "Backup",
+      "restore": "Ripristino",
+      "check": "Controllo Repository",
+      "compact": "Compattazione",
+      "prune": "Pulizia",
+      "package": "Installazione Pacchetto"
     }
   },
   "scheduledJobsTable": {

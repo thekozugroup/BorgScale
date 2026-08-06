@@ -1436,6 +1436,19 @@
     }
   },
   "backupJobsTable": {
+    "actions": {
+      "runNow": "Run Now",
+      "edit": "Edit",
+      "duplicate": "Duplicate",
+      "delete": "Delete",
+      "viewLogs": "View Logs",
+      "viewArchive": "View Archive",
+      "downloadLogs": "Download Logs",
+      "errorDetails": "Error Details",
+      "cancel": "Cancel",
+      "cancelJob": "Cancel Job",
+      "breakLock": "Break Lock"
+    },
     "columns": {
       "status": "Status",
       "jobName": "Job Name",
@@ -1450,31 +1463,11 @@
       "started": "Started",
       "duration": "Duration"
     },
-    "actions": {
-      "runNow": "Run Now",
-      "edit": "Edit",
-      "duplicate": "Duplicate",
-      "delete": "Delete",
-      "viewLogs": "View Logs",
-      "viewArchive": "View Archive",
-      "downloadLogs": "Download Logs",
-      "errorDetails": "Error Details",
-      "cancel": "Cancel",
-      "cancelJob": "Cancel Job",
-      "breakLock": "Break Lock"
-    },
-    "never": "Never",
     "empty": "No backup jobs found",
-    "types": {
-      "backup": "Backup",
-      "restore": "Restore",
-      "check": "Repository Check",
-      "compact": "Compact",
-      "prune": "Prune",
-      "package": "Package Install"
-    },
-    "scheduledById": "Scheduled (ID: {{id}})",
+    "emptyDescription": "Backups you run by hand appear here, with their status and logs.",
     "manual": "Manual",
+    "never": "Never",
+    "scheduledById": "Scheduled (ID: {{id}})",
     "toasts": {
       "authRequired": "Authentication required",
       "downloadingLogs": "Downloading logs...",
@@ -1483,6 +1476,14 @@
       "failedToDelete": "Failed to delete job",
       "deleteSuccess": "Job deleted successfully",
       "repositoryNotFound": "Repository not found"
+    },
+    "types": {
+      "backup": "Backup",
+      "restore": "Restore",
+      "check": "Repository Check",
+      "compact": "Compact",
+      "prune": "Prune",
+      "package": "Package Install"
     }
   },
   "scheduledJobsTable": {

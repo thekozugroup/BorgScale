@@ -578,7 +578,7 @@ export const BackupJobsTable = <T extends Job = Job>({
   const defaultEmptyState: EmptyState = {
     icon: <Clock size={48} className="text-muted-foreground opacity-40" />,
     title: t('backupJobsTable.empty'),
-    description: t('backupJobsTable.empty'),
+    description: t('backupJobsTable.emptyDescription'),
   }
 
   const finalEmptyState: {
