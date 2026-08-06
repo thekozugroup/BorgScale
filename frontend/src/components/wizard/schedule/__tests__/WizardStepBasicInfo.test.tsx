@@ -131,7 +131,9 @@ describe('WizardStepBasicInfo', () => {
       name: 'Test',
     }
 
-    renderWithProviders(<WizardStepBasicInfo {...defaultProps} data={dataWithName} onChange={onChange} />)
+    renderWithProviders(
+      <WizardStepBasicInfo {...defaultProps} data={dataWithName} onChange={onChange} />
+    )
 
     const nameInput = screen.getByPlaceholderText(/Daily backup/i) as HTMLInputElement
     expect(nameInput.value).toBe('Test')
@@ -148,7 +150,9 @@ describe('WizardStepBasicInfo', () => {
       description: 'Test description',
     }
 
-    renderWithProviders(<WizardStepBasicInfo {...defaultProps} data={dataWithDescription} onChange={onChange} />)
+    renderWithProviders(
+      <WizardStepBasicInfo {...defaultProps} data={dataWithDescription} onChange={onChange} />
+    )
 
     const descriptionInput = screen.getByPlaceholderText(
       /Optional description/i

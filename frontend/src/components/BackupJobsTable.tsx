@@ -105,7 +105,6 @@ const getTypeLabel = (type: string, t: (key: string) => string): string => {
   }
 }
 
-
 export const BackupJobsTable = <T extends Job = Job>({
   jobs,
   showTypeColumn = false,
@@ -330,9 +329,7 @@ export const BackupJobsTable = <T extends Job = Job>({
       label: t('backupJobsTable.columns.jobId'),
       align: 'left',
       width: '80px',
-      render: (job: T) => (
-        <span className="text-sm font-semibold text-primary">#{job.id}</span>
-      ),
+      render: (job: T) => <span className="text-sm font-semibold text-primary">#{job.id}</span>,
     },
     {
       id: 'repository',
@@ -429,7 +426,9 @@ export const BackupJobsTable = <T extends Job = Job>({
       align: 'left',
       width: '160px',
       render: (job: T) => (
-        <span className="text-sm text-muted-foreground">{job.started_at ? formatDate(job.started_at) : '-'}</span>
+        <span className="text-sm text-muted-foreground">
+          {job.started_at ? formatDate(job.started_at) : '-'}
+        </span>
       ),
     },
     {
@@ -582,7 +581,12 @@ export const BackupJobsTable = <T extends Job = Job>({
     description: t('backupJobsTable.empty'),
   }
 
-  const finalEmptyState: { icon: React.ReactNode; title: string; description?: string; action?: React.ReactNode } = emptyState
+  const finalEmptyState: {
+    icon: React.ReactNode
+    title: string
+    description?: string
+    action?: React.ReactNode
+  } = emptyState
     ? {
         icon: emptyState.icon || defaultEmptyState.icon!,
         title: emptyState.title || defaultEmptyState.title!,

@@ -11,12 +11,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface MountArchiveDialogProps {
   open: boolean
@@ -39,7 +34,12 @@ export default function MountArchiveDialog({
 }: MountArchiveDialogProps) {
   const { t } = useTranslation()
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose() }}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onClose()
+      }}
+    >
       <DialogContent showCloseButton={false} className="max-w-sm sm:max-w-md">
         <DialogHeader>
           <div className="flex items-center gap-3">
@@ -65,18 +65,14 @@ export default function MountArchiveDialog({
                   </Tooltip>
                 </TooltipProvider>
               </div>
-              {archive && (
-                <p className="text-sm text-muted-foreground mt-0.5">{archive.name}</p>
-              )}
+              {archive && <p className="text-sm text-muted-foreground mt-0.5">{archive.name}</p>}
             </div>
           </div>
         </DialogHeader>
 
         <div className="space-y-4 mt-2">
           <div className="space-y-2">
-            <Label htmlFor="mount-point-input">
-              {t('dialogs.mountArchive.mountPoint')}
-            </Label>
+            <Label htmlFor="mount-point-input">{t('dialogs.mountArchive.mountPoint')}</Label>
             <Input
               id="mount-point-input"
               value={mountPoint}

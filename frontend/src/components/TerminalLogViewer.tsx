@@ -52,15 +52,31 @@ function colorizeJsonLine(content: string): React.ReactNode {
     }
     const [fullMatch, key, stringVal, num, keyword, punct] = match
     if (key) {
-      parts.push(<span key={match.index} style={{ color: '#9cdcfe' }}>{key}</span>)
+      parts.push(
+        <span key={match.index} style={{ color: '#9cdcfe' }}>
+          {key}
+        </span>
+      )
       const trailingSpace = fullMatch.slice(key.length)
       if (trailingSpace) parts.push(trailingSpace)
     } else if (stringVal) {
-      parts.push(<span key={match.index} style={{ color: '#ce9178' }}>{stringVal}</span>)
+      parts.push(
+        <span key={match.index} style={{ color: '#ce9178' }}>
+          {stringVal}
+        </span>
+      )
     } else if (num) {
-      parts.push(<span key={match.index} style={{ color: '#b5cea8' }}>{num}</span>)
+      parts.push(
+        <span key={match.index} style={{ color: '#b5cea8' }}>
+          {num}
+        </span>
+      )
     } else if (keyword) {
-      parts.push(<span key={match.index} style={{ color: '#569cd6' }}>{keyword}</span>)
+      parts.push(
+        <span key={match.index} style={{ color: '#569cd6' }}>
+          {keyword}
+        </span>
+      )
     } else if (punct) {
       parts.push(punct)
     }
@@ -87,11 +103,7 @@ function mergeLogLines(prev: LogLine[], next: LogLine[]): LogLine[] {
 
 const MemoizedLogLine = React.memo(({ log }: { log: LogLine }) => (
   <div className="mb-1">
-    <span
-      className="text-neutral-500 text-sm mr-4 select-none"
-    >
-      {log.line_number}
-    </span>
+    <span className="text-neutral-500 text-sm mr-4 select-none">{log.line_number}</span>
     <span className="text-neutral-200">{colorizeJsonLine(log.content)}</span>
   </div>
 ))
@@ -267,7 +279,12 @@ export const TerminalLogViewer = React.forwardRef<TerminalLogViewerHandle, Termi
             <Badge variant="secondary" className="text-xs font-medium">
               {t('terminalLogViewer.showingLast', { total: totalLines.toLocaleString() })}
             </Badge>
-            <Button size="sm" variant="ghost" className="text-xs h-auto py-1 min-w-0" onClick={handleJumpToStart}>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-xs h-auto py-1 min-w-0"
+              onClick={handleJumpToStart}
+            >
               {t('terminalLogViewer.jumpToStart')}
             </Button>
           </div>

@@ -78,6 +78,22 @@ async def run_due_scheduled_checks(db: Session, now: Optional[datetime] = None) 
     for repo in repos:
         if dispatched >= available_slots:
             break
+
+        # An invalid expression can never produce a next_scheduled_check, so
+        # the repo would stay "due" and dispatch a new check every minute
+        # forever. Disable the schedule instead and log once.
+        if not croniter.is_valid(repo.check_cron_expression):
+            logger.error(
+                "Invalid check cron expression - disabling check schedule",
+                repo_id=repo.id,
+                repo_name=repo.name,
+                cron_expression=repo.check_cron_expression,
+            )
+            repo.check_cron_expression = None
+            repo.next_scheduled_check = None
+            db.commit()
+            continue
+
         try:
             check_job = start_background_maintenance_job(
                 db,
@@ -109,12 +125,15 @@ async def run_due_scheduled_checks(db: Session, now: Optional[datetime] = None) 
                 cron = croniter(repo.check_cron_expression, now)
                 repo.next_scheduled_check = cron.get_next(datetime)
             except Exception as exc:
+                # Leaving next_scheduled_check at None would re-dispatch every
+                # minute, so disable the schedule when no next time exists
                 logger.error(
-                    "Failed to calculate next check time",
+                    "Failed to calculate next check time - disabling check schedule",
                     repo_id=repo.id,
                     cron_expression=repo.check_cron_expression,
                     error=str(exc),
                 )
+                repo.check_cron_expression = None
                 repo.next_scheduled_check = None
 
             db.commit()

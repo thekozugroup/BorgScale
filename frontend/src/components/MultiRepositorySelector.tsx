@@ -41,7 +41,11 @@ export const MultiRepositorySelector: React.FC<MultiRepositorySelectorProps> = (
   const [touched, setTouched] = React.useState(false)
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
+  const [activeIndex, setActiveIndex] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const labelId = React.useId()
+  const listboxId = React.useId()
 
   const safeRepositories = Array.isArray(repositories) ? repositories : []
   const availableRepos = filterMode
@@ -52,10 +56,52 @@ export const MultiRepositorySelector: React.FC<MultiRepositorySelectorProps> = (
     .map((id) => availableRepos.find((r) => r.id === id))
     .filter(Boolean) as Repository[]
 
-  const filteredOptions = availableRepos.filter((repo) =>
-    repo.name.toLowerCase().includes(search.toLowerCase()) ||
-    repo.path.toLowerCase().includes(search.toLowerCase())
+  const filteredOptions = availableRepos.filter(
+    (repo) =>
+      repo.name.toLowerCase().includes(search.toLowerCase()) ||
+      repo.path.toLowerCase().includes(search.toLowerCase())
   )
+
+  const activeOption = filteredOptions[activeIndex]
+
+  const openDropdown = () => {
+    setOpen(true)
+    setTouched(true)
+    setActiveIndex(0)
+  }
+
+  const closeDropdown = () => {
+    setOpen(false)
+    triggerRef.current?.focus()
+  }
+
+  const handleTriggerKeyDown = (e: React.KeyboardEvent) => {
+    if (!open && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      e.preventDefault()
+      openDropdown()
+    }
+  }
+
+  // WAI-ARIA combobox pattern: focus stays in the search input while
+  // aria-activedescendant tracks the highlighted option
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault()
+      if (filteredOptions.length === 0) return
+      const delta = e.key === 'ArrowDown' ? 1 : -1
+      setActiveIndex((i) => (i + delta + filteredOptions.length) % filteredOptions.length)
+    } else if (e.key === 'Enter' || (e.key === ' ' && search === '')) {
+      e.preventDefault()
+      if (activeOption) handleToggle(activeOption.id)
+    } else if (e.key === 'Escape') {
+      // Keep an enclosing dialog open — Escape only dismisses the dropdown
+      e.preventDefault()
+      e.stopPropagation()
+      closeDropdown()
+    } else if (e.key === 'Tab') {
+      setOpen(false)
+    }
+  }
 
   const handleToggle = (repoId: number) => {
     setTouched(true)
@@ -89,57 +135,105 @@ export const MultiRepositorySelector: React.FC<MultiRepositorySelectorProps> = (
   return (
     <div ref={containerRef}>
       {label && (
-        <Label className={cn('mb-1 block', required && "after:content-['*'] after:ml-0.5 after:text-destructive")}>
+        <Label
+          id={labelId}
+          className={cn(
+            'mb-1 block',
+            required && "after:content-['*'] after:ml-0.5 after:text-destructive"
+          )}
+        >
           {label}
         </Label>
       )}
 
       {/* Trigger / dropdown */}
       <div className="relative">
-        <div
+        <button
+          type="button"
+          ref={triggerRef}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          aria-controls={listboxId}
+          aria-labelledby={label ? labelId : undefined}
+          disabled={disabled}
           className={cn(
-            'flex items-center min-h-[52px] rounded-md border px-3 py-2 cursor-pointer bg-background gap-2',
+            'flex items-center w-full text-left min-h-[52px] rounded-md border px-3 py-2 cursor-pointer bg-background gap-2',
             showError ? 'border-destructive' : 'border-input',
             disabled && 'opacity-50 cursor-not-allowed'
           )}
-          onClick={() => { if (!disabled) { setOpen(!open); setTouched(true) } }}
+          onClick={() => {
+            if (open) {
+              setOpen(false)
+            } else {
+              openDropdown()
+            }
+          }}
+          onKeyDown={handleTriggerKeyDown}
         >
           <div className="flex-1 text-sm text-muted-foreground">
-            {selectedIds.length === 0
-              ? placeholder
-              : t('multiRepositorySelector.searchOrAddMore')}
+            {selectedIds.length === 0 ? placeholder : t('multiRepositorySelector.searchOrAddMore')}
           </div>
           <DropdownIcon size={16} className="text-muted-foreground flex-shrink-0" />
-        </div>
+        </button>
 
         {open && !disabled && (
           <div className="absolute z-50 w-full mt-1 rounded-md border border-border bg-background shadow-md">
             <div className="p-2 border-b border-border">
               <Input
                 autoFocus
+                role="combobox"
+                aria-expanded={true}
+                aria-controls={listboxId}
+                aria-autocomplete="list"
+                aria-activedescendant={
+                  activeOption ? `${listboxId}-option-${activeOption.id}` : undefined
+                }
                 placeholder={t('multiRepositorySelector.searchOrAddMore')}
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value)
+                  setActiveIndex(0)
+                }}
                 className="h-8 text-sm"
                 onClick={(e) => e.stopPropagation()}
+                onKeyDown={handleSearchKeyDown}
               />
             </div>
-            <div className="max-h-[360px] overflow-y-auto py-1">
+            <div
+              id={listboxId}
+              role="listbox"
+              aria-multiselectable="true"
+              aria-labelledby={label ? labelId : undefined}
+              className="max-h-[360px] overflow-y-auto py-1"
+            >
               {filteredOptions.length === 0 ? (
-                <p className="text-sm text-muted-foreground px-3 py-2">{t('multiRepositorySelector.noReposFound') || 'No repositories found'}</p>
+                <p className="text-sm text-muted-foreground px-3 py-2">
+                  {t('multiRepositorySelector.noReposFound') || 'No repositories found'}
+                </p>
               ) : (
-                filteredOptions.map((repo) => {
+                filteredOptions.map((repo, index) => {
                   const selected = selectedIds.includes(repo.id)
                   return (
                     <div
                       key={repo.id}
+                      id={`${listboxId}-option-${repo.id}`}
+                      role="option"
+                      aria-selected={selected}
                       className={cn(
                         'flex items-center gap-2 px-3 py-1.5 cursor-pointer hover:bg-muted transition-colors',
-                        selected && 'bg-primary/5'
+                        selected && 'bg-primary/5',
+                        index === activeIndex && 'bg-muted'
                       )}
                       onClick={() => handleToggle(repo.id)}
+                      onMouseEnter={() => setActiveIndex(index)}
                     >
-                      <div className={cn('w-4 h-4 flex-shrink-0 rounded border flex items-center justify-center', selected ? 'bg-primary border-primary' : 'border-border')}>
+                      <div
+                        aria-hidden="true"
+                        className={cn(
+                          'w-4 h-4 flex-shrink-0 rounded border flex items-center justify-center',
+                          selected ? 'bg-primary border-primary' : 'border-border'
+                        )}
+                      >
                         {selected && <Check size={10} className="text-primary-foreground" />}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -161,14 +255,14 @@ export const MultiRepositorySelector: React.FC<MultiRepositorySelectorProps> = (
       </div>
 
       {showError && required && selectedIds.length === 0 && (
-        <p className="text-xs text-destructive mt-1">{t('multiRepositorySelector.required') || 'Required'}</p>
+        <p className="text-xs text-destructive mt-1">
+          {t('multiRepositorySelector.required') || 'Required'}
+        </p>
       )}
       {helperText && <p className="text-xs text-muted-foreground mt-1">{helperText}</p>}
 
       {/* Click outside to close */}
-      {open && (
-        <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-      )}
+      {open && <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />}
 
       {/* Selected list */}
       {selectedRepos.length > 0 && (

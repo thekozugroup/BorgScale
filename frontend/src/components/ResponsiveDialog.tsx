@@ -1,9 +1,7 @@
 import { useState, useEffect, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
-import {
-  Dialog,
-  DialogContent,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { X } from 'lucide-react'
 
 type DialogCloseReason = 'backdropClick' | 'escapeKeyDown'
@@ -56,52 +54,55 @@ export default function ResponsiveDialog({
   }
 
   if (isMobile) {
-    // Bottom sheet on mobile
+    // Bottom sheet on mobile — built on the Radix Sheet primitive so it gets
+    // the same dialog role, focus trap, and Escape handling as the desktop
+    // branch instead of a bare positioned div
     return (
-      <>
-        {open && (
+      <Sheet
+        open={open}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) handleClose()
+        }}
+      >
+        <SheetContent
+          side="bottom"
+          showCloseButton={false}
+          className="gap-0 rounded-t-2xl max-h-[90vh]"
+          onEscapeKeyDown={() => onClose?.({}, 'escapeKeyDown')}
+          onInteractOutside={handleClose}
+        >
+          {/* Drag handle row */}
           <div
-            className="fixed inset-0 z-50 flex items-end bg-foreground/50"
-            onClick={handleClose}
+            data-testid="drag-handle"
+            className="relative flex items-center justify-center h-11 flex-shrink-0"
           >
-            <div
-              className="w-full bg-background rounded-t-2xl max-h-[90vh] flex flex-col shadow-lg"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Drag handle row */}
-              <div
-                data-testid="drag-handle"
-                className="relative flex items-center justify-center h-11 flex-shrink-0"
+            <div className="w-8 h-1 rounded-full bg-border" />
+            {onClose && (
+              <button
+                onClick={handleClose}
+                aria-label="close"
+                className="absolute right-2 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
               >
-                <div className="w-8 h-1 rounded-full bg-border" />
-                {onClose && (
-                  <button
-                    onClick={handleClose}
-                    aria-label="close"
-                    className="absolute right-2 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                  >
-                    <X size={14} />
-                  </button>
-                )}
-              </div>
-
-              {/* Scrollable content */}
-              <div className="overflow-y-auto flex-1 overscroll-contain">{children}</div>
-
-              {/* Sticky footer */}
-              {footer && (
-                <div
-                  data-testid="responsive-dialog-footer"
-                  className="flex-shrink-0 border-t border-border"
-                  style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
-                >
-                  {footer}
-                </div>
-              )}
-            </div>
+                <X size={14} />
+              </button>
+            )}
           </div>
-        )}
-      </>
+
+          {/* Scrollable content */}
+          <div className="overflow-y-auto flex-1 overscroll-contain">{children}</div>
+
+          {/* Sticky footer */}
+          {footer && (
+            <div
+              data-testid="responsive-dialog-footer"
+              className="flex-shrink-0 border-t border-border"
+              style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+            >
+              {footer}
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     )
   }
 
@@ -109,17 +110,18 @@ export default function ResponsiveDialog({
   const mwClass = maxWidth ? (MAX_WIDTH_CLASSES[maxWidth] ?? 'max-w-sm') : ''
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) handleClose() }}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) handleClose()
+      }}
+    >
       {/* DialogContent already renders its own DialogPortal + DialogOverlay internally.
           Do NOT wrap in an extra <DialogPortal><DialogOverlay /> here — doing so creates
           two overlays under the same Dialog root, and Radix leaves both in data-state="open"
           permanently (neither animates out), blocking all pointer events after modal close. */}
       <DialogContent
-        className={cn(
-          mwClass,
-          fullWidth ? 'w-full' : '',
-          'p-0 gap-0 overflow-hidden'
-        )}
+        className={cn(mwClass, fullWidth ? 'w-full' : '', 'p-0 gap-0 overflow-hidden')}
         onEscapeKeyDown={() => onClose?.({}, 'escapeKeyDown')}
         onInteractOutside={handleClose}
         // hide the default X button — our dialog contents provide their own close UX

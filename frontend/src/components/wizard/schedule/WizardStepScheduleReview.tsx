@@ -64,10 +64,7 @@ function SectionCard({
     <div className={cn('rounded-lg p-3 flex flex-col gap-2 min-w-0 overflow-hidden', cardClass)}>
       <div className="flex items-center gap-2">
         <div
-          className={cn(
-            'w-7 h-7 rounded-lg flex items-center justify-center shrink-0',
-            iconClass
-          )}
+          className={cn('w-7 h-7 rounded-lg flex items-center justify-center shrink-0', iconClass)}
         >
           {icon}
         </div>
@@ -226,9 +223,7 @@ const WizardStepScheduleReview: React.FC<WizardStepScheduleReviewProps> = ({
             <span
               className={cn(
                 'text-2xs font-semibold px-1.5 py-0.5 rounded-full',
-                data.runPruneAfter
-                  ? 'bg-primary/10 text-primary'
-                  : 'bg-muted text-muted-foreground'
+                data.runPruneAfter ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
               )}
             >
               {data.runPruneAfter

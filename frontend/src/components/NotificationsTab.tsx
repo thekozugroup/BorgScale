@@ -324,10 +324,7 @@ const NotificationsTab: React.FC = () => {
                 {/* Stats grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 rounded-xl border border-border overflow-hidden mb-3">
                   {[0, 1, 2, 3].map((j) => (
-                    <div
-                      key={j}
-                      className={`px-3 py-2 ${j < 3 ? 'border-r border-border' : ''}`}
-                    >
+                    <div key={j} className={`px-3 py-2 ${j < 3 ? 'border-r border-border' : ''}`}>
                       <Skeleton className="h-2 w-10 mb-1" />
                       <Skeleton className="h-3" style={{ width: [55, 45, 60, 50][j] }} />
                     </div>
@@ -391,7 +388,9 @@ const NotificationsTab: React.FC = () => {
         fullWidth
       >
         <div className="p-4">
-          <h2 className="text-base font-medium leading-none mb-1">{t('notifications.appriseUrlExamplesTitle')}</h2>
+          <h2 className="text-base font-medium leading-none mb-1">
+            {t('notifications.appriseUrlExamplesTitle')}
+          </h2>
           <p className="text-sm text-muted-foreground mb-3 mt-2">
             {t('notifications.alertDescription')}
           </p>
@@ -462,9 +461,7 @@ const NotificationsTab: React.FC = () => {
       >
         <div className="p-4">
           <h2 className="text-base font-medium leading-none mb-1">
-            {editingNotification
-              ? t('notifications.editService')
-              : t('notifications.addService')}
+            {editingNotification ? t('notifications.editService') : t('notifications.addService')}
           </h2>
 
           <div className="mt-4 space-y-4">
@@ -494,8 +491,7 @@ const NotificationsTab: React.FC = () => {
             </div>
 
             <div className="rounded-lg bg-muted/40 border border-border p-3 text-sm text-muted-foreground">
-              <strong>{t('notifications.form.tipLabel')}</strong>{' '}
-              {t('notifications.form.tipText')}
+              <strong>{t('notifications.form.tipLabel')}</strong> {t('notifications.form.tipText')}
             </div>
 
             <div className="space-y-1.5">
@@ -521,7 +517,9 @@ const NotificationsTab: React.FC = () => {
             </div>
 
             <div className="space-y-2 pt-1">
-              <p className="text-sm font-medium">{t('notifications.form.notificationEnhancements')}</p>
+              <p className="text-sm font-medium">
+                {t('notifications.form.notificationEnhancements')}
+              </p>
               <div className="flex items-center gap-3">
                 <Switch
                   id="notif-job-name"
@@ -691,9 +689,7 @@ const NotificationsTab: React.FC = () => {
               >
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="all" id="repo-all" />
-                  <Label htmlFor="repo-all">
-                    {t('notifications.form.allRepositories')}
-                  </Label>
+                  <Label htmlFor="repo-all">{t('notifications.form.allRepositories')}</Label>
                 </div>
                 <div className="flex items-center gap-2">
                   <RadioGroupItem value="selected" id="repo-selected" />
@@ -747,10 +743,11 @@ const NotificationsTab: React.FC = () => {
         }
       >
         <div className="p-4">
-          <h2 className="text-base font-medium leading-none mb-1">{t('notifications.deleteServiceTitle')}</h2>
+          <h2 className="text-base font-medium leading-none mb-1">
+            {t('notifications.deleteServiceTitle')}
+          </h2>
           <p className="mt-2 text-sm">
-            {t('notifications.confirmDelete.messagePrefix')}{' '}
-            <strong>{deleteConfirm?.name}</strong>
+            {t('notifications.confirmDelete.messagePrefix')} <strong>{deleteConfirm?.name}</strong>
             {t('notifications.confirmDelete.messageSuffix')}
           </p>
         </div>

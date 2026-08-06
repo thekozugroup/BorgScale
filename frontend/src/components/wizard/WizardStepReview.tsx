@@ -69,12 +69,7 @@ function getEncryptionLabelKey(encryption: string) {
 // Colored icon badge
 function IconBadge({ icon, className }: { icon: React.ReactNode; className?: string }) {
   return (
-    <div
-      className={cn(
-        'w-7 h-7 rounded-lg flex items-center justify-center shrink-0',
-        className
-      )}
-    >
+    <div className={cn('w-7 h-7 rounded-lg flex items-center justify-center shrink-0', className)}>
       {icon}
     </div>
   )
@@ -137,7 +132,12 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
     if (data.dataSource !== 'remote' || !data.sourceSshConnectionId) return null
     const conn = sshConnections.find((c) => c.id === data.sourceSshConnectionId)
     if (!conn) return null
-    return { username: conn.username, host: conn.host, port: conn.port, defaultPath: conn.default_path }
+    return {
+      username: conn.username,
+      host: conn.host,
+      port: conn.port,
+      defaultPath: conn.default_path,
+    }
   }
 
   const getRepoSshConnection = () => {
@@ -277,15 +277,9 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
           icon={<Shield size={14} />}
           label={t('wizard.review.security')}
           iconClass={cn(
-            isEncrypted
-              ? 'bg-primary/10 text-primary'
-              : 'bg-destructive/10 text-destructive'
+            isEncrypted ? 'bg-primary/10 text-primary' : 'bg-destructive/10 text-destructive'
           )}
-          cardClass={cn(
-            isEncrypted
-              ? 'bg-muted/20'
-              : 'bg-muted/20'
-          )}
+          cardClass={cn(isEncrypted ? 'bg-muted/20' : 'bg-muted/20')}
         >
           {mode === 'create' && (
             <AttrRow label={t('wizard.review.encryption')}>
@@ -312,12 +306,7 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
           <AttrRow label={t('wizard.review.passphrase')}>
             {data.passphrase ? (
               <div className="flex items-center gap-1">
-                <span
-                  className={cn(
-                    'text-sm',
-                    !showPassphrase && 'font-mono tracking-widest'
-                  )}
-                >
+                <span className={cn('text-sm', !showPassphrase && 'font-mono tracking-widest')}>
                   {showPassphrase ? data.passphrase : '••••••••'}
                 </span>
                 <button
@@ -392,10 +381,8 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
         const hasPostScript = !!data.postBackupScript
         const hasRemotePath = !!data.remotePath
         const hasBypassLock = data.bypassLock === true
-        const hasPreTimeout =
-          data.preHookTimeout !== undefined && data.preHookTimeout !== 300
-        const hasPostTimeout =
-          data.postHookTimeout !== undefined && data.postHookTimeout !== 300
+        const hasPreTimeout = data.preHookTimeout !== undefined && data.preHookTimeout !== 300
+        const hasPostTimeout = data.postHookTimeout !== undefined && data.postHookTimeout !== 300
         const anyAdvanced =
           hasCustomFlags ||
           hasPreScript ||
@@ -406,10 +393,7 @@ export default function WizardStepReview({ mode, data, sshConnections }: WizardS
           hasPostTimeout
         if (!anyAdvanced) return null
         return (
-          <AdvancedDisclosure
-            labelKey="wizard.review.advancedUsed"
-            testId="review-advanced"
-          >
+          <AdvancedDisclosure labelKey="wizard.review.advancedUsed" testId="review-advanced">
             <div className="flex flex-col gap-1.5">
               {hasCustomFlags && (
                 <AttrRow label={t('wizard.review.customFlags')}>

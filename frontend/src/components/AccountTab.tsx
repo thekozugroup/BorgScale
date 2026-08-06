@@ -279,11 +279,20 @@ const AccountTab: React.FC = () => {
 
   useEffect(() => {
     let cancelled = false
-    if (!totpOtpAuthUri) { setTotpQrCodeDataUrl(''); return }
+    if (!totpOtpAuthUri) {
+      setTotpQrCodeDataUrl('')
+      return
+    }
     QRCode.toDataURL(totpOtpAuthUri, { width: 220, margin: 1, errorCorrectionLevel: 'M' })
-      .then((dataUrl: string) => { if (!cancelled) setTotpQrCodeDataUrl(dataUrl) })
-      .catch(() => { if (!cancelled) setTotpQrCodeDataUrl('') })
-    return () => { cancelled = true }
+      .then((dataUrl: string) => {
+        if (!cancelled) setTotpQrCodeDataUrl(dataUrl)
+      })
+      .catch(() => {
+        if (!cancelled) setTotpQrCodeDataUrl('')
+      })
+    return () => {
+      cancelled = true
+    }
   }, [totpOtpAuthUri])
 
   useEffect(() => {
@@ -301,9 +310,17 @@ const AccountTab: React.FC = () => {
     setTotpRecoveryCodes([])
   }
 
-  const dialogFooter = (onCancel: () => void, onConfirm: () => void, confirmLabel: string, confirmDisabled: boolean, confirmLoading?: boolean) => (
+  const dialogFooter = (
+    onCancel: () => void,
+    onConfirm: () => void,
+    confirmLabel: string,
+    confirmDisabled: boolean,
+    confirmLoading?: boolean
+  ) => (
     <div className="flex items-center justify-end gap-2 px-5 py-3">
-      <Button variant="outline" size="sm" onClick={onCancel}>{t('common.buttons.cancel')}</Button>
+      <Button variant="outline" size="sm" onClick={onCancel}>
+        {t('common.buttons.cancel')}
+      </Button>
       <Button size="sm" disabled={confirmDisabled} onClick={onConfirm} className="gap-1.5">
         {confirmLoading && <Loader2 size={13} className="animate-spin" />}
         {confirmLabel}
@@ -337,16 +354,24 @@ const AccountTab: React.FC = () => {
                 totpEnabled={!!user?.totp_enabled}
                 passkeyCount={user?.passkey_count ?? 0}
                 onProfileFormChange={(updates) => setProfileForm((c) => ({ ...c, ...updates }))}
-                onDeploymentFormChange={(updates) => setDeploymentForm((c) => ({ ...c, ...updates }))}
+                onDeploymentFormChange={(updates) =>
+                  setDeploymentForm((c) => ({ ...c, ...updates }))
+                }
                 onSaveProfile={() => updateProfileMutation.mutate(profileForm)}
                 onSaveDeployment={() => updateDeploymentMutation.mutate(deploymentForm)}
                 onOpenChangePassword={() => {
                   setShowChangePasswordDialog(true)
-                  trackSettings(EventAction.VIEW, { section: 'account', operation: 'open_change_password_dialog' })
+                  trackSettings(EventAction.VIEW, {
+                    section: 'account',
+                    operation: 'open_change_password_dialog',
+                  })
                 }}
                 onOpenEditProfile={() => {
                   setShowEditProfileDialog(true)
-                  trackSettings(EventAction.VIEW, { section: 'account', operation: 'open_edit_profile_dialog' })
+                  trackSettings(EventAction.VIEW, {
+                    section: 'account',
+                    operation: 'open_edit_profile_dialog',
+                  })
                 }}
               />
             )}
@@ -404,27 +429,58 @@ const AccountTab: React.FC = () => {
         maxWidth="sm"
         footer={dialogFooter(
           () => setShowEditProfileDialog(false),
-          () => updateProfileMutation.mutate(profileForm, { onSuccess: () => setShowEditProfileDialog(false) }),
-          updateProfileMutation.isPending ? t('settings.account.profile.saving') : t('settings.account.profile.saveButton'),
+          () =>
+            updateProfileMutation.mutate(profileForm, {
+              onSuccess: () => setShowEditProfileDialog(false),
+            }),
+          updateProfileMutation.isPending
+            ? t('settings.account.profile.saving')
+            : t('settings.account.profile.saveButton'),
           updateProfileMutation.isPending,
           updateProfileMutation.isPending
         )}
       >
         <div className="px-5 pt-5 pb-4">
           <p className="text-base font-semibold mb-1">{t('settings.account.profile.title')}</p>
-          <p className="text-sm text-muted-foreground mb-4">{t('settings.account.profile.description')}</p>
+          <p className="text-sm text-muted-foreground mb-4">
+            {t('settings.account.profile.description')}
+          </p>
           <div className="flex flex-col gap-3">
             <div>
-              <Label htmlFor="account-username" className="text-xs font-semibold mb-1.5 block">{t('settings.users.fields.username')} *</Label>
-              <Input id="account-username" value={profileForm.username} onChange={(e) => setProfileForm((c) => ({ ...c, username: e.target.value }))} className="h-9 text-sm" required />
+              <Label htmlFor="account-username" className="text-xs font-semibold mb-1.5 block">
+                {t('settings.users.fields.username')} *
+              </Label>
+              <Input
+                id="account-username"
+                value={profileForm.username}
+                onChange={(e) => setProfileForm((c) => ({ ...c, username: e.target.value }))}
+                className="h-9 text-sm"
+                required
+              />
             </div>
             <div>
-              <Label htmlFor="account-email" className="text-xs font-semibold mb-1.5 block">{t('settings.users.fields.email')} *</Label>
-              <Input id="account-email" type="email" value={profileForm.email} onChange={(e) => setProfileForm((c) => ({ ...c, email: e.target.value }))} className="h-9 text-sm" required />
+              <Label htmlFor="account-email" className="text-xs font-semibold mb-1.5 block">
+                {t('settings.users.fields.email')} *
+              </Label>
+              <Input
+                id="account-email"
+                type="email"
+                value={profileForm.email}
+                onChange={(e) => setProfileForm((c) => ({ ...c, email: e.target.value }))}
+                className="h-9 text-sm"
+                required
+              />
             </div>
             <div>
-              <Label htmlFor="account-fullname" className="text-xs font-semibold mb-1.5 block">{t('settings.users.fields.fullName')}</Label>
-              <Input id="account-fullname" value={profileForm.full_name} onChange={(e) => setProfileForm((c) => ({ ...c, full_name: e.target.value }))} className="h-9 text-sm" />
+              <Label htmlFor="account-fullname" className="text-xs font-semibold mb-1.5 block">
+                {t('settings.users.fields.fullName')}
+              </Label>
+              <Input
+                id="account-fullname"
+                value={profileForm.full_name}
+                onChange={(e) => setProfileForm((c) => ({ ...c, full_name: e.target.value }))}
+                className="h-9 text-sm"
+              />
             </div>
           </div>
         </div>
@@ -438,9 +494,16 @@ const AccountTab: React.FC = () => {
         maxWidth="sm"
         footer={
           <div className="flex items-center justify-end gap-2 px-5 py-3">
-            <Button variant="outline" size="sm" onClick={closeTotpSetupDialog}>{t('common.buttons.cancel')}</Button>
+            <Button variant="outline" size="sm" onClick={closeTotpSetupDialog}>
+              {t('common.buttons.cancel')}
+            </Button>
             {!totpSetupToken ? (
-              <Button size="sm" disabled={!totpSetupPassword || beginTotpSetupMutation.isPending} onClick={() => beginTotpSetupMutation.mutate(totpSetupPassword)} className="gap-1.5">
+              <Button
+                size="sm"
+                disabled={!totpSetupPassword || beginTotpSetupMutation.isPending}
+                onClick={() => beginTotpSetupMutation.mutate(totpSetupPassword)}
+                className="gap-1.5"
+              >
                 {beginTotpSetupMutation.isPending && <Loader2 size={13} className="animate-spin" />}
                 {t('common.buttons.next')}
               </Button>
@@ -448,17 +511,19 @@ const AccountTab: React.FC = () => {
               <Button
                 size="sm"
                 disabled={!totpVerificationCode || enableTotpMutation.isPending}
-                onClick={() => enableTotpMutation.mutate(undefined, {
-                  onSuccess: () => {
-                    setShowTotpSetupDialog(false)
-                    setTotpSetupPassword('')
-                    setTotpSetupToken(null)
-                    setTotpSecret('')
-                    setTotpOtpAuthUri('')
-                    setTotpQrCodeDataUrl('')
-                    setTotpVerificationCode('')
-                  },
-                })}
+                onClick={() =>
+                  enableTotpMutation.mutate(undefined, {
+                    onSuccess: () => {
+                      setShowTotpSetupDialog(false)
+                      setTotpSetupPassword('')
+                      setTotpSetupToken(null)
+                      setTotpSecret('')
+                      setTotpOtpAuthUri('')
+                      setTotpQrCodeDataUrl('')
+                      setTotpVerificationCode('')
+                    },
+                  })
+                }
                 className="gap-1.5"
               >
                 {enableTotpMutation.isPending && <Loader2 size={13} className="animate-spin" />}
@@ -469,40 +534,79 @@ const AccountTab: React.FC = () => {
         }
       >
         <div className="px-5 pt-5 pb-4">
-          <p className="text-base font-semibold mb-4">{t('settings.account.security.enableTotp')}</p>
+          <p className="text-base font-semibold mb-4">
+            {t('settings.account.security.enableTotp')}
+          </p>
           {!totpSetupToken ? (
             <div className="flex flex-col gap-3">
-              <p className="text-sm text-muted-foreground">{t('settings.account.security.totpSetupIntro')}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('settings.account.security.totpSetupIntro')}
+              </p>
               <div>
-                <Label htmlFor="account-totp-current-password" className="text-xs font-semibold mb-1.5 block">{t('settings.account.security.currentPasswordLabel')}</Label>
-                <Input id="account-totp-current-password" type="password" value={totpSetupPassword} onChange={(e) => setTotpSetupPassword(e.target.value)} className="h-9 text-sm" />
+                <Label
+                  htmlFor="account-totp-current-password"
+                  className="text-xs font-semibold mb-1.5 block"
+                >
+                  {t('settings.account.security.currentPasswordLabel')}
+                </Label>
+                <Input
+                  id="account-totp-current-password"
+                  type="password"
+                  value={totpSetupPassword}
+                  onChange={(e) => setTotpSetupPassword(e.target.value)}
+                  className="h-9 text-sm"
+                />
               </div>
             </div>
           ) : (
             <div className="flex flex-col gap-3">
-              <p className="text-sm text-muted-foreground">{t('settings.account.security.totpSetupInstructions')}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('settings.account.security.totpSetupInstructions')}
+              </p>
               {totpQrCodeDataUrl && (
                 <div className="p-4 rounded-xl bg-muted flex flex-col items-center gap-3">
                   {/* QR scanners require white background regardless of theme */}
-                  <img src={totpQrCodeDataUrl} alt={t('settings.account.security.totpQrCodeAlt')} className="w-56 max-w-full rounded-xl bg-white p-2" />
-                  <p className="text-xs text-muted-foreground text-center">{t('settings.account.security.totpQrCodeHint')}</p>
+                  <img
+                    src={totpQrCodeDataUrl}
+                    alt={t('settings.account.security.totpQrCodeAlt')}
+                    className="w-56 max-w-full rounded-xl bg-white p-2"
+                  />
+                  <p className="text-xs text-muted-foreground text-center">
+                    {t('settings.account.security.totpQrCodeHint')}
+                  </p>
                 </div>
               )}
               <div className="p-3 rounded-xl bg-muted">
-                <p className="text-xs text-muted-foreground mb-1">{t('settings.account.security.manualSecret')}</p>
+                <p className="text-xs text-muted-foreground mb-1">
+                  {t('settings.account.security.manualSecret')}
+                </p>
                 <p className="text-sm font-bold break-all font-mono">{totpSecret}</p>
               </div>
               <div className="p-3 rounded-xl bg-muted">
-                <p className="text-xs text-muted-foreground mb-2">{t('settings.account.security.recoveryCodesTitle')}</p>
+                <p className="text-xs text-muted-foreground mb-2">
+                  {t('settings.account.security.recoveryCodesTitle')}
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {totpRecoveryCodes.map((code) => (
-                    <span key={code} className="px-2 py-1 rounded bg-background text-xs font-mono">{code}</span>
+                    <span key={code} className="px-2 py-1 rounded bg-background text-xs font-mono">
+                      {code}
+                    </span>
                   ))}
                 </div>
               </div>
               <div>
-                <Label htmlFor="account-totp-verification" className="text-xs font-semibold mb-1.5 block">{t('settings.account.security.totpVerificationLabel')}</Label>
-                <Input id="account-totp-verification" value={totpVerificationCode} onChange={(e) => setTotpVerificationCode(e.target.value)} className="h-9 text-sm" />
+                <Label
+                  htmlFor="account-totp-verification"
+                  className="text-xs font-semibold mb-1.5 block"
+                >
+                  {t('settings.account.security.totpVerificationLabel')}
+                </Label>
+                <Input
+                  id="account-totp-verification"
+                  value={totpVerificationCode}
+                  onChange={(e) => setTotpVerificationCode(e.target.value)}
+                  className="h-9 text-sm"
+                />
               </div>
             </div>
           )}
@@ -517,8 +621,16 @@ const AccountTab: React.FC = () => {
         maxWidth="sm"
         footer={
           <div className="flex items-center justify-end gap-2 px-5 py-3">
-            <Button variant="outline" size="sm" onClick={() => setShowTotpDisableDialog(false)}>{t('common.buttons.cancel')}</Button>
-            <Button size="sm" variant="destructive" disabled={!totpDisablePassword || !totpDisableCode || disableTotpMutation.isPending} onClick={() => disableTotpMutation.mutate()} className="gap-1.5">
+            <Button variant="outline" size="sm" onClick={() => setShowTotpDisableDialog(false)}>
+              {t('common.buttons.cancel')}
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              disabled={!totpDisablePassword || !totpDisableCode || disableTotpMutation.isPending}
+              onClick={() => disableTotpMutation.mutate()}
+              className="gap-1.5"
+            >
               {disableTotpMutation.isPending && <Loader2 size={13} className="animate-spin" />}
               {t('settings.account.security.disableTotp')}
             </Button>
@@ -526,17 +638,44 @@ const AccountTab: React.FC = () => {
         }
       >
         <div className="px-5 pt-5 pb-4">
-          <p className="text-base font-semibold mb-4">{t('settings.account.security.disableTotp')}</p>
+          <p className="text-base font-semibold mb-4">
+            {t('settings.account.security.disableTotp')}
+          </p>
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-muted-foreground">{t('settings.account.security.totpDisableIntro')}</p>
+            <p className="text-sm text-muted-foreground">
+              {t('settings.account.security.totpDisableIntro')}
+            </p>
             <div>
-              <Label htmlFor="account-totp-disable-password" className="text-xs font-semibold mb-1.5 block">{t('settings.account.security.currentPasswordLabel')}</Label>
-              <Input id="account-totp-disable-password" type="password" value={totpDisablePassword} onChange={(e) => setTotpDisablePassword(e.target.value)} className="h-9 text-sm" />
+              <Label
+                htmlFor="account-totp-disable-password"
+                className="text-xs font-semibold mb-1.5 block"
+              >
+                {t('settings.account.security.currentPasswordLabel')}
+              </Label>
+              <Input
+                id="account-totp-disable-password"
+                type="password"
+                value={totpDisablePassword}
+                onChange={(e) => setTotpDisablePassword(e.target.value)}
+                className="h-9 text-sm"
+              />
             </div>
             <div>
-              <Label htmlFor="account-totp-disable-code" className="text-xs font-semibold mb-1.5 block">{t('settings.account.security.totpVerificationLabel')}</Label>
-              <Input id="account-totp-disable-code" value={totpDisableCode} onChange={(e) => setTotpDisableCode(e.target.value)} className="h-9 text-sm" />
-              <p className="text-xs text-muted-foreground mt-1">{t('settings.account.security.totpDisableHint')}</p>
+              <Label
+                htmlFor="account-totp-disable-code"
+                className="text-xs font-semibold mb-1.5 block"
+              >
+                {t('settings.account.security.totpVerificationLabel')}
+              </Label>
+              <Input
+                id="account-totp-disable-code"
+                value={totpDisableCode}
+                onChange={(e) => setTotpDisableCode(e.target.value)}
+                className="h-9 text-sm"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {t('settings.account.security.totpDisableHint')}
+              </p>
             </div>
           </div>
         </div>
@@ -550,8 +689,15 @@ const AccountTab: React.FC = () => {
         maxWidth="sm"
         footer={
           <div className="flex items-center justify-end gap-2 px-5 py-3">
-            <Button variant="outline" size="sm" onClick={() => setShowPasskeyDialog(false)}>{t('common.buttons.cancel')}</Button>
-            <Button size="sm" disabled={!passkeyPassword || addPasskeyMutation.isPending} onClick={() => addPasskeyMutation.mutate()} className="gap-1.5">
+            <Button variant="outline" size="sm" onClick={() => setShowPasskeyDialog(false)}>
+              {t('common.buttons.cancel')}
+            </Button>
+            <Button
+              size="sm"
+              disabled={!passkeyPassword || addPasskeyMutation.isPending}
+              onClick={() => addPasskeyMutation.mutate()}
+              className="gap-1.5"
+            >
               {addPasskeyMutation.isPending && <Loader2 size={13} className="animate-spin" />}
               {t('settings.account.security.addPasskey')}
             </Button>
@@ -559,12 +705,27 @@ const AccountTab: React.FC = () => {
         }
       >
         <div className="px-5 pt-5 pb-4">
-          <p className="text-base font-semibold mb-4">{t('settings.account.security.addPasskey')}</p>
+          <p className="text-base font-semibold mb-4">
+            {t('settings.account.security.addPasskey')}
+          </p>
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-muted-foreground">{t('settings.account.security.passkeySetupIntro')}</p>
+            <p className="text-sm text-muted-foreground">
+              {t('settings.account.security.passkeySetupIntro')}
+            </p>
             <div>
-              <Label htmlFor="account-passkey-password" className="text-xs font-semibold mb-1.5 block">{t('settings.account.security.currentPasswordLabel')}</Label>
-              <Input id="account-passkey-password" type="password" value={passkeyPassword} onChange={(e) => setPasskeyPassword(e.target.value)} className="h-9 text-sm" />
+              <Label
+                htmlFor="account-passkey-password"
+                className="text-xs font-semibold mb-1.5 block"
+              >
+                {t('settings.account.security.currentPasswordLabel')}
+              </Label>
+              <Input
+                id="account-passkey-password"
+                type="password"
+                value={passkeyPassword}
+                onChange={(e) => setPasskeyPassword(e.target.value)}
+                className="h-9 text-sm"
+              />
             </div>
           </div>
         </div>

@@ -42,7 +42,9 @@ describe('RepoMenuItem', () => {
     })
 
     it('can show both v2 and Observe Only chips simultaneously', () => {
-      renderWithProviders(<RepoMenuItem name="My Repo" path="/data/backups" borgVersion={2} mode="observe" />)
+      renderWithProviders(
+        <RepoMenuItem name="My Repo" path="/data/backups" borgVersion={2} mode="observe" />
+      )
 
       expect(screen.getByText('v2')).toBeInTheDocument()
       expect(screen.getByText('Watch only')).toBeInTheDocument()

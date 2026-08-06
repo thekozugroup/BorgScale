@@ -15,7 +15,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '../components/ui/alert-dialog'
-import { Loader2, Plus, Edit, Trash2, Play, FileCode, Clock, CheckCircle, XCircle } from 'lucide-react'
+import {
+  Loader2,
+  Plus,
+  Edit,
+  Trash2,
+  Play,
+  FileCode,
+  Clock,
+  CheckCircle,
+  XCircle,
+} from 'lucide-react'
 import { toast } from 'sonner'
 import api from '../services/api'
 import CodeEditor from '../components/CodeEditor'
@@ -361,7 +371,9 @@ export default function Scripts() {
       id: 'run_on',
       label: t('scripts.table.runOn'),
       render: (script) => (
-        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border ${RUN_ON_BADGE[script.run_on] ?? 'border-border text-muted-foreground'}`}>
+        <span
+          className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border ${RUN_ON_BADGE[script.run_on] ?? 'border-border text-muted-foreground'}`}
+        >
           {t(`scripts.runOn.${script.run_on}`)}
         </span>
       ),
@@ -438,7 +450,11 @@ export default function Scripts() {
         emptyState={{
           icon: <FileCode size={48} />,
           title: t('scripts.empty'),
-          action: <Button size="sm" onClick={handleCreate}>{t('scripts.newScript')}</Button>,
+          action: (
+            <Button size="sm" onClick={handleCreate}>
+              {t('scripts.newScript')}
+            </Button>
+          ),
         }}
       />
 
@@ -452,7 +468,9 @@ export default function Scripts() {
           </DialogHeader>
           <div className="flex flex-col gap-4 pt-1">
             <div>
-              <Label htmlFor="script-form-name" className="text-xs font-semibold mb-1.5 block">{t('scripts.fields.name')} *</Label>
+              <Label htmlFor="script-form-name" className="text-xs font-semibold mb-1.5 block">
+                {t('scripts.fields.name')} *
+              </Label>
               <Input
                 id="script-form-name"
                 value={formData.name}
@@ -460,11 +478,18 @@ export default function Scripts() {
                 required
                 className="h-9 text-sm"
               />
-              <p className="text-xs text-muted-foreground mt-1">{t('scripts.fields.nameHelperText')}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {t('scripts.fields.nameHelperText')}
+              </p>
             </div>
 
             <div>
-              <Label htmlFor="script-form-description" className="text-xs font-semibold mb-1.5 block">{t('scripts.fields.description')}</Label>
+              <Label
+                htmlFor="script-form-description"
+                className="text-xs font-semibold mb-1.5 block"
+              >
+                {t('scripts.fields.description')}
+              </Label>
               <textarea
                 id="script-form-description"
                 value={formData.description}
@@ -472,11 +497,15 @@ export default function Scripts() {
                 rows={2}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
               />
-              <p className="text-xs text-muted-foreground mt-1">{t('scripts.fields.descriptionHelperText')}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {t('scripts.fields.descriptionHelperText')}
+              </p>
             </div>
 
             <div>
-              <Label htmlFor="scripts-run-on" className="text-xs font-semibold mb-1.5 block">{t('scripts.fields.runOn')}</Label>
+              <Label htmlFor="scripts-run-on" className="text-xs font-semibold mb-1.5 block">
+                {t('scripts.fields.runOn')}
+              </Label>
               <select
                 id="scripts-run-on"
                 value={formData.run_on}
@@ -495,7 +524,9 @@ export default function Scripts() {
             </div>
 
             <div>
-              <Label htmlFor="scripts-timeout" className="text-xs font-semibold mb-1.5 block">{t('scripts.fields.timeout')}</Label>
+              <Label htmlFor="scripts-timeout" className="text-xs font-semibold mb-1.5 block">
+                {t('scripts.fields.timeout')}
+              </Label>
               <Input
                 id="scripts-timeout"
                 type="number"
@@ -505,7 +536,9 @@ export default function Scripts() {
                 max={3600}
                 className="h-9 text-sm"
               />
-              <p className="text-xs text-muted-foreground mt-1">{t('scripts.fields.timeoutHint')}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {t('scripts.fields.timeoutHint')}
+              </p>
             </div>
 
             <CodeEditor
@@ -534,7 +567,9 @@ export default function Scripts() {
                         <p className="text-sm font-semibold font-mono">{param.name}</p>
                         <div className="flex gap-2 mt-0.5">
                           {param.default && (
-                            <span className="text-xs text-muted-foreground">{t('scripts.fields.default')}: {param.default}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {t('scripts.fields.default')}: {param.default}
+                            </span>
                           )}
                           {param.required && (
                             <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-semibold border border-destructive/20 bg-destructive/10 text-destructive">
@@ -543,8 +578,13 @@ export default function Scripts() {
                           )}
                         </div>
                       </div>
-                      <label htmlFor={`scripts-treat-as-secret-${param.name}`} className="flex items-center gap-2 cursor-pointer">
-                        <span className="text-sm text-muted-foreground">{t('scripts.fields.treatAsSecret')}</span>
+                      <label
+                        htmlFor={`scripts-treat-as-secret-${param.name}`}
+                        className="flex items-center gap-2 cursor-pointer"
+                      >
+                        <span className="text-sm text-muted-foreground">
+                          {t('scripts.fields.treatAsSecret')}
+                        </span>
                         <input
                           id={`scripts-treat-as-secret-${param.name}`}
                           type="checkbox"
@@ -566,7 +606,9 @@ export default function Scripts() {
             )}
 
             <div className="flex justify-end gap-2 pt-2">
-              <Button variant="outline" onClick={() => setDialogOpen(false)}>{t('scripts.buttons.cancel')}</Button>
+              <Button variant="outline" onClick={() => setDialogOpen(false)}>
+                {t('scripts.buttons.cancel')}
+              </Button>
               <Button onClick={handleSave} disabled={!formData.name.trim()}>
                 {editingScript ? t('scripts.buttons.update') : t('scripts.buttons.create')}
               </Button>
@@ -610,8 +652,14 @@ export default function Scripts() {
                   {t('scripts.buttons.cancel')}
                 </Button>
                 <Button onClick={executeTest} disabled={testingScript} className="gap-1.5">
-                  {testingScript ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} />}
-                  {testingScript ? t('scripts.testDialog.running') : t('scripts.testDialog.runTest')}
+                  {testingScript ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <Play size={16} />
+                  )}
+                  {testingScript
+                    ? t('scripts.testDialog.running')
+                    : t('scripts.testDialog.runTest')}
                 </Button>
               </div>
             </div>
@@ -623,14 +671,25 @@ export default function Scripts() {
           ) : testResult ? (
             <div className="flex flex-col gap-3">
               {/* Status */}
-              <div className={`flex items-start gap-2 p-3 rounded-xl text-sm border ${testResult.success ? 'border-primary/20 bg-primary/10 text-primary' : 'border-destructive/25 bg-destructive/10 text-destructive'}`}>
-                {testResult.success ? <CheckCircle size={18} className="flex-shrink-0 mt-0.5" /> : <XCircle size={18} className="flex-shrink-0 mt-0.5" />}
+              <div
+                className={`flex items-start gap-2 p-3 rounded-xl text-sm border ${testResult.success ? 'border-primary/20 bg-primary/10 text-primary' : 'border-destructive/25 bg-destructive/10 text-destructive'}`}
+              >
+                {testResult.success ? (
+                  <CheckCircle size={18} className="flex-shrink-0 mt-0.5" />
+                ) : (
+                  <XCircle size={18} className="flex-shrink-0 mt-0.5" />
+                )}
                 <div>
                   <p className="font-semibold">
-                    {testResult.success ? t('scripts.testDialog.success') : t('scripts.testDialog.failed')}
+                    {testResult.success
+                      ? t('scripts.testDialog.success')
+                      : t('scripts.testDialog.failed')}
                   </p>
                   <p className="text-xs mt-0.5">
-                    {t('scripts.testDialog.exitCode', { code: testResult.exit_code, time: testResult.execution_time.toFixed(2) })}
+                    {t('scripts.testDialog.exitCode', {
+                      code: testResult.exit_code,
+                      time: testResult.execution_time.toFixed(2),
+                    })}
                   </p>
                 </div>
               </div>
@@ -640,7 +699,9 @@ export default function Scripts() {
                 <div>
                   <p className="text-sm font-semibold mb-1">{t('scripts.testDialog.stdout')}</p>
                   <div className="p-3 rounded-xl overflow-auto max-h-48 bg-foreground">
-                    <pre className="text-sm font-mono whitespace-pre-wrap m-0 text-background">{testResult.stdout}</pre>
+                    <pre className="text-sm font-mono whitespace-pre-wrap m-0 text-background">
+                      {testResult.stdout}
+                    </pre>
                   </div>
                 </div>
               )}
@@ -648,9 +709,13 @@ export default function Scripts() {
               {/* Stderr */}
               {testResult.stderr && (
                 <div>
-                  <p className="text-sm font-semibold mb-1 text-destructive">{t('scripts.testDialog.stderr')}</p>
+                  <p className="text-sm font-semibold mb-1 text-destructive">
+                    {t('scripts.testDialog.stderr')}
+                  </p>
                   <div className="p-3 rounded-xl overflow-auto max-h-48 bg-foreground">
-                    <pre className="text-sm font-mono whitespace-pre-wrap m-0 text-destructive">{testResult.stderr}</pre>
+                    <pre className="text-sm font-mono whitespace-pre-wrap m-0 text-destructive">
+                      {testResult.stderr}
+                    </pre>
                   </div>
                 </div>
               )}
@@ -669,10 +734,17 @@ export default function Scripts() {
       </Dialog>
 
       {/* Delete-script confirmation */}
-      <AlertDialog open={!!pendingDeleteScript} onOpenChange={(open) => { if (!open) setPendingDeleteScript(null) }}>
+      <AlertDialog
+        open={!!pendingDeleteScript}
+        onOpenChange={(open) => {
+          if (!open) setPendingDeleteScript(null)
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('scripts.confirmDeleteTitle', { defaultValue: 'Delete script?' })}</AlertDialogTitle>
+            <AlertDialogTitle>
+              {t('scripts.confirmDeleteTitle', { defaultValue: 'Delete script?' })}
+            </AlertDialogTitle>
             <AlertDialogDescription>
               {pendingDeleteScript
                 ? t('scripts.confirmDelete', { name: pendingDeleteScript.name })
@@ -681,7 +753,9 @@ export default function Scripts() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common.buttons.cancel')}</AlertDialogCancel>
-            <AlertDialogAction variant="destructive" onClick={confirmDeleteScript}>{t('common.buttons.delete', { defaultValue: 'Delete' })}</AlertDialogAction>
+            <AlertDialogAction variant="destructive" onClick={confirmDeleteScript}>
+              {t('common.buttons.delete', { defaultValue: 'Delete' })}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

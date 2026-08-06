@@ -10,7 +10,7 @@ from typing import Optional, Tuple
 from fastapi import APIRouter, Depends, Header, HTTPException, status as http_status
 from fastapi.responses import PlainTextResponse
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, select
 from datetime import datetime, timezone
 import structlog
 
@@ -52,6 +52,39 @@ def _extract_metrics_token(
     if authorization and authorization.startswith("Bearer "):
         return authorization.split(" ", 1)[1]
     return None
+
+
+def _latest_job_per_repository(
+    db: Session, partition_column, keys, columns, order_column, *filters
+):
+    """Newest job per repository, keyed by `partition_column`, in one query.
+
+    The per-repository variant of this ran once per repository per metric, so a
+    scrape scaled as repositories x metrics scans of the job table.
+    """
+
+    if not keys:
+        return {}
+
+    ranked = (
+        select(
+            partition_column.label("partition_key"),
+            *columns,
+            func.row_number()
+            .over(
+                partition_by=partition_column,
+                order_by=order_column.desc(),
+            )
+            .label("rank"),
+        )
+        .where(partition_column.in_(keys), *filters)
+        .subquery()
+    )
+
+    return {
+        row.partition_key: row
+        for row in db.execute(select(ranked).where(ranked.c.rank == 1)).all()
+    }
 
 
 def parse_size_string(size_str: str) -> int:
@@ -238,13 +271,18 @@ async def get_metrics(
         )
         lines.append("# TYPE borg_backup_last_job_success gauge")
 
+        repo_paths = list(repo_path_to_name)
+        repo_ids = [repo.id for repo in repositories]
+        last_created_jobs = _latest_job_per_repository(
+            db,
+            BackupJob.repository,
+            repo_paths,
+            (BackupJob.status,),
+            BackupJob.created_at,
+        )
+
         for repo in repositories:
-            last_job = (
-                db.query(BackupJob)
-                .filter(BackupJob.repository == repo.path)
-                .order_by(BackupJob.created_at.desc())
-                .first()
-            )
+            last_job = last_created_jobs.get(repo.path)
 
             if last_job:
                 success = (
@@ -262,17 +300,18 @@ async def get_metrics(
         )
         lines.append("# TYPE borg_backup_last_duration_seconds gauge")
 
+        last_finished_jobs = _latest_job_per_repository(
+            db,
+            BackupJob.repository,
+            repo_paths,
+            (BackupJob.started_at, BackupJob.completed_at),
+            BackupJob.completed_at,
+            BackupJob.started_at.isnot(None),
+            BackupJob.completed_at.isnot(None),
+        )
+
         for repo in repositories:
-            last_job = (
-                db.query(BackupJob)
-                .filter(
-                    BackupJob.repository == repo.path,
-                    BackupJob.started_at.isnot(None),
-                    BackupJob.completed_at.isnot(None),
-                )
-                .order_by(BackupJob.completed_at.desc())
-                .first()
-            )
+            last_job = last_finished_jobs.get(repo.path)
 
             if last_job and last_job.started_at and last_job.completed_at:
                 duration = (last_job.completed_at - last_job.started_at).total_seconds()
@@ -286,16 +325,18 @@ async def get_metrics(
         )
         lines.append("# TYPE borg_backup_last_original_size_bytes gauge")
 
+        # Both size metrics read the same "last successful backup" row.
+        last_successful_jobs = _latest_job_per_repository(
+            db,
+            BackupJob.repository,
+            repo_paths,
+            (BackupJob.original_size, BackupJob.deduplicated_size),
+            BackupJob.completed_at,
+            BackupJob.status.in_(["completed", "completed_with_warnings"]),
+        )
+
         for repo in repositories:
-            last_job = (
-                db.query(BackupJob)
-                .filter(
-                    BackupJob.repository == repo.path,
-                    BackupJob.status.in_(["completed", "completed_with_warnings"]),
-                )
-                .order_by(BackupJob.completed_at.desc())
-                .first()
-            )
+            last_job = last_successful_jobs.get(repo.path)
 
             if last_job:
                 lines.append(
@@ -309,15 +350,7 @@ async def get_metrics(
         lines.append("# TYPE borg_backup_last_deduplicated_size_bytes gauge")
 
         for repo in repositories:
-            last_job = (
-                db.query(BackupJob)
-                .filter(
-                    BackupJob.repository == repo.path,
-                    BackupJob.status.in_(["completed", "completed_with_warnings"]),
-                )
-                .order_by(BackupJob.completed_at.desc())
-                .first()
-            )
+            last_job = last_successful_jobs.get(repo.path)
 
             if last_job:
                 lines.append(
@@ -367,17 +400,18 @@ async def get_metrics(
         )
         lines.append("# TYPE borg_check_last_duration_seconds gauge")
 
+        last_check_jobs = _latest_job_per_repository(
+            db,
+            CheckJob.repository_id,
+            repo_ids,
+            (CheckJob.started_at, CheckJob.completed_at),
+            CheckJob.completed_at,
+            CheckJob.started_at.isnot(None),
+            CheckJob.completed_at.isnot(None),
+        )
+
         for repo in repositories:
-            last_job = (
-                db.query(CheckJob)
-                .filter(
-                    CheckJob.repository_id == repo.id,
-                    CheckJob.started_at.isnot(None),
-                    CheckJob.completed_at.isnot(None),
-                )
-                .order_by(CheckJob.completed_at.desc())
-                .first()
-            )
+            last_job = last_check_jobs.get(repo.id)
 
             if last_job and last_job.started_at and last_job.completed_at:
                 duration = (last_job.completed_at - last_job.started_at).total_seconds()
@@ -414,17 +448,18 @@ async def get_metrics(
         )
         lines.append("# TYPE borg_compact_last_duration_seconds gauge")
 
+        last_compact_jobs = _latest_job_per_repository(
+            db,
+            CompactJob.repository_id,
+            repo_ids,
+            (CompactJob.started_at, CompactJob.completed_at),
+            CompactJob.completed_at,
+            CompactJob.started_at.isnot(None),
+            CompactJob.completed_at.isnot(None),
+        )
+
         for repo in repositories:
-            last_job = (
-                db.query(CompactJob)
-                .filter(
-                    CompactJob.repository_id == repo.id,
-                    CompactJob.started_at.isnot(None),
-                    CompactJob.completed_at.isnot(None),
-                )
-                .order_by(CompactJob.completed_at.desc())
-                .first()
-            )
+            last_job = last_compact_jobs.get(repo.id)
 
             if last_job and last_job.started_at and last_job.completed_at:
                 duration = (last_job.completed_at - last_job.started_at).total_seconds()

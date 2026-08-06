@@ -366,7 +366,12 @@ export default function FileExplorerDialog({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose() }}>
+      <Dialog
+        open={open}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) onClose()
+        }}
+      >
         <DialogContent
           showCloseButton={false}
           className="max-w-2xl w-full p-0 gap-0 overflow-hidden h-[75vh] flex flex-col"
@@ -418,7 +423,10 @@ export default function FileExplorerDialog({
           {/* Search and Create Folder */}
           <div className="px-3 py-1.5 flex gap-2 shrink-0">
             <div className="relative flex-1">
-              <Search size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <Search
+                size={16}
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
+              />
               <Input
                 ref={searchInputRef}
                 placeholder={t('fileExplorer.searchPlaceholder')}
@@ -451,9 +459,7 @@ export default function FileExplorerDialog({
           {currentPath === '/' && activeConnectionType === 'local' && sshConnections.length > 0 && (
             <div className="px-3 pb-1.5 shrink-0">
               <div className="rounded-md border border-border bg-muted/40 px-3 py-2">
-                <p className="text-xs text-muted-foreground">
-                  {t('fileExplorer.sshInfoAlert')}
-                </p>
+                <p className="text-xs text-muted-foreground">{t('fileExplorer.sshInfoAlert')}</p>
               </div>
             </div>
           )}
@@ -572,11 +578,7 @@ export default function FileExplorerDialog({
                 {t('fileExplorer.useCurrent')}
               </Button>
             )}
-            <Button
-              size="sm"
-              onClick={handleConfirm}
-              disabled={selectedPaths.length === 0}
-            >
+            <Button size="sm" onClick={handleConfirm} disabled={selectedPaths.length === 0}>
               {multiSelect && selectedPaths.length > 0
                 ? t('fileExplorer.selectWithCount', { count: selectedPaths.length })
                 : t('fileExplorer.select')}
@@ -588,7 +590,9 @@ export default function FileExplorerDialog({
       {/* Create Folder Dialog */}
       <Dialog
         open={showCreateFolder}
-        onOpenChange={(isOpen) => { if (!isOpen && !creatingFolder) setShowCreateFolder(false) }}
+        onOpenChange={(isOpen) => {
+          if (!isOpen && !creatingFolder) setShowCreateFolder(false)
+        }}
       >
         <DialogContent showCloseButton={false} className="max-w-xs">
           <DialogHeader>
@@ -632,10 +636,7 @@ export default function FileExplorerDialog({
             >
               {t('fileExplorer.cancel')}
             </Button>
-            <Button
-              onClick={handleCreateFolder}
-              disabled={!newFolderName.trim() || creatingFolder}
-            >
+            <Button onClick={handleCreateFolder} disabled={!newFolderName.trim() || creatingFolder}>
               {creatingFolder ? t('fileExplorer.creating') : t('fileExplorer.create')}
             </Button>
           </DialogFooter>

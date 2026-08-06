@@ -64,9 +64,7 @@ const WizardStepScripts: React.FC<WizardStepScriptsProps> = ({
         />
       ) : (
         <Alert>
-          <AlertDescription>
-            {t('wizard.scheduleWizard.scripts.selectRepoFirst')}
-          </AlertDescription>
+          <AlertDescription>{t('wizard.scheduleWizard.scripts.selectRepoFirst')}</AlertDescription>
         </Alert>
       )}
     </div>

@@ -84,7 +84,9 @@ const ExportImportTab: React.FC = () => {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast.error(translateBackendKey(error.response?.data?.detail) || t('exportImport.failedToExport'))
+      toast.error(
+        translateBackendKey(error.response?.data?.detail) || t('exportImport.failedToExport')
+      )
     },
   })
 
@@ -115,7 +117,9 @@ const ExportImportTab: React.FC = () => {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast.error(translateBackendKey(error.response?.data?.detail) || t('exportImport.failedToImport'))
+      toast.error(
+        translateBackendKey(error.response?.data?.detail) || t('exportImport.failedToImport')
+      )
     },
   })
 
@@ -176,19 +180,43 @@ const ExportImportTab: React.FC = () => {
               <div className="flex justify-between items-center mb-2">
                 <p className="text-sm font-semibold">{t('exportImport.selectRepositories')}</p>
                 <div className="flex gap-1">
-                  <Button variant="ghost" size="sm" onClick={() => setSelectedRepos(repositories.map((r) => r.id))} disabled={loadingRepos}>{t('exportImport.selectAll')}</Button>
-                  <Button variant="ghost" size="sm" onClick={() => setSelectedRepos([])} disabled={loadingRepos}>{t('exportImport.clear')}</Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedRepos(repositories.map((r) => r.id))}
+                    disabled={loadingRepos}
+                  >
+                    {t('exportImport.selectAll')}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedRepos([])}
+                    disabled={loadingRepos}
+                  >
+                    {t('exportImport.clear')}
+                  </Button>
                 </div>
               </div>
-              <div className="border border-border rounded-xl overflow-auto" style={{ maxHeight: 200 }}>
+              <div
+                className="border border-border rounded-xl overflow-auto"
+                style={{ maxHeight: 200 }}
+              >
                 {loadingRepos ? (
-                  <p className="text-sm text-muted-foreground p-3">{t('exportImport.loadingRepositories')}</p>
+                  <p className="text-sm text-muted-foreground p-3">
+                    {t('exportImport.loadingRepositories')}
+                  </p>
                 ) : repositories.length === 0 ? (
-                  <p className="text-sm text-muted-foreground p-3">{t('exportImport.noRepositoriesAvailable')}</p>
+                  <p className="text-sm text-muted-foreground p-3">
+                    {t('exportImport.noRepositoriesAvailable')}
+                  </p>
                 ) : (
                   <div>
                     {repositories.map((repo) => (
-                      <label key={repo.id} className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-muted/40 border-b border-border last:border-b-0">
+                      <label
+                        key={repo.id}
+                        className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-muted/40 border-b border-border last:border-b-0"
+                      >
                         <input
                           type="checkbox"
                           checked={selectedRepos.includes(repo.id)}
@@ -197,7 +225,9 @@ const ExportImportTab: React.FC = () => {
                         />
                         <div className="min-w-0">
                           <p className="text-sm font-medium truncate">{repo.name}</p>
-                          <p className="text-xs text-muted-foreground truncate">{repo.path} · {repo.repository_type}</p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {repo.path} · {repo.repository_type}
+                          </p>
                         </div>
                       </label>
                     ))}
@@ -222,8 +252,14 @@ const ExportImportTab: React.FC = () => {
             onClick={() => exportMutation.mutate()}
             disabled={exportMutation.isPending || (!exportingAll && selectedRepos.length === 0)}
           >
-            {exportMutation.isPending ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
-            {exportMutation.isPending ? t('exportImport.export.exporting') : t('exportImport.export.button')}
+            {exportMutation.isPending ? (
+              <Loader2 size={15} className="animate-spin" />
+            ) : (
+              <Download size={15} />
+            )}
+            {exportMutation.isPending
+              ? t('exportImport.export.exporting')
+              : t('exportImport.export.button')}
           </Button>
         </div>
       </SettingsCard>
@@ -252,7 +288,10 @@ const ExportImportTab: React.FC = () => {
             />
             <label htmlFor="import-file-input">
               <Button variant="outline" className="gap-1.5 cursor-pointer" asChild>
-                <span><FileText size={15} />{t('exportImport.selectYamlFile')}</span>
+                <span>
+                  <FileText size={15} />
+                  {t('exportImport.selectYamlFile')}
+                </span>
               </Button>
             </label>
             {importFile && (
@@ -264,16 +303,27 @@ const ExportImportTab: React.FC = () => {
 
           {/* Merge strategy */}
           <div>
-            <p className="text-xs font-semibold mb-1.5">{t('exportImport.conflictResolutionStrategy')}</p>
-            <Select value={mergeStrategy} onValueChange={(v) => {
-              setMergeStrategy(v)
-              trackSystem(EventAction.EDIT, { section: 'export_import', setting: 'merge_strategy', value: v })
-            }}>
+            <p className="text-xs font-semibold mb-1.5">
+              {t('exportImport.conflictResolutionStrategy')}
+            </p>
+            <Select
+              value={mergeStrategy}
+              onValueChange={(v) => {
+                setMergeStrategy(v)
+                trackSystem(EventAction.EDIT, {
+                  section: 'export_import',
+                  setting: 'merge_strategy',
+                  value: v,
+                })
+              }}
+            >
               <SelectTrigger className="h-9 text-sm font-semibold">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="skip_duplicates">{t('exportImport.strategySkipDuplicates')}</SelectItem>
+                <SelectItem value="skip_duplicates">
+                  {t('exportImport.strategySkipDuplicates')}
+                </SelectItem>
                 <SelectItem value="replace">{t('exportImport.strategyReplace')}</SelectItem>
                 <SelectItem value="rename">{t('exportImport.strategyRename')}</SelectItem>
               </SelectContent>
@@ -293,8 +343,14 @@ const ExportImportTab: React.FC = () => {
             onClick={() => importFile && importMutation.mutate({ file: importFile, dryRun: false })}
             disabled={!importFile || importMutation.isPending}
           >
-            {importMutation.isPending ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} />}
-            {importMutation.isPending ? t('exportImport.import.importing') : t('exportImport.import.button')}
+            {importMutation.isPending ? (
+              <Loader2 size={15} className="animate-spin" />
+            ) : (
+              <Upload size={15} />
+            )}
+            {importMutation.isPending
+              ? t('exportImport.import.importing')
+              : t('exportImport.import.button')}
           </Button>
 
           {importMutation.isPending && (
@@ -314,7 +370,9 @@ const ExportImportTab: React.FC = () => {
                     <AlertCircle size={22} className="text-destructive" />
                   )}
                   <p className="text-base font-semibold">
-                    {importResult.success ? t('exportImport.importSummary') : t('exportImport.importFailed')}
+                    {importResult.success
+                      ? t('exportImport.importSummary')
+                      : t('exportImport.importFailed')}
                   </p>
                 </div>
 
@@ -335,7 +393,9 @@ const ExportImportTab: React.FC = () => {
                       <div className="mt-2 flex flex-col gap-1">
                         <p className="text-sm font-semibold">{t('exportImport.warnings')}:</p>
                         {importResult.warnings?.map((w, i) => (
-                          <Alert key={i}><AlertDescription>{w}</AlertDescription></Alert>
+                          <Alert key={i}>
+                            <AlertDescription>{w}</AlertDescription>
+                          </Alert>
                         ))}
                       </div>
                     )}
@@ -343,14 +403,18 @@ const ExportImportTab: React.FC = () => {
                 )}
 
                 {!importResult.success && (
-                  <Alert variant="destructive"><AlertDescription>{importResult.error}</AlertDescription></Alert>
+                  <Alert variant="destructive">
+                    <AlertDescription>{importResult.error}</AlertDescription>
+                  </Alert>
                 )}
 
                 {(importResult.errors?.length ?? 0) > 0 && (
                   <div className="mt-2 flex flex-col gap-1">
                     <p className="text-sm font-semibold">{t('exportImport.errors')}:</p>
                     {importResult.errors?.map((e, i) => (
-                      <Alert key={i} variant="destructive"><AlertDescription>{e}</AlertDescription></Alert>
+                      <Alert key={i} variant="destructive">
+                        <AlertDescription>{e}</AlertDescription>
+                      </Alert>
                     ))}
                   </div>
                 )}

@@ -56,9 +56,7 @@ export default function DiscoveryPicker({ mode, connectionId, defaultRoots, onIm
     setScanning(true)
     try {
       const url =
-        mode === 'local'
-          ? '/repositories/discover/local'
-          : '/repositories/discover/remote'
+        mode === 'local' ? '/repositories/discover/local' : '/repositories/discover/remote'
       const body: Record<string, unknown> = {
         max_depth: mode === 'local' ? 8 : 6,
         budget_seconds: 30,
@@ -139,9 +137,7 @@ export default function DiscoveryPicker({ mode, connectionId, defaultRoots, onIm
                     {r.path}
                   </div>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <Badge
-                      variant={r.encryption_guess === 'encrypted' ? 'default' : 'secondary'}
-                    >
+                    <Badge variant={r.encryption_guess === 'encrypted' ? 'default' : 'secondary'}>
                       {t(`discovery.guess.${r.encryption_guess}`)}
                     </Badge>
                     <Badge variant="outline">borg v{r.borg_version}</Badge>
@@ -188,11 +184,7 @@ export default function DiscoveryPicker({ mode, connectionId, defaultRoots, onIm
               <div className="font-mono">{target.path}</div>
               <div>
                 <Label htmlFor="qi-name">{t('discovery.importDialog.nameLabel')}</Label>
-                <Input
-                  id="qi-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
+                <Input id="qi-name" value={name} onChange={(e) => setName(e.target.value)} />
               </div>
               <div>
                 <Label htmlFor="qi-mode">{t('discovery.importDialog.modeLabel')}</Label>
@@ -241,9 +233,7 @@ export default function DiscoveryPicker({ mode, connectionId, defaultRoots, onIm
               disabled={importMutation.isPending}
               data-testid="qi-submit"
             >
-              {importMutation.isPending
-                ? t('discovery.importing')
-                : t('discovery.importButton')}
+              {importMutation.isPending ? t('discovery.importing') : t('discovery.importButton')}
             </Button>
           </DialogFooter>
         </DialogContent>

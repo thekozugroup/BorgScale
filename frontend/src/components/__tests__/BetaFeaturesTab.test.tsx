@@ -71,7 +71,7 @@ describe('BetaFeaturesTab', () => {
       renderWithProviders(<BetaFeaturesTab />)
       await waitFor(() => {
         expect(
-          screen.getByText('Allow read operations during another tool\'s lock')
+          screen.getByText("Allow read operations during another tool's lock")
         ).toBeInTheDocument()
       })
     })
@@ -79,9 +79,7 @@ describe('BetaFeaturesTab', () => {
     it('renders bypass lock on list toggle', async () => {
       renderWithProviders(<BetaFeaturesTab />)
       await waitFor(() => {
-        expect(
-          screen.getByText('Allow browsing during another tool\'s lock')
-        ).toBeInTheDocument()
+        expect(screen.getByText("Allow browsing during another tool's lock")).toBeInTheDocument()
       })
     })
 
@@ -116,7 +114,7 @@ describe('BetaFeaturesTab', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Allow read operations during another tool\'s lock')
+          screen.getByText("Allow read operations during another tool's lock")
         ).toBeInTheDocument()
       })
 
@@ -133,13 +131,13 @@ describe('BetaFeaturesTab', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Allow read operations during another tool\'s lock')
+          screen.getByText("Allow read operations during another tool's lock")
         ).toBeInTheDocument()
       })
 
       const switches = screen.getAllByRole('switch')
       const infoSwitch = switches.find((sw) =>
-        sw.parentElement?.textContent?.includes('Allow read operations during another tool\'s lock')
+        sw.parentElement?.textContent?.includes("Allow read operations during another tool's lock")
       )
 
       if (infoSwitch) {
@@ -162,13 +160,13 @@ describe('BetaFeaturesTab', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Allow read operations during another tool\'s lock')
+          screen.getByText("Allow read operations during another tool's lock")
         ).toBeInTheDocument()
       })
 
       const switches = screen.getAllByRole('switch')
       const infoSwitch = switches.find((sw) =>
-        sw.parentElement?.textContent?.includes('Allow read operations during another tool\'s lock')
+        sw.parentElement?.textContent?.includes("Allow read operations during another tool's lock")
       )
 
       if (infoSwitch) {
@@ -189,13 +187,13 @@ describe('BetaFeaturesTab', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Allow read operations during another tool\'s lock')
+          screen.getByText("Allow read operations during another tool's lock")
         ).toBeInTheDocument()
       })
 
       const switches = screen.getAllByRole('switch')
       const infoSwitch = switches.find((sw) =>
-        sw.parentElement?.textContent?.includes('Allow read operations during another tool\'s lock')
+        sw.parentElement?.textContent?.includes("Allow read operations during another tool's lock")
       )
 
       if (infoSwitch) {
@@ -232,9 +230,7 @@ describe('BetaFeaturesTab', () => {
       renderWithProviders(<BetaFeaturesTab />)
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Allow browsing during another tool\'s lock')
-        ).toBeInTheDocument()
+        expect(screen.getByText("Allow browsing during another tool's lock")).toBeInTheDocument()
       })
 
       const switches = screen.getAllByRole('switch')
@@ -249,14 +245,12 @@ describe('BetaFeaturesTab', () => {
       renderWithProviders(<BetaFeaturesTab />)
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Allow browsing during another tool\'s lock')
-        ).toBeInTheDocument()
+        expect(screen.getByText("Allow browsing during another tool's lock")).toBeInTheDocument()
       })
 
       const switches = screen.getAllByRole('switch')
       const listSwitch = switches.find((sw) =>
-        sw.parentElement?.textContent?.includes('Allow browsing during another tool\'s lock')
+        sw.parentElement?.textContent?.includes("Allow browsing during another tool's lock")
       )
 
       if (listSwitch) {
@@ -398,13 +392,13 @@ describe('BetaFeaturesTab', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Allow read operations during another tool\'s lock')
+          screen.getByText("Allow read operations during another tool's lock")
         ).toBeInTheDocument()
       })
 
       const switches = screen.getAllByRole('switch')
       const infoSwitch = switches.find((sw) =>
-        sw.parentElement?.textContent?.includes('Allow read operations during another tool\'s lock')
+        sw.parentElement?.textContent?.includes("Allow read operations during another tool's lock")
       )
 
       if (infoSwitch) {
@@ -473,16 +467,16 @@ describe('BetaFeaturesTab', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Allow read operations during another tool\'s lock')
+          screen.getByText("Allow read operations during another tool's lock")
         ).toBeInTheDocument()
       })
 
       const switches = screen.getAllByRole('switch')
       const infoSwitch = switches.find((sw) =>
-        sw.parentElement?.textContent?.includes('Allow read operations during another tool\'s lock')
+        sw.parentElement?.textContent?.includes("Allow read operations during another tool's lock")
       )
       const listSwitch = switches.find((sw) =>
-        sw.parentElement?.textContent?.includes('Allow browsing during another tool\'s lock')
+        sw.parentElement?.textContent?.includes("Allow browsing during another tool's lock")
       )
 
       if (infoSwitch && listSwitch) {

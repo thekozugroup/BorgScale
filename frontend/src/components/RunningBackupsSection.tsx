@@ -1,7 +1,16 @@
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Activity, Archive, Clock, Database, Eye, FileText, HardDrive, RefreshCw, Square, Zap,
+  Activity,
+  Archive,
+  Clock,
+  Database,
+  Eye,
+  FileText,
+  HardDrive,
+  RefreshCw,
+  Square,
+  Zap,
 } from 'lucide-react'
 import { BackupJob } from '../types'
 import {
@@ -39,24 +48,101 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
   onViewLogs,
 }) => {
   const { t } = useTranslation()
+  const prevJobIdsRef = React.useRef<Array<BackupJob['id']>>([])
+  const [finishedAnnouncement, setFinishedAnnouncement] = React.useState('')
+
+  // Announce jobs that left the running list — the card unmounts with them,
+  // so a screen reader would otherwise never learn the backup ended
+  React.useEffect(() => {
+    const currentIds = runningBackupJobs.map((job) => job.id)
+    const finishedIds = prevJobIdsRef.current.filter((id) => !currentIds.includes(id))
+    if (finishedIds.length > 0) {
+      setFinishedAnnouncement(
+        finishedIds
+          .map((id) =>
+            t('backup.runningJobs.progress.finishedAnnouncement', {
+              id,
+              defaultValue: 'Backup job {{id}} finished',
+            })
+          )
+          .join('. ')
+      )
+    }
+    prevJobIdsRef.current = currentIds
+  }, [runningBackupJobs, t])
 
   const getVisibleStats = (job: BackupJob) =>
     [
-      { key: 'filesProcessed', label: t('backup.runningJobs.progress.filesProcessed'), value: job.progress_details?.nfiles?.toLocaleString() || job.processed_files?.toLocaleString() || '0' },
-      { key: 'originalSize', label: t('backup.runningJobs.progress.originalSize'), value: job.progress_details?.original_size ? formatBytesUtil(job.progress_details.original_size) : job.processed_size || 'Unknown' },
-      { key: 'compressed', label: t('backup.runningJobs.progress.compressed'), value: job.progress_details?.compressed_size !== undefined ? formatBytesUtil(job.progress_details.compressed_size) : null },
-      { key: 'deduplicated', label: t('backup.runningJobs.progress.deduplicated'), value: job.progress_details?.deduplicated_size !== undefined ? formatBytesUtil(job.progress_details.deduplicated_size) : null },
-      { key: 'totalSourceSize', label: t('backup.runningJobs.progress.totalSourceSize'), value: job.progress_details?.total_expected_size && job.progress_details.total_expected_size > 0 ? formatBytesUtil(job.progress_details.total_expected_size) : 'Unknown' },
-      { key: 'speed', label: t('backup.runningJobs.progress.speed'), value: job.status === 'running' && job.progress_details?.backup_speed ? `${job.progress_details.backup_speed.toFixed(2)} MB/s` : 'N/A' },
-      { key: 'eta', label: t('backup.runningJobs.progress.eta'), value: (job.progress_details?.estimated_time_remaining || 0) > 0 ? formatDurationSeconds(job.progress_details?.estimated_time_remaining || 0) : 'N/A' },
+      {
+        key: 'filesProcessed',
+        label: t('backup.runningJobs.progress.filesProcessed'),
+        value:
+          job.progress_details?.nfiles?.toLocaleString() ||
+          job.processed_files?.toLocaleString() ||
+          '0',
+      },
+      {
+        key: 'originalSize',
+        label: t('backup.runningJobs.progress.originalSize'),
+        value: job.progress_details?.original_size
+          ? formatBytesUtil(job.progress_details.original_size)
+          : job.processed_size || 'Unknown',
+      },
+      {
+        key: 'compressed',
+        label: t('backup.runningJobs.progress.compressed'),
+        value:
+          job.progress_details?.compressed_size !== undefined
+            ? formatBytesUtil(job.progress_details.compressed_size)
+            : null,
+      },
+      {
+        key: 'deduplicated',
+        label: t('backup.runningJobs.progress.deduplicated'),
+        value:
+          job.progress_details?.deduplicated_size !== undefined
+            ? formatBytesUtil(job.progress_details.deduplicated_size)
+            : null,
+      },
+      {
+        key: 'totalSourceSize',
+        label: t('backup.runningJobs.progress.totalSourceSize'),
+        value:
+          job.progress_details?.total_expected_size && job.progress_details.total_expected_size > 0
+            ? formatBytesUtil(job.progress_details.total_expected_size)
+            : 'Unknown',
+      },
+      {
+        key: 'speed',
+        label: t('backup.runningJobs.progress.speed'),
+        value:
+          job.status === 'running' && job.progress_details?.backup_speed
+            ? `${job.progress_details.backup_speed.toFixed(2)} MB/s`
+            : 'N/A',
+      },
+      {
+        key: 'eta',
+        label: t('backup.runningJobs.progress.eta'),
+        value:
+          (job.progress_details?.estimated_time_remaining || 0) > 0
+            ? formatDurationSeconds(job.progress_details?.estimated_time_remaining || 0)
+            : 'N/A',
+      },
     ].filter((stat) => stat.value !== null)
 
-  if (runningBackupJobs.length === 0) return null
+  if (runningBackupJobs.length === 0) {
+    return finishedAnnouncement ? (
+      <div role="status" className="sr-only">
+        {finishedAnnouncement}
+      </div>
+    ) : null
+  }
 
   return (
-    <div
-      className="mb-6 rounded-lg overflow-hidden border border-border shadow-sm"
-    >
+    <div className="mb-6 rounded-lg overflow-hidden border border-border shadow-sm">
+      <div role="status" className="sr-only">
+        {finishedAnnouncement}
+      </div>
       <div className="px-4 sm:px-6 pt-4 pb-5 bg-background">
         {/* Section Header */}
         <div className="flex items-center gap-2 mb-1">
@@ -78,14 +164,20 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
             const visibleStats = getVisibleStats(job)
             const progress = job.progress || 0
             const stageLabel =
-              progress === 0 ? t('backup.runningJobs.progress.initializing')
-                : progress >= 100 ? t('backup.runningJobs.progress.finalizing')
-                : t('backup.runningJobs.progress.processing')
+              progress === 0
+                ? t('backup.runningJobs.progress.initializing')
+                : progress >= 100
+                  ? t('backup.runningJobs.progress.finalizing')
+                  : t('backup.runningJobs.progress.processing')
 
             const processed = job.progress_details?.original_size ?? 0
             const total = job.progress_details?.total_expected_size ?? 0
             const showProgress = processed > 0 && total > 0
             const pct = showProgress ? Math.min(100, (processed / total) * 100) : 0
+            // Quarter-step buckets keep the polite live region from firing on
+            // every percent while still conveying real progress
+            const announcedPct = Math.floor(pct / 25) * 25
+            const jobTitle = t('backup.runningJobs.jobTitle', { id: job.id })
 
             return (
               <div
@@ -96,7 +188,10 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                 <div
                   className="pointer-events-none absolute bg-primary/10"
                   style={{
-                    top: -60, right: -40, width: 200, height: 140,
+                    top: -60,
+                    right: -40,
+                    width: 200,
+                    height: 140,
                     borderRadius: '50%',
                     filter: 'blur(55px)',
                     animation: 'blobPulseJob 3s ease-in-out infinite',
@@ -104,13 +199,22 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                 />
 
                 <div className="px-4 sm:px-5 pt-4 pb-4">
+                  <div role="status" className="sr-only">
+                    {showProgress
+                      ? `${jobTitle}: ${stageLabel}, ${announcedPct}%`
+                      : `${jobTitle}: ${stageLabel}`}
+                  </div>
+
                   {/* Header row */}
                   <div className="flex justify-between items-start gap-4 mb-4 flex-wrap sm:flex-nowrap">
                     {/* Left */}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-                        <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-primary" style={{ animation: 'liveDot 2s ease-in-out infinite' }} />
-                        <p className="font-bold text-base leading-tight">{t('backup.runningJobs.jobTitle', { id: job.id })}</p>
+                        <div
+                          className="w-1.5 h-1.5 rounded-full flex-shrink-0 bg-primary"
+                          style={{ animation: 'liveDot 2s ease-in-out infinite' }}
+                        />
+                        <p className="font-bold text-base leading-tight">{jobTitle}</p>
                         <div className="px-1.5 py-0.5 rounded text-2xs font-bold uppercase tracking-[0.05em] leading-none bg-primary/10 border border-primary/20 text-primary">
                           {stageLabel}
                         </div>
@@ -127,7 +231,9 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
 
                     {/* Right: actions */}
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="text-xs text-muted-foreground hidden sm:block">{formatTimeRange(job.started_at, job.completed_at, job.status)}</span>
+                      <span className="text-xs text-muted-foreground hidden sm:block">
+                        {formatTimeRange(job.started_at, job.completed_at, job.status)}
+                      </span>
                       {onViewLogs && (
                         <Button
                           size="sm"
@@ -158,11 +264,26 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                   {showProgress && (
                     <div className="mb-3">
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-2xs font-semibold text-primary">{pct.toFixed(1)}%</span>
-                        <span className="text-2xs text-muted-foreground">{t('backup.runningJobs.progress.totalSourceSize')}</span>
+                        <span className="text-2xs font-semibold text-primary">
+                          {pct.toFixed(1)}%
+                        </span>
+                        <span className="text-2xs text-muted-foreground">
+                          {t('backup.runningJobs.progress.totalSourceSize')}
+                        </span>
                       </div>
-                      <div className="h-1 rounded-full overflow-hidden bg-muted">
-                        <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
+                      <div
+                        role="progressbar"
+                        aria-label={jobTitle}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={Math.round(pct)}
+                        aria-valuetext={`${pct.toFixed(1)}%`}
+                        className="h-1 rounded-full overflow-hidden bg-muted"
+                      >
+                        <div
+                          className="h-full rounded-full bg-primary"
+                          style={{ width: `${pct}%` }}
+                        />
                       </div>
                     </div>
                   )}
@@ -176,15 +297,18 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
                       }}
                     >
                       {visibleStats.map((stat, i) => (
-                        <div
-                          key={stat.key}
-                          className="px-3 py-2 bg-background/60"
-                        >
+                        <div key={stat.key} className="px-3 py-2 bg-background/60">
                           <div className="flex items-center gap-1 mb-0.5">
-                            <span className="text-muted-foreground/70 flex items-center">{STAT_ICONS[i]}</span>
-                            <span className="text-3xs font-bold uppercase tracking-[0.07em] leading-none text-muted-foreground/70">{stat.label}</span>
+                            <span className="text-muted-foreground/70 flex items-center">
+                              {STAT_ICONS[i]}
+                            </span>
+                            <span className="text-3xs font-bold uppercase tracking-[0.07em] leading-none text-muted-foreground/70">
+                              {stat.label}
+                            </span>
                           </div>
-                          <p className="text-sm font-semibold truncate tabular-nums">{stat.value}</p>
+                          <p className="text-sm font-semibold truncate tabular-nums">
+                            {stat.value}
+                          </p>
                         </div>
                       ))}
                     </div>
@@ -192,10 +316,10 @@ const RunningBackupsSection: React.FC<RunningBackupsSectionProps> = ({
 
                   {/* Current file */}
                   {job.progress_details?.current_file && (
-                    <div
-                      className="flex items-center gap-2 px-3 py-2 rounded overflow-hidden bg-muted/50 border border-border"
-                    >
-                      <span className="text-primary/60 flex shrink-0"><FileText size={13} /></span>
+                    <div className="flex items-center gap-2 px-3 py-2 rounded overflow-hidden bg-muted/50 border border-border">
+                      <span className="text-primary/60 flex shrink-0">
+                        <FileText size={13} />
+                      </span>
                       <p className="text-xs text-muted-foreground truncate flex-1 min-w-0 font-mono">
                         {job.progress_details.current_file}
                       </p>

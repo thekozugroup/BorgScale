@@ -31,17 +31,13 @@ function StatCard({ label, value, icon, bgOpacity = '10', tooltip }: StatCardPro
   const bgClass = bgOpacity === '5' ? 'bg-primary/5' : 'bg-primary/10'
 
   const card = (
-    <div
-      className={`rounded-lg px-4 py-3.5 ${bgClass} border border-primary/20`}
-    >
+    <div className={`rounded-lg px-4 py-3.5 ${bgClass} border border-primary/20`}>
       <div className="flex justify-between items-start">
         <div>
           <p className="text-2xs font-bold uppercase tracking-[0.06em] block mb-1.5 text-primary">
             {label}
           </p>
-          <p className="font-bold leading-tight text-xl lg:text-2xl text-primary">
-            {value}
-          </p>
+          <p className="font-bold leading-tight text-xl lg:text-2xl text-primary">{value}</p>
         </div>
         <div className="text-primary opacity-40 mt-0.5 flex-shrink-0">{icon}</div>
       </div>
@@ -71,13 +67,7 @@ export default function RepositoryStatsGrid({
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <StatCard
         label={t('repositoryStatsGrid.totalArchives')}
-        value={
-          archivesLoading ? (
-            <Skeleton className="h-7 w-10" />
-          ) : (
-            archivesCount
-          )
-        }
+        value={archivesLoading ? <Skeleton className="h-7 w-10" /> : archivesCount}
         icon={<ArchiveIcon size={32} />}
         bgOpacity="10"
       />

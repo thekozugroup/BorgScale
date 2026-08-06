@@ -1,8 +1,11 @@
+import asyncio
 from datetime import datetime
+from unittest.mock import patch
 
 import pytest
 from fastapi import HTTPException
 
+from app.api import maintenance_jobs
 from app.api.maintenance_jobs import (
     create_maintenance_job,
     create_running_maintenance_job,
@@ -130,6 +133,44 @@ class TestMaintenanceJobsHelpers:
 
         assert read_job_logs(file_job) == "from file\n"
         assert read_job_logs(legacy_job) == "legacy only"
+
+    @pytest.mark.asyncio
+    async def test_schedule_background_job_retains_task_reference(self):
+        release = asyncio.Event()
+
+        async def slow_job():
+            await release.wait()
+
+        before = set(maintenance_jobs._background_tasks)
+        maintenance_jobs.schedule_background_job(slow_job())
+        try:
+            # Without a strong reference the task could be garbage-collected mid-run
+            task = next(iter(maintenance_jobs._background_tasks - before))
+            assert task in maintenance_jobs._background_tasks
+        finally:
+            release.set()
+            await asyncio.sleep(0)
+
+        await task
+        await asyncio.sleep(0)
+        assert task not in maintenance_jobs._background_tasks
+
+    @pytest.mark.asyncio
+    async def test_schedule_background_job_logs_task_failure(self):
+        async def failing_job():
+            raise RuntimeError("boom")
+
+        before = set(maintenance_jobs._background_tasks)
+        with patch.object(maintenance_jobs, "logger") as mock_logger:
+            maintenance_jobs.schedule_background_job(failing_job())
+            task = next(iter(maintenance_jobs._background_tasks - before))
+            with pytest.raises(RuntimeError, match="boom"):
+                await task
+            # Done-callbacks run on the next loop iteration
+            await asyncio.sleep(0)
+
+        assert task not in maintenance_jobs._background_tasks
+        mock_logger.error.assert_called_once()
 
     def test_serialize_job_helpers_include_requested_fields(self, test_db):
         repo = _create_repo(test_db)

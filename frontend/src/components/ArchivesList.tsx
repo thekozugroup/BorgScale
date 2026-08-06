@@ -351,10 +351,7 @@ export default function ArchivesList({
           {groupedArchives.map((group) => {
             const isExpanded = expandedGroups.has(group.key)
             return (
-              <div
-                key={group.key}
-                className="rounded-lg border border-border overflow-hidden"
-              >
+              <div key={group.key} className="rounded-lg border border-border overflow-hidden">
                 <button
                   type="button"
                   data-testid="accordion-trigger"
@@ -448,7 +445,10 @@ export default function ArchivesList({
               {/* Display rows */}
               <span className="ml-auto text-sm">
                 {page * rowsPerPage + 1}–{Math.min((page + 1) * rowsPerPage, sortedArchives.length)}{' '}
-                of {sortedArchives.length !== -1 ? sortedArchives.length : `more than ${(page + 1) * rowsPerPage}`}
+                of{' '}
+                {sortedArchives.length !== -1
+                  ? sortedArchives.length
+                  : `more than ${(page + 1) * rowsPerPage}`}
               </span>
 
               {/* Prev/Next */}

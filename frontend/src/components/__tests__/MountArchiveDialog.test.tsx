@@ -31,7 +31,9 @@ describe('MountArchiveDialog', () => {
   })
 
   it('renders dialog when open', () => {
-    renderWithProviders(<MountArchiveDialog open={true} archive={mockArchive} mountPoint="" {...mockHandlers} />)
+    renderWithProviders(
+      <MountArchiveDialog open={true} archive={mockArchive} mountPoint="" {...mockHandlers} />
+    )
 
     expect(screen.getByText('Mount Archive')).toBeInTheDocument()
     expect(screen.getByText('backup-2024-01-15')).toBeInTheDocument()
@@ -39,7 +41,9 @@ describe('MountArchiveDialog', () => {
 
   it('displays info alert about read-only filesystem', async () => {
     const user = userEvent.setup()
-    renderWithProviders(<MountArchiveDialog open={true} archive={mockArchive} mountPoint="" {...mockHandlers} />)
+    renderWithProviders(
+      <MountArchiveDialog open={true} archive={mockArchive} mountPoint="" {...mockHandlers} />
+    )
 
     const infoIcon = document.body.querySelector('.lucide-info')?.parentElement
     expect(infoIcon).toBeTruthy()
@@ -54,7 +58,9 @@ describe('MountArchiveDialog', () => {
   })
 
   it('renders mount point input with placeholder', () => {
-    renderWithProviders(<MountArchiveDialog open={true} archive={mockArchive} mountPoint="" {...mockHandlers} />)
+    renderWithProviders(
+      <MountArchiveDialog open={true} archive={mockArchive} mountPoint="" {...mockHandlers} />
+    )
 
     const input = screen.getByLabelText('Mount Point')
     expect(input).toBeInTheDocument()
@@ -76,7 +82,9 @@ describe('MountArchiveDialog', () => {
   })
 
   it('calls onMountPointChange when input changes', () => {
-    renderWithProviders(<MountArchiveDialog open={true} archive={mockArchive} mountPoint="" {...mockHandlers} />)
+    renderWithProviders(
+      <MountArchiveDialog open={true} archive={mockArchive} mountPoint="" {...mockHandlers} />
+    )
 
     const input = screen.getByLabelText('Mount Point')
     fireEvent.change(input, { target: { value: 'new-mount' } })
@@ -98,13 +106,17 @@ describe('MountArchiveDialog', () => {
   })
 
   it('shows placeholder in helper text when mount point is empty', () => {
-    renderWithProviders(<MountArchiveDialog open={true} archive={mockArchive} mountPoint="" {...mockHandlers} />)
+    renderWithProviders(
+      <MountArchiveDialog open={true} archive={mockArchive} mountPoint="" {...mockHandlers} />
+    )
 
     expect(screen.getByText(/Will be mounted at: \/data\/mounts\/<name>/)).toBeInTheDocument()
   })
 
   it('calls onClose when Cancel button is clicked', () => {
-    renderWithProviders(<MountArchiveDialog open={true} archive={mockArchive} mountPoint="" {...mockHandlers} />)
+    renderWithProviders(
+      <MountArchiveDialog open={true} archive={mockArchive} mountPoint="" {...mockHandlers} />
+    )
 
     fireEvent.click(screen.getByRole('button', { name: /cancel/i }))
     expect(mockHandlers.onClose).toHaveBeenCalledTimes(1)
@@ -154,7 +166,9 @@ describe('MountArchiveDialog', () => {
   })
 
   it('handles null archive gracefully', () => {
-    renderWithProviders(<MountArchiveDialog open={true} archive={null} mountPoint="" {...mockHandlers} />)
+    renderWithProviders(
+      <MountArchiveDialog open={true} archive={null} mountPoint="" {...mockHandlers} />
+    )
 
     expect(screen.getByText('Mount Archive')).toBeInTheDocument()
   })

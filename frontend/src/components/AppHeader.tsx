@@ -92,12 +92,15 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
       <div className="flex-1" />
 
       {/* User menu */}
-      <Popover open={open} onOpenChange={(val) => {
-        setOpen(val)
-        if (val) {
-          trackNavigation(EventAction.VIEW, { surface: 'user_menu' })
-        }
-      }}>
+      <Popover
+        open={open}
+        onOpenChange={(val) => {
+          setOpen(val)
+          if (val) {
+            trackNavigation(EventAction.VIEW, { surface: 'user_menu' })
+          }
+        }}
+      >
         <PopoverTrigger asChild>
           <button
             aria-label="User menu"
@@ -138,8 +141,7 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
             <div className="min-w-0">
               <p className="truncate text-sm font-bold text-foreground">{displayName}</p>
               <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                {companyLabel ||
-                  t('settings.account.profile.deployment.individual', 'Individual')}
+                {companyLabel || t('settings.account.profile.deployment.individual', 'Individual')}
               </p>
               {roleLabel && (
                 <span
@@ -163,9 +165,7 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
               </div>
               <div className="flex-1 text-left">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-foreground">
-                    BorgScale
-                  </span>
+                  <span className="text-xs font-bold text-foreground">BorgScale</span>
                   <span className="inline-flex items-center gap-1 rounded border border-border/30 bg-muted px-1.5 py-0.5 text-3xs font-bold uppercase tracking-wide text-muted-foreground">
                     {t('plan.activeStatus', 'Active')}
                   </span>
@@ -197,9 +197,7 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
                   <Icon size={14} className="text-muted-foreground" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-xs font-semibold leading-tight text-foreground">
-                    {label}
-                  </p>
+                  <p className="text-xs font-semibold leading-tight text-foreground">{label}</p>
                   <p className="mt-0.5 text-3xs text-muted-foreground">{desc}</p>
                 </div>
                 <ChevronRight size={13} className="shrink-0 text-border" />

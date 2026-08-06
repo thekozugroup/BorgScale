@@ -115,7 +115,9 @@ export default function WizardStepDataSource({
 
         {/* Remote Data Source Card */}
         <div
-          title={isRemoteToRemoteDisabled ? t('wizard.dataSource.remoteToRemoteDisabledTooltip') : ''}
+          title={
+            isRemoteToRemoteDisabled ? t('wizard.dataSource.remoteToRemoteDisabledTooltip') : ''
+          }
           className="flex-1"
         >
           <button

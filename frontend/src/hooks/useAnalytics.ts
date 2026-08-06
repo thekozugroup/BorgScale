@@ -160,7 +160,10 @@ export const useAnalytics = () => {
     []
   )
 
-  const trackNotifications = useCallback((_action: string, _data?: Record<string, unknown>) => {}, [])
+  const trackNotifications = useCallback(
+    (_action: string, _data?: Record<string, unknown>) => {},
+    []
+  )
 
   const trackSystem = useCallback((_action: string, _data?: Record<string, unknown>) => {}, [])
 
@@ -173,7 +176,10 @@ export const useAnalytics = () => {
 
   const trackPlan = useCallback((_action: string, _data?: Record<string, unknown>) => {}, [])
 
-  const trackAnnouncement = useCallback((_action: string, _data?: Record<string, unknown>) => {}, [])
+  const trackAnnouncement = useCallback(
+    (_action: string, _data?: Record<string, unknown>) => {},
+    []
+  )
 
   const trackAuth = useCallback((_action: string, _data?: Record<string, unknown>) => {}, [])
 

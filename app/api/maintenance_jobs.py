@@ -3,12 +3,19 @@ import os
 from datetime import datetime
 from typing import Any, Awaitable, Callable, Optional, Type
 
+import structlog
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.security import check_repo_access
 from app.database.models import Repository, User
 from app.utils.datetime_utils import serialize_datetime
+
+logger = structlog.get_logger()
+
+# Strong references to in-flight background job tasks; without them the event
+# loop only holds a weak reference and Python may garbage-collect a task mid-run.
+_background_tasks: set[asyncio.Task] = set()
 
 
 def get_repository_with_access(
@@ -100,8 +107,23 @@ def create_running_maintenance_job(
     )
 
 
+def _finalize_background_job(task: asyncio.Task) -> None:
+    _background_tasks.discard(task)
+    if task.cancelled():
+        return
+    exc = task.exception()
+    if exc is not None:
+        logger.error(
+            "Background maintenance job task failed",
+            task_name=task.get_name(),
+            error=str(exc),
+        )
+
+
 def schedule_background_job(coro) -> None:
-    asyncio.create_task(coro)
+    task = asyncio.create_task(coro)
+    _background_tasks.add(task)
+    task.add_done_callback(_finalize_background_job)
 
 
 def create_started_maintenance_job(

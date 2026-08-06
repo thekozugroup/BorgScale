@@ -946,4 +946,54 @@ describe('RepositoryCard', () => {
       expect(screen.queryByRole('button', { name: /Backup Now/i })).not.toBeInTheDocument()
     })
   })
+
+  describe('Maintenance action bar', () => {
+    it('names each maintenance action in plain language', () => {
+      renderWithProviders(
+        <RepositoryCard
+          repository={mockRepository}
+          isInJobsSet={false}
+          canManageRepository={true}
+          getCompressionLabel={mockGetCompressionLabel}
+          {...mockCallbacks}
+        />
+      )
+
+      expect(
+        screen.getByRole('button', { name: 'Check this repository for damage' })
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: 'Reclaim disk space (compact)' })
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: 'Remove old backups by retention rules (prune)' })
+      ).toBeInTheDocument()
+    })
+
+    it('gives the whole icon cluster one hover treatment and no faded foregrounds', () => {
+      renderWithProviders(
+        <RepositoryCard
+          repository={mockRepository}
+          isInJobsSet={false}
+          canManageRepository={true}
+          getCompressionLabel={mockGetCompressionLabel}
+          {...mockCallbacks}
+        />
+      )
+
+      const iconButtons = [
+        screen.getByRole('button', { name: /Info/i }),
+        screen.getByRole('button', { name: /Check/i }),
+        screen.getByRole('button', { name: /Compact/i }),
+        screen.getByRole('button', { name: /Prune/i }),
+        screen.getByRole('button', { name: /View Archives/i }),
+      ]
+
+      iconButtons.forEach((button) => {
+        expect(button.className).toContain('hover:bg-accent')
+        expect(button.className).toContain('hover:text-foreground')
+        expect(button.className).not.toMatch(/text-[a-z-]+\/\d+/)
+      })
+    })
+  })
 })

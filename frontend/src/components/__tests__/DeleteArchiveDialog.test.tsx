@@ -21,27 +21,35 @@ describe('DeleteArchiveDialog', () => {
   })
 
   it('renders dialog when open', () => {
-    renderWithProviders(<DeleteArchiveDialog open={true} archiveName="backup-2024-01-15" {...mockHandlers} />)
+    renderWithProviders(
+      <DeleteArchiveDialog open={true} archiveName="backup-2024-01-15" {...mockHandlers} />
+    )
 
     expect(screen.getByText('Delete Archive?')).toBeInTheDocument()
     expect(screen.getAllByText(/backup-2024-01-15/).length).toBeGreaterThan(0)
   })
 
   it('displays warning message', () => {
-    renderWithProviders(<DeleteArchiveDialog open={true} archiveName="backup-2024-01-15" {...mockHandlers} />)
+    renderWithProviders(
+      <DeleteArchiveDialog open={true} archiveName="backup-2024-01-15" {...mockHandlers} />
+    )
 
     expect(screen.getByText(/This action cannot be undone/)).toBeInTheDocument()
   })
 
   it('calls onClose when Cancel button is clicked', () => {
-    renderWithProviders(<DeleteArchiveDialog open={true} archiveName="backup-2024-01-15" {...mockHandlers} />)
+    renderWithProviders(
+      <DeleteArchiveDialog open={true} archiveName="backup-2024-01-15" {...mockHandlers} />
+    )
 
     fireEvent.click(screen.getByRole('button', { name: /cancel/i }))
     expect(mockHandlers.onClose).toHaveBeenCalledTimes(1)
   })
 
   it('calls onConfirm with archive name when Delete button is clicked', () => {
-    renderWithProviders(<DeleteArchiveDialog open={true} archiveName="backup-2024-01-15" {...mockHandlers} />)
+    renderWithProviders(
+      <DeleteArchiveDialog open={true} archiveName="backup-2024-01-15" {...mockHandlers} />
+    )
 
     fireEvent.click(screen.getByRole('button', { name: /delete/i }))
     expect(mockHandlers.onConfirm).toHaveBeenCalledWith('backup-2024-01-15')

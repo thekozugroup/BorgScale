@@ -90,7 +90,9 @@ describe('PruneSettingsInput', () => {
 
   it('disables all inputs when disabled prop is true', () => {
     const onChange = vi.fn()
-    renderWithProviders(<PruneSettingsInput values={defaultValues} onChange={onChange} disabled={true} />)
+    renderWithProviders(
+      <PruneSettingsInput values={defaultValues} onChange={onChange} disabled={true} />
+    )
 
     expect(screen.getByLabelText(/Keep hourly backups for/i)).toBeDisabled()
     expect(screen.getByLabelText(/Keep daily backups for/i)).toBeDisabled()

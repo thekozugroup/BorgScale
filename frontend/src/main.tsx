@@ -44,7 +44,6 @@ const _origIsFrozen = Object.isFrozen
   return _origIsFrozen(obj)
 }
 
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

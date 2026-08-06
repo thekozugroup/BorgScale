@@ -188,29 +188,9 @@ def _resolve_bypass_lock(
     return use_bypass_lock, _lock_source(repository.bypass_lock, system_enabled)
 
 
-def _get_repository_schedule_summary(repo_id: int, db: Session) -> Dict[str, Any]:
-    """Return one preferred schedule summary for a repository.
+def _summarize_schedule(matched: List[ScheduledJob]) -> Dict[str, Any]:
+    """Shape the preferred schedule out of a repository's matches."""
 
-    Enabled schedules win over disabled ones. We support both legacy single-repo
-    schedules and multi-repo schedules through the junction table.
-    """
-
-    direct_matches = (
-        db.query(ScheduledJob).filter(ScheduledJob.repository_id == repo_id).all()
-    )
-    linked_schedule_ids = [
-        row.scheduled_job_id
-        for row in db.query(ScheduledJobRepository.scheduled_job_id)
-        .filter(ScheduledJobRepository.repository_id == repo_id)
-        .all()
-    ]
-    linked_matches = (
-        db.query(ScheduledJob).filter(ScheduledJob.id.in_(linked_schedule_ids)).all()
-        if linked_schedule_ids
-        else []
-    )
-
-    matched = direct_matches + linked_matches
     if not matched:
         return {
             "has_schedule": False,
@@ -227,6 +207,65 @@ def _get_repository_schedule_summary(repo_id: int, db: Session) -> Dict[str, Any
         "next_run": format_datetime(preferred.next_run)
         if preferred.enabled and preferred.next_run
         else None,
+    }
+
+
+def _get_repository_schedule_summaries(
+    repo_ids: List[int], db: Session
+) -> Dict[int, Dict[str, Any]]:
+    """Preferred schedule summary per repository, in a fixed number of queries.
+
+    Enabled schedules win over disabled ones. We support both legacy single-repo
+    schedules and multi-repo schedules through the junction table.
+
+    The repository list is polled globally, so resolving schedules one repository
+    at a time made every poll cost three queries per repository.
+    """
+
+    if not repo_ids:
+        return {}
+
+    direct_by_repo: Dict[int, List[ScheduledJob]] = {}
+    for schedule in (
+        db.query(ScheduledJob)
+        .filter(ScheduledJob.repository_id.in_(repo_ids))
+        .order_by(ScheduledJob.id)
+        .all()
+    ):
+        direct_by_repo.setdefault(schedule.repository_id, []).append(schedule)
+
+    links = (
+        db.query(
+            ScheduledJobRepository.repository_id,
+            ScheduledJobRepository.scheduled_job_id,
+        )
+        .filter(ScheduledJobRepository.repository_id.in_(repo_ids))
+        .all()
+    )
+    linked_schedules = (
+        {
+            schedule.id: schedule
+            for schedule in db.query(ScheduledJob)
+            .filter(ScheduledJob.id.in_({link.scheduled_job_id for link in links}))
+            .all()
+        }
+        if links
+        else {}
+    )
+
+    linked_by_repo: Dict[int, List[ScheduledJob]] = {}
+    for link in links:
+        schedule = linked_schedules.get(link.scheduled_job_id)
+        if schedule:
+            linked_by_repo.setdefault(link.repository_id, []).append(schedule)
+    for schedules in linked_by_repo.values():
+        schedules.sort(key=lambda schedule: schedule.id)
+
+    return {
+        repo_id: _summarize_schedule(
+            direct_by_repo.get(repo_id, []) + linked_by_repo.get(repo_id, [])
+        )
+        for repo_id in repo_ids
     }
 
 
@@ -812,33 +851,28 @@ async def get_repositories(
                 db.query(Repository).filter(Repository.id.in_(permitted_ids)).all()
             )
 
-        # Check for running maintenance jobs for each repository
+        # Check for running maintenance jobs across every repository at once —
+        # one query per job type rather than one per repository, on a poll that
+        # runs every 30 seconds for every open tab.
+        repo_ids = [repo.id for repo in repositories]
+        maintenance_repo_ids = set()
+        for job_model in (CheckJob, CompactJob, PruneJob):
+            maintenance_repo_ids.update(
+                row.repository_id
+                for row in db.query(job_model.repository_id)
+                .filter(
+                    job_model.repository_id.in_(repo_ids),
+                    job_model.status == "running",
+                )
+                .distinct()
+                .all()
+            )
+
+        schedule_summaries = _get_repository_schedule_summaries(repo_ids, db)
+
         repo_list = []
         for repo in repositories:
-            # Check if this repository has running check, compact, or prune jobs
-            has_check = (
-                db.query(CheckJob)
-                .filter(CheckJob.repository_id == repo.id, CheckJob.status == "running")
-                .first()
-                is not None
-            )
-
-            has_compact = (
-                db.query(CompactJob)
-                .filter(
-                    CompactJob.repository_id == repo.id, CompactJob.status == "running"
-                )
-                .first()
-                is not None
-            )
-
-            has_prune = (
-                db.query(PruneJob)
-                .filter(PruneJob.repository_id == repo.id, PruneJob.status == "running")
-                .first()
-                is not None
-            )
-            schedule_summary = _get_repository_schedule_summary(repo.id, db)
+            schedule_summary = schedule_summaries[repo.id]
 
             repo_list.append(
                 {
@@ -877,7 +911,7 @@ async def get_repositories(
                     or "full",  # Default to "full" for backward compatibility
                     "bypass_lock": repo.bypass_lock or False,
                     "custom_flags": repo.custom_flags,
-                    "has_running_maintenance": has_check or has_compact or has_prune,
+                    "has_running_maintenance": repo.id in maintenance_repo_ids,
                     "has_schedule": schedule_summary["has_schedule"],
                     "schedule_enabled": schedule_summary["schedule_enabled"],
                     "schedule_name": schedule_summary["schedule_name"],
@@ -3085,93 +3119,6 @@ async def get_repository_stats(
                 os.unlink(temp_key_file)
             except Exception:
                 pass
-
-
-@router.post("/{repository_id}/break-lock")
-async def break_repository_lock(
-    repository_id: int,
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    """
-    Break a stale lock on a repository
-
-    Use this when a backup has crashed or been killed, leaving behind a lock file
-    that prevents new backups from starting.
-
-    WARNING: Only use this if you're CERTAIN no backup is currently running!
-    """
-    try:
-        # Get repository from database
-        repository = db.query(Repository).filter(Repository.id == repository_id).first()
-        if not repository:
-            raise HTTPException(
-                status_code=404,
-                detail={"key": "backend.errors.repo.repositoryNotFound"},
-            )
-        _require_repository_access(db, current_user, repository, "operator")
-
-        logger.info(
-            "Breaking repository lock",
-            repository=repository.path,
-            user=current_user.username,
-            repository_id=repository_id,
-        )
-
-        cmd = BorgRouter(repository).build_break_lock_command(
-            repository_path=repository.path,
-            remote_path=repository.remote_path,
-        )
-
-        returncode, stdout, stderr = await _run_repository_command(
-            repository,
-            db,
-            cmd,
-            30,
-            log_message="Using SSH key for break-lock",
-            log_fields={"repository_id": repository_id},
-        )
-
-        stdout_str = stdout.decode("utf-8", errors="replace") if stdout else ""
-        stderr_str = stderr.decode("utf-8", errors="replace") if stderr else ""
-
-        if returncode == 0:
-            logger.info(
-                "Successfully broke repository lock",
-                repository=repository.path,
-                user=current_user.username,
-            )
-            return {
-                "success": True,
-                "message": "backend.success.repo.lockRemoved",
-                "repository": repository.path,
-                "output": stdout_str,
-            }
-        else:
-            logger.error(
-                "Failed to break repository lock",
-                repository=repository.path,
-                returncode=returncode,
-                stderr=stderr_str,
-            )
-            raise HTTPException(
-                status_code=500, detail={"key": "backend.errors.repo.failedToBreakLock"}
-            )
-
-    except asyncio.TimeoutError:
-        logger.error("Timeout breaking repository lock", repository_id=repository_id)
-        raise HTTPException(
-            status_code=500, detail={"key": "backend.errors.repo.breakLockTimeout"}
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(
-            "Error breaking repository lock", repository_id=repository_id, error=str(e)
-        )
-        raise HTTPException(
-            status_code=500, detail={"key": "backend.errors.repo.failedToBreakLock"}
-        )
 
 
 # Check job endpoints

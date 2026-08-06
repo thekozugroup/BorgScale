@@ -98,11 +98,8 @@ export default function RemoteMachineCard({
     machine.default_path || (machine.mount_point && machine.mount_point !== machine.host)
 
   return (
-    <div
-      className="w-full flex flex-col rounded-2xl border border-border bg-card shadow-sm"
-    >
+    <div className="w-full flex flex-col rounded-2xl border border-border bg-card shadow-sm">
       <div className="flex-1 flex flex-col px-4 sm:px-5 pt-4 sm:pt-5 pb-3.5 sm:pb-4">
-
         {/* ── Header ── */}
         <div className="mb-3">
           <div className="flex items-center justify-between mb-1">
@@ -138,14 +135,20 @@ export default function RemoteMachineCard({
 
         {/* ── Storage Stats Band ── */}
         {machine.storage ? (
-          <div
-            className="rounded-xl overflow-hidden mb-3 border border-border bg-muted/30"
-          >
+          <div className="rounded-xl overflow-hidden mb-3 border border-border bg-muted/30">
             {/* Two-column stats */}
             <div className="grid grid-cols-2">
               {[
-                { label: t('remoteMachine.used'), value: machine.storage.used_formatted, colorClass: 'text-muted-foreground' },
-                { label: t('remoteMachine.free'), value: machine.storage.available_formatted, colorClass: 'text-foreground' },
+                {
+                  label: t('remoteMachine.used'),
+                  value: machine.storage.used_formatted,
+                  colorClass: 'text-muted-foreground',
+                },
+                {
+                  label: t('remoteMachine.free'),
+                  value: machine.storage.available_formatted,
+                  colorClass: 'text-foreground',
+                },
               ].map((col, i) => (
                 <div
                   key={col.label}
@@ -164,9 +167,7 @@ export default function RemoteMachineCard({
             </div>
 
             {/* Usage bar */}
-            <div
-              className="px-4 sm:px-5 pb-2.5 pt-1.5 border-t border-border"
-            >
+            <div className="px-4 sm:px-5 pb-2.5 pt-1.5 border-t border-border">
               <div className="flex justify-between items-center mb-1">
                 <span className="text-3xs text-muted-foreground leading-none">
                   {machine.storage.percent_used.toFixed(1)}% used
@@ -175,9 +176,7 @@ export default function RemoteMachineCard({
                   {machine.storage.total_formatted} total
                 </span>
               </div>
-              <div
-                className="h-1.5 rounded-full overflow-hidden bg-muted"
-              >
+              <div className="h-1.5 rounded-full overflow-hidden bg-muted">
                 <div
                   className={`h-full rounded-full ${getStorageBarClass(machine.storage.percent_used)}`}
                   style={{ width: `${Math.min(100, machine.storage.percent_used)}%` }}
@@ -186,9 +185,7 @@ export default function RemoteMachineCard({
             </div>
           </div>
         ) : (
-          <div
-            className="flex items-center gap-2 px-3 py-2.5 mb-3 rounded-xl border border-border bg-muted/30"
-          >
+          <div className="flex items-center gap-2 px-3 py-2.5 mb-3 rounded-xl border border-border bg-muted/30">
             <HardDrive size={14} className="opacity-40 flex-shrink-0" />
             <span className="text-sm text-muted-foreground flex-1 truncate">
               {t('remoteMachine.noStorageInfo')}
@@ -217,9 +214,7 @@ export default function RemoteMachineCard({
                 <span className="text-2xs text-muted-foreground leading-none flex-shrink-0">
                   {t('remoteMachine.defaultPath')}:
                 </span>
-                <span
-                  className="text-2xs font-semibold text-foreground truncate min-w-0 font-mono"
-                >
+                <span className="text-2xs font-semibold text-foreground truncate min-w-0 font-mono">
                   {machine.default_path}
                 </span>
               </div>
@@ -229,9 +224,7 @@ export default function RemoteMachineCard({
                 <span className="text-2xs text-muted-foreground leading-none flex-shrink-0">
                   {t('remoteMachineCard.mountPoint')}:
                 </span>
-                <span
-                  className="text-2xs font-semibold text-primary truncate min-w-0 font-mono"
-                >
+                <span className="text-2xs font-semibold text-primary truncate min-w-0 font-mono">
                   {machine.mount_point}
                 </span>
               </div>
@@ -241,9 +234,7 @@ export default function RemoteMachineCard({
 
         {/* ── Error Message ── */}
         {machine.error_message && (
-          <div
-            className="mb-3 px-3 py-2.5 rounded-xl bg-destructive/10 border border-destructive/25 text-destructive"
-          >
+          <div className="mb-3 px-3 py-2.5 rounded-xl bg-destructive/10 border border-destructive/25 text-destructive">
             <p className="text-xs text-destructive break-words leading-snug">
               {machine.error_message}
             </p>
@@ -251,9 +242,7 @@ export default function RemoteMachineCard({
         )}
 
         {/* ── Action Bar ── */}
-        <div
-          className="mt-auto flex items-center gap-2 sm:gap-1.5 pt-3 sm:pt-2.5 border-t border-border"
-        >
+        <div className="mt-auto flex items-center gap-2 sm:gap-1.5 pt-3 sm:pt-2.5 border-t border-border">
           {/* Left cluster */}
           <div className="flex items-center gap-1 sm:gap-0.5 flex-1">
             <Tooltip>
@@ -302,10 +291,7 @@ export default function RemoteMachineCard({
           {/* Right cluster — edit / delete */}
           {canManageConnections && (
             <div className="flex items-center gap-1 sm:gap-0.5">
-              <div
-                className="w-px flex-shrink-0 mx-0.5 bg-border"
-                style={{ height: 18 }}
-              />
+              <div className="w-px flex-shrink-0 mx-0.5 bg-border" style={{ height: 18 }} />
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button

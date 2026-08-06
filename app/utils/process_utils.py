@@ -239,6 +239,56 @@ def cleanup_orphaned_jobs(db: Session):
             "Orphaned backup job detected", job_id=job.id, repository=job.repository
         )
 
+        if job.execution_mode == "remote_ssh":
+            # Borg runs on the remote host and may still be alive - don't touch the lock
+            logger.warning(
+                "Orphaned remote-execution backup job - manual lock break may be needed",
+                job_id=job.id,
+                repository=job.repository,
+            )
+            job.error_message += "\n" + json.dumps(
+                {"key": "backend.errors.service.warningRemoteProcessMayBeRunning"}
+            )
+            continue
+
+        # The borg create process died with the container, so its repository
+        # lock is stale and would fail every future backup with a lock error
+        repository = (
+            db.query(Repository).filter(Repository.path == job.repository).first()
+        )
+
+        if repository:
+            if not repository.connection_id:
+                # For local repos, we can safely break the lock
+                logger.info(
+                    "Attempting to break lock for local repository",
+                    repository_id=repository.id,
+                )
+                if break_repository_lock(repository):
+                    logger.info(
+                        "Successfully broke lock for local repository",
+                        repository_id=repository.id,
+                    )
+                else:
+                    logger.warning(
+                        "Failed to break lock for local repository",
+                        repository_id=repository.id,
+                    )
+                    job.error_message += "\n" + json.dumps(
+                        {"key": "backend.errors.service.warningFailedBreakLock"}
+                    )
+            else:
+                # For remote repos, don't auto-break lock (remote process may still be running)
+                logger.warning(
+                    "Orphaned backup job for remote repository - manual lock break may be needed",
+                    repository_id=repository.id,
+                )
+                job.error_message += "\n" + json.dumps(
+                    {
+                        "key": "backend.errors.service.warningRemoteProcessMayBeRunning"
+                    }
+                )
+
     # Process restore jobs
     for job in running_restore_jobs:
         # Restore jobs don't have process_pid tracking, so we mark them all as failed on restart

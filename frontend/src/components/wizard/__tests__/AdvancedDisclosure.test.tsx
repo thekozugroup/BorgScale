@@ -52,8 +52,6 @@ describe('AdvancedDisclosure', () => {
         </AdvancedDisclosure>
       )
     )
-    expect(
-      screen.getByRole('button', { name: /Advanced settings/i })
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Advanced settings/i })).toBeInTheDocument()
   })
 })

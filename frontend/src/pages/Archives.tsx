@@ -16,7 +16,13 @@ import LastRestoreSection from '../components/LastRestoreSection'
 import DeleteArchiveDialog from '../components/DeleteArchiveDialog'
 import MountArchiveDialog from '../components/MountArchiveDialog'
 import ArchiveContentsDialog from '../components/ArchiveContentsDialog'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '../components/ui/dialog'
 import { Button } from '../components/ui/button'
 import { toast } from 'sonner'
 // MountSuccessToast replaced by inline dialog — import removed
@@ -68,7 +74,11 @@ const Archives: React.FC = () => {
   } | null>(null)
   const [mountDialogArchive, setMountDialogArchive] = useState<Archive | null>(null)
   const [customMountPoint, setCustomMountPoint] = useState<string>('')
-  const [showMountCommand, setShowMountCommand] = useState<{ command: string; archiveName: string; mountPoint: string } | null>(null)
+  const [showMountCommand, setShowMountCommand] = useState<{
+    command: string
+    archiveName: string
+    mountPoint: string
+  } | null>(null)
 
   // Restore functionality
   const [restoreArchive, setRestoreArchive] = useState<Archive | null>(null)
@@ -195,9 +205,7 @@ const Archives: React.FC = () => {
       const archiveName = variables.archive_name
 
       setShowMountCommand({ command: accessCommand, archiveName, mountPoint })
-      toast.success(
-        t('archives.mountSuccess', { command: accessCommand })
-      )
+      toast.success(t('archives.mountSuccess', { command: accessCommand }))
       trackArchive(EventAction.MOUNT, selectedRepository || undefined, {
         operation: 'mount_archive',
         archive_age_bucket: getArchiveAgeBucket(variables.archive_start),
@@ -566,16 +574,23 @@ const Archives: React.FC = () => {
         <Dialog open onOpenChange={() => setShowMountCommand(null)}>
           <DialogContent className="max-w-lg">
             <DialogHeader>
-              <DialogTitle>{t('archives.mountCommandTitle', 'Terminal access command')}</DialogTitle>
+              <DialogTitle>
+                {t('archives.mountCommandTitle', 'Terminal access command')}
+              </DialogTitle>
               <DialogDescription>
                 {t('archives.mountCommandDesc', { path: showMountCommand.mountPoint })}
               </DialogDescription>
             </DialogHeader>
             <div className="rounded-lg bg-muted p-3 border border-border flex items-start gap-2">
               <code className="font-mono text-xs break-all flex-1">{showMountCommand.command}</code>
-              <Button variant="ghost" size="sm" className="flex-shrink-0 h-6 px-2" onClick={() => {
-                navigator.clipboard.writeText(showMountCommand.command)
-              }}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex-shrink-0 h-6 px-2"
+                onClick={() => {
+                  navigator.clipboard.writeText(showMountCommand.command)
+                }}
+              >
                 {t('common.copy', 'Copy')}
               </Button>
             </div>

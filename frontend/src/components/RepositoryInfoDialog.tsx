@@ -112,10 +112,7 @@ export default function RepositoryInfoDialog({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent
-        className="max-w-2xl gap-0 overflow-hidden p-0"
-        showCloseButton={false}
-      >
+      <DialogContent className="max-w-2xl gap-0 overflow-hidden p-0" showCloseButton={false}>
         {/* Dialog Header */}
         <DialogHeader className="border-b px-6 py-4">
           <DialogTitle className="flex items-center gap-2 text-base font-semibold">
@@ -222,10 +219,7 @@ export default function RepositoryInfoDialog({
                 </div>
               ) : (
                 <div className="flex items-start gap-3 rounded-lg border border-destructive/20 bg-destructive/5 p-4">
-                  <AlertCircle
-                    size={18}
-                    className="mt-0.5 shrink-0 text-destructive"
-                  />
+                  <AlertCircle size={18} className="mt-0.5 shrink-0 text-destructive" />
                   <p className="text-sm text-destructive">
                     {t('repositoryInfoDialog.failedToLoad')}
                   </p>

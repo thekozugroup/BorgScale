@@ -374,16 +374,10 @@ const ScheduleWizard: React.FC<ScheduleWizardProps> = ({
 
         <div className="flex flex-col flex-1 min-h-0 px-6">
           {/* Step Indicator */}
-          <WizardStepIndicator
-            steps={steps}
-            currentStep={activeStep}
-            onStepClick={setActiveStep}
-          />
+          <WizardStepIndicator steps={steps} currentStep={activeStep} onStepClick={setActiveStep} />
 
           {/* Step Content */}
-          <div className="flex-1 overflow-auto pb-4">
-            {renderStepContent()}
-          </div>
+          <div className="flex-1 overflow-auto pb-4">{renderStepContent()}</div>
         </div>
 
         <DialogFooter className="px-6 py-3 border-t flex-row gap-2 shrink-0">

@@ -40,9 +40,7 @@ export default function MountSuccessToast({ toastId, command }: MountSuccessToas
 
       {/* Command block */}
       <div className="flex items-center gap-2 px-3 py-2 rounded border border-border bg-muted/40">
-        <code
-          className="flex-1 text-xs break-all leading-relaxed font-mono text-foreground"
-        >
+        <code className="flex-1 text-xs break-all leading-relaxed font-mono text-foreground">
           {command}
         </code>
         <button

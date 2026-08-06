@@ -28,6 +28,25 @@ from app.utils.ssh_utils import (
 
 logger = structlog.get_logger()
 
+# Borg exit-code semantics, in one place.
+#
+# Backups run with BORG_EXIT_CODES=modern, where 0 is success, 3-99 are errors
+# and 100-127 are warnings. Legacy borg used 1 for warning and 2+ for error, and
+# a repository can still be reached by an older binary over SSH, so both
+# conventions are honoured. This rule was previously written out at three
+# separate decision points, where it could drift.
+BORG_WARNING_EXIT_CODES = range(100, 128)
+BORG_LEGACY_WARNING_EXIT_CODE = 1
+
+
+def classify_borg_exit_code(returncode: int) -> str:
+    """Return "success", "warning", or "error" for a borg exit code."""
+    if returncode == 0:
+        return "success"
+    if returncode == BORG_LEGACY_WARNING_EXIT_CODE or returncode in BORG_WARNING_EXIT_CODES:
+        return "warning"
+    return "error"
+
 
 class BackupService:
     """Service for executing backups with real-time log streaming"""
@@ -1699,6 +1718,10 @@ class BackupService:
             except Exception as e:
                 logger.warning("Failed to send backup start notification", error=str(e))
 
+            # Honor the configurable backup_timeout so a hung borg create
+            # cannot stay "running" forever and block its concurrency slot
+            backup_timeout = self._get_operation_timeouts(db)["backup_timeout"]
+
             # Execute command - NO LOG FILE FOR MAXIMUM PERFORMANCE
             process = await asyncio.create_subprocess_exec(
                 *cmd,
@@ -1714,6 +1737,9 @@ class BackupService:
 
             # Flag to track cancellation
             cancelled = False
+
+            # Flag to track backup_timeout expiry
+            timed_out = False
 
             # Track captured exit code from log messages (e.g., rc 105)
             # This is used if process.returncode is 0 but borg actually exited with a warning code
@@ -1798,6 +1824,33 @@ class BackupService:
                             process.kill()
                             await process.wait()
                         break
+
+            async def enforce_timeout():
+                """Terminate borg create once the configured backup_timeout elapses"""
+                nonlocal cancelled, timed_out
+                try:
+                    await asyncio.wait_for(
+                        asyncio.shield(process_wait_task), timeout=backup_timeout
+                    )
+                except asyncio.TimeoutError:
+                    if cancelled or process_wait_task.done():
+                        return
+                    timed_out = True
+                    cancelled = True
+                    logger.error(
+                        "Backup timed out, terminating process",
+                        job_id=job_id,
+                        timeout=backup_timeout,
+                    )
+                    process.terminate()
+                    try:
+                        await asyncio.wait_for(process.wait(), timeout=10.0)
+                    except asyncio.TimeoutError:
+                        logger.warning(
+                            "Process didn't terminate, killing it", job_id=job_id
+                        )
+                        process.kill()
+                        await process.wait()
 
             async def stream_logs():
                 """Stream log output from process and parse JSON progress"""
@@ -2150,6 +2203,7 @@ class BackupService:
             try:
                 await asyncio.gather(
                     check_cancellation(),
+                    enforce_timeout(),
                     stream_logs(),
                     periodic_sync_state(),
                     return_exceptions=True,
@@ -2317,8 +2371,7 @@ class BackupService:
                             "Failed to send backup success notification", error=str(e)
                         )
 
-            elif actual_returncode == 1 or (100 <= actual_returncode <= 127):
-                # Warning (legacy exit code 1 or modern exit codes 100-127)
+            elif classify_borg_exit_code(actual_returncode) == "warning":
                 job.status = "completed_with_warnings"
                 job.progress = 100
                 job.error_message = json.dumps(
@@ -2431,8 +2484,13 @@ class BackupService:
                 error_parts = []
                 lock_error_detected = False
 
+                if timed_out:
+                    error_parts.append(
+                        f"Backup timed out after {backup_timeout} seconds "
+                        "(backup_timeout setting) and the borg process was terminated"
+                    )
                 # Check if we have captured error msgids
-                if job_id in self.error_msgids and self.error_msgids[job_id]:
+                elif job_id in self.error_msgids and self.error_msgids[job_id]:
                     # Use the first critical error or the first error
                     errors = self.error_msgids[job_id]
                     primary_error = next(

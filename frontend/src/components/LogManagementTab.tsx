@@ -247,13 +247,17 @@ const LogManagementTab: React.FC = () => {
                     <p className="text-2xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                       Oldest Log
                     </p>
-                    <p className="text-sm mt-1">{formatDate(logStorage?.oldest_log_date || null)}</p>
+                    <p className="text-sm mt-1">
+                      {formatDate(logStorage?.oldest_log_date || null)}
+                    </p>
                   </div>
                   <div>
                     <p className="text-2xs font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                       Newest Log
                     </p>
-                    <p className="text-sm mt-1">{formatDate(logStorage?.newest_log_date || null)}</p>
+                    <p className="text-sm mt-1">
+                      {formatDate(logStorage?.newest_log_date || null)}
+                    </p>
                   </div>
                 </div>
 

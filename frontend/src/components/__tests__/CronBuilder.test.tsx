@@ -292,7 +292,9 @@ describe('CronBuilder', () => {
 
   describe('Labels and helper text', () => {
     it('renders label when provided', () => {
-      renderWithProviders(<CronBuilder value="0 2 * * *" onChange={mockOnChange} label="Schedule" />)
+      renderWithProviders(
+        <CronBuilder value="0 2 * * *" onChange={mockOnChange} label="Schedule" />
+      )
       expect(screen.getByText('Schedule')).toBeInTheDocument()
     })
 
@@ -351,7 +353,9 @@ describe('CronBuilder', () => {
     })
 
     it('handles value update from parent', async () => {
-      const { rerender } = renderWithProviders(<CronBuilder value="0 2 * * *" onChange={mockOnChange} />)
+      const { rerender } = renderWithProviders(
+        <CronBuilder value="0 2 * * *" onChange={mockOnChange} />
+      )
       expect(screen.getByText('Daily at 2:00 AM')).toBeInTheDocument()
 
       rerender(<CronBuilder value="*/10 * * * *" onChange={mockOnChange} />)

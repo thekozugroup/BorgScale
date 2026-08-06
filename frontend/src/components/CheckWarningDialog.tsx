@@ -36,9 +36,7 @@ export default function CheckWarningDialog({
           <h3 className="text-lg font-semibold">{t('dialogs.checkWarning.title')}</h3>
         </div>
 
-        <p className="text-sm mb-3">
-          {t('dialogs.checkWarning.description', { repositoryName })}
-        </p>
+        <p className="text-sm mb-3">{t('dialogs.checkWarning.description', { repositoryName })}</p>
 
         <div className="mb-3">
           <p className="text-sm font-semibold mb-2">{t('dialogs.checkWarning.important')}</p>
@@ -47,14 +45,18 @@ export default function CheckWarningDialog({
               <Lock size={14} className="text-muted-foreground mt-0.5 flex-shrink-0" />
               <span>
                 <span className="font-medium">{t('dialogs.checkWarning.repoWillBeLocked')}</span>
-                <span className="block text-xs text-muted-foreground">{t('dialogs.checkWarning.otherOperationsUnavailable')}</span>
+                <span className="block text-xs text-muted-foreground">
+                  {t('dialogs.checkWarning.otherOperationsUnavailable')}
+                </span>
               </span>
             </li>
             <li className="flex items-start gap-2 text-sm">
               <CheckCircle2 size={14} className="text-muted-foreground mt-0.5 flex-shrink-0" />
               <span>
                 <span className="font-medium">{t('dialogs.checkWarning.progressTracking')}</span>
-                <span className="block text-xs text-muted-foreground">{t('dialogs.checkWarning.progressTrackingDetail')}</span>
+                <span className="block text-xs text-muted-foreground">
+                  {t('dialogs.checkWarning.progressTrackingDetail')}
+                </span>
               </span>
             </li>
           </ul>
@@ -75,15 +77,23 @@ export default function CheckWarningDialog({
             }}
             min={0}
           />
-          <p className="text-xs text-muted-foreground">{t('dialogs.checkWarning.maxDurationHelper')}</p>
+          <p className="text-xs text-muted-foreground">
+            {t('dialogs.checkWarning.maxDurationHelper')}
+          </p>
         </div>
 
         {isBorg2 && (
           <div className="flex items-center gap-1.5 mt-2 text-muted-foreground">
-            <p className="text-sm font-medium leading-snug">{t('dialogs.checkWarning.borg2InlineNotice')}</p>
+            <p className="text-sm font-medium leading-snug">
+              {t('dialogs.checkWarning.borg2InlineNotice')}
+            </p>
             <Tooltip>
               <TooltipTrigger asChild>
-                <button type="button" aria-label={t('dialogs.checkWarning.borg2TooltipTitle')} className="inline-flex items-center cursor-pointer">
+                <button
+                  type="button"
+                  aria-label={t('dialogs.checkWarning.borg2TooltipTitle')}
+                  className="inline-flex items-center cursor-pointer"
+                >
                   <Info size={16} />
                 </button>
               </TooltipTrigger>
@@ -99,11 +109,7 @@ export default function CheckWarningDialog({
           <Button variant="ghost" onClick={onCancel} disabled={isLoading}>
             {t('dialogs.checkWarning.cancel')}
           </Button>
-          <Button
-            onClick={() => onConfirm(maxDuration)}
-            disabled={isLoading}
-            variant="default"
-          >
+          <Button onClick={() => onConfirm(maxDuration)} disabled={isLoading} variant="default">
             {isLoading ? (
               <Loader2 size={16} className="mr-2 animate-spin" />
             ) : (

@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import Depends, FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -42,6 +42,7 @@ from app.routers import config
 from app.database.database import engine
 from app.database.models import Base
 from app.config import get_runtime_app_version, settings
+from app.core.authorization import authorize_request
 from app.core.proxy_auth import inspect_proxy_auth_config
 from app.core.security import create_first_user
 
@@ -196,42 +197,95 @@ if os.path.exists("app/static/assets"):
 if os.path.exists("app/static"):
     app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-# Include API routers
+# Include API routers.
+#
+# ENDPOINT_POLICIES in app/core/authorization.py is the single declarative
+# record of which role may call which route, but it only takes effect where
+# authorize_request is mounted. Six routers declared it themselves and the rest
+# did not, so policies written for those routes silently did nothing. Applying
+# it here covers every API router; it is a no-op for any route without a policy,
+# and routers that already declare it are listed without it to avoid running the
+# lookup twice.
+API_AUTHORIZATION = [Depends(authorize_request)]
+
 app.include_router(
     metrics.router
 )  # /metrics endpoint (disabled by default, no API prefix)
-app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
-app.include_router(dashboard.router, prefix="/api/dashboard", tags=["Dashboard"])
-app.include_router(backup.router, prefix="/api/backup", tags=["Backup"])
-app.include_router(archives.router, prefix="/api/archives", tags=["Archives"])
-app.include_router(browse.router, prefix="/api/browse", tags=["Browse"])
-app.include_router(restore.router, prefix="/api/restore", tags=["Restore"])
+app.include_router(
+    auth.router,
+    prefix="/api/auth",
+    tags=["Authentication"],
+    dependencies=API_AUTHORIZATION,
+)
+app.include_router(
+    dashboard.router,
+    prefix="/api/dashboard",
+    tags=["Dashboard"],
+    dependencies=API_AUTHORIZATION,
+)
+app.include_router(
+    backup.router, prefix="/api/backup", tags=["Backup"], dependencies=API_AUTHORIZATION
+)
+app.include_router(
+    archives.router,
+    prefix="/api/archives",
+    tags=["Archives"],
+    dependencies=API_AUTHORIZATION,
+)
+app.include_router(
+    browse.router, prefix="/api/browse", tags=["Browse"], dependencies=API_AUTHORIZATION
+)
+app.include_router(
+    restore.router,
+    prefix="/api/restore",
+    tags=["Restore"],
+    dependencies=API_AUTHORIZATION,
+)
 app.include_router(schedule.router, prefix="/api/schedule", tags=["Schedule"])
 app.include_router(settings_api.router, prefix="/api/settings", tags=["Settings"])
-app.include_router(events.router, prefix="/api/events", tags=["Events"])
+app.include_router(
+    events.router, prefix="/api/events", tags=["Events"], dependencies=API_AUTHORIZATION
+)
 app.include_router(
     repositories.router, prefix="/api/repositories", tags=["Repositories"]
 )
 app.include_router(ssh_keys.router, prefix="/api/ssh-keys", tags=["SSH Keys"])
-app.include_router(system.router, prefix="/api/system", tags=["System"])
-app.include_router(filesystem.router, prefix="/api/filesystem", tags=["Filesystem"])
 app.include_router(
-    scripts.router, prefix="/api/scripts", tags=["Scripts"]
+    system.router, prefix="/api/system", tags=["System"], dependencies=API_AUTHORIZATION
+)
+app.include_router(
+    filesystem.router,
+    prefix="/api/filesystem",
+    tags=["Filesystem"],
+    dependencies=API_AUTHORIZATION,
+)
+app.include_router(
+    scripts.router,
+    prefix="/api/scripts",
+    tags=["Scripts"],
+    dependencies=API_AUTHORIZATION,
 )  # Old script test endpoint
 app.include_router(
-    scripts_library.router, prefix="/api", tags=["Script Library"]
+    scripts_library.router,
+    prefix="/api",
+    tags=["Script Library"],
+    dependencies=API_AUTHORIZATION,
 )  # New script management
 app.include_router(packages.router, prefix="/api/packages", tags=["Packages"])
-app.include_router(notifications.router)
-app.include_router(activity.router)
-app.include_router(config.router, prefix="/api")
+app.include_router(notifications.router, dependencies=API_AUTHORIZATION)
+app.include_router(activity.router, dependencies=API_AUTHORIZATION)
+app.include_router(config.router, prefix="/api", dependencies=API_AUTHORIZATION)
 app.include_router(mounts.router)  # Mount management API
 
-app.include_router(tokens.router, prefix="/api")
-app.include_router(permissions.router, prefix="/api")
+app.include_router(tokens.router, prefix="/api", dependencies=API_AUTHORIZATION)
+app.include_router(permissions.router, prefix="/api", dependencies=API_AUTHORIZATION)
 
-app.include_router(v2_router, prefix="/api/v2")  # Borg 2 versioned API
-app.include_router(about_routes.router, prefix="/api", tags=["about"])
+app.include_router(
+    v2_router, prefix="/api/v2", dependencies=API_AUTHORIZATION
+)  # Borg 2 versioned API
+app.include_router(
+    about_routes.router, prefix="/api", tags=["about"], dependencies=API_AUTHORIZATION
+)
 
 
 async def _run_startup() -> None:

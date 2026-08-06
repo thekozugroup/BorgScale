@@ -8,12 +8,7 @@ import {
   SidebarMenuSubItem,
   SidebarMenuSubButton,
 } from '@/components/ui/sidebar'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface SubItem {
   name: string
@@ -44,12 +39,15 @@ export default function NavGroup({
   navLabel,
 }: NavGroupProps) {
   const isAnySubItemActive = subItems.some((sub) => sub.href && currentPath.startsWith(sub.href))
+  const subMenuId = React.useId()
 
   return (
     <SidebarMenuItem>
       <SidebarMenuButton
         onClick={onToggle}
         isActive={isAnySubItemActive}
+        aria-expanded={isExpanded}
+        aria-controls={isExpanded ? subMenuId : undefined}
         className="rounded-md"
       >
         <Icon size={18} />
@@ -62,7 +60,7 @@ export default function NavGroup({
       </SidebarMenuButton>
 
       {isExpanded && (
-        <SidebarMenuSub>
+        <SidebarMenuSub id={subMenuId}>
           {subItems.map((subItem) => {
             const isActive = subItem.href ? currentPath.startsWith(subItem.href) : false
             const SubIcon = subItem.icon
@@ -73,7 +71,9 @@ export default function NavGroup({
                 asChild={!isDisabled}
                 isActive={isActive}
                 aria-current={isActive ? 'page' : undefined}
-                {...(isDisabled ? { 'aria-disabled': true, style: { opacity: 0.4, pointerEvents: 'none' } } : {})}
+                {...(isDisabled
+                  ? { 'aria-disabled': true, style: { opacity: 0.4, pointerEvents: 'none' } }
+                  : {})}
               >
                 {isDisabled ? (
                   <div className="flex items-center gap-2">

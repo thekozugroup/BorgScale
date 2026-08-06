@@ -79,9 +79,19 @@ const MqttSettingsTab: React.FC = () => {
       setHasChanges(changesDetected)
     }
   }, [
-    mqttEnabled, mqttBrokerUrl, mqttBrokerPort, mqttUsername, mqttClientId,
-    mqttQos, mqttRetain, mqttTlsEnabled, mqttTlsCaCert, mqttTlsClientCert,
-    mqttTlsClientKey, passwordChanged, systemSettings,
+    mqttEnabled,
+    mqttBrokerUrl,
+    mqttBrokerPort,
+    mqttUsername,
+    mqttClientId,
+    mqttQos,
+    mqttRetain,
+    mqttTlsEnabled,
+    mqttTlsCaCert,
+    mqttTlsClientCert,
+    mqttTlsClientKey,
+    passwordChanged,
+    systemSettings,
   ])
 
   const saveMqttSettingsMutation = useMutation({
@@ -187,7 +197,9 @@ const MqttSettingsTab: React.FC = () => {
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="mqtt-broker-url" className="text-xs font-semibold mb-1.5 block">{t('mqtt.brokerUrlLabel')}</Label>
+                  <Label htmlFor="mqtt-broker-url" className="text-xs font-semibold mb-1.5 block">
+                    {t('mqtt.brokerUrlLabel')}
+                  </Label>
                   <Input
                     id="mqtt-broker-url"
                     placeholder={t('mqtt.brokerUrlPlaceholder')}
@@ -200,7 +212,9 @@ const MqttSettingsTab: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="mqtt-broker-port" className="text-xs font-semibold mb-1.5 block">{t('mqtt.brokerPortLabel')}</Label>
+                  <Label htmlFor="mqtt-broker-port" className="text-xs font-semibold mb-1.5 block">
+                    {t('mqtt.brokerPortLabel')}
+                  </Label>
                   <Input
                     id="mqtt-broker-port"
                     type="number"
@@ -215,9 +229,14 @@ const MqttSettingsTab: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="mqtt-username" className="text-xs font-semibold mb-1.5 block">{t('mqtt.usernameLabel')}</Label>
+                  <Label htmlFor="mqtt-username" className="text-xs font-semibold mb-1.5 block">
+                    {t('mqtt.usernameLabel')}
+                  </Label>
                   <div className="relative">
-                    <Key size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Key
+                      size={14}
+                      className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    />
                     <Input
                       id="mqtt-username"
                       placeholder={t('mqtt.usernamePlaceholder')}
@@ -230,9 +249,14 @@ const MqttSettingsTab: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="mqtt-password" className="text-xs font-semibold mb-1.5 block">{t('mqtt.passwordLabel')}</Label>
+                  <Label htmlFor="mqtt-password" className="text-xs font-semibold mb-1.5 block">
+                    {t('mqtt.passwordLabel')}
+                  </Label>
                   <div className="relative">
-                    <Lock size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Lock
+                      size={14}
+                      className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    />
                     <Input
                       id="mqtt-password"
                       type={showPassword ? 'text' : 'password'}
@@ -249,12 +273,16 @@ const MqttSettingsTab: React.FC = () => {
                     </button>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {systemSettings?.mqtt_password_set ? t('mqtt.passwordIsSet') : t('mqtt.passwordHelper')}
+                    {systemSettings?.mqtt_password_set
+                      ? t('mqtt.passwordIsSet')
+                      : t('mqtt.passwordHelper')}
                   </p>
                 </div>
 
                 <div>
-                  <Label htmlFor="mqtt-client-id" className="text-xs font-semibold mb-1.5 block">{t('mqtt.clientIdLabel')}</Label>
+                  <Label htmlFor="mqtt-client-id" className="text-xs font-semibold mb-1.5 block">
+                    {t('mqtt.clientIdLabel')}
+                  </Label>
                   <Input
                     id="mqtt-client-id"
                     value={mqttClientId}
@@ -265,7 +293,9 @@ const MqttSettingsTab: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="mqtt-qos" className="text-xs font-semibold mb-1.5 block">{t('mqtt.qosLevelLabel')}</Label>
+                  <Label htmlFor="mqtt-qos" className="text-xs font-semibold mb-1.5 block">
+                    {t('mqtt.qosLevelLabel')}
+                  </Label>
                   <Input
                     id="mqtt-qos"
                     type="number"
@@ -319,7 +349,9 @@ const MqttSettingsTab: React.FC = () => {
             {mqttTlsEnabled && (
               <div className="flex flex-col gap-4">
                 <div>
-                  <Label htmlFor="mqtt-ca-cert" className="text-xs font-semibold mb-1.5 block">{t('mqtt.caCertPathLabel')}</Label>
+                  <Label htmlFor="mqtt-ca-cert" className="text-xs font-semibold mb-1.5 block">
+                    {t('mqtt.caCertPathLabel')}
+                  </Label>
                   <Input
                     id="mqtt-ca-cert"
                     placeholder="/path/to/ca.crt"
@@ -331,7 +363,9 @@ const MqttSettingsTab: React.FC = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="mqtt-client-cert" className="text-xs font-semibold mb-1.5 block">{t('mqtt.clientCertPathLabel')}</Label>
+                  <Label htmlFor="mqtt-client-cert" className="text-xs font-semibold mb-1.5 block">
+                    {t('mqtt.clientCertPathLabel')}
+                  </Label>
                   <Input
                     id="mqtt-client-cert"
                     placeholder="/path/to/client.crt"
@@ -339,11 +373,15 @@ const MqttSettingsTab: React.FC = () => {
                     onChange={(e) => setMqttTlsClientCert(e.target.value)}
                     className="h-9 text-sm"
                   />
-                  <p className="text-xs text-muted-foreground mt-1">{t('mqtt.clientCertPathHelper')}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t('mqtt.clientCertPathHelper')}
+                  </p>
                 </div>
 
                 <div>
-                  <Label htmlFor="mqtt-client-key" className="text-xs font-semibold mb-1.5 block">{t('mqtt.clientKeyPathLabel')}</Label>
+                  <Label htmlFor="mqtt-client-key" className="text-xs font-semibold mb-1.5 block">
+                    {t('mqtt.clientKeyPathLabel')}
+                  </Label>
                   <Input
                     id="mqtt-client-key"
                     placeholder="/path/to/client.key"
@@ -351,7 +389,9 @@ const MqttSettingsTab: React.FC = () => {
                     onChange={(e) => setMqttTlsClientKey(e.target.value)}
                     className="h-9 text-sm"
                   />
-                  <p className="text-xs text-muted-foreground mt-1">{t('mqtt.clientKeyPathHelper')}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {t('mqtt.clientKeyPathHelper')}
+                  </p>
                 </div>
 
                 <div className="flex items-start gap-2 p-3 rounded-xl text-sm bg-muted border border-border text-muted-foreground">

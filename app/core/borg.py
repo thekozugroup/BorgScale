@@ -2,6 +2,7 @@ import asyncio
 import subprocess
 import json
 import os
+import signal
 import structlog
 from typing import Dict, List
 from datetime import datetime, timezone
@@ -38,6 +39,34 @@ class BorgInterface:
         except (subprocess.TimeoutExpired, FileNotFoundError) as e:
             logger.error("Borg not available", error=str(e))
             raise RuntimeError(f"Borg not available: {str(e)}")
+
+    async def _terminate_process_tree(self, process) -> None:
+        """Stop a timed-out borg process so it releases its repository lock.
+
+        The child runs in its own session (start_new_session=True), so signal
+        the whole process group to also reap ssh transports spawned for
+        remote repositories.
+        """
+        if process.returncode is not None:
+            return
+
+        try:
+            os.killpg(process.pid, signal.SIGTERM)
+        except (ProcessLookupError, PermissionError):
+            pass
+
+        try:
+            await asyncio.wait_for(process.wait(), timeout=10)
+        except asyncio.TimeoutError:
+            logger.warning(
+                "Process did not terminate after SIGTERM, killing it",
+                pid=process.pid,
+            )
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except (ProcessLookupError, PermissionError):
+                pass
+            await process.wait()
 
     async def _execute_command(
         self, cmd: List[str], timeout: int = 3600, cwd: str = None, env: dict = None
@@ -77,12 +106,14 @@ class BorgInterface:
             exec_env.update(env)
 
         try:
+            # Own session/process group so a timeout can reap the whole tree
             process = await asyncio.create_subprocess_exec(
                 *cmd,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
                 cwd=cwd,
                 env=exec_env,
+                start_new_session=True,
             )
 
             stdout, stderr = await asyncio.wait_for(
@@ -110,6 +141,9 @@ class BorgInterface:
 
         except asyncio.TimeoutError:
             logger.error("Command timed out", command=" ".join(cmd), timeout=timeout)
+            # Without this the orphaned borg process keeps holding the
+            # repository lock and every later operation fails until restart
+            await self._terminate_process_tree(process)
             return {
                 "return_code": -1,
                 "stdout": "",
@@ -178,6 +212,10 @@ class BorgInterface:
                 stderr=asyncio.subprocess.PIPE,
                 cwd=cwd,
                 env=exec_env,
+                # Required for _terminate_process_tree: without its own session
+                # the process group is BorgScale's own, and signalling it would
+                # take down the application.
+                start_new_session=True,
             )
 
             # Stream stdout line by line with limit enforcement
@@ -187,16 +225,27 @@ class BorgInterface:
             start_time = asyncio.get_event_loop().time()
 
             try:
-                async for line in process.stdout:
-                    # Check timeout
-                    if asyncio.get_event_loop().time() - start_time > timeout:
+                while True:
+                    # Bound the wait on each line. Checking the clock only after
+                    # a line arrives never fires when borg stops emitting output
+                    # entirely, which is exactly the hang the timeout exists for.
+                    remaining = timeout - (
+                        asyncio.get_event_loop().time() - start_time
+                    )
+                    if remaining <= 0:
+                        raise asyncio.TimeoutError
+
+                    try:
+                        line = await asyncio.wait_for(
+                            process.stdout.readline(), timeout=remaining
+                        )
+                    except asyncio.TimeoutError:
                         logger.error(
                             "Command timed out during streaming",
                             command=" ".join(cmd),
                             lines_read=line_count,
                         )
-                        process.kill()
-                        await process.wait()
+                        await self._terminate_process_tree(process)
                         return {
                             "return_code": -1,
                             "stdout": "\n".join(stdout_lines),
@@ -205,6 +254,10 @@ class BorgInterface:
                             "line_count_exceeded": False,
                             "lines_read": line_count,
                         }
+
+                    if not line:
+                        # EOF: borg closed stdout, so it is finishing.
+                        break
 
                     line_count += 1
 
@@ -217,9 +270,10 @@ class BorgInterface:
                             max_lines=max_lines,
                         )
                         line_count_exceeded = True
-                        # Kill the process to prevent further memory consumption
-                        process.kill()
-                        await process.wait()
+                        # Stop the process to prevent further memory consumption.
+                        # Whole group, so an ssh transport for a remote
+                        # repository goes with it.
+                        await self._terminate_process_tree(process)
                         break
 
                     # Decode and store line (keep in memory only up to limit)

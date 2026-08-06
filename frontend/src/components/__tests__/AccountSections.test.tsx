@@ -200,9 +200,9 @@ describe('AccountTabNavigation', () => {
 
     renderWithProviders(<AccountTabNavigation value="profile" onChange={onChange} />)
 
-    expect(screen.getByRole('button', { name: /security/i })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /security/i })).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: /access/i }))
+    await user.click(screen.getByRole('tab', { name: /access/i }))
 
     expect(onChange).toHaveBeenCalledWith('access')
   })
@@ -212,7 +212,50 @@ describe('AccountTabNavigation', () => {
       <AccountTabNavigation value="profile" onChange={vi.fn()} showSecurityTab={false} />
     )
 
-    expect(screen.queryByRole('button', { name: /security/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('tab', { name: /security/i })).not.toBeInTheDocument()
+  })
+
+  it('exposes tablist semantics with aria-selected on the active tab', () => {
+    renderWithProviders(<AccountTabNavigation value="security" onChange={vi.fn()} />)
+
+    expect(screen.getByRole('tablist')).toBeInTheDocument()
+    expect(screen.getAllByRole('tab')).toHaveLength(3)
+    expect(screen.getByRole('tab', { name: /security/i })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('tab', { name: /profile/i })).toHaveAttribute('aria-selected', 'false')
+  })
+
+  it('uses a roving tabindex so only the selected tab is in the tab order', () => {
+    renderWithProviders(<AccountTabNavigation value="access" onChange={vi.fn()} />)
+
+    expect(screen.getByRole('tab', { name: /access/i })).toHaveAttribute('tabindex', '0')
+    expect(screen.getByRole('tab', { name: /profile/i })).toHaveAttribute('tabindex', '-1')
+    expect(screen.getByRole('tab', { name: /security/i })).toHaveAttribute('tabindex', '-1')
+  })
+
+  it('moves focus between tabs with arrow keys and activates with Enter', async () => {
+    const user = userEvent.setup()
+    const onChange = vi.fn()
+
+    renderWithProviders(<AccountTabNavigation value="profile" onChange={onChange} />)
+
+    await user.tab()
+    expect(screen.getByRole('tab', { name: /profile/i })).toHaveFocus()
+
+    await user.keyboard('{ArrowRight}')
+    expect(screen.getByRole('tab', { name: /security/i })).toHaveFocus()
+
+    await user.keyboard('{Enter}')
+    expect(onChange).toHaveBeenCalledWith('security')
+
+    // Wraps from the first tab back to the last
+    await user.keyboard('{ArrowLeft}{ArrowLeft}')
+    expect(screen.getByRole('tab', { name: /access/i })).toHaveFocus()
+
+    await user.keyboard('{Home}')
+    expect(screen.getByRole('tab', { name: /profile/i })).toHaveFocus()
+
+    await user.keyboard('{End}')
+    expect(screen.getByRole('tab', { name: /access/i })).toHaveFocus()
   })
 })
 

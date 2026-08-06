@@ -90,8 +90,7 @@ export default function WizardStepSecurity({
     }
   }
 
-  const encryptionOptions =
-    borgVersion === 2 ? BORG2_ENCRYPTION_OPTIONS : BORG1_ENCRYPTION_OPTIONS
+  const encryptionOptions = borgVersion === 2 ? BORG2_ENCRYPTION_OPTIONS : BORG1_ENCRYPTION_OPTIONS
   const isKeyfileEncryption = data.encryption.includes('keyfile')
 
   // Recommended tile selections per borg version. The underlying form value
@@ -107,9 +106,7 @@ export default function WizardStepSecurity({
       {(mode === 'create' || mode === 'import') && (
         <>
           <div className="flex flex-col gap-1.5">
-            {mode === 'create' && (
-              <Label>{t('wizard.security.encryptionMethodLabel')}</Label>
-            )}
+            {mode === 'create' && <Label>{t('wizard.security.encryptionMethodLabel')}</Label>}
             <div
               role="radiogroup"
               aria-label={t('wizard.security.encryptionMethodLabel')}
@@ -138,9 +135,7 @@ export default function WizardStepSecurity({
               />
             </div>
             {data.encryption === 'none' && (
-              <p className="text-xs text-destructive mt-1">
-                {t('wizard.security.noneWarning')}
-              </p>
+              <p className="text-xs text-destructive mt-1">{t('wizard.security.noneWarning')}</p>
             )}
           </div>
 
@@ -160,10 +155,7 @@ export default function WizardStepSecurity({
               <Label htmlFor="encryption-method">
                 {t('wizard.security.encryptionMethodLabel')}
               </Label>
-              <Select
-                value={data.encryption}
-                onValueChange={(v) => onChange({ encryption: v })}
-              >
+              <Select value={data.encryption} onValueChange={(v) => onChange({ encryption: v })}>
                 <SelectTrigger id="encryption-method" className="w-full">
                   <SelectValue />
                 </SelectTrigger>

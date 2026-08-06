@@ -17,7 +17,11 @@ import structlog
 from app.api.archive_download import extract_file_download
 from app.database.database import get_db
 from app.database.models import User, Repository, DeleteArchiveJob
-from app.core.security import get_current_user, get_current_download_user
+from app.core.security import (
+    check_repo_access,
+    get_current_user,
+    get_current_download_user,
+)
 from app.core.borg2 import borg2
 from app.services.archive_browse_service import (
     build_browse_items,
@@ -41,11 +45,22 @@ def _repo_needs_custom_env(repo: Repository) -> bool:
     )
 
 
-def _get_v2_repo(repository: str, db: Session) -> Repository:
-    """Resolve and validate a Borg 2 repository by ID or path.
+def _get_v2_repo(
+    repository: str,
+    db: Session,
+    current_user: User,
+    required_role: str = "viewer",
+) -> Repository:
+    """Resolve a Borg 2 repository by ID or path and enforce access to it.
 
     BorgApiClient sends the integer ID as a string; legacy callers may send
     the repository path. Both are supported.
+
+    The permission check is not optional. The v1 archive endpoints in
+    app/api/archives.py call require_repository_access_by_path on every route;
+    this resolver previously took no user at all, so any authenticated account
+    could list, read and download files from every Borg 2 repository regardless
+    of the permissions granted to it.
     """
     repo = None
     try:
@@ -70,6 +85,8 @@ def _get_v2_repo(repository: str, db: Session) -> Repository:
             status_code=status.HTTP_404_NOT_FOUND,
             detail={"key": "backend.errors.restore.repositoryNotFound"},
         )
+
+    check_repo_access(db, current_user, repo, required_role)
     return repo
 
 
@@ -152,7 +169,7 @@ async def list_archives(
     db: Session = Depends(get_db),
 ):
     """List archives in a Borg 2 repository."""
-    repo = _get_v2_repo(repository, db)
+    repo = _get_v2_repo(repository, db, current_user)
     if _repo_needs_custom_env(repo):
         with repository_borg_env(repo, db) as env:
             result = await borg2.list_archives(
@@ -190,7 +207,7 @@ async def get_archive_info(
     db: Session = Depends(get_db),
 ):
     """Get detailed information about a Borg 2 archive."""
-    repo = _get_v2_repo(repository, db)
+    repo = _get_v2_repo(repository, db, current_user)
     archive_selector = _get_archive_selector(archive_id)
     if _repo_needs_custom_env(repo):
         with repository_borg_env(repo, db) as env:
@@ -305,7 +322,7 @@ async def get_archive_contents(
     Returns {"items": [...]} matching the v1 /browse/ response shape so
     ArchiveContentsDialog works without version branching.
     """
-    repo = _get_v2_repo(repository, db)
+    repo = _get_v2_repo(repository, db, current_user)
     archive_selector = _get_archive_selector(archive_id)
     fast_browse = is_fast_browse_enabled(db)
     cache_key = _get_browse_cache_key(archive_id, path)
@@ -408,7 +425,7 @@ async def delete_archive(
             detail={"key": "backend.errors.archives.adminAccessRequired"},
         )
 
-    repo = _get_v2_repo(repository, db)
+    repo = _get_v2_repo(repository, db, current_user)
     archive_name = await _resolve_archive_name(repo, archive_id, db)
 
     running_job = (
@@ -473,7 +490,7 @@ async def download_file_from_archive(
     db: Session = Depends(get_db),
 ):
     """Extract and download a specific file from a Borg 2 archive."""
-    repo = _get_v2_repo(repository, db)
+    repo = _get_v2_repo(repository, db, current_user)
     archive_selector = _get_archive_selector(archive)
     try:
 

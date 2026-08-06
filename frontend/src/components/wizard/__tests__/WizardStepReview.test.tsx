@@ -108,7 +108,9 @@ describe('WizardStepReview', () => {
     it('shows SSH Remote for ssh location', () => {
       const sshData = { ...defaultData, repositoryLocation: 'ssh' as const }
 
-      renderWithProviders(<WizardStepReview mode="create" data={sshData} sshConnections={mockSshConnections} />)
+      renderWithProviders(
+        <WizardStepReview mode="create" data={sshData} sshConnections={mockSshConnections} />
+      )
 
       expect(screen.getByText('SSH Remote')).toBeInTheDocument()
     })
@@ -318,11 +320,7 @@ describe('WizardStepReview', () => {
 
     it('does not render the Advanced disclosure when no advanced fields are set', () => {
       renderWithProviders(
-        <WizardStepReview
-          mode="create"
-          data={defaultData}
-          sshConnections={mockSshConnections}
-        />
+        <WizardStepReview mode="create" data={defaultData} sshConnections={mockSshConnections} />
       )
 
       expect(screen.queryByTestId('review-advanced')).not.toBeInTheDocument()

@@ -602,7 +602,9 @@ describe('ArchivesList', () => {
         />
       )
 
-      const todayAccordion = screen.getByText('Today').closest('button[data-testid="accordion-trigger"]')
+      const todayAccordion = screen
+        .getByText('Today')
+        .closest('button[data-testid="accordion-trigger"]')
       if (todayAccordion) {
         await user.click(todayAccordion)
       }

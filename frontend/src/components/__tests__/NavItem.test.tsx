@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { renderWithProviders, screen } from '../../test/test-utils'
+import { renderWithProviders, screen, userEvent } from '../../test/test-utils'
 import { Database } from 'lucide-react'
 import NavItem from '../NavItem'
 
@@ -34,6 +34,29 @@ describe('NavItem', () => {
     )
     // MUI Tooltip wraps the element — confirm the wrapper is present
     expect(screen.getByText('Repositories')).toBeInTheDocument()
+  })
+
+  it('keeps a disabled item focusable and exposes aria-disabled', async () => {
+    const user = userEvent.setup()
+    renderWithProviders(
+      <NavItem {...defaultProps} isEnabled={false} disabledReason="No repository configured" />
+    )
+
+    const item = screen.getByRole('button', { name: /repositories/i })
+    expect(item).toHaveAttribute('aria-disabled', 'true')
+    expect(item).not.toHaveAttribute('disabled')
+
+    await user.tab()
+    expect(item).toHaveFocus()
+  })
+
+  it('exposes the disabled reason as the accessible description', () => {
+    renderWithProviders(
+      <NavItem {...defaultProps} isEnabled={false} disabledReason="No repository configured" />
+    )
+
+    const item = screen.getByRole('button', { name: /repositories/i })
+    expect(item).toHaveAccessibleDescription('No repository configured')
   })
 
   it('uses navLabel to translate the name', () => {

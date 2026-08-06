@@ -129,7 +129,12 @@ export default function ArchiveContentsDialog({
   const { folders, files } = getFilesInCurrentPath()
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose() }}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onClose()
+      }}
+    >
       <DialogContent
         showCloseButton={false}
         className="max-w-2xl w-full p-0 gap-0 overflow-hidden max-h-[85vh] flex flex-col"
@@ -151,9 +156,7 @@ export default function ArchiveContentsDialog({
           <div className="flex items-center flex-wrap gap-1 px-4 py-2 border-b shrink-0">
             {getBreadcrumbs().map((crumb, index) => (
               <React.Fragment key={crumb.path}>
-                {index > 0 && (
-                  <span className="text-sm text-muted-foreground">/</span>
-                )}
+                {index > 0 && <span className="text-sm text-muted-foreground">/</span>}
                 <button
                   type="button"
                   onClick={() => navigateToPath(crumb.path)}
@@ -275,9 +278,7 @@ export default function ArchiveContentsDialog({
                 <div className="size-[72px] rounded-full flex items-center justify-center bg-muted mb-5">
                   <Inbox size={32} className="opacity-50" />
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {t('archiveContents.noInfo')}
-                </p>
+                <p className="text-sm text-muted-foreground">{t('archiveContents.noInfo')}</p>
               </div>
             )}
           </div>

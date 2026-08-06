@@ -37,7 +37,9 @@ export function PaginationBar({
           onChange={onRowsPerPageChange}
         >
           {rowsPerPageOptions.map((n) => (
-            <option key={n} value={n}>{n}</option>
+            <option key={n} value={n}>
+              {n}
+            </option>
           ))}
         </select>
       </div>
@@ -142,7 +144,11 @@ const ACTION_CLASSES: Record<string, { text: string; hover: string }> = {
 }
 
 const BREAKPOINT_PX: Record<string, number> = {
-  xs: 0, sm: 640, md: 768, lg: 1024, xl: 1280,
+  xs: 0,
+  sm: 640,
+  md: 768,
+  lg: 1024,
+  xl: 1280,
 }
 
 function useIsMobileWidth(bp: string) {
@@ -233,7 +239,10 @@ export default function DataTable<T>({
                     className={cn('min-w-0', col.mobileFullWidth ? 'col-span-2' : '')}
                   >
                     <Skeleton className="h-2 mb-1.5 rounded" style={{ width: 48 }} />
-                    <Skeleton className="h-4 rounded" style={{ width: `${rowWidths[i][ci % 5]}%` }} />
+                    <Skeleton
+                      className="h-4 rounded"
+                      style={{ width: `${rowWidths[i][ci % 5]}%` }}
+                    />
                   </div>
                 ))}
               </div>
@@ -260,7 +269,10 @@ export default function DataTable<T>({
                 </th>
               ))}
               {actions && actions.length > 0 && (
-                <th className="px-3 py-2 text-right text-xs font-bold uppercase tracking-[0.05em] text-muted-foreground border-b border-border" style={{ width: 152 }}>
+                <th
+                  className="px-3 py-2 text-right text-xs font-bold uppercase tracking-[0.05em] text-muted-foreground border-b border-border"
+                  style={{ width: 152 }}
+                >
                   {t('dataTable.actions')}
                 </th>
               )}
@@ -271,7 +283,10 @@ export default function DataTable<T>({
               <tr key={i} style={{ opacity: Math.max(0.2, 1 - i * 0.15) }}>
                 {columns.map((col, ci) => (
                   <td key={col.id} className="px-3 py-2.5 border-b border-border last:border-0">
-                    <Skeleton className="h-4 rounded" style={{ width: `${rowWidths[i][ci % 5]}%` }} />
+                    <Skeleton
+                      className="h-4 rounded"
+                      style={{ width: `${rowWidths[i][ci % 5]}%` }}
+                    />
                   </td>
                 ))}
                 {actions && actions.length > 0 && (
@@ -296,7 +311,7 @@ export default function DataTable<T>({
     return (
       <div className={cn('bg-background', borderClass)} style={radiusStyle}>
         <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-          <div className="mb-4 text-muted-foreground opacity-60">{emptyState.icon}</div>
+          <div className="mb-4 text-muted-foreground">{emptyState.icon}</div>
           <p className="text-base font-semibold mb-1">{emptyState.title}</p>
           {emptyState.description && (
             <p className="text-sm text-muted-foreground">{emptyState.description}</p>
@@ -308,19 +323,20 @@ export default function DataTable<T>({
   }
 
   // --- Render actions helper ---
-  const renderActions = (
-    row: T,
-    iconOpacity = 0.45,
-    justify: 'start' | 'end' = 'end'
-  ) => (
-    <div className={cn('flex gap-1 flex-nowrap', justify === 'end' ? 'justify-end' : 'justify-start')}>
+  const renderActions = (row: T, justify: 'start' | 'end' = 'end') => (
+    <div
+      className={cn('flex gap-1 flex-nowrap', justify === 'end' ? 'justify-end' : 'justify-start')}
+    >
       {actions?.map((action, idx) => {
         const shouldShow = action.show ? action.show(row) : true
         if (!shouldShow) return null
         const isDisabled = action.disabled ? action.disabled(row) : false
         const tooltipText =
-          typeof action.tooltip === 'function' ? action.tooltip(row) : action.tooltip || action.label
-        const actionClass = action.color && action.color !== 'default' ? ACTION_CLASSES[action.color] : undefined
+          typeof action.tooltip === 'function'
+            ? action.tooltip(row)
+            : action.tooltip || action.label
+        const actionClass =
+          action.color && action.color !== 'default' ? ACTION_CLASSES[action.color] : undefined
 
         return (
           <TooltipProvider key={idx}>
@@ -334,8 +350,7 @@ export default function DataTable<T>({
                       e.stopPropagation()
                       action.onClick(row)
                     }}
-                    className={`w-7 h-7 rounded flex items-center justify-center disabled:opacity-20 disabled:cursor-not-allowed ${actionClass ? `${actionClass.text} ${actionClass.hover}` : 'text-muted-foreground hover:bg-foreground/[0.06]'}`}
-                    style={{ opacity: isDisabled ? 0.2 : iconOpacity }}
+                    className={`w-7 h-7 rounded flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed ${actionClass ? `${actionClass.text} ${actionClass.hover}` : 'text-muted-foreground hover:bg-foreground/[0.06]'}`}
                   >
                     {action.icon}
                   </button>
@@ -349,6 +364,27 @@ export default function DataTable<T>({
     </div>
   )
 
+  // A row that answers the mouse must answer the keyboard too, so an
+  // interactive row takes focus and treats Enter/Space as a click. Rows without
+  // onRowClick stay inert and out of the tab order. The <tr> keeps its row role
+  // — overriding it with "button" would break the table for screen readers.
+  const interactiveRowProps = (row: T) =>
+    onRowClick
+      ? {
+          tabIndex: 0,
+          onClick: () => onRowClick(row),
+          onKeyDown: (e: React.KeyboardEvent) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              onRowClick(row)
+            }
+          },
+        }
+      : {}
+
+  const interactiveRowClass =
+    onRowClick && 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+
   // --- Mobile card layout ---
   if (isMobile) {
     return (
@@ -359,9 +395,11 @@ export default function DataTable<T>({
             className={cn(
               'p-3 border-b border-border last:border-0 transition-colors duration-180',
               enableHover && 'hover:bg-foreground/[0.02]',
-              enablePointer && onRowClick && 'cursor-pointer'
+              enablePointer && onRowClick && 'cursor-pointer',
+              interactiveRowClass
             )}
-            onClick={onRowClick ? () => onRowClick(row) : undefined}
+            role={onRowClick ? 'button' : undefined}
+            {...interactiveRowProps(row)}
           >
             <div className="grid grid-cols-2 gap-3">
               {columns.map((column) => (
@@ -384,7 +422,7 @@ export default function DataTable<T>({
                   <p className="text-2xs font-bold uppercase tracking-[0.03em] text-muted-foreground mb-0.5">
                     {t('dataTable.actions')}
                   </p>
-                  {renderActions(row, 0.7, 'start')}
+                  {renderActions(row, 'start')}
                 </div>
               )}
             </div>
@@ -417,7 +455,11 @@ export default function DataTable<T>({
                   key={col.id}
                   className={cn(
                     'px-3 py-2 text-xs font-bold uppercase tracking-[0.05em] text-muted-foreground whitespace-nowrap border-b border-border',
-                    col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'
+                    col.align === 'right'
+                      ? 'text-right'
+                      : col.align === 'center'
+                        ? 'text-center'
+                        : 'text-left'
                   )}
                   style={{ width: col.width, minWidth: col.minWidth, maxWidth: col.width }}
                 >
@@ -441,18 +483,28 @@ export default function DataTable<T>({
                 className={cn(
                   'transition-colors duration-180 border-b border-border last:border-0',
                   enableHover && 'hover:bg-foreground/[0.03]',
-                  enablePointer && onRowClick && 'cursor-pointer'
+                  enablePointer && onRowClick && 'cursor-pointer',
+                  interactiveRowClass
                 )}
-                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                {...interactiveRowProps(row)}
               >
                 {columns.map((col) => (
                   <td
                     key={col.id}
                     className={cn(
                       'px-3 py-2.5 overflow-hidden text-ellipsis',
-                      col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'
+                      col.align === 'right'
+                        ? 'text-right'
+                        : col.align === 'center'
+                          ? 'text-center'
+                          : 'text-left'
                     )}
-                    style={{ width: col.width, minWidth: col.minWidth, maxWidth: col.width, fontWeight: col.fontWeight }}
+                    style={{
+                      width: col.width,
+                      minWidth: col.minWidth,
+                      maxWidth: col.width,
+                      fontWeight: col.fontWeight,
+                    }}
                   >
                     {col.render
                       ? col.render(row)
@@ -460,7 +512,10 @@ export default function DataTable<T>({
                   </td>
                 ))}
                 {actions && actions.length > 0 && (
-                  <td className="px-3 py-2.5 text-right" style={{ width: 130, minWidth: 130, maxWidth: 130 }}>
+                  <td
+                    className="px-3 py-2.5 text-right"
+                    style={{ width: 130, minWidth: 130, maxWidth: 130 }}
+                  >
                     {renderActions(row)}
                   </td>
                 )}

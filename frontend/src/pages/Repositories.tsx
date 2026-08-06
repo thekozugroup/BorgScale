@@ -681,9 +681,7 @@ export default function Repositories() {
                   className="rounded-md border bg-background px-3 py-1.5"
                   value={selectedDiscoveryConnId ?? ''}
                   onChange={(e) =>
-                    setSelectedDiscoveryConnId(
-                      e.target.value ? Number(e.target.value) : null
-                    )
+                    setSelectedDiscoveryConnId(e.target.value ? Number(e.target.value) : null)
                   }
                 >
                   <option value="">{t('discovery.pickConnectionPlaceholder')}</option>
@@ -746,7 +744,10 @@ export default function Repositories() {
               })
             }}
           >
-            <SelectTrigger className="min-w-[160px] flex-1 text-xs font-semibold" aria-label={t('repositories.sort.ariaLabel', 'Sort repositories')}>
+            <SelectTrigger
+              className="min-w-[160px] flex-1 text-xs font-semibold"
+              aria-label={t('repositories.sort.ariaLabel', 'Sort repositories')}
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -782,7 +783,10 @@ export default function Repositories() {
               })
             }}
           >
-            <SelectTrigger className="min-w-[120px] flex-1 text-xs font-semibold" aria-label={t('repositories.group.ariaLabel', 'Group by')}>
+            <SelectTrigger
+              className="min-w-[120px] flex-1 text-xs font-semibold"
+              aria-label={t('repositories.group.ariaLabel', 'Group by')}
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -952,10 +956,13 @@ export default function Repositories() {
       <AlertDialog open={!!pendingDelete} onOpenChange={(o) => !o && setPendingDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('repositories.deleteDialog.title', 'Delete repository?')}</AlertDialogTitle>
+            <AlertDialogTitle>
+              {t('repositories.deleteDialog.title', 'Delete repository?')}
+            </AlertDialogTitle>
             <AlertDialogDescription>
               {t('repositories.deleteDialog.description', {
-                defaultValue: 'This removes {{name}} from BorgScale. Backup archives in the underlying borg repository remain on disk.',
+                defaultValue:
+                  'This removes {{name}} from BorgScale. Backup archives in the underlying borg repository remain on disk.',
                 name: pendingDelete?.name ?? '',
               })}
             </AlertDialogDescription>

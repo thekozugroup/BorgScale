@@ -330,10 +330,28 @@ class CheckService:
                         repository_id=repository_id,
                     )
 
-            # Run both tasks concurrently
+            async def drain_stdout():
+                """Drain stdout so borg cannot block on a full pipe buffer
+
+                Progress goes to stderr, but borg check still writes findings
+                to stdout; left unread, the OS pipe fills and hangs the job.
+                """
+                async for line in process.stdout:
+                    if cancelled:
+                        break
+                    line_str = line.decode("utf-8", errors="replace").strip()
+                    if line_str:
+                        log_buffer.append(line_str)
+                        if len(log_buffer) > MAX_BUFFER_SIZE:
+                            log_buffer.pop(0)
+
+            # Run all tasks concurrently
             try:
                 await asyncio.gather(
-                    check_cancellation(), stream_logs(), return_exceptions=True
+                    check_cancellation(),
+                    stream_logs(),
+                    drain_stdout(),
+                    return_exceptions=True,
                 )
             except asyncio.CancelledError:
                 logger.info("Check task cancelled", job_id=job_id)

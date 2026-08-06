@@ -46,11 +46,23 @@ function SummaryRow({ label, children }: { label: string; children: React.ReactN
   )
 }
 
-const BADGE_PRIMARY = 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20'
-const BADGE_WARNING = 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground border border-border'
-const BADGE_DEFAULT = 'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border border-border text-muted-foreground'
+const BADGE_PRIMARY =
+  'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20'
+const BADGE_WARNING =
+  'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-muted text-muted-foreground border border-border'
+const BADGE_DEFAULT =
+  'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border border-border text-muted-foreground'
 
-function Panel({ icon, title, children }: { icon: React.ReactNode; title: string; headerBg?: string; children: React.ReactNode }) {
+function Panel({
+  icon,
+  title,
+  children,
+}: {
+  icon: React.ReactNode
+  title: string
+  headerBg?: string
+  children: React.ReactNode
+}) {
   return (
     <div className="rounded-xl border border-border overflow-hidden">
       <div className="px-4 py-3 border-b border-border flex items-center gap-2 bg-muted/30">
@@ -94,7 +106,6 @@ export default function WizardStepRestoreReview({
   const examplePaths = selectedFiles.length > 0 ? selectedFiles.slice(0, 3).map((f) => f.path) : []
   const hasMoreFiles = selectedFiles.length > 3
 
-
   return (
     <div className="flex flex-col gap-4">
       {/* Success Alert */}
@@ -125,7 +136,8 @@ export default function WizardStepRestoreReview({
             <div className="border-t border-border my-1" />
             <SummaryRow label={t('wizard.restoreReview.sshConnection')}>
               <span className="text-sm font-mono">
-                {destinationConnection.username}@{destinationConnection.host}:{destinationConnection.port}
+                {destinationConnection.username}@{destinationConnection.host}:
+                {destinationConnection.port}
               </span>
             </SummaryRow>
           </>
@@ -154,11 +166,10 @@ export default function WizardStepRestoreReview({
 
       {/* Restore Preview */}
       {examplePaths.length > 0 && (
-        <Panel
-          icon={<FileCheck size={16} />}
-          title={t('wizard.restoreReview.restorePreview')}
-        >
-          <p className="text-xs text-muted-foreground mb-3">{t('wizard.restoreReview.previewNote')}</p>
+        <Panel icon={<FileCheck size={16} />} title={t('wizard.restoreReview.restorePreview')}>
+          <p className="text-xs text-muted-foreground mb-3">
+            {t('wizard.restoreReview.previewNote')}
+          </p>
           <div className="p-3 rounded-xl bg-muted/30 overflow-auto max-h-48">
             <div className="flex flex-col gap-3">
               {examplePaths.map((path, index) => (
@@ -180,10 +191,7 @@ export default function WizardStepRestoreReview({
       )}
 
       {/* Files Summary */}
-      <Panel
-        icon={<FolderOpen size={16} />}
-        title={t('wizard.restoreReview.filesToRestore')}
-      >
+      <Panel icon={<FolderOpen size={16} />} title={t('wizard.restoreReview.filesToRestore')}>
         <SummaryRow label={t('wizard.restoreReview.numberOfItems')}>
           <span className={BADGE_PRIMARY}>
             {selectedFiles.length === 0

@@ -3,6 +3,8 @@ Comprehensive unit tests for backup API endpoints
 """
 
 import pytest
+
+from app.services.backup_service import classify_borg_exit_code
 from unittest.mock import patch, AsyncMock
 from fastapi.testclient import TestClient
 from app.database.models import Repository, BackupJob, PruneJob, CompactJob
@@ -808,38 +810,39 @@ class TestBackupHistory:
 
 
 @pytest.mark.unit
-class TestBackupNotifications:
-    """
-    Test notification behavior with pre/post hooks and various exit codes.
-
-    These tests verify the fixes for three notification bugs:
-    1. Backups with warnings (exit 100-127) should send success notifications
-    2. Pre-hook failures should send failure notifications
-    3. Notifications should be sent AFTER post-hooks complete
-
-    NOTE: These tests document the expected behavior. Full integration testing
-    requires a working borg environment and database setup which is complex to mock.
-    The actual fixes are verified by code inspection and manual testing.
+class TestBorgExitCodeClassification:
+    """Exit-code semantics decide whether a finished backup notifies success,
+    warning, or failure. These previously existed only as `assert True`
+    placeholders, so a regression in the rule would not have been caught.
     """
 
-    def test_notification_logic_for_warning_exit_code(self):
-        """Document that warnings (exit 100-127) should send success notifications"""
-        # This test documents the fix: backup_service.py lines 966-977
-        # When borg returns exit code 100-127 (warning), we now send success notification
-        # Previously, no notification was sent at all
-        assert True  # Documentation test
+    @pytest.mark.parametrize("returncode", [0])
+    def test_zero_is_success(self, returncode):
+        assert classify_borg_exit_code(returncode) == "success"
 
-    def test_notification_logic_for_pre_hook_failure(self):
-        """Document that pre-hook failures should send failure notifications"""
-        # This test documents the fix: backup_service.py lines 568-574
-        # When pre-hook fails, we now send failure notification before returning
-        # Previously, no notification was sent
-        assert True  # Documentation test
+    @pytest.mark.parametrize("returncode", [1, 100, 107, 127])
+    def test_warning_codes_are_warnings_not_failures(self, returncode):
+        """Legacy borg signalled warning with 1; modern borg uses 100-127.
 
-    def test_notification_logic_for_post_hook_timing(self):
-        """Document that notifications should be sent AFTER post-hook completes"""
-        # This test documents the fix: backup_service.py lines 916-977 and 989-1051
-        # Notifications are now sent AFTER post-hook execution
-        # If post-hook fails, we send failure notification instead of success
-        # Previously, success notification was sent before post-hook ran
-        assert True  # Documentation test
+        Classifying these as errors would mark a backup that actually completed
+        as failed, and send the operator a false alarm.
+        """
+        assert classify_borg_exit_code(returncode) == "warning"
+
+    @pytest.mark.parametrize("returncode", [2, 3, 50, 99, 128, 130, 255])
+    def test_error_codes_are_errors(self, returncode):
+        """Classifying a real failure as a warning is the dangerous direction:
+        the operator would be told the backup succeeded with a caveat.
+        """
+        assert classify_borg_exit_code(returncode) == "error"
+
+    def test_the_three_classes_are_exhaustive_and_disjoint(self):
+        seen = {classify_borg_exit_code(code) for code in range(0, 256)}
+        assert seen == {"success", "warning", "error"}
+
+    def test_warning_band_boundaries(self):
+        """99 and 128 sit either side of the modern warning band."""
+        assert classify_borg_exit_code(99) == "error"
+        assert classify_borg_exit_code(100) == "warning"
+        assert classify_borg_exit_code(127) == "warning"
+        assert classify_borg_exit_code(128) == "error"

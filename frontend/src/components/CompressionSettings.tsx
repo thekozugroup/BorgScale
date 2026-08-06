@@ -57,7 +57,9 @@ export default function CompressionSettings({
 
       <div className="flex flex-col gap-4">
         <div>
-          <Label htmlFor="compression-algorithm" className="mb-1 block">{t('compressionSettings.algorithmLabel')}</Label>
+          <Label htmlFor="compression-algorithm" className="mb-1 block">
+            {t('compressionSettings.algorithmLabel')}
+          </Label>
           <Select value={algorithm} onValueChange={setAlgorithm} disabled={disabled}>
             <SelectTrigger id="compression-algorithm">
               <SelectValue />
@@ -76,26 +78,35 @@ export default function CompressionSettings({
         {algorithm !== 'none' && (
           <>
             <div>
-              <Label htmlFor="compression-level" className="mb-1 block">{t('compressionSettings.levelLabel')}</Label>
+              <Label htmlFor="compression-level" className="mb-1 block">
+                {t('compressionSettings.levelLabel')}
+              </Label>
               <Input
                 id="compression-level"
                 type="number"
                 value={level}
                 onChange={(e) => setLevel(e.target.value)}
                 placeholder={
-                  algorithm === 'zstd' ? t('compressionSettings.levelPlaceholderZstd')
-                    : algorithm === 'zlib' ? t('compressionSettings.levelPlaceholderZlib')
-                    : algorithm === 'lzma' ? t('compressionSettings.levelPlaceholderLzma')
-                    : t('compressionSettings.levelPlaceholderDefault')
+                  algorithm === 'zstd'
+                    ? t('compressionSettings.levelPlaceholderZstd')
+                    : algorithm === 'zlib'
+                      ? t('compressionSettings.levelPlaceholderZlib')
+                      : algorithm === 'lzma'
+                        ? t('compressionSettings.levelPlaceholderLzma')
+                        : t('compressionSettings.levelPlaceholderDefault')
                 }
                 disabled={disabled || algorithm === 'auto'}
               />
               <p className="text-xs text-muted-foreground mt-1">
-                {algorithm === 'auto' ? t('compressionSettings.levelHelperAuto')
-                  : algorithm === 'zstd' ? t('compressionSettings.levelHelperZstd')
-                  : algorithm === 'zlib' ? t('compressionSettings.levelHelperZlib')
-                  : algorithm === 'lzma' ? t('compressionSettings.levelHelperLzma')
-                  : t('compressionSettings.levelHelperDefault')}
+                {algorithm === 'auto'
+                  ? t('compressionSettings.levelHelperAuto')
+                  : algorithm === 'zstd'
+                    ? t('compressionSettings.levelHelperZstd')
+                    : algorithm === 'zlib'
+                      ? t('compressionSettings.levelHelperZlib')
+                      : algorithm === 'lzma'
+                        ? t('compressionSettings.levelHelperLzma')
+                        : t('compressionSettings.levelHelperDefault')}
               </p>
             </div>
 
@@ -110,13 +121,17 @@ export default function CompressionSettings({
                 />
                 <div>
                   <span className="text-sm">{t('compressionSettings.autoDetect')}</span>
-                  <p className="text-xs text-muted-foreground">{t('compressionSettings.autoDetectDesc')}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t('compressionSettings.autoDetectDesc')}
+                  </p>
                 </div>
               </label>
             )}
 
             <div>
-              <Label htmlFor="compression-obfuscate" className="mb-1 block">{t('compressionSettings.obfuscateLabel')}</Label>
+              <Label htmlFor="compression-obfuscate" className="mb-1 block">
+                {t('compressionSettings.obfuscateLabel')}
+              </Label>
               <Input
                 id="compression-obfuscate"
                 type="number"
@@ -126,8 +141,12 @@ export default function CompressionSettings({
                 disabled={disabled}
                 className={obfuscateError ? 'border-destructive' : ''}
               />
-              <p className={`text-xs mt-1 ${obfuscateError ? 'text-destructive' : 'text-muted-foreground'}`}>
-                {obfuscateError ? t('compressionSettings.obfuscateErrorInvalid') : t('compressionSettings.obfuscateHelper')}
+              <p
+                className={`text-xs mt-1 ${obfuscateError ? 'text-destructive' : 'text-muted-foreground'}`}
+              >
+                {obfuscateError
+                  ? t('compressionSettings.obfuscateErrorInvalid')
+                  : t('compressionSettings.obfuscateHelper')}
               </p>
             </div>
 

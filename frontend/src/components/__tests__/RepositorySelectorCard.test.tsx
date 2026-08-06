@@ -34,7 +34,9 @@ describe('RepositorySelectorCard', () => {
   })
 
   it('shows selected repository', () => {
-    renderWithProviders(<RepositorySelectorCard repositories={mockRepositories} value={2} onChange={vi.fn()} />)
+    renderWithProviders(
+      <RepositorySelectorCard repositories={mockRepositories} value={2} onChange={vi.fn()} />
+    )
 
     // Radix Select shows selected value as text in the trigger
     expect(screen.getByText('Repo 2')).toBeInTheDocument()
@@ -80,7 +82,9 @@ describe('RepositorySelectorCard', () => {
   })
 
   it('shows empty message when no repositories', () => {
-    renderWithProviders(<RepositorySelectorCard repositories={[]} value={null} onChange={vi.fn()} />)
+    renderWithProviders(
+      <RepositorySelectorCard repositories={[]} value={null} onChange={vi.fn()} />
+    )
 
     // Open dropdown
     const select = screen.getByRole('combobox')

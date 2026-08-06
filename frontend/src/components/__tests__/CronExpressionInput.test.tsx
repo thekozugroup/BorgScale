@@ -11,13 +11,9 @@ vi.mock('../../services/api', () => ({
       Promise.resolve({
         data: {
           expression: '0 2 * * *',
-          next_runs: [
-            '2026-05-27T02:00:00',
-            '2026-05-28T02:00:00',
-            '2026-05-29T02:00:00',
-          ],
+          next_runs: ['2026-05-27T02:00:00', '2026-05-28T02:00:00', '2026-05-29T02:00:00'],
         },
-      }),
+      })
     ),
   },
 }))
@@ -49,9 +45,7 @@ describe('CronExpressionInput', () => {
   })
 
   it('renders a custom label when provided', () => {
-    renderWithProviders(
-      <CronExpressionInput {...defaultProps} label="Custom Schedule Label" />,
-    )
+    renderWithProviders(<CronExpressionInput {...defaultProps} label="Custom Schedule Label" />)
     expect(screen.getByText(/Custom Schedule Label/i)).toBeInTheDocument()
   })
 
@@ -84,9 +78,7 @@ describe('CronExpressionInput', () => {
   })
 
   it('force-opens the Advanced disclosure when the value does not match any preset', () => {
-    renderWithProviders(
-      <CronExpressionInput value="0 0 1,15 * *" onChange={vi.fn()} />,
-    )
+    renderWithProviders(<CronExpressionInput value="0 0 1,15 * *" onChange={vi.fn()} />)
     expect(screen.getByPlaceholderText('0 2 * * *')).toBeInTheDocument()
   })
 
@@ -98,9 +90,7 @@ describe('CronExpressionInput', () => {
 
   it('shows helper text inside the Advanced disclosure when provided', async () => {
     const user = userEvent.setup()
-    renderWithProviders(
-      <CronExpressionInput {...defaultProps} helperText="Custom helper text" />,
-    )
+    renderWithProviders(<CronExpressionInput {...defaultProps} helperText="Custom helper text" />)
     await user.click(screen.getByText(/Custom schedule \(cron syntax\)/i))
     expect(screen.getByText(/Custom helper text/i)).toBeInTheDocument()
   })

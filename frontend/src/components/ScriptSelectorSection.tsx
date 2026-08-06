@@ -58,7 +58,9 @@ const ScriptSelectorSection: React.FC<ScriptSelectorSectionProps> = ({
       <div className="flex flex-col gap-4">
         {/* Pre-backup script */}
         <div>
-          <Label htmlFor="script-pre-backup" className="mb-1 block">{t('scriptSelector.preBackup')}</Label>
+          <Label htmlFor="script-pre-backup" className="mb-1 block">
+            {t('scriptSelector.preBackup')}
+          </Label>
           <Select
             value={preBackupScriptId ? String(preBackupScriptId) : '__none__'}
             onValueChange={(v) => onPreChange(v === '__none__' ? null : Number(v))}
@@ -78,20 +80,24 @@ const ScriptSelectorSection: React.FC<ScriptSelectorSectionProps> = ({
           </Select>
         </div>
 
-        {selectedPreScript?.parameters && selectedPreScript.parameters.length > 0 && onPreParametersChange && (
-          <div className="pl-4 pt-1">
-            <ScriptParameterInputs
-              parameters={selectedPreScript.parameters}
-              values={preBackupScriptParameters}
-              onChange={onPreParametersChange}
-              showDescriptions={true}
-            />
-          </div>
-        )}
+        {selectedPreScript?.parameters &&
+          selectedPreScript.parameters.length > 0 &&
+          onPreParametersChange && (
+            <div className="pl-4 pt-1">
+              <ScriptParameterInputs
+                parameters={selectedPreScript.parameters}
+                values={preBackupScriptParameters}
+                onChange={onPreParametersChange}
+                showDescriptions={true}
+              />
+            </div>
+          )}
 
         {/* Post-backup script */}
         <div>
-          <Label htmlFor="script-post-backup" className="mb-1 block">{t('scriptSelector.postBackup')}</Label>
+          <Label htmlFor="script-post-backup" className="mb-1 block">
+            {t('scriptSelector.postBackup')}
+          </Label>
           <Select
             value={postBackupScriptId ? String(postBackupScriptId) : '__none__'}
             onValueChange={(v) => onPostChange(v === '__none__' ? null : Number(v))}
@@ -111,16 +117,18 @@ const ScriptSelectorSection: React.FC<ScriptSelectorSectionProps> = ({
           </Select>
         </div>
 
-        {selectedPostScript?.parameters && selectedPostScript.parameters.length > 0 && onPostParametersChange && (
-          <div className="pl-4 pt-1">
-            <ScriptParameterInputs
-              parameters={selectedPostScript.parameters}
-              values={postBackupScriptParameters}
-              onChange={onPostParametersChange}
-              showDescriptions={true}
-            />
-          </div>
-        )}
+        {selectedPostScript?.parameters &&
+          selectedPostScript.parameters.length > 0 &&
+          onPostParametersChange && (
+            <div className="pl-4 pt-1">
+              <ScriptParameterInputs
+                parameters={selectedPostScript.parameters}
+                values={postBackupScriptParameters}
+                onChange={onPostParametersChange}
+                showDescriptions={true}
+              />
+            </div>
+          )}
 
         {/* Run repo scripts checkbox */}
         <label className="flex items-start gap-2 cursor-pointer">
@@ -133,7 +141,9 @@ const ScriptSelectorSection: React.FC<ScriptSelectorSectionProps> = ({
           />
           <div>
             <p className="text-sm">{t('scriptSelector.runRepoScripts')}</p>
-            <p className="text-xs text-muted-foreground">{t('scriptSelector.runRepoScriptsDesc')}</p>
+            <p className="text-xs text-muted-foreground">
+              {t('scriptSelector.runRepoScriptsDesc')}
+            </p>
           </div>
         </label>
       </div>

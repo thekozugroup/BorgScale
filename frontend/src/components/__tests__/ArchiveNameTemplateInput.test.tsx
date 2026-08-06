@@ -17,32 +17,26 @@ describe('ArchiveNameTemplateInput', () => {
   it('renders the always-visible "Files will be named:" preview line', () => {
     renderWithProviders(<ArchiveNameTemplateInput {...defaultProps} />)
 
-    expect(
-      screen.getByTestId('archive-name-preview-intro'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('archive-name-preview-intro')).toBeInTheDocument()
     expect(screen.getByText(/Files will be named:/i)).toBeInTheDocument()
   })
 
   it('hides the placeholder syntax hint by default; reveals it after toggling Advanced', async () => {
     renderWithProviders(<ArchiveNameTemplateInput {...defaultProps} />)
 
-    expect(
-      screen.queryByText(/Available placeholders:/i),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByText(/Available placeholders:/i)).not.toBeInTheDocument()
 
     await openAdvanced()
 
     expect(
-      screen.getByText(/Available placeholders: {job_name}, {now}, {date}, {time}, {timestamp}/i),
+      screen.getByText(/Available placeholders: {job_name}, {now}, {date}, {time}, {timestamp}/i)
     ).toBeInTheDocument()
   })
 
   it('hides the raw template input by default; shows it after Advanced is opened', async () => {
     renderWithProviders(<ArchiveNameTemplateInput {...defaultProps} />)
 
-    expect(
-      screen.queryByLabelText(/Archive Name Template/i),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(/Archive Name Template/i)).not.toBeInTheDocument()
 
     await openAdvanced()
 
@@ -61,9 +55,7 @@ describe('ArchiveNameTemplateInput', () => {
   })
 
   it('generates preview with job_name placeholder', () => {
-    renderWithProviders(
-      <ArchiveNameTemplateInput value="{job_name}-backup" onChange={vi.fn()} />,
-    )
+    renderWithProviders(<ArchiveNameTemplateInput value="{job_name}-backup" onChange={vi.fn()} />)
     expect(screen.getByText(/example-job-backup/)).toBeInTheDocument()
   })
 
@@ -73,39 +65,29 @@ describe('ArchiveNameTemplateInput', () => {
         value="{job_name}-archive"
         onChange={vi.fn()}
         jobName="my-custom-job"
-      />,
+      />
     )
     expect(screen.getByText(/my-custom-job-archive/)).toBeInTheDocument()
   })
 
   it('generates preview with date placeholder', () => {
-    renderWithProviders(
-      <ArchiveNameTemplateInput value="{date}" onChange={vi.fn()} />,
-    )
+    renderWithProviders(<ArchiveNameTemplateInput value="{date}" onChange={vi.fn()} />)
     expect(screen.getByText(/\d{4}-\d{2}-\d{2}/)).toBeInTheDocument()
   })
 
   it('generates preview with time placeholder', () => {
-    renderWithProviders(
-      <ArchiveNameTemplateInput value="{time}" onChange={vi.fn()} />,
-    )
+    renderWithProviders(<ArchiveNameTemplateInput value="{time}" onChange={vi.fn()} />)
     expect(screen.getByText(/\d{2}-\d{2}-\d{2}/)).toBeInTheDocument()
   })
 
   it('generates preview with timestamp placeholder', () => {
-    renderWithProviders(
-      <ArchiveNameTemplateInput value="{timestamp}" onChange={vi.fn()} />,
-    )
+    renderWithProviders(<ArchiveNameTemplateInput value="{timestamp}" onChange={vi.fn()} />)
     expect(screen.getByText(/\d+/)).toBeInTheDocument()
   })
 
   it('generates preview with now placeholder', () => {
-    renderWithProviders(
-      <ArchiveNameTemplateInput value="{now}" onChange={vi.fn()} />,
-    )
-    expect(
-      screen.getByText(/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/),
-    ).toBeInTheDocument()
+    renderWithProviders(<ArchiveNameTemplateInput value="{now}" onChange={vi.fn()} />)
+    expect(screen.getByText(/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/)).toBeInTheDocument()
   })
 
   it('generates preview with multiple placeholders', () => {
@@ -114,11 +96,9 @@ describe('ArchiveNameTemplateInput', () => {
         value="{job_name}-{date}-{time}"
         onChange={vi.fn()}
         jobName="test-job"
-      />,
+      />
     )
-    expect(
-      screen.getByText(/test-job-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}/),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/test-job-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}/)).toBeInTheDocument()
   })
 
   it('disables the input when disabled prop is true (after opening Advanced)', async () => {
@@ -131,9 +111,7 @@ describe('ArchiveNameTemplateInput', () => {
   it('uses the default {job_name}-{timestamp} template for the preview when value is empty', () => {
     renderWithProviders(<ArchiveNameTemplateInput value="" onChange={vi.fn()} />)
     // Preview line still renders because we fall back to the default template
-    expect(
-      screen.getByTestId('archive-name-preview-intro'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('archive-name-preview-intro')).toBeInTheDocument()
     expect(screen.getByText(/example-job-\d+/)).toBeInTheDocument()
   })
 
@@ -143,15 +121,13 @@ describe('ArchiveNameTemplateInput', () => {
   })
 
   it('handles template with no placeholders', () => {
-    renderWithProviders(
-      <ArchiveNameTemplateInput value="static-archive-name" onChange={vi.fn()} />,
-    )
+    renderWithProviders(<ArchiveNameTemplateInput value="static-archive-name" onChange={vi.fn()} />)
     expect(screen.getByText(/static-archive-name/)).toBeInTheDocument()
   })
 
   it('updates preview when value changes', () => {
     const { rerender } = renderWithProviders(
-      <ArchiveNameTemplateInput value="{job_name}-v1" onChange={vi.fn()} />,
+      <ArchiveNameTemplateInput value="{job_name}-v1" onChange={vi.fn()} />
     )
     expect(screen.getByText(/example-job-v1/)).toBeInTheDocument()
 
@@ -161,9 +137,7 @@ describe('ArchiveNameTemplateInput', () => {
 
   it('shows the Advanced disclosure toggle by default', () => {
     renderWithProviders(<ArchiveNameTemplateInput {...defaultProps} />)
-    expect(
-      screen.getByText(/Customize archive naming \(advanced\)/i),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Customize archive naming \(advanced\)/i)).toBeInTheDocument()
   })
 
   it('renders monospace styling on the raw input (after opening Advanced)', async () => {
@@ -180,11 +154,7 @@ describe('ArchiveNameTemplateInput', () => {
   })
 
   it('size="small" still renders the preview line', () => {
-    renderWithProviders(
-      <ArchiveNameTemplateInput {...defaultProps} size="small" />,
-    )
-    expect(
-      screen.getByTestId('archive-name-preview-intro'),
-    ).toBeInTheDocument()
+    renderWithProviders(<ArchiveNameTemplateInput {...defaultProps} size="small" />)
+    expect(screen.getByTestId('archive-name-preview-intro')).toBeInTheDocument()
   })
 })

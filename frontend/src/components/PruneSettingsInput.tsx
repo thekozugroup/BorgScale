@@ -31,12 +31,36 @@ const PruneSettingsInput: React.FC<PruneSettingsInputProps> = ({
   }
 
   const fields: { key: keyof PruneSettings; label: string; hint: string }[] = [
-    { key: 'keepHourly', label: t('pruneSettings.keepHourly'), hint: t('pruneSettings.keepHourlyHint') },
-    { key: 'keepDaily', label: t('pruneSettings.keepDaily'), hint: t('pruneSettings.keepDailyHint') },
-    { key: 'keepWeekly', label: t('pruneSettings.keepWeekly'), hint: t('pruneSettings.keepWeeklyHint') },
-    { key: 'keepMonthly', label: t('pruneSettings.keepMonthly'), hint: t('pruneSettings.keepMonthlyHint') },
-    { key: 'keepQuarterly', label: t('pruneSettings.keepQuarterly'), hint: t('pruneSettings.keepQuarterlyHint') },
-    { key: 'keepYearly', label: t('pruneSettings.keepYearly'), hint: t('pruneSettings.keepYearlyHint') },
+    {
+      key: 'keepHourly',
+      label: t('pruneSettings.keepHourly'),
+      hint: t('pruneSettings.keepHourlyHint'),
+    },
+    {
+      key: 'keepDaily',
+      label: t('pruneSettings.keepDaily'),
+      hint: t('pruneSettings.keepDailyHint'),
+    },
+    {
+      key: 'keepWeekly',
+      label: t('pruneSettings.keepWeekly'),
+      hint: t('pruneSettings.keepWeeklyHint'),
+    },
+    {
+      key: 'keepMonthly',
+      label: t('pruneSettings.keepMonthly'),
+      hint: t('pruneSettings.keepMonthlyHint'),
+    },
+    {
+      key: 'keepQuarterly',
+      label: t('pruneSettings.keepQuarterly'),
+      hint: t('pruneSettings.keepQuarterlyHint'),
+    },
+    {
+      key: 'keepYearly',
+      label: t('pruneSettings.keepYearly'),
+      hint: t('pruneSettings.keepYearlyHint'),
+    },
   ]
 
   const suffix = t('pruneSettings.suffix')
@@ -55,9 +79,7 @@ const PruneSettingsInput: React.FC<PruneSettingsInputProps> = ({
               min={0}
               disabled={disabled}
             />
-            <span className="text-sm text-muted-foreground whitespace-nowrap">
-              {suffix}
-            </span>
+            <span className="text-sm text-muted-foreground whitespace-nowrap">{suffix}</span>
           </div>
           <p className="text-xs text-muted-foreground">{hint}</p>
         </div>

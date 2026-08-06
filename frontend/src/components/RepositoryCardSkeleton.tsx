@@ -13,11 +13,7 @@ export default function RepositoryCardSkeleton({ index = 0 }: RepositoryCardSkel
   const pathWidth = PATH_WIDTHS[index % PATH_WIDTHS.length]
 
   return (
-    <div
-      className={cn(
-        'relative overflow-hidden rounded-xl border bg-card shadow-sm',
-      )}
-    >
+    <div className={cn('relative overflow-hidden rounded-xl border bg-card shadow-sm')}>
       <div className="px-4 pb-3.5 pt-4 sm:px-5">
         {/* ── Header ── */}
         <div className="mb-3 flex items-start justify-between gap-2">
@@ -55,10 +51,7 @@ export default function RepositoryCardSkeleton({ index = 0 }: RepositoryCardSkel
                   <Skeleton className="size-2.5 shrink-0 rounded" />
                   <Skeleton className="h-2.5 w-10 rounded" />
                 </div>
-                <Skeleton
-                  className="h-4 rounded"
-                  style={{ width: [36, 48, 52, 44][i] }}
-                />
+                <Skeleton className="h-4 rounded" style={{ width: [36, 48, 52, 44][i] }} />
               </div>
             )
           })}

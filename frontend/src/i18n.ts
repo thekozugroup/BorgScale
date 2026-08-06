@@ -6,6 +6,15 @@ import es from './locales/es.json'
 import de from './locales/de.json'
 import it from './locales/it.json'
 
+// WCAG 3.1.1/3.1.2: keep <html lang> in sync with the active language so
+// screen readers switch pronunciation. Registered before init so the
+// languageChanged event fired during init also sets the initial value.
+i18n.on('languageChanged', (lng) => {
+  if (typeof document !== 'undefined') {
+    document.documentElement.lang = lng
+  }
+})
+
 i18n.use(initReactI18next).init({
   lng:
     (typeof localStorage !== 'undefined' ? localStorage.getItem('i18nextLng') : null) ||

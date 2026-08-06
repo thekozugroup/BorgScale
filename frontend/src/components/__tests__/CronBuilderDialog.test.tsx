@@ -93,7 +93,9 @@ describe('CronBuilderDialog', () => {
 
     it('shows custom button label', async () => {
       const user = userEvent.setup()
-      renderWithProviders(<CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} buttonLabel="Save" />)
+      renderWithProviders(
+        <CronBuilderDialog value="0 0 * * *" onChange={mockOnChange} buttonLabel="Save" />
+      )
 
       await user.click(screen.getByRole('button', { name: 'Open schedule builder' }))
 

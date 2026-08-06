@@ -26,6 +26,8 @@ vi.mock('react-i18next', async () => {
           'backup.runningJobs.progress.finalizing': 'Finalizing',
         }
         if (key === 'backup.runningJobs.jobTitle') return `Backup Job ${opts?.id}`
+        if (key === 'backup.runningJobs.progress.finishedAnnouncement')
+          return `Backup job ${opts?.id} finished`
         return map[key] ?? key
       },
       i18n: { language: 'en' },
@@ -280,6 +282,87 @@ describe('RunningBackupsSection', () => {
       />
     )
     expect(screen.queryByRole('button', { name: /view logs/i })).not.toBeInTheDocument()
+  })
+
+  it('exposes the progress bar with progressbar role and value attributes', () => {
+    renderWithProviders(
+      <RunningBackupsSection
+        runningBackupJobs={[mockRunningJob]}
+        onCancelBackup={mockOnCancelBackup}
+        isCancelling={false}
+      />
+    )
+    // 5,000,000 of 10,000,000 bytes processed
+    const progressbar = screen.getByRole('progressbar')
+    expect(progressbar).toHaveAttribute('aria-valuemin', '0')
+    expect(progressbar).toHaveAttribute('aria-valuemax', '100')
+    expect(progressbar).toHaveAttribute('aria-valuenow', '50')
+    expect(progressbar).toHaveAttribute('aria-valuetext', '50.0%')
+    expect(progressbar).toHaveAccessibleName('Backup Job 1')
+  })
+
+  it('announces progress politely in quarter steps, not per percent', () => {
+    const { rerender } = renderWithProviders(
+      <RunningBackupsSection
+        runningBackupJobs={[mockRunningJob]}
+        onCancelBackup={mockOnCancelBackup}
+        isCancelling={false}
+      />
+    )
+    const jobStatus = screen
+      .getAllByRole('status')
+      .find((el) => el.textContent?.includes('Backup Job 1'))
+    expect(jobStatus).toHaveTextContent('Backup Job 1: Processing, 50%')
+
+    // 62% still reads as the 50% bucket — no announcement churn
+    rerender(
+      <RunningBackupsSection
+        runningBackupJobs={[
+          {
+            ...mockRunningJob,
+            progress_details: { ...mockRunningJob.progress_details!, original_size: 6200000 },
+          },
+        ]}
+        onCancelBackup={mockOnCancelBackup}
+        isCancelling={false}
+      />
+    )
+    expect(jobStatus).toHaveTextContent('Backup Job 1: Processing, 50%')
+
+    rerender(
+      <RunningBackupsSection
+        runningBackupJobs={[
+          {
+            ...mockRunningJob,
+            progress_details: { ...mockRunningJob.progress_details!, original_size: 7600000 },
+          },
+        ]}
+        onCancelBackup={mockOnCancelBackup}
+        isCancelling={false}
+      />
+    )
+    expect(jobStatus).toHaveTextContent('Backup Job 1: Processing, 75%')
+  })
+
+  it('announces a job politely once it leaves the running list', () => {
+    const { rerender } = renderWithProviders(
+      <RunningBackupsSection
+        runningBackupJobs={[mockRunningJob]}
+        onCancelBackup={mockOnCancelBackup}
+        isCancelling={false}
+      />
+    )
+
+    rerender(
+      <RunningBackupsSection
+        runningBackupJobs={[]}
+        onCancelBackup={mockOnCancelBackup}
+        isCancelling={false}
+      />
+    )
+
+    expect(screen.getByRole('status')).toHaveTextContent('Backup job 1 finished')
+    expect(screen.queryByText('Running Jobs')).not.toBeInTheDocument()
   })
 
   it('shows View Logs button and calls onViewLogs when provided', () => {

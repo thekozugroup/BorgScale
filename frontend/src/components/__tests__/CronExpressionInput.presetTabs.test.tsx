@@ -11,13 +11,9 @@ vi.mock('../../services/api', () => ({
       Promise.resolve({
         data: {
           expression: '0 3 * * *',
-          next_runs: [
-            '2026-05-27T03:00:00',
-            '2026-05-28T03:00:00',
-            '2026-05-29T03:00:00',
-          ],
+          next_runs: ['2026-05-27T03:00:00', '2026-05-28T03:00:00', '2026-05-29T03:00:00'],
         },
-      }),
+      })
     ),
   },
 }))
@@ -26,9 +22,7 @@ describe('CronExpressionInput preset tabs', () => {
   it('clicking Daily with the time set to 03:00 produces cron "0 3 * * *"', async () => {
     const user = userEvent.setup()
     const onChange = vi.fn()
-    renderWithProviders(
-      <CronExpressionInput value="0 2 * * *" onChange={onChange} />,
-    )
+    renderWithProviders(<CronExpressionInput value="0 2 * * *" onChange={onChange} />)
 
     // Click the Daily preset tab — CronBuilder fires an onChange with the
     // current daily template.
@@ -42,15 +36,11 @@ describe('CronExpressionInput preset tabs', () => {
 
     // The last call should be a daily expression at 03:00 (24h) with the
     // CronBuilder's AM default → "0 3 * * *".
-    expect(
-      onChange.mock.calls.some((call) => call[0] === '0 3 * * *'),
-    ).toBe(true)
+    expect(onChange.mock.calls.some((call) => call[0] === '0 3 * * *')).toBe(true)
   })
 
   it('renders a description containing "03:00" for the daily 3am preset', () => {
-    renderWithProviders(
-      <CronExpressionInput value="0 3 * * *" onChange={vi.fn()} />,
-    )
+    renderWithProviders(<CronExpressionInput value="0 3 * * *" onChange={vi.fn()} />)
     const desc = screen.getByTestId('cron-description')
     expect(desc.textContent ?? '').toMatch(/03:00|3:00/)
   })

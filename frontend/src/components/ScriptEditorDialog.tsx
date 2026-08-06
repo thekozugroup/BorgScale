@@ -113,7 +113,9 @@ export default function ScriptEditorDialog({
 
           <div className="flex gap-4 items-start flex-wrap">
             <div className="flex-1 min-w-[160px]">
-              <Label htmlFor="script-editor-timeout" className="text-xs font-semibold mb-1.5 block">{t('scriptEditor.timeoutLabel')}</Label>
+              <Label htmlFor="script-editor-timeout" className="text-xs font-semibold mb-1.5 block">
+                {t('scriptEditor.timeoutLabel')}
+              </Label>
               <Input
                 id="script-editor-timeout"
                 type="number"
@@ -131,7 +133,10 @@ export default function ScriptEditorDialog({
                 <p className="text-xs font-semibold mb-2">{t('scriptEditor.onFailureLabel')}</p>
                 <div className="flex gap-3 flex-wrap">
                   {failureModeOptions.map((opt) => (
-                    <label key={opt.value} className="flex items-center gap-1.5 cursor-pointer text-sm">
+                    <label
+                      key={opt.value}
+                      className="flex items-center gap-1.5 cursor-pointer text-sm"
+                    >
                       <input
                         type="radio"
                         name="onFailureMode"

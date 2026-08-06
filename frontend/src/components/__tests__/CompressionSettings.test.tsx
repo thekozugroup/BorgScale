@@ -166,25 +166,33 @@ describe('CompressionSettings', () => {
 
   describe('Disabled state', () => {
     it('disables algorithm select when disabled=true', () => {
-      renderWithProviders(<CompressionSettings value="lz4" onChange={mockOnChange} disabled={true} />)
+      renderWithProviders(
+        <CompressionSettings value="lz4" onChange={mockOnChange} disabled={true} />
+      )
       const select = screen.getByRole('combobox')
       expect(select).toBeDisabled()
     })
 
     it('disables level input when disabled=true', () => {
-      renderWithProviders(<CompressionSettings value="lz4" onChange={mockOnChange} disabled={true} />)
+      renderWithProviders(
+        <CompressionSettings value="lz4" onChange={mockOnChange} disabled={true} />
+      )
       const levelInput = screen.getByPlaceholderText('Leave empty for default')
       expect(levelInput).toBeDisabled()
     })
 
     it('disables obfuscate input when disabled=true', () => {
-      renderWithProviders(<CompressionSettings value="lz4" onChange={mockOnChange} disabled={true} />)
+      renderWithProviders(
+        <CompressionSettings value="lz4" onChange={mockOnChange} disabled={true} />
+      )
       const obfuscateInput = screen.getByPlaceholderText('e.g., 3, 110, or 250')
       expect(obfuscateInput).toBeDisabled()
     })
 
     it('disables auto-detect checkbox when disabled=true', () => {
-      renderWithProviders(<CompressionSettings value="lz4" onChange={mockOnChange} disabled={true} />)
+      renderWithProviders(
+        <CompressionSettings value="lz4" onChange={mockOnChange} disabled={true} />
+      )
       const checkbox = screen.getByRole('checkbox')
       expect(checkbox).toBeDisabled()
     })
@@ -234,7 +242,9 @@ describe('CompressionSettings', () => {
 
   describe('External value changes', () => {
     it('updates state when value prop changes', () => {
-      const { rerender } = renderWithProviders(<CompressionSettings value="lz4" onChange={mockOnChange} />)
+      const { rerender } = renderWithProviders(
+        <CompressionSettings value="lz4" onChange={mockOnChange} />
+      )
 
       rerender(<CompressionSettings value="zstd,10" onChange={mockOnChange} />)
 

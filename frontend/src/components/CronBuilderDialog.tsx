@@ -44,12 +44,10 @@ export const CronBuilderDialog: React.FC<CronBuilderDialogProps> = ({
 
   const footer = (
     <div className="flex justify-end gap-2 px-5 py-3">
-      <Button variant="outline" onClick={handleCancel}>{t('common.buttons.cancel')}</Button>
-      <Button
-        onClick={handleApply}
-      >
-        {buttonLabel || t('cronBuilder.applySchedule')}
+      <Button variant="outline" onClick={handleCancel}>
+        {t('common.buttons.cancel')}
       </Button>
+      <Button onClick={handleApply}>{buttonLabel || t('cronBuilder.applySchedule')}</Button>
     </div>
   )
 
@@ -71,7 +69,9 @@ export const CronBuilderDialog: React.FC<CronBuilderDialogProps> = ({
 
       <ResponsiveDialog open={open} onClose={handleCancel} maxWidth="sm" fullWidth footer={footer}>
         <div className="px-5 pt-5 pb-2">
-          <p className="text-base font-semibold mb-4">{dialogTitle || t('cronBuilder.configureSchedule')}</p>
+          <p className="text-base font-semibold mb-4">
+            {dialogTitle || t('cronBuilder.configureSchedule')}
+          </p>
           <CronBuilder
             value={tempValue}
             onChange={setTempValue}

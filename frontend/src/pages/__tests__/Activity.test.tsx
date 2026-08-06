@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, renderWithProviders, screen, userEvent, waitFor } from '../../test/test-utils'
+import { renderWithProviders, screen, userEvent, waitFor } from '../../test/test-utils'
 import Activity from '../Activity'
 import { activityAPI } from '../../services/api'
 
@@ -86,7 +86,8 @@ describe('Activity page', () => {
       })
     )
 
-    fireEvent.change(screen.getAllByRole('combobox')[0], { target: { value: 'restore' } })
+    await user.click(screen.getAllByRole('combobox')[0])
+    await user.click(await screen.findByRole('option', { name: 'Restore' }))
 
     await waitFor(() => {
       expect(activityAPI.list).toHaveBeenLastCalledWith({
@@ -99,7 +100,8 @@ describe('Activity page', () => {
       filter_value: 'restore',
     })
 
-    fireEvent.change(screen.getAllByRole('combobox')[1], { target: { value: 'failed' } })
+    await user.click(screen.getAllByRole('combobox')[1])
+    await user.click(await screen.findByRole('option', { name: 'Failed' }))
 
     await waitFor(() => {
       expect(activityAPI.list).toHaveBeenLastCalledWith({
@@ -115,5 +117,27 @@ describe('Activity page', () => {
 
     await user.click(screen.getByRole('button', { name: /refresh/i }))
     expect(refetchSpy).toHaveBeenCalled()
+  })
+
+  it('renders the filters as shared Select components, not native selects', async () => {
+    renderWithProviders(<Activity />)
+
+    expect(await screen.findByText('Jobs Table')).toBeInTheDocument()
+    expect(document.querySelectorAll('select')).toHaveLength(0)
+
+    const triggers = screen.getAllByRole('combobox')
+    expect(triggers).toHaveLength(2)
+    triggers.forEach((trigger) => {
+      expect(trigger).toHaveAttribute('data-slot', 'select-trigger')
+    })
+  })
+
+  it('uses the design-system page title spec', async () => {
+    renderWithProviders(<Activity />)
+
+    const heading = await screen.findByRole('heading', { level: 1 })
+    expect(heading.className).toContain('text-2xl')
+    expect(heading.className).toContain('font-semibold')
+    expect(heading.className).toContain('tracking-tight')
   })
 })

@@ -123,10 +123,14 @@ const ScheduledJobsTable = ({
         <div className="py-12 flex flex-col items-center text-muted-foreground">
           <Clock size={40} style={{ opacity: 0.25, marginBottom: 12 }} />
           <p className="text-base mb-1">{t('scheduledJobsTableSection.noJobsFound')}</p>
-          <p className="text-sm text-muted-foreground">{t('scheduledJobsTableSection.noJobsDesc')}</p>
+          <p className="text-sm text-muted-foreground">
+            {t('scheduledJobsTableSection.noJobsDesc')}
+          </p>
           {onCreateNew && (
             <div className="mt-4">
-              <Button size="sm" onClick={onCreateNew}>{t('schedule.createBackup')}</Button>
+              <Button size="sm" onClick={onCreateNew}>
+                {t('schedule.createBackup')}
+              </Button>
             </div>
           )}
         </div>

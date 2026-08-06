@@ -65,7 +65,9 @@ export default function SourceDirectoriesInput({
       </div>
       <p className="text-xs text-muted-foreground mb-3">
         {t('sourceDirectories.subtitle')}
-        {required ? t('sourceDirectories.atLeastOneRequired') : t('sourceDirectories.optionalSuffix')}
+        {required
+          ? t('sourceDirectories.atLeastOneRequired')
+          : t('sourceDirectories.optionalSuffix')}
       </p>
 
       {directories.length > 0 && (

@@ -271,15 +271,18 @@ const RestoreWizard = ({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose() }}>
+      <Dialog
+        open={open}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) onClose()
+        }}
+      >
         <DialogContent
           showCloseButton={false}
           className="max-w-2xl w-full p-0 gap-0 overflow-hidden rounded-2xl"
         >
           <DialogHeader className="px-6 pt-5 pb-3">
-            <DialogTitle className="text-xl font-bold">
-              {t('restoreWizard.title')}
-            </DialogTitle>
+            <DialogTitle className="text-xl font-bold">{t('restoreWizard.title')}</DialogTitle>
             <p className="text-sm text-muted-foreground mt-1">
               {t('restoreWizard.fromArchive', { archiveName: archive.name })}
             </p>

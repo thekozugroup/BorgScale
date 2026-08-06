@@ -10,13 +10,9 @@ vi.mock('../../../../services/api', () => ({
       Promise.resolve({
         data: {
           expression: '0 2 * * *',
-          next_runs: [
-            '2026-05-27T02:00:00',
-            '2026-05-28T02:00:00',
-            '2026-05-29T02:00:00',
-          ],
+          next_runs: ['2026-05-27T02:00:00', '2026-05-28T02:00:00', '2026-05-29T02:00:00'],
         },
-      }),
+      })
     ),
   },
 }))
@@ -68,9 +64,7 @@ describe('WizardStepScheduleConfig', () => {
   it('hides the raw cron text input behind the Advanced disclosure', () => {
     renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
     expect(screen.queryByPlaceholderText('0 2 * * *')).not.toBeInTheDocument()
-    expect(
-      screen.getByText(/Custom schedule \(cron syntax\)/i),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Custom schedule \(cron syntax\)/i)).toBeInTheDocument()
   })
 
   it('exposes the raw cron input only after opening the Advanced disclosure', async () => {
@@ -96,16 +90,12 @@ describe('WizardStepScheduleConfig', () => {
 
   it('renders the archive-name "Files will be named:" preview by default', () => {
     renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
-    expect(
-      screen.getByTestId('archive-name-preview-intro'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('archive-name-preview-intro')).toBeInTheDocument()
   })
 
   it('hides the archive-name template syntax behind its Advanced disclosure', () => {
     renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
-    expect(
-      screen.queryByLabelText(/Archive Name Template/i),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(/Archive Name Template/i)).not.toBeInTheDocument()
   })
 
   it('opens the archive-name Advanced disclosure when clicked', async () => {
@@ -140,9 +130,7 @@ describe('WizardStepScheduleConfig', () => {
   })
 
   it('uses jobName in the archive-name preview', () => {
-    renderWithProviders(
-      <WizardStepScheduleConfig {...defaultProps} jobName="my-custom-job" />,
-    )
+    renderWithProviders(<WizardStepScheduleConfig {...defaultProps} jobName="my-custom-job" />)
     expect(screen.getByText(/my-custom-job/)).toBeInTheDocument()
   })
 
@@ -161,9 +149,7 @@ describe('WizardStepScheduleConfig', () => {
   it('handles empty archive name template by still rendering preview', () => {
     const emptyData = { ...defaultData, archiveNameTemplate: '' }
     renderWithProviders(<WizardStepScheduleConfig {...defaultProps} data={emptyData} />)
-    expect(
-      screen.getByTestId('archive-name-preview-intro'),
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('archive-name-preview-intro')).toBeInTheDocument()
   })
 
   it('shows the inline info icon tooltip for next run times', () => {
@@ -179,9 +165,7 @@ describe('WizardStepScheduleConfig', () => {
   })
 
   it('updates the wizard tooltip when cron expression becomes invalid', () => {
-    const { rerender } = renderWithProviders(
-      <WizardStepScheduleConfig {...defaultProps} />,
-    )
+    const { rerender } = renderWithProviders(<WizardStepScheduleConfig {...defaultProps} />)
     expect(screen.getByText(/Next 3 Run Times:/i)).toBeInTheDocument()
 
     const newData = { ...defaultData, cronExpression: 'invalid' }

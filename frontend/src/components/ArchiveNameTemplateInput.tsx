@@ -45,13 +45,8 @@ const ArchiveNameTemplateInput: React.FC<ArchiveNameTemplateInputProps> = ({
   return (
     <div>
       {/* Always-visible plain-English preview line */}
-      <p
-        className="text-sm text-muted-foreground"
-        data-testid="archive-name-preview-intro"
-      >
-        <span className="font-medium text-foreground">
-          {t('archiveNameTemplate.previewIntro')}
-        </span>{' '}
+      <p className="text-sm text-muted-foreground" data-testid="archive-name-preview-intro">
+        <span className="font-medium text-foreground">{t('archiveNameTemplate.previewIntro')}</span>{' '}
         <span className="font-mono">{previewName}</span>
       </p>
 
@@ -72,13 +67,9 @@ const ArchiveNameTemplateInput: React.FC<ArchiveNameTemplateInputProps> = ({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             disabled={disabled}
-            className={
-              size === 'medium' ? 'font-mono text-lg' : 'font-mono text-sm'
-            }
+            className={size === 'medium' ? 'font-mono text-lg' : 'font-mono text-sm'}
           />
-          <p className="text-xs text-muted-foreground">
-            {t('archiveNameTemplate.hint')}
-          </p>
+          <p className="text-xs text-muted-foreground">{t('archiveNameTemplate.hint')}</p>
         </div>
         {value && (
           <Alert className="mt-4 font-mono text-sm">

@@ -249,16 +249,15 @@ export default function UserPermissionsPanel({
 
             {scopeMode === 'all' ? (
               <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
-                <Select
-                  value={effectiveWildcardRole}
-                  onValueChange={setWildcardRole}
-                >
+                <Select value={effectiveWildcardRole} onValueChange={setWildcardRole}>
                   <SelectTrigger className="w-full sm:w-44 h-8 text-sm font-semibold">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {availableRoles.map((r) => (
-                      <SelectItem key={r} value={r}>{formatRoleLabel(r)}</SelectItem>
+                      <SelectItem key={r} value={r}>
+                        {formatRoleLabel(r)}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -349,7 +348,9 @@ export default function UserPermissionsPanel({
                     </SelectTrigger>
                     <SelectContent>
                       {availableRoles.map((r) => (
-                        <SelectItem key={r} value={r}>{formatRoleLabel(r)}</SelectItem>
+                        <SelectItem key={r} value={r}>
+                          {formatRoleLabel(r)}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -376,7 +377,9 @@ export default function UserPermissionsPanel({
                           <Trash2 size={14} />
                         </button>
                       </TooltipTrigger>
-                      <TooltipContent>{t('settings.permissions.actions.removeAccess')}</TooltipContent>
+                      <TooltipContent>
+                        {t('settings.permissions.actions.removeAccess')}
+                      </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
                 )}
@@ -413,11 +416,15 @@ export default function UserPermissionsPanel({
                   onValueChange={(v) => setAddRepoId(v === '' ? '' : Number(v))}
                 >
                   <SelectTrigger className="flex-1 sm:min-w-40 h-8 text-sm font-semibold">
-                    <SelectValue placeholder={t('settings.permissions.grantAccess.selectRepository')} />
+                    <SelectValue
+                      placeholder={t('settings.permissions.grantAccess.selectRepository')}
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {availableRepos.map((r) => (
-                      <SelectItem key={r.id} value={String(r.id)}>{r.name}</SelectItem>
+                      <SelectItem key={r.id} value={String(r.id)}>
+                        {r.name}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -428,7 +435,9 @@ export default function UserPermissionsPanel({
                     </SelectTrigger>
                     <SelectContent>
                       {availableRoles.map((r) => (
-                        <SelectItem key={r} value={r}>{formatRoleLabel(r)}</SelectItem>
+                        <SelectItem key={r} value={r}>
+                          {formatRoleLabel(r)}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

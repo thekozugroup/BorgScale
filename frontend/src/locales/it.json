@@ -55,7 +55,100 @@
     "undoneWarning": "Questa azione non può essere annullata.",
     "version": "Versione",
     "errors": {
-      "unexpectedError": "Si è verificato un errore imprevisto"
+      "unexpectedError": "Si è verificato un errore imprevisto",
+      "clipboardFailed": "Impossibile copiare negli appunti"
+    }
+  },
+  "ssh": {
+    "manualPair": {
+      "title": "Connessione rapida",
+      "quickConnectButton": "Connessione rapida",
+      "advancedSetupLabel": "Configurazione avanzata (distribuzione con password / aggiunta manuale)",
+      "intro": "Aggiungi un host remoto incollando una chiave in ~/.ssh/authorized_keys. Nessuna password richiesta.",
+      "hostLabel": "Host",
+      "userLabel": "Nome utente",
+      "portLabel": "Porta",
+      "preparing": "Preparazione della chiave...",
+      "continue": "Continua",
+      "pasteIntro": "Incolla questa chiave pubblica in ~/.ssh/authorized_keys su {{user}}@{{host}}, poi fai clic su Testa connessione.",
+      "publicKey": "Chiave pubblica",
+      "step1": "Accedi via SSH a {{target}} con un metodo che già utilizzi.",
+      "step2": "Esegui questo comando (aggiunge la chiave in modo sicuro):",
+      "step3": "Fai clic su Testa connessione qui sotto.",
+      "testConnection": "Testa connessione",
+      "verifying": "Connessione a {{target}} in corso...",
+      "connectedTitle": "Connesso!",
+      "connected": "BorgScale ora può raggiungere questo host.",
+      "connectedWithVersion": "BorgScale ha trovato Borg {{version}} sull'host remoto.",
+      "successToast": "Connessione SSH salvata",
+      "failedTitle": "Impossibile connettersi",
+      "failedGeneric": "Verifica fallita. Controlla i passaggi qui sopra e riprova.",
+      "rawErrorToggle": "Mostra l'errore grezzo di SSH",
+      "retryTest": "Riprova il test",
+      "copiedKey": "Chiave pubblica copiata",
+      "copiedCommand": "Comando copiato",
+      "initFailed": "Impossibile preparare una chiave — riprova"
+    }
+  },
+  "firstRun": {
+    "title": "Configuriamo il tuo primo backup",
+    "subtitle": "Scegli da dove iniziare. Potrai sempre cambiare più avanti.",
+    "tile": {
+      "new": {
+        "title": "Parti da zero",
+        "desc": "Crea un repository Borg completamente nuovo su questo server o su un host remoto.",
+        "cta": "Crea nuovo"
+      },
+      "discoverLocal": {
+        "title": "Trova backup esistenti su questo server",
+        "desc": "Analizza le cartelle locali alla ricerca di repository Borg che possiedi già.",
+        "cta": "Analizza questo server"
+      },
+      "discoverRemote": {
+        "title": "Trova backup su un altro server",
+        "desc": "Connettiti via SSH e cerca repository Borg su un host remoto.",
+        "cta": "Analizza un host remoto"
+      }
+    },
+    "helpLink": "Ti serve aiuto? Consulta la guida introduttiva di BorgScale."
+  },
+  "discovery": {
+    "startScan": "Cerca backup",
+    "scanning": "Ricerca in corso...",
+    "importing": "Aggiunta in corso...",
+    "foundCount_one": "{{count}} backup trovato",
+    "foundCount_other": "{{count}} backup trovati",
+    "noneFound": "Nessun repository Borg trovato nelle posizioni analizzate.",
+    "partialResults": "Risultati parziali - la ricerca si è fermata al limite di tempo.",
+    "scannedRoots": "Analizzati: {{roots}}",
+    "alreadyImported": "Già aggiunto",
+    "importButton": "Aggiungi",
+    "passphraseRequired": "Passphrase",
+    "passphraseOptional": "Passphrase (facoltativa)",
+    "passphrasePlaceholder": "Inserisci la passphrase del repository",
+    "modePickerObserve": "Solo osservazione (leggi gli archivi esistenti)",
+    "modePickerFull": "Esegui backup e gestisci (consigliato)",
+    "localHeading": "Trova backup esistenti su questo server",
+    "remoteHeading": "Trova backup su un server remoto",
+    "pickConnection": "Connessione SSH:",
+    "pickConnectionPlaceholder": "Seleziona una connessione SSH",
+    "noConnections": "Nessuna connessione SSH ancora configurata.",
+    "addConnection": "Aggiungine una",
+    "guess": {
+      "encrypted": "Crittografato",
+      "unencrypted": "Non crittografato",
+      "unknown": "Crittografia: sconosciuta"
+    },
+    "importDialog": {
+      "title": "Aggiungi questo backup",
+      "nameLabel": "Nome descrittivo",
+      "modeLabel": "Come deve usare BorgScale questo repository?"
+    },
+    "importSuccess": "Aggiunto a BorgScale",
+    "importFailed": "Impossibile aggiungere - controlla la passphrase o il percorso",
+    "errors": {
+      "noConnection": "Seleziona prima una connessione SSH",
+      "scanFailed": "Ricerca fallita - riprova"
     }
   },
   "login": {
@@ -241,8 +334,10 @@
     "banner": {
       "systemStatus": "Stato del sistema",
       "allNominal": "Tutti i sistemi nominali",
-      "warnings": "{{count}} avviso{{s}}",
-      "critical": "{{count}} critico{{s}}",
+      "warnings_one": "{{count}} avviso",
+      "warnings_other": "{{count}} avvisi",
+      "critical_one": "{{count}} critico",
+      "critical_other": "{{count}} critici",
       "warnChip": "{{count}} avv.",
       "okChip": "{{count}} ok",
       "stats": {
@@ -413,6 +508,20 @@
       "compactFailed": "Compattazione fallita",
       "completed": "Manutenzione completata"
     },
+    "table": {
+      "status": "Stato",
+      "jobName": "Nome Job",
+      "repository": "Repository",
+      "schedule": "Pianificazione",
+      "lastRun": "Ultima Esecuzione",
+      "nextRun": "Prossima Esecuzione",
+      "enabled": "Abilitato",
+      "runNow": "Esegui Ora",
+      "edit": "Modifica",
+      "duplicate": "Duplica",
+      "delete": "Elimina",
+      "never": "Mai"
+    },
     "card": {
       "stats": {
         "schedule": "Schedule",
@@ -455,20 +564,6 @@
       "badge": {
         "healthCheck": "Health Check"
       }
-    },
-    "table": {
-      "status": "Stato",
-      "jobName": "Nome Job",
-      "repository": "Repository",
-      "schedule": "Pianificazione",
-      "lastRun": "Ultima Esecuzione",
-      "nextRun": "Prossima Esecuzione",
-      "enabled": "Abilitato",
-      "runNow": "Esegui Ora",
-      "edit": "Modifica",
-      "duplicate": "Duplica",
-      "delete": "Elimina",
-      "never": "Mai"
     },
     "toasts": {
       "jobCreated": "Job pianificato creato con successo",
@@ -1908,7 +2003,8 @@
     "keepQuarterly": "Mantieni Trimestrali",
     "keepQuarterlyHint": "Backup trimestrali da mantenere (0 = disabilitato)",
     "keepYearly": "Mantieni Annuali",
-    "keepYearlyHint": "Backup annuali da mantenere"
+    "keepYearlyHint": "Backup annuali da mantenere",
+    "suffix": "snapshot"
   },
   "compressionSettings": {
     "title": "Impostazioni Compressione",
@@ -1941,7 +2037,9 @@
   "archiveNameTemplate": {
     "label": "Template Nome Archivio",
     "hint": "Personalizza la denominazione dell'archivio. Segnaposto disponibili: {job_name}, {now}, {date}, {time}, {timestamp}",
-    "preview": "Anteprima:"
+    "preview": "Anteprima:",
+    "advancedLabel": "Personalizza la denominazione degli archivi (avanzato)",
+    "previewIntro": "I file verranno denominati:"
   },
   "remoteMachineCard": {
     "status": {
@@ -2116,6 +2214,30 @@
     "borgUiServer": "Server BorgScale",
     "remoteClient": "Client Remoto",
     "noSshConnections": "Nessuna connessione SSH configurata. Configura prima le connessioni SSH nella pagina Chiavi SSH.",
+    "advanced": {
+      "label": "Advanced settings",
+      "openHint": "Click to see less-common options"
+    },
+    "backup": {
+      "compression": {
+        "balanced": {
+          "title": "Balanced (recommended)",
+          "desc": "Fast, modest space savings."
+        },
+        "smaller": {
+          "title": "Smaller files",
+          "desc": "Slower but stores more history per gigabyte."
+        },
+        "none": {
+          "title": "No compression",
+          "desc": "Maximum speed, more disk usage."
+        }
+      },
+      "advanced": {
+        "compression": "Advanced compression settings",
+        "power": "Power-user settings"
+      }
+    },
     "backupFlowPreview": {
       "localToLocal": "Backup di dati locali su repository locale",
       "localToRemote": "Backup di dati locali su repository remoto",
@@ -2385,30 +2507,6 @@
       "scripts": {
         "scheduleLevelNote": "A livello di pianificazione: viene eseguito una volta per pianificazione. A livello di repository: viene eseguito per ogni repository.",
         "selectRepoFirst": "Seleziona almeno un repository nel Passaggio 1 per configurare gli script."
-      }
-    },
-    "advanced": {
-      "label": "Advanced settings",
-      "openHint": "Click to see less-common options"
-    },
-    "backup": {
-      "compression": {
-        "balanced": {
-          "title": "Balanced (recommended)",
-          "desc": "Fast, modest space savings."
-        },
-        "smaller": {
-          "title": "Smaller files",
-          "desc": "Slower but stores more history per gigabyte."
-        },
-        "none": {
-          "title": "No compression",
-          "desc": "Maximum speed, more disk usage."
-        }
-      },
-      "advanced": {
-        "compression": "Advanced compression settings",
-        "power": "Power-user settings"
       }
     }
   },
@@ -2743,7 +2841,10 @@
     }
   },
   "cronExpressionInput": {
-    "label": "Pianificazione"
+    "label": "Pianificazione",
+    "advancedLabel": "Pianificazione personalizzata (sintassi cron)",
+    "nextRuns": "Prossime esecuzioni",
+    "description": "{{description}}"
   },
   "pathSelectorField": {
     "browseFilesystem": "Sfoglia filesystem",
@@ -2947,95 +3048,102 @@
         "passkeyNotFound": "Passkey non trovata"
       },
       "repo": {
-        "repositoryNotFound": "Repository non trovato",
-        "repositoryNameExists": "Nome repository già esistente",
-        "repositoryPathExists": "Percorso repository già esistente",
-        "repositoryDirNotExist": "La directory del repository non esiste: {{path}}",
-        "notValidBorgRepository": "Non è un repository Borg valido: {{path}}",
-        "parentDirectoryNotWritable": "La directory padre non è scrivibile: {{path}}. Assicurati che la directory esista con i permessi corretti.",
-        "permissionDeniedCreateDirectory": "Permesso negato: impossibile creare la directory in '{{path}}'. Per archiviare repository sulla tua macchina host, usa percorsi che iniziano con '/local/'.",
-        "permissionDeniedCreateParentDirectory": "Permesso negato: impossibile creare la directory padre '{{path}}'. Assicurati che la directory esista sulla tua macchina host con i permessi corretti.",
-        "encryptedPassphraseRequired": "La passphrase è richiesta per la modalità di crittografia '{{mode}}'",
-        "encryptedPassphraseIncorrect": "Il repository è crittografato ma la passphrase non è corretta o mancante. Fornisci la passphrase corretta.",
-        "encryptionKeyfileNotRequired": "Il repository usa la crittografia '{{mode}}', che non richiede un file chiave. Il caricamento del file chiave è necessario solo per le modalità di crittografia 'keyfile' o 'keyfile-blake2'.",
         "adminAccessRequired": "Accesso amministratore richiesto",
-        "sshConnectionNotFound": "Connessione SSH con ID {{id}} non trovata",
         "atLeastOneSourceDirRequired": "È richiesta almeno una directory sorgente per i repository in modalità completa",
-        "keyfileEmpty": "Il file chiave è vuoto",
-        "repoHasNoKeyfile": "Questo repository non ha un file chiave",
-        "cannotSwitchToFullModeNoSourceDirs": "Impossibile passare alla modalità completa: è richiesta almeno una directory sorgente",
-        "cannotDeleteRepoWithArchives": "Impossibile eliminare il repository con archivi esistenti. Elimina prima tutti gli archivi.",
-        "checkAlreadyRunning": "Un'operazione di controllo è già in esecuzione per questo repository",
-        "compactAlreadyRunning": "Un'operazione di compattazione è già in esecuzione per questo repository",
         "breakLockTimeout": "Timeout durante il tentativo di rompere il blocco",
+        "cannotDeleteRepoWithArchives": "Impossibile eliminare il repository con archivi esistenti. Elimina prima tutti gli archivi.",
+        "cannotSwitchToFullModeNoSourceDirs": "Impossibile passare alla modalità completa: è richiesta almeno una directory sorgente",
+        "checkAlreadyRunning": "Un'operazione di controllo è già in esecuzione per questo repository",
         "checkJobNotFound": "Job di controllo non trovato",
+        "compactAlreadyRunning": "Un'operazione di compattazione è già in esecuzione per questo repository",
         "compactJobNotFound": "Job di compattazione non trovato",
-        "sshUrlWithoutConnectionId": "Il percorso sembra essere un URL SSH ma non è stato fornito connection_id. Seleziona una connessione SSH.",
-        "failedToRetrieveRepositories": "Impossibile recuperare i repository",
-        "failedToCreateParentDirectory": "Impossibile creare la directory padre",
-        "failedToInitializeRepository": "Impossibile inizializzare il repository",
-        "failedToCreateRepository": "Impossibile creare il repository",
-        "failedToVerifyRepository": "Impossibile verificare il repository",
-        "failedToImportRepository": "Impossibile importare il repository",
-        "failedToUploadKeyfile": "Impossibile caricare il file chiave",
-        "failedToExportKeyfile": "Impossibile esportare il file chiave",
-        "failedToRetrieveRepository": "Impossibile recuperare il repository",
-        "failedToUpdateRepository": "Impossibile aggiornare il repository",
-        "failedToDeleteRepository": "Impossibile eliminare il repository",
-        "failedToStartCheck": "Impossibile avviare il controllo",
-        "failedToStartCompact": "Impossibile avviare la compattazione",
-        "pruneAlreadyRunning": "Un'operazione di pulizia è già in esecuzione per questo repository",
-        "failedToStartPrune": "Impossibile avviare la pulizia",
-        "failedToGetStatistics": "Impossibile ottenere le statistiche del repository",
-        "failedToListArchives": "Impossibile elencare gli archivi",
-        "failedToGetRepositoryInfo": "Impossibile ottenere le informazioni del repository",
-        "failedToBreakLock": "Impossibile rompere il blocco",
-        "failedToGetArchiveInfo": "Impossibile ottenere le informazioni dell'archivio",
-        "failedToListArchiveFiles": "Impossibile elencare i file dell'archivio",
-        "failedToGetJobStatus": "Impossibile ottenere lo stato del job",
-        "failedToGetCheckJobs": "Impossibile ottenere i job di controllo",
-        "failedToGetCompactJobs": "Impossibile ottenere i job di compattazione",
-        "failedToGetRunningJobs": "Impossibile ottenere i job in esecuzione",
-        "invalidCronExpression": "Espressione cron non valida",
-        "failedToUpdateCheckSchedule": "Impossibile aggiornare la pianificazione del controllo",
-        "failedToGetCheckSchedule": "Impossibile ottenere la pianificazione del controllo",
+        "encryptedPassphraseIncorrect": "Il repository è crittografato ma la passphrase non è corretta o mancante. Fornisci la passphrase corretta.",
+        "encryptedPassphraseRequired": "La passphrase è richiesta per la modalità di crittografia '{{mode}}'",
+        "encryptionKeyfileNotRequired": "Il repository usa la crittografia '{{mode}}', che non richiede un file chiave. Il caricamento del file chiave è necessario solo per le modalità di crittografia 'keyfile' o 'keyfile-blake2'.",
+        "failedExportKeyfile": "Impossibile esportare il file chiave",
+        "failedParseArchiveInfo": "Impossibile analizzare le informazioni dell'archivio",
         "failedParseArchiveList": "Impossibile analizzare l'elenco degli archivi",
         "failedParseRepositoryInfo": "Impossibile analizzare le informazioni del repository",
-        "failedParseArchiveInfo": "Impossibile analizzare le informazioni dell'archivio",
-        "failedExportKeyfile": "Impossibile esportare il file chiave"
+        "failedToBreakLock": "Impossibile rompere il blocco",
+        "failedToCreateParentDirectory": "Impossibile creare la directory padre",
+        "failedToCreateRepository": "Impossibile creare il repository",
+        "failedToDeleteRepository": "Impossibile eliminare il repository",
+        "failedToExportKeyfile": "Impossibile esportare il file chiave",
+        "failedToGetArchiveInfo": "Impossibile ottenere le informazioni dell'archivio",
+        "failedToGetCheckJobs": "Impossibile ottenere i job di controllo",
+        "failedToGetCheckSchedule": "Impossibile ottenere la pianificazione del controllo",
+        "failedToGetCompactJobs": "Impossibile ottenere i job di compattazione",
+        "failedToGetJobStatus": "Impossibile ottenere lo stato del job",
+        "failedToGetRepositoryInfo": "Impossibile ottenere le informazioni del repository",
+        "failedToGetRunningJobs": "Impossibile ottenere i job in esecuzione",
+        "failedToGetStatistics": "Impossibile ottenere le statistiche del repository",
+        "failedToImportRepository": "Impossibile importare il repository",
+        "failedToInitializeRepository": "Impossibile inizializzare il repository",
+        "failedToListArchiveFiles": "Impossibile elencare i file dell'archivio",
+        "failedToListArchives": "Impossibile elencare gli archivi",
+        "failedToRetrieveRepositories": "Impossibile recuperare i repository",
+        "failedToRetrieveRepository": "Impossibile recuperare il repository",
+        "failedToStartCheck": "Impossibile avviare il controllo",
+        "failedToStartCompact": "Impossibile avviare la compattazione",
+        "failedToStartPrune": "Impossibile avviare la pulizia",
+        "failedToUpdateCheckSchedule": "Impossibile aggiornare la pianificazione del controllo",
+        "failedToUpdateRepository": "Impossibile aggiornare il repository",
+        "failedToUploadKeyfile": "Impossibile caricare il file chiave",
+        "failedToVerifyRepository": "Impossibile verificare il repository",
+        "invalidCronExpression": "Espressione cron non valida",
+        "keyfileEmpty": "Il file chiave è vuoto",
+        "notValidBorgRepository": "Non è un repository Borg valido: {{path}}",
+        "parentDirectoryNotWritable": "La directory padre non è scrivibile: {{path}}. Assicurati che la directory esista con i permessi corretti.",
+        "parentIsFile": "{{path}} è un file, quindi non è possibile crearvi nulla dentro. Scegli un'altra posizione.",
+        "pathIsFile": "{{path}} è un file, non una cartella. Scegli una cartella per il repository.",
+        "pathRequired": "Inserisci un percorso per il repository",
+        "permissionDeniedCreateDirectory": "Permesso negato: impossibile creare la directory in '{{path}}'. Per archiviare repository sulla tua macchina host, usa percorsi che iniziano con '/local/'.",
+        "permissionDeniedCreateParentDirectory": "Permesso negato: impossibile creare la directory padre '{{path}}'. Assicurati che la directory esista sulla tua macchina host con i permessi corretti.",
+        "pruneAlreadyRunning": "Un'operazione di pulizia è già in esecuzione per questo repository",
+        "repoHasNoKeyfile": "Questo repository non ha un file chiave",
+        "repositoryDirNotExist": "La directory del repository non esiste: {{path}}",
+        "repositoryNameExists": "Nome repository già esistente",
+        "repositoryNotFound": "Repository non trovato",
+        "repositoryPathExists": "Percorso repository già esistente",
+        "sshConnectionNotFound": "Connessione SSH con ID {{id}} non trovata",
+        "sshUrlWithoutConnectionId": "Il percorso sembra essere un URL SSH ma non è stato fornito connection_id. Seleziona una connessione SSH."
       },
       "backup": {
         "backupJobNotFound": "Job di backup non trovato",
         "canOnlyCancelRunningJobs": "Puoi annullare solo job in esecuzione",
         "cancelledByUser": "Backup annullato dall'utente",
         "cancelledByUserProcessNotFound": "Backup annullato dall'utente (processo non trovato, potrebbe essere già completato)",
-        "noLogsAvailable": "Nessun log disponibile per questo backup (i backup riusciti non salvano i log)",
-        "logFileNotFound": "File di log non trovato: {{filename}}",
+        "cannotDownloadLogsForRunningBackup": "Impossibile scaricare i log per un backup in esecuzione",
+        "failedCancelBackup": "Impossibile annullare il backup",
         "failedGetBackupJobs": "Impossibile ottenere i job di backup",
         "failedGetBackupStatus": "Impossibile ottenere lo stato del backup",
-        "failedCancelBackup": "Impossibile annullare il backup",
-        "cannotDownloadLogsForRunningBackup": "Impossibile scaricare i log per un backup in esecuzione"
+        "logFileNotFound": "File di log non trovato: {{filename}}",
+        "noLogsAvailable": "Nessun log disponibile per questo backup (i backup riusciti non salvano i log)",
+        "operatorAccessRequired": "È richiesto l'accesso come operatore o amministratore"
       },
       "restore": {
+        "canOnlyCancelRunningJobs": "Puoi annullare solo job in esecuzione",
         "cancelledByUser": "Ripristino annullato dall'utente",
         "cancelledByUserProcessNotFound": "Ripristino annullato dall'utente (processo non trovato, potrebbe essere già completato)",
-        "canOnlyCancelRunningJobs": "Puoi annullare solo job in esecuzione",
         "failedCancelRestore": "Impossibile annullare il ripristino",
+        "failedFetchArchiveContents": "Impossibile recuperare il contenuto dell'archivio",
+        "failedFetchArchives": "Impossibile recuperare gli archivi",
         "failedFetchRepositories": "Impossibile recuperare i repository",
         "failedGetRestoreJobs": "Impossibile ottenere i job di ripristino",
         "failedGetRestoreStatus": "Impossibile ottenere lo stato del ripristino",
         "failedPreviewRestore": "Impossibile visualizzare l'anteprima del ripristino",
+        "failedStartRestore": "Impossibile avviare il ripristino",
+        "operatorAccessRequired": "È richiesto l'accesso come operatore o amministratore",
         "repositoryNotFound": "Repository non trovato",
         "restoreJobNotFound": "Job di ripristino non trovato",
-        "sshToSshNotSupported": "Il ripristino da repository SSH a destinazione SSH non è supportato",
-        "failedStartRestore": "Impossibile avviare il ripristino",
-        "failedFetchArchives": "Impossibile recuperare gli archivi",
-        "failedFetchArchiveContents": "Impossibile recuperare il contenuto dell'archivio"
+        "sshToSshNotSupported": "Il ripristino da repository SSH a destinazione SSH non è supportato"
       },
       "schedule": {
         "adminAccessRequired": "Accesso amministratore richiesto",
         "operatorAccessRequired": "È richiesto l'accesso come operatore o amministratore",
         "invalidCronExpression": "Espressione cron non valida",
+        "invalidCron": "La pianificazione non è valida. Usa il selettore dei preset oppure controlla la sintassi personalizzata.",
+        "previewCountOutOfRange": "Il numero di anteprime deve essere compreso tra 1 e 12.",
         "jobNameExists": "Nome job già esistente",
         "noRepositoriesConfigured": "Il job pianificato non ha repository configurati",
         "observabilityOnlyRepo": "Impossibile pianificare backup per repository di sola osservabilità",
@@ -3166,6 +3274,7 @@
         "folderAlreadyExists": "La cartella '{{name}}' esiste già",
         "invalidConnectionType": "Tipo di connessione non valido",
         "invalidFolderName": "Nome cartella non valido",
+        "operatorAccessRequired": "È richiesto l'accesso come operatore o amministratore",
         "pathNotDirectory": "Il percorso non è una directory: {{path}}",
         "pathNotFound": "Percorso non trovato: {{path}}",
         "permissionDenied": "Permesso negato: {{path}}",
@@ -3338,6 +3447,18 @@
       "repo": {
         "repositoryLocked": "Il repository è bloccato da un altro processo o ha un blocco obsoleto"
       }
+    },
+    "ssh": {
+      "hint": {
+        "publicKeyNotAuthorized": "L'host remoto ha rifiutato la chiave. Assicurati di aver aggiunto la chiave pubblica a ~/.ssh/authorized_keys per l'utente corretto.",
+        "borgNotInstalled": "Connessione riuscita, ma Borg non è installato sull'host remoto. Installa prima borgbackup su quell'host.",
+        "connectionRefused": "Nessun servizio è in ascolto su quella porta. Controlla host, porta e firewall.",
+        "timeout": "La connessione è scaduta. Controlla il nome host e il firewall.",
+        "hostKeyFailed": "L'identità dell'host remoto è cambiata. Rimuovila manualmente da known_hosts e riprova.",
+        "noRoute": "Nessuna rotta di rete verso l'host. Controlla VPN/Tailscale.",
+        "dnsFailed": "Il DNS non è riuscito a risolvere il nome host.",
+        "unknownFailure": "Connessione fallita per un motivo sconosciuto. Vedi l'errore grezzo qui sotto."
+      }
     }
   },
   "announcements": {
@@ -3353,5 +3474,97 @@
       "migration_notice": "Migration notice",
       "custom_announcement": "Announcement"
     }
+  },
+  "guidedSetup": {
+    "title": "Configura i backup",
+    "subtitle": "Sarai operativo in meno di un minuto.",
+    "step": {
+      "destination": {
+        "title": "Dove salvare i backup?",
+        "subtitle": "Scegli un posto sicuro in cui conservare i tuoi backup."
+      },
+      "sources": {
+        "title": "Cosa vuoi salvare?",
+        "subtitle": "Aggiungi le cartelle che vuoi proteggere."
+      },
+      "encryption": {
+        "title": "Metti tutto al sicuro",
+        "subtitle": "Scegli come BorgScale protegge i tuoi dati."
+      },
+      "schedule": {
+        "title": "Ogni quanto?",
+        "subtitle": "BorgScale lavorerà in background senza disturbarti."
+      }
+    },
+    "stepBadge": "Passaggio {{current}} di {{total}}",
+    "destination": {
+      "localTile": {
+        "title": "Su questo server",
+        "desc": "Conserva i backup sulla stessa macchina su cui gira BorgScale."
+      },
+      "sshTile": {
+        "title": "Su un'altra macchina",
+        "desc": "Invia i backup a un server remoto tramite SSH."
+      },
+      "pathLabel": "Dove conservare i backup",
+      "pathHelper": "Creeremo questa cartella se non esiste.",
+      "pathStatusOk": "Tutto a posto — cartella vuota, pronta per borg init.",
+      "pathStatusExisting": "Questa cartella contiene già un repository Borg.",
+      "pathStatusNotEmpty": "Questa cartella non è vuota. Scegli un percorso nuovo.",
+      "pathStatusMissing": "La cartella non esiste ancora — BorgScale la creerà.",
+      "sshConnection": "Scegli la macchina remota",
+      "manageSshLink": "Configura prima SSH"
+    },
+    "sources": {
+      "addFolder": "Aggiungi cartella",
+      "suggestHome": "Usa la mia cartella home",
+      "noneAdded": "Nessuna cartella aggiunta. Aggiungine almeno una per continuare.",
+      "removeFolder": "Rimuovi"
+    },
+    "encryption": {
+      "tileEncrypted": {
+        "title": "Crittografato (consigliato)",
+        "desc": "Protezione forte con una passphrase che conosci solo tu."
+      },
+      "tileNone": {
+        "title": "Nessuna crittografia",
+        "desc": "Più veloce e semplice — usala solo su storage di cui ti fidi completamente."
+      },
+      "passphrase": "Passphrase",
+      "confirm": "Conferma passphrase",
+      "passphraseMismatch": "Le passphrase non coincidono.",
+      "passphraseShort": "Usa almeno 12 caratteri per la passphrase.",
+      "lossWarning": "Se perdi questa passphrase, i tuoi backup non potranno più essere aperti. Non esiste alcun recupero.",
+      "savedConfirm": "Ho salvato questa passphrase in un posto sicuro."
+    },
+    "schedule": {
+      "presetDaily": {
+        "title": "Ogni notte alle 3:00",
+        "desc": "È la scelta della maggior parte delle persone."
+      },
+      "presetWeekly": {
+        "title": "Ogni domenica alle 3:00",
+        "desc": "Per macchine che non restano accese tutte le notti."
+      },
+      "presetHourly": {
+        "title": "Ogni ora",
+        "desc": "Per sistemi che cambiano spesso."
+      },
+      "nextRunsLabel": "I prossimi backup verranno eseguiti il:",
+      "autoStartLabel": "Esegui subito il mio primo backup",
+      "autoStartHelper": "Consigliato — conferma che tutto sia configurato correttamente.",
+      "advancedCron": "Pianificazione personalizzata (sintassi cron)"
+    },
+    "confirm": {
+      "summary": "Tutto pronto",
+      "submitButton": "Avvia il mio primo backup",
+      "submitting": "Configurazione in corso…",
+      "successToast": "Backup configurati. Il tuo primo backup è in coda.",
+      "partialToast": "Repository e pianificazione salvati — il primo backup non è partito. Puoi eseguirlo manualmente dalla dashboard.",
+      "failureToast": "Configurazione fallita. {{error}}"
+    },
+    "back": "Indietro",
+    "continue": "Continua",
+    "skip": "Salta"
   }
 }

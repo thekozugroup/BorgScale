@@ -155,7 +155,9 @@ export default function CommandPreview({
     return (
       <div className="border border-border rounded-lg p-4 mb-4">
         <p className="text-sm font-semibold mb-4">
-          {mode === 'create' ? t('commandPreview.howBackupWillWork') : t('commandPreview.howBackupWorks')}
+          {mode === 'create'
+            ? t('commandPreview.howBackupWillWork')
+            : t('commandPreview.howBackupWorks')}
         </p>
 
         {mode === 'create' && (
@@ -169,10 +171,16 @@ export default function CommandPreview({
           <StepLabel>
             {mode === 'create'
               ? t('commandPreview.step2MountRemote', {
-                  type: mountPaths.length > 1 ? t('commandPreview.mountDirectories') : t('commandPreview.mountDirectory'),
+                  type:
+                    mountPaths.length > 1
+                      ? t('commandPreview.mountDirectories')
+                      : t('commandPreview.mountDirectory'),
                 })
               : t('commandPreview.step1MountRemote', {
-                  type: mountPaths.length > 1 ? t('commandPreview.mountDirectories') : t('commandPreview.mountDirectory'),
+                  type:
+                    mountPaths.length > 1
+                      ? t('commandPreview.mountDirectories')
+                      : t('commandPreview.mountDirectory'),
                 })}
           </StepLabel>
           <CommandBox>{sshfsMountCommands.join('\n')}</CommandBox>
@@ -181,15 +189,21 @@ export default function CommandPreview({
 
         <div className="mb-4">
           <StepLabel>
-            {mode === 'create' ? t('commandPreview.step3RunBackup') : t('commandPreview.step2RunBackup')}
+            {mode === 'create'
+              ? t('commandPreview.step3RunBackup')
+              : t('commandPreview.step2RunBackup')}
           </StepLabel>
           <CommandBox>{createCommand}</CommandBox>
-          <p className="text-xs text-muted-foreground mt-1">{t('commandPreview.archivesPreserve')}</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {t('commandPreview.archivesPreserve')}
+          </p>
         </div>
 
         <div>
           <StepLabel>
-            {mode === 'create' ? t('commandPreview.step4Cleanup') : t('commandPreview.step3Cleanup')}
+            {mode === 'create'
+              ? t('commandPreview.step4Cleanup')
+              : t('commandPreview.step3Cleanup')}
           </StepLabel>
           <CommandBox>fusermount -u /tmp/sshfs_mount/</CommandBox>
           <p className="text-xs text-muted-foreground mt-1">{t('commandPreview.cleanupDesc')}</p>
@@ -201,25 +215,33 @@ export default function CommandPreview({
   return (
     <div className="border border-border rounded-lg p-4 mb-4">
       <p className="text-sm font-semibold mb-4">
-        {mode === 'create' ? t('commandPreview.howBackupWillWork') : t('commandPreview.howBackupWorks')}
+        {mode === 'create'
+          ? t('commandPreview.howBackupWillWork')
+          : t('commandPreview.howBackupWorks')}
       </p>
 
       {mode === 'create' && (
         <div className="mb-4">
           <StepLabel>{t('commandPreview.step1InitRepo')}</StepLabel>
           <CommandBox>{initCommand}</CommandBox>
-          <p className="text-xs text-muted-foreground mt-1">{t('commandPreview.initRepositoryDesc')}</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {t('commandPreview.initRepositoryDesc')}
+          </p>
         </div>
       )}
 
       {repositoryMode === 'full' && (
         <div>
           <StepLabel>
-            {mode === 'create' ? t('commandPreview.step2RunBackup') : t('commandPreview.stepRunBackup')}
+            {mode === 'create'
+              ? t('commandPreview.step2RunBackup')
+              : t('commandPreview.stepRunBackup')}
           </StepLabel>
           <CommandBox>{createCommand}</CommandBox>
           <p className="text-xs text-muted-foreground mt-1">
-            {mode === 'create' ? t('commandPreview.backupSourceDirs') : t('commandPreview.futureBackups')}
+            {mode === 'create'
+              ? t('commandPreview.backupSourceDirs')
+              : t('commandPreview.futureBackups')}
           </p>
         </div>
       )}

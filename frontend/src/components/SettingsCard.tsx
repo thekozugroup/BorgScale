@@ -18,9 +18,7 @@ interface SettingsCardProps {
 export default function SettingsCard({ children, className, contentClassName }: SettingsCardProps) {
   return (
     <Card className={cn('rounded-xl', className)}>
-      <CardContent className={cn('p-4 md:p-6', contentClassName)}>
-        {children}
-      </CardContent>
+      <CardContent className={cn('p-4 md:p-6', contentClassName)}>{children}</CardContent>
     </Card>
   )
 }

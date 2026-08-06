@@ -458,7 +458,11 @@ const Schedule: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <div role="tablist" aria-label={t('schedule.title')} className="flex border-b border-border mb-6">
+      <div
+        role="tablist"
+        aria-label={t('schedule.title')}
+        className="flex border-b border-border mb-6"
+      >
         <button
           type="button"
           role="tab"

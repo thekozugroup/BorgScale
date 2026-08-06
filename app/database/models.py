@@ -8,6 +8,7 @@ from sqlalchemy import (
     ForeignKey,
     Float,
     BigInteger,
+    Index,
     Table,
     UniqueConstraint,
     JSON,
@@ -323,6 +324,17 @@ class Configuration(Base):
 class BackupJob(Base):
     __tablename__ = "backup_jobs"
 
+    # The dashboard, activity feed and metrics endpoints are all polled on short
+    # intervals and every one of them filters or sorts this table on the columns
+    # below. Keep in sync with migration 101 for databases created before it.
+    __table_args__ = (
+        Index("ix_backup_jobs_started_at", "started_at"),
+        Index("ix_backup_jobs_status_started_at", "status", "started_at"),
+        Index("ix_backup_jobs_repository_status", "repository", "status"),
+        Index("ix_backup_jobs_repository_created_at", "repository", "created_at"),
+        Index("ix_backup_jobs_repository_completed_at", "repository", "completed_at"),
+    )
+
     id = Column(Integer, primary_key=True, index=True)
     repository = Column(String)  # Repository path/name
     status = Column(
@@ -588,6 +600,16 @@ class CompactJob(Base):
 
 class PruneJob(Base):
     __tablename__ = "prune_jobs"
+
+    # Same polling pressure as backup_jobs: the repository list checks for a
+    # running prune per repository, the activity feed sorts by started_at, and
+    # the backup detail view resolves a running prune by path.
+    __table_args__ = (
+        Index("ix_prune_jobs_started_at", "started_at"),
+        Index("ix_prune_jobs_status_started_at", "status", "started_at"),
+        Index("ix_prune_jobs_repository_id_status", "repository_id", "status"),
+        Index("ix_prune_jobs_repository_path_status", "repository_path", "status"),
+    )
 
     id = Column(Integer, primary_key=True, index=True)
     repository_id = Column(Integer, ForeignKey("repositories.id"), nullable=False)

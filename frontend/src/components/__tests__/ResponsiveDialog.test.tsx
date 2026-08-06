@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { screen, renderWithProviders } from '../../test/test-utils'
+import { screen, renderWithProviders, userEvent, waitFor } from '../../test/test-utils'
 import ResponsiveDialog from '../ResponsiveDialog'
 
 // Helper: mock window.matchMedia for mobile vs desktop
@@ -89,6 +89,54 @@ describe('ResponsiveDialog', () => {
         </ResponsiveDialog>
       )
       expect(screen.queryByText('hidden')).not.toBeInTheDocument()
+    })
+
+    it('announces the bottom sheet as a dialog', () => {
+      renderWithProviders(
+        <ResponsiveDialog open={true} onClose={onClose}>
+          <div>content</div>
+        </ResponsiveDialog>
+      )
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+    })
+
+    it('moves focus into the sheet when it opens', async () => {
+      renderWithProviders(
+        <ResponsiveDialog open={true} onClose={onClose}>
+          <button>first action</button>
+        </ResponsiveDialog>
+      )
+      const dialog = screen.getByRole('dialog')
+      await waitFor(() => {
+        expect(dialog.contains(document.activeElement)).toBe(true)
+      })
+    })
+
+    it('keeps Tab focus trapped inside the sheet', async () => {
+      const user = userEvent.setup()
+      renderWithProviders(
+        <ResponsiveDialog open={true} onClose={onClose}>
+          <button>first action</button>
+          <button>second action</button>
+        </ResponsiveDialog>
+      )
+      const dialog = screen.getByRole('dialog')
+      // Cycle past every tabbable element — focus must never escape the dialog
+      for (let i = 0; i < 5; i++) {
+        await user.tab()
+        expect(dialog.contains(document.activeElement)).toBe(true)
+      }
+    })
+
+    it('closes on Escape and reports the escapeKeyDown reason', async () => {
+      const user = userEvent.setup()
+      renderWithProviders(
+        <ResponsiveDialog open={true} onClose={onClose}>
+          <div>content</div>
+        </ResponsiveDialog>
+      )
+      await user.keyboard('{Escape}')
+      expect(onClose).toHaveBeenCalledWith({}, 'escapeKeyDown')
     })
   })
 

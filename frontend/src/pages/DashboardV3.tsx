@@ -46,6 +46,7 @@ import {
 import { formatDistanceToNow, differenceInDays, startOfDay, addDays, format } from 'date-fns'
 import { useAnalytics } from '../hooks/useAnalytics'
 import { dashboardAPI } from '../services/api'
+import StatusBadge from '../components/StatusBadge'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -147,22 +148,22 @@ function dimSince(dt: string | null, t: (key: string) => string): string {
 
 const STATUS_CLASSES = {
   healthy: {
-    badge: 'bg-primary/10 text-primary border-primary/20',
-    dot: 'bg-primary',
-    border: 'border-primary/20',
-    card: 'bg-primary/5',
+    badge: 'bg-success-subtle text-success border-success/25',
+    dot: 'bg-success',
+    border: 'border-success/25',
+    card: 'bg-success-subtle',
   },
   warning: {
-    badge: 'bg-secondary text-secondary-foreground border-border',
-    dot: 'bg-secondary-foreground',
-    border: 'border-border',
-    card: 'bg-secondary/30',
+    badge: 'bg-warning-subtle text-warning border-warning/25',
+    dot: 'bg-warning',
+    border: 'border-warning/25',
+    card: 'bg-warning-subtle',
   },
   critical: {
-    badge: 'bg-destructive/10 text-destructive border-destructive/20',
+    badge: 'bg-destructive-subtle text-destructive border-destructive/25',
     dot: 'bg-destructive',
-    border: 'border-destructive/20',
-    card: 'bg-destructive/5',
+    border: 'border-destructive/25',
+    card: 'bg-destructive-subtle',
   },
   unknown: {
     badge: 'bg-muted text-muted-foreground border-border',
@@ -185,8 +186,8 @@ function StatusDot({ status }: { status: 'healthy' | 'warning' | 'critical' | 'u
 }
 
 function DimIcon({ status }: { status: string }) {
-  if (status === 'healthy') return <CheckCircle2 className="h-3 w-3 text-primary" />
-  if (status === 'warning') return <AlertTriangle className="h-3 w-3 text-muted-foreground" />
+  if (status === 'healthy') return <CheckCircle2 className="h-3 w-3 text-success" />
+  if (status === 'warning') return <AlertTriangle className="h-3 w-3 text-warning" />
   if (status === 'critical') return <XCircle className="h-3 w-3 text-destructive" />
   return <MinusCircle className="h-3 w-3 text-muted-foreground" />
 }
@@ -399,63 +400,63 @@ function ActivityAreaChart({ activities }: { activities: DashboardOverview['acti
 
   return (
     <div className="text-xs">
-    <ResponsiveContainer width="100%" height={180}>
-      <AreaChart data={data} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-        <defs>
-          <linearGradient id="gradBackups" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="var(--success)" stopOpacity={0.22} />
-            <stop offset="95%" stopColor="var(--success)" stopOpacity={0} />
-          </linearGradient>
-          <linearGradient id="gradFailures" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="var(--destructive)" stopOpacity={0.2} />
-            <stop offset="95%" stopColor="var(--destructive)" stopOpacity={0} />
-          </linearGradient>
-        </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-        <XAxis
-          dataKey="date"
-          tick={{ fill: 'var(--muted-foreground)' }}
-          tickLine={false}
-          axisLine={false}
-          interval={1}
-        />
-        <YAxis
-          tick={{ fill: 'var(--muted-foreground)' }}
-          tickLine={false}
-          axisLine={false}
-          allowDecimals={false}
-        />
-        <RechartsTooltip
-          contentStyle={{
-            background: 'var(--popover)',
-            color: 'var(--popover-foreground)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius)',
-            boxShadow: '0 8px 24px oklch(0 0 0 / 12%)',
-          }}
-          itemStyle={{ color: 'var(--popover-foreground)' }}
-          labelStyle={{ color: 'var(--foreground)' }}
-        />
-        <Area
-          type="monotone"
-          dataKey="backups"
-          name={t('dashboard.activityTimeline.jobType.backup', { defaultValue: 'backups' })}
-          stroke="var(--success)"
-          strokeWidth={2}
-          fill="url(#gradBackups)"
-          dot={false}
-        />
-        <Area
-          type="monotone"
-          dataKey="failures"
-          name={t('dashboard.activityTimeline.legendFailed', { defaultValue: 'failures' })}
-          stroke="var(--destructive)"
-          strokeWidth={2}
-          fill="url(#gradFailures)"
-          dot={false}
-        />
-      </AreaChart>
-    </ResponsiveContainer>
+      <ResponsiveContainer width="100%" height={180}>
+        <AreaChart data={data} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+          <defs>
+            <linearGradient id="gradBackups" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="var(--success)" stopOpacity={0.22} />
+              <stop offset="95%" stopColor="var(--success)" stopOpacity={0} />
+            </linearGradient>
+            <linearGradient id="gradFailures" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="var(--destructive)" stopOpacity={0.2} />
+              <stop offset="95%" stopColor="var(--destructive)" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+          <XAxis
+            dataKey="date"
+            tick={{ fill: 'var(--muted-foreground)' }}
+            tickLine={false}
+            axisLine={false}
+            interval={1}
+          />
+          <YAxis
+            tick={{ fill: 'var(--muted-foreground)' }}
+            tickLine={false}
+            axisLine={false}
+            allowDecimals={false}
+          />
+          <RechartsTooltip
+            contentStyle={{
+              background: 'var(--popover)',
+              color: 'var(--popover-foreground)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              boxShadow: '0 8px 24px oklch(0 0 0 / 12%)',
+            }}
+            itemStyle={{ color: 'var(--popover-foreground)' }}
+            labelStyle={{ color: 'var(--foreground)' }}
+          />
+          <Area
+            type="monotone"
+            dataKey="backups"
+            name={t('dashboard.activityTimeline.jobType.backup', { defaultValue: 'backups' })}
+            stroke="var(--success)"
+            strokeWidth={2}
+            fill="url(#gradBackups)"
+            dot={false}
+          />
+          <Area
+            type="monotone"
+            dataKey="failures"
+            name={t('dashboard.activityTimeline.legendFailed', { defaultValue: 'failures' })}
+            stroke="var(--destructive)"
+            strokeWidth={2}
+            fill="url(#gradFailures)"
+            dot={false}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
     </div>
   )
 }
@@ -540,7 +541,7 @@ function DashboardSkeleton() {
         <Skeleton className="h-8 w-20" />
       </div>
       {/* stat tiles */}
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
         {[0, 1, 2, 3].map((i) => (
           <Card key={i}>
             <CardHeader className="pb-2">
@@ -607,7 +608,10 @@ export default function DashboardV3() {
 
   if (error || !ov)
     return (
-      <div role="alert" className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive flex items-center justify-between gap-4">
+      <div
+        role="alert"
+        className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive flex items-center justify-between gap-4"
+      >
         <span>{t('dashboard.error.unavailable')}</span>
         <Button
           size="sm"
@@ -642,10 +646,7 @@ export default function DashboardV3() {
     sysStatus === 'healthy'
       ? t('dashboard.banner.allNominal')
       : sysStatus === 'warning'
-        ? t('dashboard.banner.warnings', {
-            count: warningCount,
-            s: warningCount > 1 ? 's' : '',
-          })
+        ? t('dashboard.banner.warnings', { count: warningCount })
         : t('dashboard.banner.critical', { count: criticalCount })
 
   return (
@@ -654,16 +655,13 @@ export default function DashboardV3() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2">
           <Boxes className="h-5 w-5" />
-          <h1 className="text-lg font-semibold">{t('dashboard.pageTitle')}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('dashboard.pageTitle')}</h1>
         </div>
         <div className="flex items-center gap-3">
           {/* System status badge */}
           <Badge
             variant="outline"
-            className={cn(
-              'gap-1.5 font-mono text-xs',
-              STATUS_CLASSES[sysStatus].badge
-            )}
+            className={cn('gap-1.5 font-mono text-xs', STATUS_CLASSES[sysStatus].badge)}
           >
             <StatusDot status={sysStatus} />
             {systemStatusText}
@@ -687,7 +685,9 @@ export default function DashboardV3() {
       </div>
 
       {/* ── 4-up stat tiles ────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      {/* Four across only from xl: the 240px sidebar is permanent from sm, so at
+          md the content column is ~480px and four tiles would be unreadable. */}
+      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
         <StatCard
           title={t('dashboard.stats.repositories')}
           value={summary.total_repositories}
@@ -723,9 +723,7 @@ export default function DashboardV3() {
                 <span
                   className={cn(
                     'font-mono text-sm font-semibold',
-                    summary.failed_jobs_30d > 0
-                      ? 'text-destructive'
-                      : 'text-muted-foreground'
+                    summary.failed_jobs_30d > 0 ? 'text-destructive' : 'text-muted-foreground'
                   )}
                 >
                   {summary.failed_jobs_30d}
@@ -813,17 +811,26 @@ export default function DashboardV3() {
             </CardTitle>
             <div className="flex items-center gap-1.5">
               {criticalCount > 0 && (
-                <Badge variant="outline" className={cn('font-mono text-xs', STATUS_CLASSES.critical.badge)}>
+                <Badge
+                  variant="outline"
+                  className={cn('font-mono text-xs', STATUS_CLASSES.critical.badge)}
+                >
                   {t('dashboard.banner.critical', { count: criticalCount })}
                 </Badge>
               )}
               {warningCount > 0 && (
-                <Badge variant="outline" className={cn('font-mono text-xs', STATUS_CLASSES.warning.badge)}>
+                <Badge
+                  variant="outline"
+                  className={cn('font-mono text-xs', STATUS_CLASSES.warning.badge)}
+                >
                   {t('dashboard.banner.warnChip', { count: warningCount })}
                 </Badge>
               )}
               {healthyCount > 0 && (
-                <Badge variant="outline" className={cn('font-mono text-xs', STATUS_CLASSES.healthy.badge)}>
+                <Badge
+                  variant="outline"
+                  className={cn('font-mono text-xs', STATUS_CLASSES.healthy.badge)}
+                >
                   {t('dashboard.banner.okChip', { count: healthyCount })}
                 </Badge>
               )}
@@ -833,7 +840,9 @@ export default function DashboardV3() {
         <CardContent>
           {repos.length === 0 ? (
             <div className="py-10 text-center">
-              <p className="mb-4 text-sm text-muted-foreground">{t('dashboard.noRepositoriesShort')}</p>
+              <p className="mb-4 text-sm text-muted-foreground">
+                {t('dashboard.noRepositoriesShort')}
+              </p>
               <Button
                 size="sm"
                 variant="outline"
@@ -847,6 +856,7 @@ export default function DashboardV3() {
               {repos.map((repo) => {
                 const cardStatus = repo.health_status as 'healthy' | 'warning' | 'critical'
                 const cls = STATUS_CLASSES[cardStatus]
+                const repoHref = `/repositories?repo=${repo.id}`
 
                 return (
                   <div
@@ -859,11 +869,11 @@ export default function DashboardV3() {
                         destination: 'repositories',
                         source: 'repository_health',
                       })
-                      navigate('/repositories')
+                      navigate(repoHref)
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
-                        navigate('/repositories')
+                        navigate(repoHref)
                       }
                     }}
                     className={cn(
@@ -903,6 +913,23 @@ export default function DashboardV3() {
                       <p className="truncate text-sm font-semibold">{repo.name}</p>
                       <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-60" />
                     </div>
+
+                    {/* Warnings the payload already carries */}
+                    {repo.warnings.length > 0 && (
+                      <ul
+                        className={cn(
+                          'mb-2 space-y-0.5 text-2xs',
+                          cardStatus === 'critical' ? 'text-destructive' : 'text-warning'
+                        )}
+                      >
+                        {repo.warnings.map((warning) => (
+                          <li key={warning} className="flex items-start gap-1">
+                            <AlertTriangle className="mt-px h-3 w-3 shrink-0" aria-hidden="true" />
+                            <span className="min-w-0">{warning}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
 
                     {/* Stats */}
                     <div className="mb-2 flex items-center gap-3 font-mono text-2xs text-muted-foreground">
@@ -1010,9 +1037,15 @@ export default function DashboardV3() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="pl-6 text-xs">{t('common.status', { defaultValue: 'Status' })}</TableHead>
-                  <TableHead className="text-xs">{t('common.type', { defaultValue: 'Type' })}</TableHead>
-                  <TableHead className="text-xs">{t('common.repository', { defaultValue: 'Repository' })}</TableHead>
+                  <TableHead className="pl-6 text-xs">
+                    {t('common.status', { defaultValue: 'Status' })}
+                  </TableHead>
+                  <TableHead className="text-xs">
+                    {t('common.type', { defaultValue: 'Type' })}
+                  </TableHead>
+                  <TableHead className="text-xs">
+                    {t('common.repository', { defaultValue: 'Repository' })}
+                  </TableHead>
                   <TableHead className="text-right pr-6 text-xs">Time</TableHead>
                 </TableRow>
               </TableHeader>
@@ -1020,17 +1053,7 @@ export default function DashboardV3() {
                 {ov.activity_feed.slice(0, 10).map((a) => (
                   <TableRow key={`${a.type}-${a.id}`}>
                     <TableCell className="pl-6">
-                      <Badge
-                        variant="outline"
-                        className={cn(
-                          'font-mono text-2xs',
-                          a.status === 'failed'
-                            ? STATUS_CLASSES.critical.badge
-                            : STATUS_CLASSES.healthy.badge
-                        )}
-                      >
-                        {a.status}
-                      </Badge>
+                      <StatusBadge status={a.status} />
                     </TableCell>
                     <TableCell className="font-mono text-xs text-muted-foreground">
                       {a.type}

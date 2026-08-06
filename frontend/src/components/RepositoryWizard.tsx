@@ -663,9 +663,7 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
             />
 
             {/* Step Content */}
-            <div className="flex-1 overflow-auto pb-4">
-              {renderStepContent()}
-            </div>
+            <div className="flex-1 overflow-auto pb-4">{renderStepContent()}</div>
           </div>
 
           <DialogFooter className="px-6 py-3 border-t flex-row gap-2 shrink-0">
@@ -685,10 +683,7 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
                 {t('common.buttons.next')}
               </Button>
             ) : (
-              <Button
-                onClick={handleSubmit}
-                disabled={!canProceed() || isSubmitting}
-              >
+              <Button onClick={handleSubmit} disabled={!canProceed() || isSubmitting}>
                 {isSubmitting && <Loader2 size={16} className="animate-spin mr-1" />}
                 {finalButtonLabel()}
               </Button>

@@ -151,7 +151,9 @@ describe('ExcludePatternInput', () => {
 
     it('removes first pattern correctly', async () => {
       const user = userEvent.setup()
-      renderWithProviders(<ExcludePatternInput patterns={['*.log', '*.tmp']} onChange={mockOnChange} />)
+      renderWithProviders(
+        <ExcludePatternInput patterns={['*.log', '*.tmp']} onChange={mockOnChange} />
+      )
 
       const deleteButtons = screen.getAllByRole('button', { name: /^Remove / })
 
@@ -162,7 +164,9 @@ describe('ExcludePatternInput', () => {
 
     it('removes last pattern correctly', async () => {
       const user = userEvent.setup()
-      renderWithProviders(<ExcludePatternInput patterns={['*.log', '*.tmp']} onChange={mockOnChange} />)
+      renderWithProviders(
+        <ExcludePatternInput patterns={['*.log', '*.tmp']} onChange={mockOnChange} />
+      )
 
       const deleteButtons = screen.getAllByRole('button', { name: /^Remove / })
 
@@ -191,17 +195,23 @@ describe('ExcludePatternInput', () => {
 
   describe('Disabled state', () => {
     it('disables input when disabled=true', () => {
-      renderWithProviders(<ExcludePatternInput patterns={[]} onChange={mockOnChange} disabled={true} />)
+      renderWithProviders(
+        <ExcludePatternInput patterns={[]} onChange={mockOnChange} disabled={true} />
+      )
       expect(screen.getByPlaceholderText('*.log or /path/to/exclude')).toBeDisabled()
     })
 
     it('disables Add button when disabled=true', () => {
-      renderWithProviders(<ExcludePatternInput patterns={[]} onChange={mockOnChange} disabled={true} />)
+      renderWithProviders(
+        <ExcludePatternInput patterns={[]} onChange={mockOnChange} disabled={true} />
+      )
       expect(screen.getByRole('button', { name: /Add/i })).toBeDisabled()
     })
 
     it('disables delete buttons when disabled=true', () => {
-      renderWithProviders(<ExcludePatternInput patterns={['*.log']} onChange={mockOnChange} disabled={true} />)
+      renderWithProviders(
+        <ExcludePatternInput patterns={['*.log']} onChange={mockOnChange} disabled={true} />
+      )
       const deleteBtn = screen.getByRole('button', { name: /^Remove / })
       expect(deleteBtn).toBeDisabled()
     })

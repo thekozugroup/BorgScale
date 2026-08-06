@@ -1,16 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Lock } from 'lucide-react'
-import {
-  SidebarMenuItem,
-  SidebarMenuButton,
-} from '@/components/ui/sidebar'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface NavItemProps {
   name: string
@@ -33,13 +25,17 @@ export default function NavItem({
   disabledReason,
   navLabel,
 }: NavItemProps) {
+  const reasonId = React.useId()
+
   const button = (
     <SidebarMenuButton
       asChild={isEnabled}
       isActive={isActive}
       aria-current={isActive ? 'page' : undefined}
-      disabled={!isEnabled}
-      aria-disabled={!isEnabled}
+      // aria-disabled instead of disabled keeps the item focusable so screen
+      // reader users can reach it and hear why it is locked (WCAG 2.1.1)
+      aria-disabled={!isEnabled || undefined}
+      aria-describedby={!isEnabled && disabledReason ? reasonId : undefined}
       className="rounded-md"
     >
       {isEnabled ? (
@@ -66,6 +62,9 @@ export default function NavItem({
             </TooltipTrigger>
             <TooltipContent side="right">{disabledReason}</TooltipContent>
           </Tooltip>
+          <span id={reasonId} className="sr-only">
+            {disabledReason}
+          </span>
         </TooltipProvider>
       ) : (
         button

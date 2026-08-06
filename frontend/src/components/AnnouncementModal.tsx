@@ -70,29 +70,49 @@ export default function AnnouncementModal({
 
   const accentCls = announcement
     ? tone === 'warning'
-      ? { bg: 'bg-secondary text-secondary-foreground', border: 'border-border', icon: 'bg-muted text-muted-foreground', isPrimary: false }
+      ? {
+          bg: 'bg-secondary text-secondary-foreground',
+          border: 'border-border',
+          icon: 'bg-muted text-muted-foreground',
+          isPrimary: false,
+        }
       : tone === 'info'
-        ? { bg: 'bg-muted text-muted-foreground', border: 'border-border', icon: 'bg-muted text-muted-foreground', isPrimary: false }
-        : { bg: 'bg-primary/10 text-primary', border: 'border-primary/20', icon: 'bg-primary/10 text-primary', isPrimary: true }
+        ? {
+            bg: 'bg-muted text-muted-foreground',
+            border: 'border-border',
+            icon: 'bg-muted text-muted-foreground',
+            isPrimary: false,
+          }
+        : {
+            bg: 'bg-primary/10 text-primary',
+            border: 'border-primary/20',
+            icon: 'bg-primary/10 text-primary',
+            isPrimary: true,
+          }
     : { bg: '', border: '', icon: '', isPrimary: false }
 
   return (
-    <Dialog open={realOpen} onOpenChange={(v) => { if (!v) onAcknowledge() }}>
+    <Dialog
+      open={realOpen}
+      onOpenChange={(v) => {
+        if (!v) onAcknowledge()
+      }}
+    >
       {/* DialogContent is always rendered (not gated on realOpen/announcement) so
           Radix can manage its own overlay lifecycle through the close animation.
           Without this, the overlay div stays orphaned in the DOM when announcement
           becomes null before the Radix exit transition completes, intercepting all
           pointer events and blocking sidebar navigation. */}
-      <DialogContent
-        className="sm:max-w-md p-0 overflow-hidden gap-0 bg-card text-card-foreground border-border rounded-3xl shadow-md"
-      >
+      <DialogContent className="sm:max-w-md p-0 overflow-hidden gap-0 bg-card text-card-foreground border-border rounded-3xl shadow-md">
         {announcement && (
           <>
             {/* Header section */}
             <div className="px-5 sm:px-6 pt-5 sm:pt-6 pb-3">
               <div className="flex items-start gap-3">
                 {/* Icon */}
-                <div className={`flex items-center justify-center w-11 h-11 rounded-2xl flex-shrink-0 border ${accentCls.icon} ${accentCls.border}`}>
+                <div
+                  className={`flex items-center justify-center w-11 h-11 rounded-2xl flex-shrink-0 border ${accentCls.icon} ${accentCls.border}`}
+                >
                   {icon}
                 </div>
 
@@ -147,17 +167,19 @@ export default function AnnouncementModal({
             <div className="px-5 sm:px-6 pb-5 sm:pb-6">
               {announcement.highlights?.length ? (
                 <div className={`p-4 mb-4 rounded-2xl border ${accentCls.border} bg-muted/30`}>
-                  <p className={`text-xs font-extrabold uppercase tracking-[0.12em] mb-2.5 ${accentCls.isPrimary ? 'text-primary' : 'text-muted-foreground'}`}>
+                  <p
+                    className={`text-xs font-extrabold uppercase tracking-[0.12em] mb-2.5 ${accentCls.isPrimary ? 'text-primary' : 'text-muted-foreground'}`}
+                  >
                     {t('announcements.highlights')}
                   </p>
 
                   <div className="flex flex-col gap-2">
                     {announcement.highlights.map((highlight) => (
                       <div key={highlight} className="flex gap-2.5 items-start">
-                        <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 mt-2 bg-foreground/60`} />
-                        <p className="text-sm leading-relaxed text-muted-foreground">
-                          {highlight}
-                        </p>
+                        <div
+                          className={`w-1.5 h-1.5 rounded-full flex-shrink-0 mt-2 bg-foreground/60`}
+                        />
+                        <p className="text-sm leading-relaxed text-muted-foreground">{highlight}</p>
                       </div>
                     ))}
                   </div>
@@ -185,20 +207,12 @@ export default function AnnouncementModal({
 
                 {/* Buttons */}
                 <div className="flex items-center gap-2.5 justify-end">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={onSnooze}
-                  >
+                  <Button variant="outline" size="sm" onClick={onSnooze}>
                     {t('announcements.remindLater')}
                   </Button>
 
                   {announcement.dismissible !== false && (
-                    <Button
-                      size="sm"
-                      onClick={onAcknowledge}
-                      className="gap-1.5"
-                    >
+                    <Button size="sm" onClick={onAcknowledge} className="gap-1.5">
                       {t('announcements.gotIt')}
                       <ChevronRight size={16} />
                     </Button>

@@ -79,8 +79,10 @@ export default function CodeEditor({
     () =>
       (value || '')
         .split('\n')
-        .map((line) => (language === 'shell' ? tokenize(line) : [{ text: line, kind: 'plain' as TokenKind }])),
-    [value, language],
+        .map((line) =>
+          language === 'shell' ? tokenize(line) : [{ text: line, kind: 'plain' as TokenKind }]
+        ),
+    [value, language]
   )
 
   // Rewriting the value through onChange re-renders a controlled textarea with
@@ -108,7 +110,10 @@ export default function CodeEditor({
     const blockStart = source.lastIndexOf('\n', selectionStart - 1) + 1
     // A selection ending on a line break stops at that break, so the untouched
     // line below it is not dragged into the indent.
-    const searchFrom = selectionEnd > blockStart && source[selectionEnd - 1] === '\n' ? selectionEnd - 1 : selectionEnd
+    const searchFrom =
+      selectionEnd > blockStart && source[selectionEnd - 1] === '\n'
+        ? selectionEnd - 1
+        : selectionEnd
     const lineBreak = source.indexOf('\n', searchFrom)
     const blockEnd = lineBreak === -1 ? source.length : lineBreak
 
@@ -143,7 +148,9 @@ export default function CodeEditor({
   return (
     <div className="mb-4">
       {label && (
-        <label htmlFor={editorId} className="block text-sm font-medium mb-1">{label}</label>
+        <label htmlFor={editorId} className="block text-sm font-medium mb-1">
+          {label}
+        </label>
       )}
       <div className="border-2 border-border rounded overflow-hidden transition-colors hover:border-muted-foreground focus-within:border-primary">
         <div
@@ -157,10 +164,14 @@ export default function CodeEditor({
           >
             {lines.map((tokens, index) => (
               <div key={index} className="flex">
-                <span className="w-10 shrink-0 select-none pr-3 text-right text-muted-foreground/60">{index + 1}</span>
+                <span className="w-10 shrink-0 select-none pr-3 text-right text-muted-foreground/60">
+                  {index + 1}
+                </span>
                 <span className="min-w-0 flex-1 whitespace-pre-wrap break-words">
                   {tokens.map((token, tokenIndex) => (
-                    <span key={tokenIndex} className={TOKEN_CLASS[token.kind]}>{token.text}</span>
+                    <span key={tokenIndex} className={TOKEN_CLASS[token.kind]}>
+                      {token.text}
+                    </span>
                   ))}
                 </span>
               </div>
@@ -185,7 +196,9 @@ export default function CodeEditor({
         </div>
       </div>
       {helperText && (
-        <p id={helperId} className="text-xs text-muted-foreground mt-1">{helperText}</p>
+        <p id={helperId} className="text-xs text-muted-foreground mt-1">
+          {helperText}
+        </p>
       )}
     </div>
   )

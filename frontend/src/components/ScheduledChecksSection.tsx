@@ -80,8 +80,12 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
   })
 
   const repositories = repositoriesData?.data?.repositories || []
-  const manageableRepositories = repositories.filter((repo: { id: number }) => canDo(repo.id, 'maintenance'))
-  const selectedRepository = manageableRepositories.find((repo: Repository) => repo.id === selectedRepositoryId) as Repository | undefined
+  const manageableRepositories = repositories.filter((repo: { id: number }) =>
+    canDo(repo.id, 'maintenance')
+  )
+  const selectedRepository = manageableRepositories.find(
+    (repo: Repository) => repo.id === selectedRepositoryId
+  ) as Repository | undefined
   const isSelectedRepoBorg2 = selectedRepository?.borg_version === 2
 
   const { data: scheduledChecks, isLoading } = useQuery({
@@ -93,7 +97,9 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
         try {
           const response = await repositoriesAPI.getCheckSchedule(repo.id)
           if (response.data.enabled) checks.push(response.data)
-        } catch { /* skip */ }
+        } catch {
+          /* skip */
+        }
       }
       return checks
     },
@@ -101,22 +107,29 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
   })
 
   const { data: checkHistoryData, isLoading: loadingCheckHistory } = useQuery({
-    queryKey: ['scheduled-check-history', manageableRepositories.map((repo: Repository) => repo.id)],
+    queryKey: [
+      'scheduled-check-history',
+      manageableRepositories.map((repo: Repository) => repo.id),
+    ],
     queryFn: async () => {
       const jobs: CheckHistoryJob[] = []
       for (const repo of manageableRepositories) {
         try {
           const response = await repositoriesAPI.getRepositoryCheckJobs(repo.id, 10, true)
           const repoJobs = response.data.jobs || []
-          jobs.push(...repoJobs.map((job: Job & { scheduled_check?: boolean }) => ({
-            ...job,
-            repository_id: repo.id,
-            repository: repo.path,
-            repository_path: repo.path,
-            type: 'check' as const,
-            scheduled_check: Boolean(job.scheduled_check),
-          })))
-        } catch { /* skip */ }
+          jobs.push(
+            ...repoJobs.map((job: Job & { scheduled_check?: boolean }) => ({
+              ...job,
+              repository_id: repo.id,
+              repository: repo.path,
+              repository_path: repo.path,
+              type: 'check' as const,
+              scheduled_check: Boolean(job.scheduled_check),
+            }))
+          )
+        } catch {
+          /* skip */
+        }
       }
       return jobs.sort((a, b) => {
         const aTime = new Date(a.started_at || a.completed_at || 0).getTime()
@@ -130,7 +143,8 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
 
   const checkHistory = checkHistoryData || []
   const filteredCheckHistory = checkHistory.filter((job) => {
-    if (historyRepositoryFilter !== 'all' && job.repository_id !== historyRepositoryFilter) return false
+    if (historyRepositoryFilter !== 'all' && job.repository_id !== historyRepositoryFilter)
+      return false
     if (historyStatusFilter !== 'all' && job.status !== historyStatusFilter) return false
     return true
   })
@@ -150,7 +164,10 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast.error(translateBackendKey(error.response?.data?.detail) || t('scheduledChecks.toasts.updateFailed'))
+      toast.error(
+        translateBackendKey(error.response?.data?.detail) ||
+          t('scheduledChecks.toasts.updateFailed')
+      )
     },
   })
 
@@ -161,10 +178,14 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
       if (!repo) throw new Error('Repository not found')
       return new BorgApiClient(repo).checkRepository()
     },
-    onSuccess: () => { toast.success(t('scheduledChecks.toasts.checkStarted')) },
+    onSuccess: () => {
+      toast.success(t('scheduledChecks.toasts.checkStarted'))
+    },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
-      toast.error(translateBackendKey(error.response?.data?.detail) || t('scheduledChecks.toasts.checkFailed'))
+      toast.error(
+        translateBackendKey(error.response?.data?.detail) || t('scheduledChecks.toasts.checkFailed')
+      )
     },
   })
 
@@ -176,7 +197,9 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
 
   const openEditDialog = (check: ScheduledCheck) => {
     setSelectedRepositoryId(check.repository_id)
-    const localCron = check.check_cron_expression ? convertCronToLocal(check.check_cron_expression) : '0 2 * * 0'
+    const localCron = check.check_cron_expression
+      ? convertCronToLocal(check.check_cron_expression)
+      : '0 2 * * 0'
     setFormData({ cron_expression: localCron, max_duration: check.check_max_duration })
     setShowDialog(true)
   }
@@ -189,7 +212,10 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
       return
     }
     const utcCron = convertCronToUTC(formData.cron_expression)
-    updateMutation.mutate({ repoId: selectedRepositoryId, data: { ...formData, cron_expression: utcCron } })
+    updateMutation.mutate({
+      repoId: selectedRepositoryId,
+      data: { ...formData, cron_expression: utcCron },
+    })
   }
 
   const handleDelete = (check: ScheduledCheck) => {
@@ -198,18 +224,20 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
 
   const confirmDelete = () => {
     if (pendingDeleteCheck) {
-      updateMutation.mutate({ repoId: pendingDeleteCheck.repository_id, data: { cron_expression: '' } })
+      updateMutation.mutate({
+        repoId: pendingDeleteCheck.repository_id,
+        data: { cron_expression: '' },
+      })
       setPendingDeleteCheck(null)
     }
   }
 
   const dialogFooter = (
     <div className="flex justify-end gap-2 px-5 py-3">
-      <Button variant="outline" onClick={() => setShowDialog(false)}>{t('common.buttons.cancel')}</Button>
-      <Button
-        onClick={handleSubmit}
-        disabled={!selectedRepositoryId || updateMutation.isPending}
-      >
+      <Button variant="outline" onClick={() => setShowDialog(false)}>
+        {t('common.buttons.cancel')}
+      </Button>
+      <Button onClick={handleSubmit} disabled={!selectedRepositoryId || updateMutation.isPending}>
         {selectedRepositoryId ? t('scheduledChecks.update') : t('scheduledChecks.create')}
       </Button>
     </div>
@@ -239,7 +267,10 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
                 </div>
                 <div className="grid grid-cols-4 rounded-md overflow-hidden mb-3 border border-border">
                   {[0, 1, 2, 3].map((j) => (
-                    <div key={j} className={cn('px-3 py-2.5', j < 3 ? 'border-r border-border' : '')}>
+                    <div
+                      key={j}
+                      className={cn('px-3 py-2.5', j < 3 ? 'border-r border-border' : '')}
+                    >
                       <Skeleton className="h-2.5 mb-1.5 rounded" style={{ width: 38 }} />
                       <Skeleton className="h-4 rounded" style={{ width: [58, 48, 54, 44][j] }} />
                     </div>
@@ -258,9 +289,16 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
         <div className="py-12 flex flex-col items-center gap-3 text-muted-foreground">
           <Shield size={40} style={{ opacity: 0.25 }} />
           <p className="text-base">{t('scheduledChecks.noScheduledChecks')}</p>
-          <p className="text-sm text-muted-foreground">{t('scheduledChecks.noScheduledChecksDesc')}</p>
+          <p className="text-sm text-muted-foreground">
+            {t('scheduledChecks.noScheduledChecksDesc')}
+          </p>
           {manageableRepositories.length > 0 && (
-            <Button size="sm" variant="outline" className="mt-1" onClick={() => setShowDialog(true)}>
+            <Button
+              size="sm"
+              variant="outline"
+              className="mt-1"
+              onClick={() => setShowDialog(true)}
+            >
               {t('schedule.addCheck')}
             </Button>
           )}
@@ -287,26 +325,45 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
               <p className="text-base font-semibold">{t('scheduledChecks.historyTitle')}</p>
               <p className="text-sm text-muted-foreground">
                 {historyHasFilters
-                  ? t('scheduledChecks.historyShowingFiltered', { filtered: filteredCheckHistory.length, total: checkHistory.length })
-                  : t('scheduledChecks.historyShowing', { filtered: filteredCheckHistory.length, total: checkHistory.length })}
+                  ? t('scheduledChecks.historyShowingFiltered', {
+                      filtered: filteredCheckHistory.length,
+                      total: checkHistory.length,
+                    })
+                  : t('scheduledChecks.historyShowing', {
+                      filtered: filteredCheckHistory.length,
+                      total: checkHistory.length,
+                    })}
               </p>
             </div>
             {historyHasFilters && (
-              <Button size="sm" variant="ghost" className="font-bold flex-shrink-0" onClick={() => { setHistoryRepositoryFilter('all'); setHistoryStatusFilter('all') }}>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="font-bold flex-shrink-0"
+                onClick={() => {
+                  setHistoryRepositoryFilter('all')
+                  setHistoryStatusFilter('all')
+                }}
+              >
                 {t('common.clearFilters', { defaultValue: 'Clear filters' })}
               </Button>
             )}
           </div>
 
           <div className="mb-5 flex flex-wrap gap-3">
-            <Select value={String(historyRepositoryFilter)} onValueChange={(v) => setHistoryRepositoryFilter(v === 'all' ? 'all' : Number(v))}>
+            <Select
+              value={String(historyRepositoryFilter)}
+              onValueChange={(v) => setHistoryRepositoryFilter(v === 'all' ? 'all' : Number(v))}
+            >
               <SelectTrigger className="flex-[2] min-w-[220px] h-9 text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t('scheduledChecks.allRepositories')}</SelectItem>
                 {manageableRepositories.map((repo: Repository) => (
-                  <SelectItem key={repo.id} value={String(repo.id)}>{repo.name}</SelectItem>
+                  <SelectItem key={repo.id} value={String(repo.id)}>
+                    {repo.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -329,24 +386,48 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
             jobs={filteredCheckHistory}
             repositories={manageableRepositories}
             loading={loadingCheckHistory}
-            actions={{ viewLogs: true, viewArchive: false, downloadLogs: true, cancel: true, errorInfo: true, breakLock: false, runNow: false, delete: true }}
+            actions={{
+              viewLogs: true,
+              viewArchive: false,
+              downloadLogs: true,
+              cancel: true,
+              errorInfo: true,
+              breakLock: false,
+              runNow: false,
+              delete: true,
+            }}
             canDeleteJobs
-            emptyState={{ title: t('scheduledChecks.noHistoryTitle'), description: t('scheduledChecks.noHistoryDescription') }}
+            emptyState={{
+              title: t('scheduledChecks.noHistoryTitle'),
+              description: t('scheduledChecks.noHistoryDescription'),
+            }}
             tableId="scheduled-check-history"
           />
         </div>
       )}
 
       {/* Add/Edit Dialog */}
-      <ResponsiveDialog open={showDialog} onClose={() => setShowDialog(false)} maxWidth="sm" fullWidth footer={dialogFooter}>
+      <ResponsiveDialog
+        open={showDialog}
+        onClose={() => setShowDialog(false)}
+        maxWidth="sm"
+        fullWidth
+        footer={dialogFooter}
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
           <p className="text-base font-semibold">
-            {selectedRepositoryId ? t('scheduledChecks.editCheckSchedule') : t('scheduledChecks.addCheckSchedule')}
+            {selectedRepositoryId
+              ? t('scheduledChecks.editCheckSchedule')
+              : t('scheduledChecks.addCheckSchedule')}
           </p>
           <Tooltip>
             <TooltipTrigger asChild>
-              <button type="button" aria-label={t('scheduledChecks.notificationHint')} className="text-muted-foreground hover:text-foreground">
+              <button
+                type="button"
+                aria-label={t('scheduledChecks.notificationHint')}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <Info size={16} />
               </button>
             </TooltipTrigger>
@@ -397,26 +478,41 @@ const ScheduledChecksSection = forwardRef<ScheduledChecksSectionRef, {}>((_, ref
               min={60}
             />
             <p className="text-xs text-muted-foreground mt-1">
-              {isSelectedRepoBorg2 ? t('scheduledChecks.maxDurationHintBorg2') : t('scheduledChecks.maxDurationHint')}
+              {isSelectedRepoBorg2
+                ? t('scheduledChecks.maxDurationHintBorg2')
+                : t('scheduledChecks.maxDurationHint')}
             </p>
           </div>
         </div>
       </ResponsiveDialog>
 
       {/* Disable-check confirmation */}
-      <AlertDialog open={!!pendingDeleteCheck} onOpenChange={(open) => { if (!open) setPendingDeleteCheck(null) }}>
+      <AlertDialog
+        open={!!pendingDeleteCheck}
+        onOpenChange={(open) => {
+          if (!open) setPendingDeleteCheck(null)
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('scheduledChecks.confirmDisableTitle', { defaultValue: 'Disable scheduled check?' })}</AlertDialogTitle>
+            <AlertDialogTitle>
+              {t('scheduledChecks.confirmDisableTitle', {
+                defaultValue: 'Disable scheduled check?',
+              })}
+            </AlertDialogTitle>
             <AlertDialogDescription>
               {pendingDeleteCheck
-                ? t('scheduledChecks.confirmDisable', { repositoryName: pendingDeleteCheck.repository_name })
+                ? t('scheduledChecks.confirmDisable', {
+                    repositoryName: pendingDeleteCheck.repository_name,
+                  })
                 : ''}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common.buttons.cancel')}</AlertDialogCancel>
-            <AlertDialogAction variant="destructive" onClick={confirmDelete}>{t('common.buttons.disable', { defaultValue: 'Disable' })}</AlertDialogAction>
+            <AlertDialogAction variant="destructive" onClick={confirmDelete}>
+              {t('common.buttons.disable', { defaultValue: 'Disable' })}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

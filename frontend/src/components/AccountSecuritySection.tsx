@@ -31,9 +31,7 @@ export default function AccountSecuritySection({
       )}
     >
       <div className="flex flex-row gap-4 items-center min-w-0">
-        <div
-          className="w-9 h-9 rounded-lg flex-shrink-0 flex items-center justify-center border bg-muted/40"
-        >
+        <div className="w-9 h-9 rounded-lg flex-shrink-0 flex items-center justify-center border bg-muted/40">
           <Lock size={16} style={{ opacity: 0.45 }} />
         </div>
         <div className="min-w-0">

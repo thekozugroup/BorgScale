@@ -42,11 +42,8 @@ interface ValidatePathArgs {
  */
 export function useValidatePath() {
   return useMutation({
-    mutationFn: async (
-      input: string | ValidatePathArgs,
-    ): Promise<PathValidation> => {
-      const args: ValidatePathArgs =
-        typeof input === 'string' ? { path: input } : input
+    mutationFn: async (input: string | ValidatePathArgs): Promise<PathValidation> => {
+      const args: ValidatePathArgs = typeof input === 'string' ? { path: input } : input
       try {
         const params: Record<string, string | number> = {
           path: args.path,
@@ -66,9 +63,8 @@ export function useValidatePath() {
           is_dir: data.is_dir ?? data.is_directory,
         }
       } catch (err) {
-        const detail = (
-          err as { response?: { data?: { detail?: unknown } } }
-        )?.response?.data?.detail
+        const detail = (err as { response?: { data?: { detail?: unknown } } })?.response?.data
+          ?.detail
         const message =
           typeof detail === 'string'
             ? detail

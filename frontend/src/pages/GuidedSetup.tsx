@@ -89,8 +89,7 @@ export default function GuidedSetup() {
   const [path, setPath] = useState<string>('/data/borg/my-backups')
   const [pathTouched, setPathTouched] = useState(false)
   const [sshConnId, setSshConnId] = useState<number | ''>('')
-  const [pathValidation, setPathValidation] =
-    useState<PathValidation | null>(null)
+  const [pathValidation, setPathValidation] = useState<PathValidation | null>(null)
   const validatePath = useValidatePath()
 
   // Stage 2: sources
@@ -216,10 +215,10 @@ export default function GuidedSetup() {
 
   const next = () => {
     if (!canAdvance) return
-    if (step < 4) setStep(((step + 1) as 1 | 2 | 3 | 4))
+    if (step < 4) setStep((step + 1) as 1 | 2 | 3 | 4)
   }
   const prev = () => {
-    if (step > 1) setStep(((step - 1) as 1 | 2 | 3 | 4))
+    if (step > 1) setStep((step - 1) as 1 | 2 | 3 | 4)
   }
 
   // ── Smart-fill: use home folder ──────────────────────────────────
@@ -229,11 +228,12 @@ export default function GuidedSetup() {
         const r = await api.get('/filesystem/browse', {
           params: { path: p, connection_type: 'local' },
         })
-        const items = (r.data?.items as Array<{
-          name: string
-          is_directory: boolean
-          path?: string
-        }>) || []
+        const items =
+          (r.data?.items as Array<{
+            name: string
+            is_directory: boolean
+            path?: string
+          }>) || []
         const firstDir = items.find((i) => i.is_directory)
         if (firstDir) {
           return firstDir.path ?? `${p.replace(/\/$/, '')}/${firstDir.name}`
@@ -243,8 +243,7 @@ export default function GuidedSetup() {
       }
       return null
     }
-    const candidate =
-      (await tryPath('/local/home')) ?? (await tryPath('/data/home'))
+    const candidate = (await tryPath('/local/home')) ?? (await tryPath('/data/home'))
     if (candidate) {
       if (!sources.includes(candidate)) {
         setSources((prev) => [...prev, candidate])
@@ -266,8 +265,7 @@ export default function GuidedSetup() {
     setNewSource('')
   }
 
-  const removeSource = (p: string) =>
-    setSources((prev) => prev.filter((x) => x !== p))
+  const removeSource = (p: string) => setSources((prev) => prev.filter((x) => x !== p))
 
   // ── Submit ───────────────────────────────────────────────────────
   const handleSubmit = async () => {
@@ -284,9 +282,7 @@ export default function GuidedSetup() {
         passphrase: encryption === 'encrypted' ? passphrase : '',
         compression: 'lz4',
         borg_version: 1,
-        ...(destination === 'ssh' && sshConnId
-          ? { connection_id: sshConnId }
-          : {}),
+        ...(destination === 'ssh' && sshConnId ? { connection_id: sshConnId } : {}),
       },
       schedule: {
         name: `${repoName}-schedule`,
@@ -308,8 +304,7 @@ export default function GuidedSetup() {
       if (data.stage === 'ready') {
         toast.success(t('guidedSetup.confirm.successToast'))
       } else if (data.stage === 'schedule_created_backup_failed') {
-        const warnFn = (toast as unknown as { warning?: (m: string) => void })
-          .warning
+        const warnFn = (toast as unknown as { warning?: (m: string) => void }).warning
         if (typeof warnFn === 'function') {
           warnFn(t('guidedSetup.confirm.partialToast'))
         } else {
@@ -343,9 +338,7 @@ export default function GuidedSetup() {
 
   // ── Render ───────────────────────────────────────────────────────
   const stepBadge = t('guidedSetup.stepBadge', { current: step, total: 4 })
-  const stepKey = (['destination', 'sources', 'encryption', 'schedule'] as const)[
-    step - 1
-  ]
+  const stepKey = (['destination', 'sources', 'encryption', 'schedule'] as const)[step - 1]
   const stepTitle = t(`guidedSetup.step.${stepKey}.title`)
   const stepSubtitle = t(`guidedSetup.step.${stepKey}.subtitle`)
 
@@ -447,11 +440,7 @@ export default function GuidedSetup() {
           {t('guidedSetup.back')}
         </Button>
         {step < 4 ? (
-          <Button
-            onClick={next}
-            disabled={!canAdvance}
-            data-testid="guided-setup-continue"
-          >
+          <Button onClick={next} disabled={!canAdvance} data-testid="guided-setup-continue">
             {t('guidedSetup.continue')}
           </Button>
         ) : null}
@@ -501,11 +490,7 @@ function DestinationStage({
 
   return (
     <div className="space-y-6">
-      <div
-        role="radiogroup"
-        aria-label="destination"
-        className="grid gap-3 md:grid-cols-2"
-      >
+      <div role="radiogroup" aria-label="destination" className="grid gap-3 md:grid-cols-2">
         <DestinationTile
           selected={destination === 'local'}
           onSelect={() => setDestination('local')}
@@ -526,9 +511,7 @@ function DestinationStage({
 
       {destination === 'ssh' && (
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="guided-ssh-conn">
-            {t('guidedSetup.destination.sshConnection')}
-          </Label>
+          <Label htmlFor="guided-ssh-conn">{t('guidedSetup.destination.sshConnection')}</Label>
           {sshConnections.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               <a href="/ssh-connections" className="underline">
@@ -541,9 +524,7 @@ function DestinationStage({
               onValueChange={(v) => setSshConnId(v ? Number(v) : '')}
             >
               <SelectTrigger id="guided-ssh-conn" data-testid="guided-ssh-conn">
-                <SelectValue
-                  placeholder={t('guidedSetup.destination.sshConnection')}
-                />
+                <SelectValue placeholder={t('guidedSetup.destination.sshConnection')} />
               </SelectTrigger>
               <SelectContent>
                 {sshConnections.map((c) => (
@@ -558,24 +539,17 @@ function DestinationStage({
       )}
 
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="guided-path">
-          {t('guidedSetup.destination.pathLabel')}
-        </Label>
+        <Label htmlFor="guided-path">{t('guidedSetup.destination.pathLabel')}</Label>
         <Input
           id="guided-path"
           value={path}
           onChange={(e) => setPath(e.target.value)}
           data-testid="guided-path"
         />
-        <p className="text-xs text-muted-foreground">
-          {t('guidedSetup.destination.pathHelper')}
-        </p>
+        <p className="text-xs text-muted-foreground">{t('guidedSetup.destination.pathHelper')}</p>
         {pathStatusKey && (
           <p
-            className={cn(
-              'text-xs',
-              pathStatusOk ? 'text-primary' : 'text-destructive'
-            )}
+            className={cn('text-xs', pathStatusOk ? 'text-primary' : 'text-destructive')}
             data-testid="guided-path-status"
           >
             {t(pathStatusKey)}
@@ -611,17 +585,13 @@ function DestinationTile({
       data-testid={testId}
       className={cn(
         'flex items-start gap-3 p-4 rounded-lg border text-left',
-        selected
-          ? 'border-primary ring-1 ring-primary bg-primary/5'
-          : 'border-border'
+        selected ? 'border-primary ring-1 ring-primary bg-primary/5' : 'border-border'
       )}
     >
       <div
         className={cn(
           'flex items-center justify-center w-10 h-10 rounded-lg shrink-0',
-          selected
-            ? 'bg-primary text-primary-foreground'
-            : 'bg-muted text-muted-foreground'
+          selected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
         )}
       >
         <Icon size={20} />
@@ -692,9 +662,7 @@ function SourcesStage({
       </div>
 
       {sources.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          {t('guidedSetup.sources.noneAdded')}
-        </p>
+        <p className="text-sm text-muted-foreground">{t('guidedSetup.sources.noneAdded')}</p>
       ) : (
         <ul className="space-y-2" data-testid="guided-sources-list">
           {sources.map((s) => (
@@ -748,17 +716,11 @@ function EncryptionStage({
 }) {
   const { t } = useTranslation()
   const mismatch =
-    passphrase.length > 0 &&
-    passphraseConfirm.length > 0 &&
-    passphrase !== passphraseConfirm
+    passphrase.length > 0 && passphraseConfirm.length > 0 && passphrase !== passphraseConfirm
   const tooShort = passphrase.length > 0 && passphrase.length < 12
   return (
     <div className="space-y-6">
-      <div
-        role="radiogroup"
-        aria-label="encryption"
-        className="grid gap-3 md:grid-cols-2"
-      >
+      <div role="radiogroup" aria-label="encryption" className="grid gap-3 md:grid-cols-2">
         <DestinationTile
           selected={encryption === 'encrypted'}
           onSelect={() => setEncryption('encrypted')}
@@ -780,9 +742,7 @@ function EncryptionStage({
       {encryption === 'encrypted' && (
         <div className="space-y-4">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="guided-passphrase">
-              {t('guidedSetup.encryption.passphrase')}
-            </Label>
+            <Label htmlFor="guided-passphrase">{t('guidedSetup.encryption.passphrase')}</Label>
             <div className="relative">
               <Input
                 id="guided-passphrase"
@@ -797,11 +757,7 @@ function EncryptionStage({
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
                 aria-label="toggle passphrase visibility"
               >
-                {showPassphrase ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
+                {showPassphrase ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
             {tooShort && (
@@ -811,9 +767,7 @@ function EncryptionStage({
             )}
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="guided-passphrase-confirm">
-              {t('guidedSetup.encryption.confirm')}
-            </Label>
+            <Label htmlFor="guided-passphrase-confirm">{t('guidedSetup.encryption.confirm')}</Label>
             <Input
               id="guided-passphrase-confirm"
               type={showPassphrase ? 'text' : 'password'}
@@ -822,17 +776,12 @@ function EncryptionStage({
               data-testid="guided-passphrase-confirm"
             />
             {mismatch && (
-              <p
-                className="text-xs text-destructive"
-                data-testid="guided-passphrase-mismatch"
-              >
+              <p className="text-xs text-destructive" data-testid="guided-passphrase-mismatch">
                 {t('guidedSetup.encryption.passphraseMismatch')}
               </p>
             )}
           </div>
-          <p className="text-xs text-muted-foreground">
-            {t('guidedSetup.encryption.lossWarning')}
-          </p>
+          <p className="text-xs text-muted-foreground">{t('guidedSetup.encryption.lossWarning')}</p>
           <div className="flex items-start gap-2">
             <Checkbox
               id="guided-passphrase-saved"
@@ -840,10 +789,7 @@ function EncryptionStage({
               onCheckedChange={(c) => setPassphraseSaved(!!c)}
               data-testid="guided-passphrase-saved"
             />
-            <Label
-              htmlFor="guided-passphrase-saved"
-              className="text-sm font-normal cursor-pointer"
-            >
+            <Label htmlFor="guided-passphrase-saved" className="text-sm font-normal cursor-pointer">
               {t('guidedSetup.encryption.savedConfirm')}
             </Label>
           </div>
@@ -882,11 +828,7 @@ function ScheduleConfirmStage({
   const { t } = useTranslation()
   return (
     <div className="space-y-6">
-      <div
-        role="radiogroup"
-        aria-label="schedule preset"
-        className="grid gap-3 md:grid-cols-3"
-      >
+      <div role="radiogroup" aria-label="schedule preset" className="grid gap-3 md:grid-cols-3">
         <PresetCard
           selected={preset === 'daily'}
           onSelect={() => setPreset('daily')}
@@ -947,10 +889,7 @@ function ScheduleConfirmStage({
           onCheckedChange={(c) => setAutoStart(!!c)}
           data-testid="guided-auto-start"
         />
-        <Label
-          htmlFor="guided-auto-start"
-          className="text-sm font-normal cursor-pointer"
-        >
+        <Label htmlFor="guided-auto-start" className="text-sm font-normal cursor-pointer">
           <span>{t('guidedSetup.schedule.autoStartLabel')}</span>
           <span className="block text-xs text-muted-foreground">
             {t('guidedSetup.schedule.autoStartHelper')}
@@ -1013,17 +952,13 @@ function PresetCard({
       data-testid={testId}
       className={cn(
         'flex flex-col items-start gap-1 p-4 rounded-lg border text-left',
-        selected
-          ? 'border-primary ring-1 ring-primary bg-primary/5'
-          : 'border-border'
+        selected ? 'border-primary ring-1 ring-primary bg-primary/5' : 'border-border'
       )}
     >
       <div
         className={cn(
           'flex items-center justify-center w-9 h-9 rounded-md mb-1',
-          selected
-            ? 'bg-primary text-primary-foreground'
-            : 'bg-muted text-muted-foreground'
+          selected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
         )}
       >
         <Icon size={18} />

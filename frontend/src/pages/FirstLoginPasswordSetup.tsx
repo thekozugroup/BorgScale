@@ -165,12 +165,7 @@ export default function PasswordSetupCard({ onComplete }: { onComplete: () => vo
           </div>
 
           {/* Primary action */}
-          <Button
-            type="submit"
-            disabled={!canSubmit}
-            className="mt-1 w-full"
-            size="lg"
-          >
+          <Button type="submit" disabled={!canSubmit} className="mt-1 w-full" size="lg">
             {isLoading ? (
               <>
                 <Loader2 className="animate-spin" size={15} />

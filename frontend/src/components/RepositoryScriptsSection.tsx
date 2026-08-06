@@ -75,9 +75,7 @@ function ScriptSection({
               </Button>
             </span>
           </TooltipTrigger>
-          <TooltipContent>
-            {!repositoryId ? createFirstLabel : addFromLibraryLabel}
-          </TooltipContent>
+          <TooltipContent>{!repositoryId ? createFirstLabel : addFromLibraryLabel}</TooltipContent>
         </Tooltip>
       </div>
 

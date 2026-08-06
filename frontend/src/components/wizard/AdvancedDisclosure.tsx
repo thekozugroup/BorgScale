@@ -46,9 +46,7 @@ export default function AdvancedDisclosure({
           forceOpen !== undefined && 'cursor-default'
         )}
       >
-        <ChevronRight
-          className={cn('h-4 w-4 transition-transform', open && 'rotate-90')}
-        />
+        <ChevronRight className={cn('h-4 w-4 transition-transform', open && 'rotate-90')} />
         <span>{resolvedLabel}</span>
       </button>
       {open && <div className="border-t px-4 py-4 space-y-4">{children}</div>}

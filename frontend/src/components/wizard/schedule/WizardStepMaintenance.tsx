@@ -58,7 +58,10 @@ const WizardStepMaintenance: React.FC<WizardStepMaintenanceProps> = ({ data, onC
             >
               <Info size={15} />
             </button>
-            <div aria-hidden="true" className="absolute left-6 top-0 z-10 hidden group-hover:block group-focus-within:block w-max max-w-xs bg-popover text-popover-foreground text-xs rounded-lg border px-2.5 py-2 shadow-md">
+            <div
+              aria-hidden="true"
+              className="absolute left-6 top-0 z-10 hidden group-hover:block group-focus-within:block w-max max-w-xs bg-popover text-popover-foreground text-xs rounded-lg border px-2.5 py-2 shadow-md"
+            >
               {t('wizard.scheduleWizard.maintenance.info')}
             </div>
           </div>
@@ -101,8 +104,7 @@ const WizardStepMaintenance: React.FC<WizardStepMaintenanceProps> = ({ data, onC
             />
             <Alert>
               <AlertDescription>
-                <strong>Caution:</strong>{' '}
-                {t('wizard.scheduleWizard.maintenance.pruneCaution')}
+                <strong>Caution:</strong> {t('wizard.scheduleWizard.maintenance.pruneCaution')}
               </AlertDescription>
             </Alert>
           </div>
@@ -131,7 +133,10 @@ const WizardStepMaintenance: React.FC<WizardStepMaintenanceProps> = ({ data, onC
                 >
                   <Info size={14} />
                 </button>
-                <div aria-hidden="true" className="absolute left-6 top-0 z-10 hidden group-hover:block group-focus-within:block w-max max-w-xs bg-popover text-popover-foreground text-xs rounded-lg border px-2.5 py-2 shadow-md">
+                <div
+                  aria-hidden="true"
+                  className="absolute left-6 top-0 z-10 hidden group-hover:block group-focus-within:block w-max max-w-xs bg-popover text-popover-foreground text-xs rounded-lg border px-2.5 py-2 shadow-md"
+                >
                   {t('wizard.scheduleWizard.maintenance.compactInfo')}
                 </div>
               </div>

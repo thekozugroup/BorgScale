@@ -31,7 +31,10 @@ function MountCardSkeleton({ index = 0 }: { index?: number }) {
       style={{ gridTemplateColumns: desktopGridTemplate }}
     >
       <div>
-        <Skeleton className="h-3.5 rounded mb-1.5" style={{ width: [160, 200, 140, 180, 152][index % 5] }} />
+        <Skeleton
+          className="h-3.5 rounded mb-1.5"
+          style={{ width: [160, 200, 140, 180, 152][index % 5] }}
+        />
         <Skeleton className="h-3 rounded" style={{ width: [80, 100, 70, 90, 85][index % 5] }} />
       </div>
       <Skeleton className="h-3.5 rounded w-28" />
@@ -92,9 +95,7 @@ function MountCard({
           {archiveName}
         </div>
         {repoName && (
-          <span
-            className="text-2xs text-muted-foreground opacity-70 block mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap"
-          >
+          <span className="text-2xs text-muted-foreground opacity-70 block mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap">
             {repoName}
           </span>
         )}
@@ -237,9 +238,7 @@ export default function MountsManagementTab() {
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div
-              className="flex items-center text-muted-foreground cursor-help"
-            >
+            <div className="flex items-center text-muted-foreground cursor-help">
               <Info size={15} />
             </div>
           </TooltipTrigger>
@@ -252,9 +251,7 @@ export default function MountsManagementTab() {
   if (isLoading) {
     return (
       <div>
-        {panelHeader(
-          <Skeleton className="h-5 w-5 rounded" />
-        )}
+        {panelHeader(<Skeleton className="h-5 w-5 rounded" />)}
         <div className="rounded-2xl overflow-hidden border border-foreground/[0.07]">
           {tableHeader}
           {[0, 1, 2, 3, 4].map((i) => (
@@ -282,9 +279,7 @@ export default function MountsManagementTab() {
         <div className="flex flex-col items-center text-center py-16 text-muted-foreground">
           <FolderOpen size={48} style={{ marginBottom: 16, opacity: 0.5 }} />
           <p className="text-sm font-medium">{t('mountsManagement.empty')}</p>
-          <p className="text-sm opacity-70 mt-1.5 max-w-sm">
-            {t('mounts.emptyDescription')}
-          </p>
+          <p className="text-sm opacity-70 mt-1.5 max-w-sm">{t('mounts.emptyDescription')}</p>
         </div>
       ) : (
         <div className="rounded-2xl overflow-hidden border border-foreground/[0.07]">

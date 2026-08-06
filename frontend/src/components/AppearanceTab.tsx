@@ -37,7 +37,9 @@ export default function AppearanceTab() {
             </div>
             <div>
               <p className="text-sm font-bold">{t('settings.appearance.theme')}</p>
-              <p className="text-sm text-muted-foreground">{t('settings.appearance.chooseTheme')}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('settings.appearance.chooseTheme')}
+              </p>
             </div>
           </div>
 
@@ -75,7 +77,11 @@ export default function AppearanceTab() {
                   onClick={() => {
                     const theme = themeOption.id as typeof mode
                     setTheme(theme)
-                    trackSettings(EventAction.EDIT, { section: 'appearance', setting: 'theme', theme })
+                    trackSettings(EventAction.EDIT, {
+                      section: 'appearance',
+                      setting: 'theme',
+                      theme,
+                    })
                   }}
                   className={cn(
                     'p-3 rounded-2xl border text-left cursor-pointer',
@@ -127,28 +133,87 @@ export default function AppearanceTab() {
                           border: `1px solid ${previewIsDark ? '#1f2937' : '#e2e8f0'}`,
                         }}
                       >
-                        <div className="w-2.5 h-2.5 rounded-full" style={{ background: previewIsDark ? `rgba(96,165,250,0.75)` : `${appearanceAccent}bf` }} />
-                        <div className="w-2 h-2 rounded" style={{ background: previewIsDark ? '#334155' : '#dbe4ee' }} />
-                        <div className="w-2 h-2 rounded" style={{ background: previewIsDark ? '#334155' : '#dbe4ee' }} />
+                        <div
+                          className="w-2.5 h-2.5 rounded-full"
+                          style={{
+                            background: previewIsDark
+                              ? `rgba(96,165,250,0.75)`
+                              : `${appearanceAccent}bf`,
+                          }}
+                        />
+                        <div
+                          className="w-2 h-2 rounded"
+                          style={{ background: previewIsDark ? '#334155' : '#dbe4ee' }}
+                        />
+                        <div
+                          className="w-2 h-2 rounded"
+                          style={{ background: previewIsDark ? '#334155' : '#dbe4ee' }}
+                        />
                       </div>
                       {/* Content mock */}
                       <div className="flex-1 min-w-0">
-                        <div className="h-3 rounded-full mb-1.5" style={{ width: '46%', background: previewIsDark ? '#334155' : '#cbd5e1' }} />
+                        <div
+                          className="h-3 rounded-full mb-1.5"
+                          style={{
+                            width: '46%',
+                            background: previewIsDark ? '#334155' : '#cbd5e1',
+                          }}
+                        />
                         <div className="flex gap-1.5 mb-1.5">
-                          <div className="h-6 rounded-xl flex-1" style={{ background: previewIsDark ? '#111827' : '#ffffff', border: `1px solid ${previewIsDark ? '#1f2937' : '#dbe4ee'}`, boxShadow: previewIsDark ? 'none' : '0 1px 2px rgba(15,23,42,0.06)' }} />
-                          <div className="w-5 h-6 rounded-xl" style={{ background: previewIsDark ? `rgba(96,165,250,0.18)` : `${appearanceAccent}24`, border: `1px solid ${previewIsDark ? `rgba(96,165,250,0.16)` : `${appearanceAccent}1f`}` }} />
+                          <div
+                            className="h-6 rounded-xl flex-1"
+                            style={{
+                              background: previewIsDark ? '#111827' : '#ffffff',
+                              border: `1px solid ${previewIsDark ? '#1f2937' : '#dbe4ee'}`,
+                              boxShadow: previewIsDark ? 'none' : '0 1px 2px rgba(15,23,42,0.06)',
+                            }}
+                          />
+                          <div
+                            className="w-5 h-6 rounded-xl"
+                            style={{
+                              background: previewIsDark
+                                ? `rgba(96,165,250,0.18)`
+                                : `${appearanceAccent}24`,
+                              border: `1px solid ${previewIsDark ? `rgba(96,165,250,0.16)` : `${appearanceAccent}1f`}`,
+                            }}
+                          />
                         </div>
                         <div className="flex gap-1">
                           {[0, 1, 2].map((i) => (
-                            <div key={i} className="flex-1 rounded-lg" style={{ height: i === 1 ? 16 : 14, background: previewIsDark ? '#172033' : '#ffffff', border: `1px solid ${previewIsDark ? '#1f2937' : '#dbe4ee'}` }} />
+                            <div
+                              key={i}
+                              className="flex-1 rounded-lg"
+                              style={{
+                                height: i === 1 ? 16 : 14,
+                                background: previewIsDark ? '#172033' : '#ffffff',
+                                border: `1px solid ${previewIsDark ? '#1f2937' : '#dbe4ee'}`,
+                              }}
+                            />
                           ))}
                         </div>
                       </div>
                     </div>
                     {/* Bottom bar mock */}
-                    <div className="h-4.5 rounded-xl flex items-center px-2 gap-1" style={{ height: 18, background: previewIsDark ? '#111827' : '#ffffff', border: `1px solid ${previewIsDark ? '#1f2937' : '#dbe4ee'}` }}>
-                      <div className="w-4 h-4 rounded-full" style={{ background: previewIsDark ? `rgba(96,165,250,0.22)` : `${appearanceAccent}2e` }} />
-                      <div className="h-1.5 rounded-full" style={{ width: '42%', background: previewIsDark ? '#334155' : '#cbd5e1' }} />
+                    <div
+                      className="h-4.5 rounded-xl flex items-center px-2 gap-1"
+                      style={{
+                        height: 18,
+                        background: previewIsDark ? '#111827' : '#ffffff',
+                        border: `1px solid ${previewIsDark ? '#1f2937' : '#dbe4ee'}`,
+                      }}
+                    >
+                      <div
+                        className="w-4 h-4 rounded-full"
+                        style={{
+                          background: previewIsDark
+                            ? `rgba(96,165,250,0.22)`
+                            : `${appearanceAccent}2e`,
+                        }}
+                      />
+                      <div
+                        className="h-1.5 rounded-full"
+                        style={{ width: '42%', background: previewIsDark ? '#334155' : '#cbd5e1' }}
+                      />
                     </div>
                   </div>
                 </button>

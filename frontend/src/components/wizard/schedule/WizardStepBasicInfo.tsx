@@ -29,9 +29,7 @@ const WizardStepBasicInfo: React.FC<WizardStepBasicInfoProps> = ({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <Label htmlFor="job-name">
-          {t('wizard.scheduleWizard.basicInfo.jobNameLabel')} *
-        </Label>
+        <Label htmlFor="job-name">{t('wizard.scheduleWizard.basicInfo.jobNameLabel')} *</Label>
         <Input
           id="job-name"
           value={data.name}

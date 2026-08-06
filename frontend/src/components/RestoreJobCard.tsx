@@ -131,9 +131,7 @@ export default function RestoreJobCard({ job, showJobId = true }: RestoreJobCard
             {getDurationText() && (
               <>
                 <span className="inline-block size-[3px] rounded-full bg-border shrink-0" />
-                <span className="text-sm text-muted-foreground text-xs">
-                  {getDurationText()}
-                </span>
+                <span className="text-sm text-muted-foreground text-xs">{getDurationText()}</span>
               </>
             )}
           </div>
@@ -162,9 +160,7 @@ export default function RestoreJobCard({ job, showJobId = true }: RestoreJobCard
       {/* Running: current file */}
       {job.status === 'running' && job.progress_details?.current_file && (
         <div className="mt-3 rounded-md border border-border bg-muted/40 px-3 py-2">
-          <p className="text-xs font-medium text-foreground">
-            {t('restoreJobCard.currentFile')}
-          </p>
+          <p className="text-xs font-medium text-foreground">{t('restoreJobCard.currentFile')}</p>
           <p className="text-xs mt-1 font-mono break-all text-muted-foreground">
             {job.progress_details.current_file}
           </p>
@@ -176,7 +172,9 @@ export default function RestoreJobCard({ job, showJobId = true }: RestoreJobCard
         <div className="grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-4 mt-3">
           <div>
             <p className="text-sm text-muted-foreground">{t('restoreJobCard.filesRestored')}</p>
-            <p className="text-sm font-medium">{job.progress_details.nfiles?.toLocaleString() || '0'}</p>
+            <p className="text-sm font-medium">
+              {job.progress_details.nfiles?.toLocaleString() || '0'}
+            </p>
           </div>
           <div>
             <p className="text-sm text-muted-foreground">{t('restoreJobCard.progress')}</p>

@@ -157,7 +157,9 @@ describe('BackupHistorySection', () => {
   })
 
   it('filters by repository', () => {
-    renderWithProviders(<BackupHistorySection {...defaultProps} filterRepository="/path/to/repo-a" />)
+    renderWithProviders(
+      <BackupHistorySection {...defaultProps} filterRepository="/path/to/repo-a" />
+    )
 
     // Jobs 1 and 3 have repository = '/path/to/repo-a'
     expect(screen.getByText('Table with 2 jobs')).toBeInTheDocument()
@@ -235,7 +237,9 @@ describe('BackupHistorySection', () => {
 
   it('calls onFilterStatusChange when status filter changes', () => {
     const onFilterStatusChange = vi.fn()
-    renderWithProviders(<BackupHistorySection {...defaultProps} onFilterStatusChange={onFilterStatusChange} />)
+    renderWithProviders(
+      <BackupHistorySection {...defaultProps} onFilterStatusChange={onFilterStatusChange} />
+    )
 
     const statusSelect = screen.getByText('All Status')
     fireEvent.pointerDown(statusSelect, { button: 0, pointerType: 'mouse' })
@@ -293,7 +297,9 @@ describe('BackupHistorySection', () => {
   })
 
   it('renders empty state when all jobs are filtered out', () => {
-    renderWithProviders(<BackupHistorySection {...defaultProps} filterStatus="completed" filterSchedule={2} />)
+    renderWithProviders(
+      <BackupHistorySection {...defaultProps} filterStatus="completed" filterSchedule={2} />
+    )
 
     // No jobs match: schedule 2 has only a failed job
     expect(screen.getByText('Table with 0 jobs')).toBeInTheDocument()

@@ -71,7 +71,9 @@ describe('ScheduledJobsTable', () => {
   })
 
   it('shows loading state when isLoading is true', () => {
-    const { container } = renderWithProviders(<ScheduledJobsTable {...defaultProps} isLoading={true} />)
+    const { container } = renderWithProviders(
+      <ScheduledJobsTable {...defaultProps} isLoading={true} />
+    )
     // shadcn Skeleton uses [data-slot="skeleton"] attribute
     expect(container.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(0)
     expect(screen.queryByTestId('schedule-job-card')).not.toBeInTheDocument()

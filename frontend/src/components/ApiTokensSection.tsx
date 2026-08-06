@@ -82,9 +82,16 @@ export default function ApiTokensSection() {
         <div className="px-5 py-4 border-b border-border bg-muted/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <p className="text-sm font-semibold">API Tokens</p>
-            <p className="text-xs text-muted-foreground">Programmatic access — shown only once when generated</p>
+            <p className="text-xs text-muted-foreground">
+              Programmatic access — shown only once when generated
+            </p>
           </div>
-          <Button variant="outline" size="sm" className="gap-1.5 w-full sm:w-auto" onClick={() => setGenerateOpen(true)}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5 w-full sm:w-auto"
+            onClick={() => setGenerateOpen(true)}
+          >
             <Plus size={14} />
             Generate
           </Button>
@@ -101,7 +108,9 @@ export default function ApiTokensSection() {
               <Key size={32} className="opacity-30 mx-auto mb-2" />
               <p className="text-sm text-muted-foreground">No tokens yet</p>
               <div className="mt-4">
-                <Button size="sm" onClick={() => setGenerateOpen(true)}>Create token</Button>
+                <Button size="sm" onClick={() => setGenerateOpen(true)}>
+                  Create token
+                </Button>
               </div>
             </div>
           ) : (
@@ -109,7 +118,10 @@ export default function ApiTokensSection() {
               <thead>
                 <tr className="border-b border-border">
                   {['Name', 'Prefix', 'Created', 'Last used', ''].map((h) => (
-                    <th key={h} className="px-4 py-3 text-left text-xs font-bold text-muted-foreground">
+                    <th
+                      key={h}
+                      className="px-4 py-3 text-left text-xs font-bold text-muted-foreground"
+                    >
                       {h}
                     </th>
                   ))}
@@ -158,11 +170,16 @@ export default function ApiTokensSection() {
             <DialogTitle>Generate API Token</DialogTitle>
           </DialogHeader>
           <form
-            onSubmit={(e) => { e.preventDefault(); generateMutation.mutate(tokenName) }}
+            onSubmit={(e) => {
+              e.preventDefault()
+              generateMutation.mutate(tokenName)
+            }}
             className="flex flex-col gap-4 pt-2"
           >
             <div>
-              <Label htmlFor="api-token-name" className="text-xs font-semibold mb-1.5 block">Token name</Label>
+              <Label htmlFor="api-token-name" className="text-xs font-semibold mb-1.5 block">
+                Token name
+              </Label>
               <Input
                 id="api-token-name"
                 value={tokenName}
@@ -174,8 +191,20 @@ export default function ApiTokensSection() {
               />
             </div>
             <div className="flex items-center justify-end gap-2">
-              <Button type="button" variant="outline" size="sm" onClick={() => setGenerateOpen(false)}>Cancel</Button>
-              <Button type="submit" size="sm" disabled={generateMutation.isPending || !tokenName.trim()} className="gap-1.5">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setGenerateOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                size="sm"
+                disabled={generateMutation.isPending || !tokenName.trim()}
+                className="gap-1.5"
+              >
                 {generateMutation.isPending && <Loader2 size={13} className="animate-spin" />}
                 Generate
               </Button>
@@ -192,7 +221,9 @@ export default function ApiTokensSection() {
           </DialogHeader>
           <div className="flex flex-col gap-4 pt-2">
             <Alert>
-              <AlertDescription>Copy this token now. You won't be able to see it again.</AlertDescription>
+              <AlertDescription>
+                Copy this token now. You won't be able to see it again.
+              </AlertDescription>
             </Alert>
             <div className="flex items-center gap-2">
               <Input
@@ -215,7 +246,9 @@ export default function ApiTokensSection() {
               </Tooltip>
             </div>
             <div className="flex justify-end">
-              <Button size="sm" onClick={handleCloseCopyModal}>Done</Button>
+              <Button size="sm" onClick={handleCloseCopyModal}>
+                Done
+              </Button>
             </div>
           </div>
         </DialogContent>
@@ -229,15 +262,22 @@ export default function ApiTokensSection() {
           </DialogHeader>
           <div className="flex flex-col gap-4 pt-2">
             <p className="text-sm text-muted-foreground">
-              You haven't copied the token. Once you close this dialog, the token cannot be retrieved.
+              You haven't copied the token. Once you close this dialog, the token cannot be
+              retrieved.
             </p>
             <div className="flex items-center justify-end gap-2">
-              <Button variant="outline" size="sm" onClick={() => setCloseConfirmOpen(false)}>Go back</Button>
-              <Button variant="destructive" size="sm" onClick={() => {
-                setNewToken(null)
-                setCloseConfirmOpen(false)
-                setGenerateOpen(false)
-              }}>
+              <Button variant="outline" size="sm" onClick={() => setCloseConfirmOpen(false)}>
+                Go back
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => {
+                  setNewToken(null)
+                  setCloseConfirmOpen(false)
+                  setGenerateOpen(false)
+                }}
+              >
                 Close anyway
               </Button>
             </div>

@@ -62,25 +62,41 @@ const BetaFeaturesTab: React.FC = () => {
 
   const handleToggle = (checked: boolean) => {
     setBypassLockOnInfo(checked)
-    trackSettings(EventAction.EDIT, { section: 'beta_features', feature: 'bypass_lock_on_info', enabled: checked })
+    trackSettings(EventAction.EDIT, {
+      section: 'beta_features',
+      feature: 'bypass_lock_on_info',
+      enabled: checked,
+    })
     saveSettingsMutation.mutate({ bypass_lock_on_info: checked })
   }
 
   const handleListToggle = (checked: boolean) => {
     setBypassLockOnList(checked)
-    trackSettings(EventAction.EDIT, { section: 'beta_features', feature: 'bypass_lock_on_list', enabled: checked })
+    trackSettings(EventAction.EDIT, {
+      section: 'beta_features',
+      feature: 'bypass_lock_on_list',
+      enabled: checked,
+    })
     saveSettingsMutation.mutate({ bypass_lock_on_list: checked })
   }
 
   const handleBorg2FastBrowseToggle = (checked: boolean) => {
     setBorg2FastBrowseBetaEnabled(checked)
-    trackSettings(EventAction.EDIT, { section: 'beta_features', feature: 'borg2_fast_browse_beta_enabled', enabled: checked })
+    trackSettings(EventAction.EDIT, {
+      section: 'beta_features',
+      feature: 'borg2_fast_browse_beta_enabled',
+      enabled: checked,
+    })
     saveSettingsMutation.mutate({ borg2_fast_browse_beta_enabled: checked })
   }
 
   const handleMQTTBetaToggle = (checked: boolean) => {
     setMqttBetaEnabled(checked)
-    trackSettings(EventAction.EDIT, { section: 'beta_features', feature: 'mqtt_beta_enabled', enabled: checked })
+    trackSettings(EventAction.EDIT, {
+      section: 'beta_features',
+      feature: 'mqtt_beta_enabled',
+      enabled: checked,
+    })
     saveSettingsMutation.mutate({ mqtt_beta_enabled: checked })
   }
 

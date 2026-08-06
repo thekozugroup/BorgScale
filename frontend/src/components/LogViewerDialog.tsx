@@ -120,12 +120,19 @@ export default function LogViewerDialog<T extends JobWithLogs>({
 
 function getTypeLabel(type: string, t: (key: string) => string): string {
   switch (type) {
-    case 'backup': return t('logViewer.typeBackup')
-    case 'restore': return t('logViewer.typeRestore')
-    case 'check': return t('logViewer.typeCheck')
-    case 'compact': return t('logViewer.typeCompact')
-    case 'prune': return t('logViewer.typePrune')
-    case 'package': return t('logViewer.typePackage')
-    default: return type.charAt(0).toUpperCase() + type.slice(1)
+    case 'backup':
+      return t('logViewer.typeBackup')
+    case 'restore':
+      return t('logViewer.typeRestore')
+    case 'check':
+      return t('logViewer.typeCheck')
+    case 'compact':
+      return t('logViewer.typeCompact')
+    case 'prune':
+      return t('logViewer.typePrune')
+    case 'package':
+      return t('logViewer.typePackage')
+    default:
+      return type.charAt(0).toUpperCase() + type.slice(1)
   }
 }

@@ -5,11 +5,7 @@ import { useLocation, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '../components/ui/button'
 import { Loader2, Clock, Info, Play, ChevronDown, ChevronUp } from 'lucide-react'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '../components/ui/collapsible'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../components/ui/collapsible'
 import { backupAPI, repositoriesAPI } from '../services/api'
 import { BorgApiClient } from '../services/borgApi'
 import { toast } from 'sonner'
@@ -196,15 +192,16 @@ const Backup: React.FC = () => {
             <h1 className="text-2xl font-bold">{t('backup.title')}</h1>
             {repositoriesData?.data?.repositories?.some(
               (repo: Repository) => !getRepoCapabilities(repo).canBackup
-            ) && !loadingRepositories && (
-              <button
-                type="button"
-                title={t('backup.manualBackup.observeOnlyHidden')}
-                className="text-muted-foreground hover:text-foreground transition-colors p-0"
-              >
-                <Info size={16} />
-              </button>
-            )}
+            ) &&
+              !loadingRepositories && (
+                <button
+                  type="button"
+                  title={t('backup.manualBackup.observeOnlyHidden')}
+                  className="text-muted-foreground hover:text-foreground transition-colors p-0"
+                >
+                  <Info size={16} />
+                </button>
+              )}
           </div>
           <p className="text-sm text-muted-foreground">{t('backup.subtitle')}</p>
         </div>
@@ -263,8 +260,16 @@ const Backup: React.FC = () => {
       {selectedRepoData && (
         <Collapsible open={showCommandPreview} onOpenChange={setShowCommandPreview}>
           <CollapsibleTrigger asChild>
-            <Button variant="ghost" size="sm" className="gap-1.5 text-xs text-muted-foreground px-0">
-              {showCommandPreview ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1.5 text-xs text-muted-foreground px-0"
+            >
+              {showCommandPreview ? (
+                <ChevronUp className="h-3.5 w-3.5" />
+              ) : (
+                <ChevronDown className="h-3.5 w-3.5" />
+              )}
               {t('backup.showCommand', 'Show command')}
             </Button>
           </CollapsibleTrigger>
@@ -324,7 +329,15 @@ const Backup: React.FC = () => {
           emptyState={{
             icon: <Clock size={48} />,
             title: t('backup.recentJobs.empty'),
-            action: <Button size="sm" variant="outline" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>{t('backup.manualBackup.startBackup')}</Button>,
+            action: (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              >
+                {t('backup.manualBackup.startBackup')}
+              </Button>
+            ),
           }}
         />
       </div>

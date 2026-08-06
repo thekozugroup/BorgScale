@@ -21,9 +21,7 @@ export default function AccountPasskeysSection({
 
   return (
     <div>
-      <p className="text-sm font-bold mb-1">
-        {t('settings.account.security.passkeysTitle')}
-      </p>
+      <p className="text-sm font-bold mb-1">{t('settings.account.security.passkeysTitle')}</p>
       <p className="text-sm text-muted-foreground mb-3">
         {t('settings.account.security.passkeysDescription')}
       </p>

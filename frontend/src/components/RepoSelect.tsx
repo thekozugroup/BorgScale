@@ -3,12 +3,7 @@ import { Database } from 'lucide-react'
 import { Repository } from '../types'
 import RepoMenuItem from './RepoMenuItem'
 import BorgVersionChip from './BorgVersionChip'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 
 interface RepoSelectProps {
@@ -56,7 +51,8 @@ export default function RepoSelect({
       ? repositories.find((r) => (valueKey === 'id' ? r.id === Number(value) : r.path === value))
       : null
 
-  const strValue = value !== null && value !== undefined && value !== '' ? String(value) : '__placeholder__'
+  const strValue =
+    value !== null && value !== undefined && value !== '' ? String(value) : '__placeholder__'
 
   const renderSelectedValue = () => {
     if (loading) {
@@ -64,7 +60,11 @@ export default function RepoSelect({
     }
     if (!strValue || !selectedRepo) {
       if (strValue && fallbackDisplayValue) {
-        return <span className="text-sm font-semibold text-muted-foreground">{fallbackDisplayValue}</span>
+        return (
+          <span className="text-sm font-semibold text-muted-foreground">
+            {fallbackDisplayValue}
+          </span>
+        )
       }
       return <span className="text-sm text-muted-foreground">{placeholderLabel}</span>
     }
@@ -84,12 +84,12 @@ export default function RepoSelect({
         <Database size={16} className="flex-shrink-0" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1">
-            <span className="text-sm font-semibold truncate leading-tight">{selectedRepo.name}</span>
+            <span className="text-sm font-semibold truncate leading-tight">
+              {selectedRepo.name}
+            </span>
             <BorgVersionChip borgVersion={selectedRepo.borg_version} compact />
           </div>
-          <p
-            className="text-2xs truncate leading-snug text-muted-foreground font-mono"
-          >
+          <p className="text-2xs truncate leading-snug text-muted-foreground font-mono">
             {selectedRepo.path}
           </p>
         </div>
@@ -127,11 +127,7 @@ export default function RepoSelect({
           {repositories.map((repo) => {
             const itemValue = String(valueKey === 'id' ? repo.id : repo.path)
             return (
-              <SelectItem
-                key={repo.id}
-                value={itemValue}
-                disabled={repo.has_running_maintenance}
-              >
+              <SelectItem key={repo.id} value={itemValue} disabled={repo.has_running_maintenance}>
                 <RepoMenuItem
                   name={repo.name}
                   path={repo.path}

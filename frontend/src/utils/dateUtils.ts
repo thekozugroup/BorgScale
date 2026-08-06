@@ -137,10 +137,7 @@ export const formatCronHuman = (cronExpression: string): string => {
  * cronstrue, falling back to the hand-rolled {@link formatCronHuman}
  * when cronstrue cannot parse the value.
  */
-export const describeCronHuman = (
-  cronExpression: string,
-  locale?: string,
-): string => {
+export const describeCronHuman = (cronExpression: string, locale?: string): string => {
   if (!cronExpression || !cronExpression.trim()) return ''
   try {
     const description = cronstrue.toString(cronExpression, {

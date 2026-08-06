@@ -326,44 +326,69 @@ export default function RepositoryScriptsTab({
               <p className="text-sm font-medium flex-1 min-w-0 truncate">{script.script_name}</p>
 
               {/* Badges */}
-              <span className="inline-flex items-center px-1.5 py-0 rounded text-2xs font-semibold bg-muted text-muted-foreground border border-border" style={{ height: 18 }}>
+              <span
+                className="inline-flex items-center px-1.5 py-0 rounded text-2xs font-semibold bg-muted text-muted-foreground border border-border"
+                style={{ height: 18 }}
+              >
                 #{script.execution_order}
               </span>
               {script.parameters && script.parameters.length > 0 && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <span className="inline-flex items-center px-1.5 rounded text-2xs font-semibold bg-muted text-muted-foreground border border-border cursor-default" style={{ height: 18 }}>
+                    <span
+                      className="inline-flex items-center px-1.5 rounded text-2xs font-semibold bg-muted text-muted-foreground border border-border cursor-default"
+                      style={{ height: 18 }}
+                    >
                       {script.parameters.length} param{script.parameters.length > 1 ? 's' : ''}
                     </span>
                   </TooltipTrigger>
                   <TooltipContent>
-                    {t('repositoryScripts.parametersConfigured', { count: script.parameters.length })}
+                    {t('repositoryScripts.parametersConfigured', {
+                      count: script.parameters.length,
+                    })}
                   </TooltipContent>
                 </Tooltip>
               )}
               {areParametersOutOfSync(script) && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <span className="inline-flex items-center gap-0.5 px-1.5 rounded text-2xs font-semibold bg-muted text-muted-foreground border border-border cursor-default" style={{ height: 18 }}>
+                    <span
+                      className="inline-flex items-center gap-0.5 px-1.5 rounded text-2xs font-semibold bg-muted text-muted-foreground border border-border cursor-default"
+                      style={{ height: 18 }}
+                    >
                       <AlertTriangle size={10} />
                       {t('repositoryScripts.chips.outOfSync')}
                     </span>
                   </TooltipTrigger>
-                  <TooltipContent>{t('repositoryScripts.tooltips.parametersOutOfSync')}</TooltipContent>
+                  <TooltipContent>
+                    {t('repositoryScripts.tooltips.parametersOutOfSync')}
+                  </TooltipContent>
                 </Tooltip>
               )}
               {!isPreBackup && (
-                <span className={cn('inline-flex items-center px-1.5 rounded text-2xs font-semibold border cursor-default', RUN_ON_BADGE[effectiveRunOn] ?? 'bg-muted text-muted-foreground border-border')} style={{ height: 18 }}>
+                <span
+                  className={cn(
+                    'inline-flex items-center px-1.5 rounded text-2xs font-semibold border cursor-default',
+                    RUN_ON_BADGE[effectiveRunOn] ?? 'bg-muted text-muted-foreground border-border'
+                  )}
+                  style={{ height: 18 }}
+                >
                   {effectiveRunOn}
                 </span>
               )}
               {isPreBackup && effectiveSkipOnFailure && (
-                <span className="inline-flex items-center px-1.5 rounded text-2xs font-semibold bg-muted text-muted-foreground border border-border" style={{ height: 18 }}>
+                <span
+                  className="inline-flex items-center px-1.5 rounded text-2xs font-semibold bg-muted text-muted-foreground border border-border"
+                  style={{ height: 18 }}
+                >
                   {t('repositoryScripts.chips.skipsGracefully')}
                 </span>
               )}
               {isPreBackup && effectiveContinueOnError && (
-                <span className="inline-flex items-center px-1.5 rounded text-2xs font-semibold bg-muted text-muted-foreground border border-border" style={{ height: 18 }}>
+                <span
+                  className="inline-flex items-center px-1.5 rounded text-2xs font-semibold bg-muted text-muted-foreground border border-border"
+                  style={{ height: 18 }}
+                >
                   {t('repositoryScripts.chips.continuesOnError')}
                 </span>
               )}
@@ -385,7 +410,9 @@ export default function RepositoryScriptsTab({
                       <Play size={14} />
                     </button>
                   </TooltipTrigger>
-                  <TooltipContent>{t('repositoryScripts.tooltips.testScript', 'Test run this script')}</TooltipContent>
+                  <TooltipContent>
+                    {t('repositoryScripts.tooltips.testScript', 'Test run this script')}
+                  </TooltipContent>
                 </Tooltip>
                 {script.parameters && script.parameters.length > 0 && (
                   <Tooltip>
@@ -398,7 +425,9 @@ export default function RepositoryScriptsTab({
                         <Settings size={14} />
                       </button>
                     </TooltipTrigger>
-                    <TooltipContent>{t('repositoryScripts.tooltips.configureParameters')}</TooltipContent>
+                    <TooltipContent>
+                      {t('repositoryScripts.tooltips.configureParameters')}
+                    </TooltipContent>
                   </Tooltip>
                 )}
                 <Tooltip>
@@ -431,7 +460,10 @@ export default function RepositoryScriptsTab({
 
       <RepositoryScriptDialog
         open={addDialogOpen}
-        onClose={() => { setAddDialogOpen(false); setSelectedScriptId('') }}
+        onClose={() => {
+          setAddDialogOpen(false)
+          setSelectedScriptId('')
+        }}
         availableScripts={availableScripts}
         selectedScriptId={selectedScriptId}
         onScriptSelect={setSelectedScriptId}
@@ -462,17 +494,24 @@ export default function RepositoryScriptsTab({
       />
 
       {/* Remove-script confirmation */}
-      <AlertDialog open={pendingRemoveId !== null} onOpenChange={(open) => { if (!open) setPendingRemoveId(null) }}>
+      <AlertDialog
+        open={pendingRemoveId !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingRemoveId(null)
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t('repositoryScripts.confirmRemoveTitle', { defaultValue: 'Remove script?' })}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('repositoryScripts.confirmRemove')}
-            </AlertDialogDescription>
+            <AlertDialogTitle>
+              {t('repositoryScripts.confirmRemoveTitle', { defaultValue: 'Remove script?' })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>{t('repositoryScripts.confirmRemove')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('common.buttons.cancel')}</AlertDialogCancel>
-            <AlertDialogAction variant="destructive" onClick={confirmRemoveScript}>{t('common.buttons.remove', { defaultValue: 'Remove' })}</AlertDialogAction>
+            <AlertDialogAction variant="destructive" onClick={confirmRemoveScript}>
+              {t('common.buttons.remove', { defaultValue: 'Remove' })}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -562,7 +601,9 @@ function RepositoryScriptDialog({
           )}
 
           <div>
-            <p className="text-xs font-semibold mb-1.5">{t('repositoryScripts.dialog.selectScriptLabel')}</p>
+            <p className="text-xs font-semibold mb-1.5">
+              {t('repositoryScripts.dialog.selectScriptLabel')}
+            </p>
             <select
               value={selectedScriptId}
               onChange={(e) => onScriptSelect(Number(e.target.value))}
@@ -571,7 +612,8 @@ function RepositoryScriptDialog({
               <option value="">— {t('repositoryScripts.dialog.selectScriptLabel')} —</option>
               {availableScripts.map((script) => (
                 <option key={script.id} value={script.id}>
-                  {script.name}{script.description ? ` — ${script.description}` : ''}
+                  {script.name}
+                  {script.description ? ` — ${script.description}` : ''}
                 </option>
               ))}
             </select>
@@ -587,7 +629,9 @@ function RepositoryScriptDialog({
 
           {isPreBackup && (
             <div>
-              <p className="text-xs font-semibold mb-2">{t('repositoryScripts.dialog.onFailureLabel')}</p>
+              <p className="text-xs font-semibold mb-2">
+                {t('repositoryScripts.dialog.onFailureLabel')}
+              </p>
               <div className="flex flex-col gap-1.5">
                 {FAILURE_MODE_OPTIONS.map((opt) => (
                   <label key={opt.value} className="flex items-center gap-2 cursor-pointer text-sm">
@@ -670,7 +714,9 @@ function EditParametersDialog({
 
           {isPreBackup && (
             <div>
-              <p className="text-xs font-semibold mb-2">{t('repositoryScripts.dialog.onFailureLabel')}</p>
+              <p className="text-xs font-semibold mb-2">
+                {t('repositoryScripts.dialog.onFailureLabel')}
+              </p>
               <div className="flex flex-col gap-1.5">
                 {FAILURE_MODE_OPTIONS.map((opt) => (
                   <label key={opt.value} className="flex items-center gap-2 cursor-pointer text-sm">
@@ -734,7 +780,14 @@ function ScriptTestDialog({ open, onClose, scriptName, running, result }: Script
                   ) : (
                     <XCircle size={18} className="text-destructive" />
                   )}
-                  <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border', result.exit_code === 0 ? 'bg-primary/10 text-primary border-primary/20' : 'bg-destructive/10 text-destructive border-destructive/20')}>
+                  <span
+                    className={cn(
+                      'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border',
+                      result.exit_code === 0
+                        ? 'bg-primary/10 text-primary border-primary/20'
+                        : 'bg-destructive/10 text-destructive border-destructive/20'
+                    )}
+                  >
                     Exit: {result.exit_code}
                   </span>
                   <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border border-border text-muted-foreground">
@@ -774,7 +827,9 @@ function ScriptTestDialog({ open, onClose, scriptName, running, result }: Script
                 </div>
               )}
               {!result.stdout && !result.stderr && (
-                <div className={`p-3 rounded-xl text-sm border ${result.success ? 'border-primary/20 bg-primary/10 text-primary' : 'border-destructive/25 bg-destructive/10 text-destructive'}`}>
+                <div
+                  className={`p-3 rounded-xl text-sm border ${result.success ? 'border-primary/20 bg-primary/10 text-primary' : 'border-destructive/25 bg-destructive/10 text-destructive'}`}
+                >
                   {result.success ? t('scriptEditor.testPassed') : t('scriptEditor.testFailed')}
                 </div>
               )}

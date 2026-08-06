@@ -22,9 +22,7 @@ export default function VersionChip({ label, version, accent = false }: VersionC
       >
         {label}
       </span>
-      <span
-        className="font-mono leading-none font-medium text-2xs text-muted-foreground"
-      >
+      <span className="font-mono leading-none font-medium text-2xs text-muted-foreground">
         {version}
       </span>
     </span>

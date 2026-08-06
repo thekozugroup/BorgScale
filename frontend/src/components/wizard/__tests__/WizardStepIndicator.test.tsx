@@ -32,9 +32,9 @@ describe('WizardStepIndicator', () => {
 
   describe('Desktop layout (md+)', () => {
     beforeEach(() => {
-      matchMediaSpy = vi.spyOn(window, 'matchMedia').mockImplementation(() =>
-        mockMediaQuery(false) as unknown as MediaQueryList
-      )
+      matchMediaSpy = vi
+        .spyOn(window, 'matchMedia')
+        .mockImplementation(() => mockMediaQuery(false) as unknown as MediaQueryList)
     })
 
     afterEach(() => {
@@ -153,9 +153,9 @@ describe('WizardStepIndicator', () => {
 
   describe('Mobile layout (< md)', () => {
     beforeEach(() => {
-      matchMediaSpy = vi.spyOn(window, 'matchMedia').mockImplementation(() =>
-        mockMediaQuery(true) as unknown as MediaQueryList
-      )
+      matchMediaSpy = vi
+        .spyOn(window, 'matchMedia')
+        .mockImplementation(() => mockMediaQuery(true) as unknown as MediaQueryList)
     })
 
     afterEach(() => {
@@ -194,7 +194,9 @@ describe('WizardStepIndicator', () => {
     })
 
     it('updates the step counter when currentStep changes', () => {
-      const { rerender } = renderWithProviders(<WizardStepIndicator steps={mockSteps} currentStep={0} />)
+      const { rerender } = renderWithProviders(
+        <WizardStepIndicator steps={mockSteps} currentStep={0} />
+      )
       expect(screen.getByText('Step 1 / 5')).toBeInTheDocument()
 
       act(() => {

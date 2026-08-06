@@ -99,16 +99,11 @@ export default function WizardStepBackupConfig({
 
       {/* Info for remote data source */}
       {dataSource === 'remote' && (
-        <p className="text-sm text-muted-foreground">
-          {t('wizard.backupConfig.remoteSshfsNote')}
-        </p>
+        <p className="text-sm text-muted-foreground">{t('wizard.backupConfig.remoteSshfsNote')}</p>
       )}
 
       {/* Power-user settings: custom flags, hook scripts, remote borg path */}
-      <AdvancedDisclosure
-        labelKey="wizard.backup.advanced.power"
-        testId="power-advanced"
-      >
+      <AdvancedDisclosure labelKey="wizard.backup.advanced.power" testId="power-advanced">
         <AdvancedRepositoryOptions
           repositoryId={repositoryId}
           mode={repositoryMode}

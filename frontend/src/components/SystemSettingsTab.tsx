@@ -51,11 +51,26 @@ interface TimeoutFieldProps {
   renderSourceLabel: (source: string | null | undefined) => React.ReactNode
 }
 
-function TimeoutField({ id, label, value, onChange, step, sourceKey, helperExtra, timeoutSources, renderSourceLabel }: TimeoutFieldProps) {
+function TimeoutField({
+  id,
+  label,
+  value,
+  onChange,
+  step,
+  sourceKey,
+  helperExtra,
+  timeoutSources,
+  renderSourceLabel,
+}: TimeoutFieldProps) {
   const isErr = value < MIN_TIMEOUT || value > MAX_TIMEOUT
   return (
     <div>
-      <Label htmlFor={id} className={cn('text-xs font-semibold mb-1.5 block', isErr && 'text-destructive')}>{label}</Label>
+      <Label
+        htmlFor={id}
+        className={cn('text-xs font-semibold mb-1.5 block', isErr && 'text-destructive')}
+      >
+        {label}
+      </Label>
       <Input
         id={id}
         type="number"
@@ -145,20 +160,23 @@ const SystemSettingsTab: React.FC = () => {
     if (source === 'saved') {
       return (
         <span className="text-xs font-medium text-primary">
-          {' '}{t('systemSettings.sourceCustomized')}
+          {' '}
+          {t('systemSettings.sourceCustomized')}
         </span>
       )
     }
     if (source === 'env') {
       return (
         <span className="text-xs font-medium text-muted-foreground">
-          {' '}{t('systemSettings.sourceFromEnv')}
+          {' '}
+          {t('systemSettings.sourceFromEnv')}
         </span>
       )
     }
     return (
       <span className="text-xs font-medium text-muted-foreground">
-        {' '}{t('systemSettings.sourceDefault')}
+        {' '}
+        {t('systemSettings.sourceDefault')}
       </span>
     )
   }
@@ -204,7 +222,8 @@ const SystemSettingsTab: React.FC = () => {
         maxConcurrentScheduledBackups !== (systemSettings.max_concurrent_scheduled_backups ?? 2) ||
         maxConcurrentScheduledChecks !== (systemSettings.max_concurrent_scheduled_checks ?? 4)
 
-      const statsRefreshDirty = statsRefreshInterval !== (systemSettings.stats_refresh_interval_minutes ?? 60)
+      const statsRefreshDirty =
+        statsRefreshInterval !== (systemSettings.stats_refresh_interval_minutes ?? 60)
       const metricsDirty =
         metricsEnabled !== (systemSettings.metrics_enabled ?? false) ||
         metricsRequireAuth !== (systemSettings.metrics_require_auth ?? false) ||
@@ -215,10 +234,22 @@ const SystemSettingsTab: React.FC = () => {
       setHasChanges(browseDirty || timeoutDirty || statsRefreshDirty || metricsDirty)
     }
   }, [
-    browseMaxItems, browseMaxMemoryMb, mountTimeout, infoTimeout, listTimeout,
-    initTimeout, backupTimeout, sourceSizeTimeout, maxConcurrentScheduledBackups,
-    maxConcurrentScheduledChecks, statsRefreshInterval, metricsEnabled, metricsRequireAuth,
-    rotateMetricsToken, cacheStats, systemSettings,
+    browseMaxItems,
+    browseMaxMemoryMb,
+    mountTimeout,
+    infoTimeout,
+    listTimeout,
+    initTimeout,
+    backupTimeout,
+    sourceSizeTimeout,
+    maxConcurrentScheduledBackups,
+    maxConcurrentScheduledChecks,
+    statsRefreshInterval,
+    metricsEnabled,
+    metricsRequireAuth,
+    rotateMetricsToken,
+    cacheStats,
+    systemSettings,
   ])
 
   const MIN_FILES = 100_000
@@ -235,7 +266,14 @@ const SystemSettingsTab: React.FC = () => {
     if (browseMaxMemoryMb < MIN_MEMORY || browseMaxMemoryMb > MAX_MEMORY) {
       return `Max memory must be between ${MIN_MEMORY} MB and ${MAX_MEMORY} MB`
     }
-    const timeouts = [mountTimeout, infoTimeout, listTimeout, initTimeout, backupTimeout, sourceSizeTimeout]
+    const timeouts = [
+      mountTimeout,
+      infoTimeout,
+      listTimeout,
+      initTimeout,
+      backupTimeout,
+      sourceSizeTimeout,
+    ]
     if (timeouts.some((t) => t < MIN_TIMEOUT || t > MAX_TIMEOUT)) {
       return `Timeouts must be between ${MIN_TIMEOUT} seconds and ${MAX_TIMEOUT} seconds (24 hours)`
     }
@@ -243,8 +281,10 @@ const SystemSettingsTab: React.FC = () => {
       return `Stats refresh interval must be between 0 and ${MAX_STATS_REFRESH} minutes (0 = disabled)`
     }
     if (
-      maxConcurrentScheduledBackups < 0 || maxConcurrentScheduledBackups > MAX_SCHEDULE_CONCURRENCY ||
-      maxConcurrentScheduledChecks < 0 || maxConcurrentScheduledChecks > MAX_SCHEDULE_CONCURRENCY
+      maxConcurrentScheduledBackups < 0 ||
+      maxConcurrentScheduledBackups > MAX_SCHEDULE_CONCURRENCY ||
+      maxConcurrentScheduledChecks < 0 ||
+      maxConcurrentScheduledChecks > MAX_SCHEDULE_CONCURRENCY
     ) {
       return `Scheduler concurrency limits must be between 0 and ${MAX_SCHEDULE_CONCURRENCY}`
     }
@@ -315,7 +355,10 @@ const SystemSettingsTab: React.FC = () => {
   })
 
   const handleSaveSettings = async () => {
-    if (validationError) { toast.error(validationError); return }
+    if (validationError) {
+      toast.error(validationError)
+      return
+    }
     try {
       const operations: Array<Promise<unknown>> = []
       let generatedMetricsToken: string | undefined
@@ -381,7 +424,11 @@ const SystemSettingsTab: React.FC = () => {
       const maxWaitTime = 5 * 60 * 1000
       stopStatsRefreshPoll()
       statsRefreshPollRef.current = setInterval(async () => {
-        if (Date.now() - startTime > maxWaitTime) { stopStatsRefreshPoll(); setIsRefreshingStats(false); return }
+        if (Date.now() - startTime > maxWaitTime) {
+          stopStatsRefreshPoll()
+          setIsRefreshingStats(false)
+          return
+        }
         try {
           const settingsResponse = await settingsAPI.getSystemSettings()
           const newLastRefresh = settingsResponse.data?.settings?.last_stats_refresh
@@ -392,12 +439,15 @@ const SystemSettingsTab: React.FC = () => {
             queryClient.invalidateQueries({ queryKey: ['repositories'] })
             queryClient.invalidateQueries({ queryKey: ['systemSettings'] })
           }
-        } catch { /* ignore */ }
+        } catch {
+          /* ignore */
+        }
       }, 3000)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(
-        translateBackendKey(error.response?.data?.detail) || t('systemSettings.failedToStartStatsRefresh')
+        translateBackendKey(error.response?.data?.detail) ||
+          t('systemSettings.failedToStartStatsRefresh')
       )
       setIsRefreshingStats(false)
     }
@@ -416,17 +466,40 @@ const SystemSettingsTab: React.FC = () => {
   const proxyAuthHeaderRows: Array<[string, string | null | undefined]> = [
     ['systemSettings.proxyAuthUsernameHeader', proxyAuthConfig?.proxy_auth_header],
     ['systemSettings.proxyAuthRoleHeader', proxyAuthConfig?.proxy_auth_role_header],
-    ['systemSettings.proxyAuthAllRepositoriesRoleHeader', proxyAuthConfig?.proxy_auth_all_repositories_role_header],
+    [
+      'systemSettings.proxyAuthAllRepositoriesRoleHeader',
+      proxyAuthConfig?.proxy_auth_all_repositories_role_header,
+    ],
     ['systemSettings.proxyAuthEmailHeader', proxyAuthConfig?.proxy_auth_email_header],
     ['systemSettings.proxyAuthFullNameHeader', proxyAuthConfig?.proxy_auth_full_name_header],
   ]
 
   const sectionTabs = [
-    { label: t('systemSettings.operationTimeoutsTitle'), description: t('systemSettings.operationTimeoutsDescription'), icon: <Clock size={14} /> },
-    { label: t('systemSettings.repositoryMonitoringTitle'), description: t('systemSettings.repositoryMonitoringDescription'), icon: <RefreshCw size={14} /> },
-    { label: t('systemSettings.metricsAccessTitle'), description: t('systemSettings.metricsAccessDescription'), icon: <Key size={14} /> },
-    { label: t('systemSettings.archiveBrowsingLimitsTitle'), description: t('systemSettings.archiveBrowsingLimitsDescription'), icon: <AlertTriangle size={14} /> },
-    { label: t('systemSettings.proxyAuthTitle'), description: t('systemSettings.proxyAuthDescription'), icon: <Settings size={14} /> },
+    {
+      label: t('systemSettings.operationTimeoutsTitle'),
+      description: t('systemSettings.operationTimeoutsDescription'),
+      icon: <Clock size={14} />,
+    },
+    {
+      label: t('systemSettings.repositoryMonitoringTitle'),
+      description: t('systemSettings.repositoryMonitoringDescription'),
+      icon: <RefreshCw size={14} />,
+    },
+    {
+      label: t('systemSettings.metricsAccessTitle'),
+      description: t('systemSettings.metricsAccessDescription'),
+      icon: <Key size={14} />,
+    },
+    {
+      label: t('systemSettings.archiveBrowsingLimitsTitle'),
+      description: t('systemSettings.archiveBrowsingLimitsDescription'),
+      icon: <AlertTriangle size={14} />,
+    },
+    {
+      label: t('systemSettings.proxyAuthTitle'),
+      description: t('systemSettings.proxyAuthDescription'),
+      icon: <Settings size={14} />,
+    },
   ]
 
   if (isLoading) {
@@ -516,7 +589,9 @@ const SystemSettingsTab: React.FC = () => {
                   </Tooltip>
                 )}
               </div>
-              <p className="text-sm text-muted-foreground">{sectionTabs[activeSection].description}</p>
+              <p className="text-sm text-muted-foreground">
+                {sectionTabs[activeSection].description}
+              </p>
             </div>
 
             <div className="border-t border-border" />
@@ -524,12 +599,72 @@ const SystemSettingsTab: React.FC = () => {
             {/* Section 0: Operation Timeouts */}
             {activeSection === 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                <TimeoutField id="sys-timeout-mount" label={t('systemSettings.mountTimeoutLabel')} value={mountTimeout} onChange={setMountTimeout} step={10} sourceKey="mount_timeout" helperExtra={t('systemSettings.mountTimeoutHelper')} renderSourceLabel={renderSourceLabel} timeoutSources={timeoutSources} />
-                <TimeoutField id="sys-timeout-info" label={t('systemSettings.infoTimeoutLabel')} value={infoTimeout} onChange={setInfoTimeout} step={60} sourceKey="info_timeout" helperExtra={t('systemSettings.infoTimeoutHelper')} renderSourceLabel={renderSourceLabel} timeoutSources={timeoutSources} />
-                <TimeoutField id="sys-timeout-list" label={t('systemSettings.listTimeoutLabel')} value={listTimeout} onChange={setListTimeout} step={60} sourceKey="list_timeout" helperExtra={t('systemSettings.listTimeoutHelper')} renderSourceLabel={renderSourceLabel} timeoutSources={timeoutSources} />
-                <TimeoutField id="sys-timeout-init" label={t('systemSettings.initTimeoutLabel')} value={initTimeout} onChange={setInitTimeout} step={60} sourceKey="init_timeout" helperExtra={t('systemSettings.initTimeoutHelper')} renderSourceLabel={renderSourceLabel} timeoutSources={timeoutSources} />
-                <TimeoutField id="sys-timeout-backup" label={t('systemSettings.backupTimeoutLabel')} value={backupTimeout} onChange={setBackupTimeout} step={300} sourceKey="backup_timeout" helperExtra={t('systemSettings.backupTimeoutHelper')} renderSourceLabel={renderSourceLabel} timeoutSources={timeoutSources} />
-                <TimeoutField id="sys-timeout-source-size" label={t('systemSettings.sourceSizeTimeoutLabel')} value={sourceSizeTimeout} onChange={setSourceSizeTimeout} step={300} sourceKey="source_size_timeout" helperExtra={t('systemSettings.sourceSizeTimeoutHelper')} renderSourceLabel={renderSourceLabel} timeoutSources={timeoutSources} />
+                <TimeoutField
+                  id="sys-timeout-mount"
+                  label={t('systemSettings.mountTimeoutLabel')}
+                  value={mountTimeout}
+                  onChange={setMountTimeout}
+                  step={10}
+                  sourceKey="mount_timeout"
+                  helperExtra={t('systemSettings.mountTimeoutHelper')}
+                  renderSourceLabel={renderSourceLabel}
+                  timeoutSources={timeoutSources}
+                />
+                <TimeoutField
+                  id="sys-timeout-info"
+                  label={t('systemSettings.infoTimeoutLabel')}
+                  value={infoTimeout}
+                  onChange={setInfoTimeout}
+                  step={60}
+                  sourceKey="info_timeout"
+                  helperExtra={t('systemSettings.infoTimeoutHelper')}
+                  renderSourceLabel={renderSourceLabel}
+                  timeoutSources={timeoutSources}
+                />
+                <TimeoutField
+                  id="sys-timeout-list"
+                  label={t('systemSettings.listTimeoutLabel')}
+                  value={listTimeout}
+                  onChange={setListTimeout}
+                  step={60}
+                  sourceKey="list_timeout"
+                  helperExtra={t('systemSettings.listTimeoutHelper')}
+                  renderSourceLabel={renderSourceLabel}
+                  timeoutSources={timeoutSources}
+                />
+                <TimeoutField
+                  id="sys-timeout-init"
+                  label={t('systemSettings.initTimeoutLabel')}
+                  value={initTimeout}
+                  onChange={setInitTimeout}
+                  step={60}
+                  sourceKey="init_timeout"
+                  helperExtra={t('systemSettings.initTimeoutHelper')}
+                  renderSourceLabel={renderSourceLabel}
+                  timeoutSources={timeoutSources}
+                />
+                <TimeoutField
+                  id="sys-timeout-backup"
+                  label={t('systemSettings.backupTimeoutLabel')}
+                  value={backupTimeout}
+                  onChange={setBackupTimeout}
+                  step={300}
+                  sourceKey="backup_timeout"
+                  helperExtra={t('systemSettings.backupTimeoutHelper')}
+                  renderSourceLabel={renderSourceLabel}
+                  timeoutSources={timeoutSources}
+                />
+                <TimeoutField
+                  id="sys-timeout-source-size"
+                  label={t('systemSettings.sourceSizeTimeoutLabel')}
+                  value={sourceSizeTimeout}
+                  onChange={setSourceSizeTimeout}
+                  step={300}
+                  sourceKey="source_size_timeout"
+                  helperExtra={t('systemSettings.sourceSizeTimeoutHelper')}
+                  renderSourceLabel={renderSourceLabel}
+                  timeoutSources={timeoutSources}
+                />
               </div>
             )}
 
@@ -538,7 +673,14 @@ const SystemSettingsTab: React.FC = () => {
               <div className="flex flex-col gap-4">
                 <div className="grid grid-cols-1 md:grid-cols-[minmax(280px,340px)_auto] gap-3 items-start">
                   <div>
-                    <Label htmlFor="sys-stats-refresh-interval" className={cn('text-xs font-semibold mb-1.5 block', (statsRefreshInterval < 0 || statsRefreshInterval > MAX_STATS_REFRESH) && 'text-destructive')}>
+                    <Label
+                      htmlFor="sys-stats-refresh-interval"
+                      className={cn(
+                        'text-xs font-semibold mb-1.5 block',
+                        (statsRefreshInterval < 0 || statsRefreshInterval > MAX_STATS_REFRESH) &&
+                          'text-destructive'
+                      )}
+                    >
                       {t('systemSettings.statsRefreshIntervalLabel')}
                     </Label>
                     <Input
@@ -549,14 +691,20 @@ const SystemSettingsTab: React.FC = () => {
                       min={0}
                       max={MAX_STATS_REFRESH}
                       step={15}
-                      className={cn('h-9 text-sm', (statsRefreshInterval < 0 || statsRefreshInterval > MAX_STATS_REFRESH) && 'border-destructive')}
+                      className={cn(
+                        'h-9 text-sm',
+                        (statsRefreshInterval < 0 || statsRefreshInterval > MAX_STATS_REFRESH) &&
+                          'border-destructive'
+                      )}
                     />
                     <p className="text-xs text-muted-foreground mt-1">
                       {statsRefreshInterval === 0
                         ? t('systemSettings.statsRefreshDisabled')
                         : statsRefreshInterval < 0 || statsRefreshInterval > MAX_STATS_REFRESH
                           ? t('systemSettings.statsRefreshRangeError', { max: MAX_STATS_REFRESH })
-                          : t('systemSettings.statsRefreshIntervalHelper', { interval: statsRefreshInterval })}
+                          : t('systemSettings.statsRefreshIntervalHelper', {
+                              interval: statsRefreshInterval,
+                            })}
                     </p>
                   </div>
                   <Button
@@ -565,21 +713,59 @@ const SystemSettingsTab: React.FC = () => {
                     disabled={isRefreshingStats}
                     className="gap-1.5 h-9 self-start mt-6"
                   >
-                    {isRefreshingStats ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
-                    {isRefreshingStats ? t('systemSettings.refreshing') : t('systemSettings.refreshNow')}
+                    {isRefreshingStats ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : (
+                      <RefreshCw size={14} />
+                    )}
+                    {isRefreshingStats
+                      ? t('systemSettings.refreshing')
+                      : t('systemSettings.refreshNow')}
                   </Button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4" style={{ maxWidth: 640 }}>
                   <div>
-                    <Label htmlFor="max-concurrent-backups" className="text-xs font-semibold mb-1.5 block">{t('systemSettings.maxConcurrentScheduledBackupsLabel')}</Label>
-                    <Input id="max-concurrent-backups" type="number" value={maxConcurrentScheduledBackups} onChange={(e) => setMaxConcurrentScheduledBackups(Number(e.target.value))} min={0} max={MAX_SCHEDULE_CONCURRENCY} step={1} className="h-9 text-sm" />
-                    <p className="text-xs text-muted-foreground mt-1">{t('systemSettings.maxConcurrentScheduledBackupsHelper')}</p>
+                    <Label
+                      htmlFor="max-concurrent-backups"
+                      className="text-xs font-semibold mb-1.5 block"
+                    >
+                      {t('systemSettings.maxConcurrentScheduledBackupsLabel')}
+                    </Label>
+                    <Input
+                      id="max-concurrent-backups"
+                      type="number"
+                      value={maxConcurrentScheduledBackups}
+                      onChange={(e) => setMaxConcurrentScheduledBackups(Number(e.target.value))}
+                      min={0}
+                      max={MAX_SCHEDULE_CONCURRENCY}
+                      step={1}
+                      className="h-9 text-sm"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {t('systemSettings.maxConcurrentScheduledBackupsHelper')}
+                    </p>
                   </div>
                   <div>
-                    <Label htmlFor="max-concurrent-checks" className="text-xs font-semibold mb-1.5 block">{t('systemSettings.maxConcurrentScheduledChecksLabel')}</Label>
-                    <Input id="max-concurrent-checks" type="number" value={maxConcurrentScheduledChecks} onChange={(e) => setMaxConcurrentScheduledChecks(Number(e.target.value))} min={0} max={MAX_SCHEDULE_CONCURRENCY} step={1} className="h-9 text-sm" />
-                    <p className="text-xs text-muted-foreground mt-1">{t('systemSettings.maxConcurrentScheduledChecksHelper')}</p>
+                    <Label
+                      htmlFor="max-concurrent-checks"
+                      className="text-xs font-semibold mb-1.5 block"
+                    >
+                      {t('systemSettings.maxConcurrentScheduledChecksLabel')}
+                    </Label>
+                    <Input
+                      id="max-concurrent-checks"
+                      type="number"
+                      value={maxConcurrentScheduledChecks}
+                      onChange={(e) => setMaxConcurrentScheduledChecks(Number(e.target.value))}
+                      min={0}
+                      max={MAX_SCHEDULE_CONCURRENCY}
+                      step={1}
+                      className="h-9 text-sm"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {t('systemSettings.maxConcurrentScheduledChecksHelper')}
+                    </p>
                   </div>
                 </div>
 
@@ -600,7 +786,10 @@ const SystemSettingsTab: React.FC = () => {
                     checked={metricsEnabled}
                     onCheckedChange={(enabled) => {
                       setMetricsEnabled(enabled)
-                      if (!enabled) { setMetricsRequireAuth(false); setRotateMetricsToken(false) }
+                      if (!enabled) {
+                        setMetricsRequireAuth(false)
+                        setRotateMetricsToken(false)
+                      }
                     }}
                   />
                   <span className="text-sm">{t('systemSettings.metricsEnabledLabel')}</span>
@@ -653,9 +842,7 @@ const SystemSettingsTab: React.FC = () => {
                         </span>
                       </div>
                       <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-border bg-background">
-                        <span
-                          className="flex-1 text-xs break-all select-all font-mono leading-relaxed"
-                        >
+                        <span className="flex-1 text-xs break-all select-all font-mono leading-relaxed">
                           {newMetricsToken}
                         </span>
                         <Tooltip>
@@ -674,7 +861,9 @@ const SystemSettingsTab: React.FC = () => {
                             </button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            {metricsTokenCopied ? t('systemSettings.metricsTokenCopied') : t('common.buttons.copy')}
+                            {metricsTokenCopied
+                              ? t('systemSettings.metricsTokenCopied')
+                              : t('common.buttons.copy')}
                           </TooltipContent>
                         </Tooltip>
                       </div>
@@ -688,7 +877,14 @@ const SystemSettingsTab: React.FC = () => {
             {activeSection === 3 && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="sys-browse-max-items" className={cn('text-xs font-semibold mb-1.5 block', (browseMaxItems < MIN_FILES || browseMaxItems > MAX_FILES) && 'text-destructive')}>
+                  <Label
+                    htmlFor="sys-browse-max-items"
+                    className={cn(
+                      'text-xs font-semibold mb-1.5 block',
+                      (browseMaxItems < MIN_FILES || browseMaxItems > MAX_FILES) &&
+                        'text-destructive'
+                    )}
+                  >
                     {t('systemSettings.maxFilesToLoadLabel')}
                   </Label>
                   <Input
@@ -699,17 +895,33 @@ const SystemSettingsTab: React.FC = () => {
                     min={MIN_FILES}
                     max={MAX_FILES}
                     step={100_000}
-                    className={cn('h-9 text-sm', (browseMaxItems < MIN_FILES || browseMaxItems > MAX_FILES) && 'border-destructive')}
+                    className={cn(
+                      'h-9 text-sm',
+                      (browseMaxItems < MIN_FILES || browseMaxItems > MAX_FILES) &&
+                        'border-destructive'
+                    )}
                   />
                   <p className="text-xs text-muted-foreground mt-1">
                     {browseMaxItems < MIN_FILES || browseMaxItems > MAX_FILES
-                      ? t('systemSettings.maxFilesRangeError', { min: MIN_FILES.toLocaleString(), max: MAX_FILES.toLocaleString() })
-                      : t('systemSettings.maxFilesHelperText', { current: (browseMaxItems / 1_000_000).toFixed(1) })}
+                      ? t('systemSettings.maxFilesRangeError', {
+                          min: MIN_FILES.toLocaleString(),
+                          max: MAX_FILES.toLocaleString(),
+                        })
+                      : t('systemSettings.maxFilesHelperText', {
+                          current: (browseMaxItems / 1_000_000).toFixed(1),
+                        })}
                   </p>
                 </div>
 
                 <div>
-                  <Label htmlFor="sys-browse-max-memory" className={cn('text-xs font-semibold mb-1.5 block', (browseMaxMemoryMb < MIN_MEMORY || browseMaxMemoryMb > MAX_MEMORY) && 'text-destructive')}>
+                  <Label
+                    htmlFor="sys-browse-max-memory"
+                    className={cn(
+                      'text-xs font-semibold mb-1.5 block',
+                      (browseMaxMemoryMb < MIN_MEMORY || browseMaxMemoryMb > MAX_MEMORY) &&
+                        'text-destructive'
+                    )}
+                  >
                     {t('systemSettings.maxMemoryLabel')}
                   </Label>
                   <Input
@@ -720,12 +932,21 @@ const SystemSettingsTab: React.FC = () => {
                     min={MIN_MEMORY}
                     max={MAX_MEMORY}
                     step={128}
-                    className={cn('h-9 text-sm', (browseMaxMemoryMb < MIN_MEMORY || browseMaxMemoryMb > MAX_MEMORY) && 'border-destructive')}
+                    className={cn(
+                      'h-9 text-sm',
+                      (browseMaxMemoryMb < MIN_MEMORY || browseMaxMemoryMb > MAX_MEMORY) &&
+                        'border-destructive'
+                    )}
                   />
                   <p className="text-xs text-muted-foreground mt-1">
                     {browseMaxMemoryMb < MIN_MEMORY || browseMaxMemoryMb > MAX_MEMORY
-                      ? t('systemSettings.maxMemoryRangeError', { min: MIN_MEMORY, max: MAX_MEMORY })
-                      : t('systemSettings.maxMemoryHelperText', { current: (browseMaxMemoryMb / 1024).toFixed(2) })}
+                      ? t('systemSettings.maxMemoryRangeError', {
+                          min: MIN_MEMORY,
+                          max: MAX_MEMORY,
+                        })
+                      : t('systemSettings.maxMemoryHelperText', {
+                          current: (browseMaxMemoryMb / 1024).toFixed(2),
+                        })}
                   </p>
                 </div>
               </div>
@@ -747,9 +968,7 @@ const SystemSettingsTab: React.FC = () => {
                     {proxyAuthHeaderRows.map(([labelKey, value]) => (
                       <div key={labelKey} className="p-3 rounded-xl border border-border">
                         <p className="text-xs text-muted-foreground mb-1">{t(labelKey)}</p>
-                        <p
-                          className="text-sm break-words font-mono"
-                        >
+                        <p className="text-sm break-words font-mono">
                           {value || t('systemSettings.proxyAuthNotConfigured')}
                         </p>
                       </div>
@@ -761,9 +980,11 @@ const SystemSettingsTab: React.FC = () => {
                   <div className="p-3 rounded-xl text-sm flex flex-col gap-2 border border-border bg-muted/40 text-foreground">
                     <p className="font-semibold">{t('systemSettings.proxyAuthWarningsTitle')}</p>
                     <div className="flex flex-col gap-1.5">
-                      {proxyAuthConfig.proxy_auth_health.warnings.map((warning: { code: string; message: string }) => (
-                        <p key={warning.code}>• {warning.message}</p>
-                      ))}
+                      {proxyAuthConfig.proxy_auth_health.warnings.map(
+                        (warning: { code: string; message: string }) => (
+                          <p key={warning.code}>• {warning.message}</p>
+                        )
+                      )}
                     </div>
                   </div>
                 ) : proxyAuthConfig?.proxy_auth_enabled ? (

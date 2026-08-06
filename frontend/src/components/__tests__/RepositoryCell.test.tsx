@@ -5,7 +5,9 @@ import RepositoryCell from '../RepositoryCell'
 describe('RepositoryCell', () => {
   describe('Display name logic', () => {
     it('displays repository name when provided', () => {
-      renderWithProviders(<RepositoryCell repositoryName="My Backup" repositoryPath="/backup/repo" />)
+      renderWithProviders(
+        <RepositoryCell repositoryName="My Backup" repositoryPath="/backup/repo" />
+      )
       expect(screen.getByText('My Backup')).toBeInTheDocument()
     })
 
@@ -36,7 +38,9 @@ describe('RepositoryCell', () => {
 
   describe('Path display', () => {
     it('shows path in monospace below name', () => {
-      renderWithProviders(<RepositoryCell repositoryName="My Backup" repositoryPath="/backup/repo" />)
+      renderWithProviders(
+        <RepositoryCell repositoryName="My Backup" repositoryPath="/backup/repo" />
+      )
       // Name is shown
       expect(screen.getByText('My Backup')).toBeInTheDocument()
       // Path is also shown (in caption)
@@ -75,7 +79,9 @@ describe('RepositoryCell', () => {
 
   describe('Tooltip', () => {
     it('wraps content in a tooltip element', () => {
-      renderWithProviders(<RepositoryCell repositoryName="My Backup" repositoryPath="/very/long/backup/path" />)
+      renderWithProviders(
+        <RepositoryCell repositoryName="My Backup" repositoryPath="/very/long/backup/path" />
+      )
       // MUI Tooltip wraps content - verify the structure exists
       expect(screen.getByText('My Backup')).toBeInTheDocument()
       expect(screen.getByText('/very/long/backup/path')).toBeInTheDocument()

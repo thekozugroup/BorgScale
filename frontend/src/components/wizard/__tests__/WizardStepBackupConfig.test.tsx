@@ -252,9 +252,7 @@ describe('WizardStepBackupConfig', () => {
     async function openPowerAdvanced() {
       const { userEvent } = await import('@testing-library/user-event')
       const user = userEvent.setup()
-      const trigger = screen
-        .getByTestId('power-advanced')
-        .querySelector('button')
+      const trigger = screen.getByTestId('power-advanced').querySelector('button')
       if (!trigger) throw new Error('power-advanced trigger not found')
       await user.click(trigger)
       return user

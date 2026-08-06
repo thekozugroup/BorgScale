@@ -111,7 +111,8 @@ const BackupHistorySection: React.FC<BackupHistorySectionProps> = ({
     return true
   })
 
-  const hasFilters = filterSchedule !== 'all' || filterRepository !== 'all' || filterStatus !== 'all'
+  const hasFilters =
+    filterSchedule !== 'all' || filterRepository !== 'all' || filterStatus !== 'all'
 
   return (
     <div className="mt-6">
@@ -121,8 +122,14 @@ const BackupHistorySection: React.FC<BackupHistorySectionProps> = ({
           <p className="text-base font-semibold">{t('backupHistory.title')}</p>
           <p className="text-sm text-muted-foreground">
             {hasFilters
-              ? t('backupHistory.showingFiltered', { filtered: filteredBackupJobs.length, total: backupJobs.length })
-              : t('backupHistory.showing', { filtered: filteredBackupJobs.length, total: backupJobs.length })}
+              ? t('backupHistory.showingFiltered', {
+                  filtered: filteredBackupJobs.length,
+                  total: backupJobs.length,
+                })
+              : t('backupHistory.showing', {
+                  filtered: filteredBackupJobs.length,
+                  total: backupJobs.length,
+                })}
           </p>
         </div>
         {hasFilters && (
@@ -134,7 +141,10 @@ const BackupHistorySection: React.FC<BackupHistorySectionProps> = ({
               onFilterScheduleChange('all')
               onFilterRepositoryChange('all')
               onFilterStatusChange('all')
-              trackNavigation(EventAction.FILTER, { section: 'backup_history', filter_kind: 'reset' })
+              trackNavigation(EventAction.FILTER, {
+                section: 'backup_history',
+                filter_kind: 'reset',
+              })
             }}
           >
             {t('common.clearFilters', { defaultValue: 'Clear filters' })}
@@ -149,7 +159,11 @@ const BackupHistorySection: React.FC<BackupHistorySectionProps> = ({
           onValueChange={(v) => {
             const value = v === 'all' ? 'all' : Number(v)
             onFilterScheduleChange(value as number | 'all')
-            trackNavigation(EventAction.FILTER, { section: 'backup_history', filter_kind: 'schedule', filter_value: value })
+            trackNavigation(EventAction.FILTER, {
+              section: 'backup_history',
+              filter_kind: 'schedule',
+              filter_value: value,
+            })
           }}
         >
           <SelectTrigger className="flex-1 min-w-[150px] sm:min-w-[150px] text-sm font-semibold h-9">
@@ -158,7 +172,9 @@ const BackupHistorySection: React.FC<BackupHistorySectionProps> = ({
           <SelectContent>
             <SelectItem value="all">{t('backupHistory.allSchedules')}</SelectItem>
             {scheduledJobs.map((job) => (
-              <SelectItem key={job.id} value={String(job.id)}>{job.name}</SelectItem>
+              <SelectItem key={job.id} value={String(job.id)}>
+                {job.name}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -169,7 +185,11 @@ const BackupHistorySection: React.FC<BackupHistorySectionProps> = ({
             value={filterRepository}
             onChange={(v) => {
               onFilterRepositoryChange(v as string)
-              trackNavigation(EventAction.FILTER, { section: 'backup_history', filter_kind: 'repository', filter_value: v as string })
+              trackNavigation(EventAction.FILTER, {
+                section: 'backup_history',
+                filter_kind: 'repository',
+                filter_value: v as string,
+              })
             }}
             valueKey="path"
             size="small"
@@ -185,7 +205,11 @@ const BackupHistorySection: React.FC<BackupHistorySectionProps> = ({
           value={filterStatus}
           onValueChange={(v) => {
             onFilterStatusChange(v)
-            trackNavigation(EventAction.FILTER, { section: 'backup_history', filter_kind: 'status', filter_value: v })
+            trackNavigation(EventAction.FILTER, {
+              section: 'backup_history',
+              filter_kind: 'status',
+              filter_value: v,
+            })
           }}
         >
           <SelectTrigger className="flex-1 min-w-[140px] text-sm font-semibold h-9">
@@ -204,7 +228,13 @@ const BackupHistorySection: React.FC<BackupHistorySectionProps> = ({
         jobs={filteredBackupJobs}
         repositories={repositories || []}
         loading={isLoading}
-        actions={{ viewLogs: true, cancel: true, downloadLogs: true, errorInfo: true, delete: true }}
+        actions={{
+          viewLogs: true,
+          cancel: true,
+          downloadLogs: true,
+          errorInfo: true,
+          delete: true,
+        }}
         canBreakLocks={canBreakLocks}
         canDeleteJobs={canDeleteJobs}
         getRowKey={(job) => String(job.id)}

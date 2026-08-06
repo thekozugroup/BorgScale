@@ -230,32 +230,63 @@ elif settings.environment == "development":
     settings.log_level = os.getenv("LOG_LEVEL", "DEBUG")
 
 
-# Security validation
-def validate_security_settings():
-    """Validate critical security settings"""
-    issues = []
+class InsecureConfigurationError(RuntimeError):
+    """Raised when a production configuration cannot be made safe."""
 
-    # Minimal validation - most security concerns are now auto-handled
+
+def validate_security_settings():
+    """Validate critical security settings.
+
+    Anything that makes the deployment forgeable refuses to start. Warning and
+    continuing is worse than not booting: the operator sees a healthy instance
+    and only learns otherwise from an incident. Everything auto-generated is
+    already correct by construction, so a fatal result here always means an
+    explicit override that cannot be honoured safely.
+    """
+    fatal = []
+    warnings = []
+
     if settings.environment == "production":
         if len(settings.secret_key) < 32:
-            issues.append(
-                "WARNING: SECRET_KEY is too short (< 32 characters). "
-                "Auto-generation failed or manual override is weak."
+            # Auto-generation produces 43 characters, so this only trips on a
+            # SECRET_KEY the operator set by hand. A short key is brute-forceable
+            # and lets an attacker mint valid session tokens.
+            fatal.append(
+                "SECRET_KEY is shorter than 32 characters. Session tokens signed "
+                "with it can be forged. Unset SECRET_KEY to have one generated and "
+                "persisted automatically, or supply at least 32 random characters."
+            )
+
+        if "*" in settings.cors_origins:
+            fatal.append(
+                "CORS_ORIGINS allows any origin (*) while credentials are enabled. "
+                "List the exact origins that serve BorgScale."
             )
 
         if settings.debug:
-            issues.append(
-                "WARNING: Debug mode is enabled in production. "
-                "Set DEBUG=false or ENVIRONMENT=production to disable."
+            warnings.append(
+                "Debug mode is enabled in production. Set DEBUG=false to disable."
             )
 
-    # Log warnings
-    if issues:
-        import logging
+    if settings.allow_insecure_no_auth and settings.environment == "production":
+        warnings.append(
+            "ALLOW_INSECURE_NO_AUTH is enabled in a production environment. Every "
+            "request is treated as an authenticated local user."
+        )
 
-        logger = logging.getLogger(__name__)
-        for issue in issues:
-            logger.warning(issue)
+    import logging
+
+    logger = logging.getLogger(__name__)
+    for warning in warnings:
+        logger.warning(warning)
+
+    if fatal:
+        for issue in fatal:
+            logger.error(issue)
+        raise InsecureConfigurationError(
+            "Refusing to start with an insecure production configuration:\n  - "
+            + "\n  - ".join(fatal)
+        )
 
 
 # Run validation

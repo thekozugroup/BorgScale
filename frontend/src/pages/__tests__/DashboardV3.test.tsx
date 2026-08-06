@@ -19,7 +19,9 @@ vi.mock('react-router-dom', async () => {
 })
 
 vi.mock('../../context/ThemeContext', async () => {
-  const actual = await vi.importActual<typeof import('../../context/ThemeContext')>('../../context/ThemeContext')
+  const actual = await vi.importActual<typeof import('../../context/ThemeContext')>(
+    '../../context/ThemeContext'
+  )
   return {
     ...actual,
     useTheme: () => ({ mode: 'dark', effectiveMode: 'dark' }),
@@ -161,7 +163,11 @@ beforeEach(() => {
   vi.clearAllMocks()
   getOverviewMock.mockResolvedValue({ data: makeOverview() })
   // Default: suppress localStorage access (provide setItem to avoid ThemeProvider errors)
-  vi.stubGlobal('localStorage', { getItem: () => 'test-token', setItem: vi.fn(), removeItem: vi.fn() })
+  vi.stubGlobal('localStorage', {
+    getItem: () => 'test-token',
+    setItem: vi.fn(),
+    removeItem: vi.fn(),
+  })
 })
 
 // ─── Tests ────────────────────────────────────────────────────────────────────
@@ -298,13 +304,49 @@ describe('DashboardV3', () => {
       await waitFor(() => expect(screen.getByText('No repositories')).toBeInTheDocument())
     })
 
-    it('clicking a repo card navigates to /repositories', async () => {
+    it('clicking a repo card navigates to that repository, not the generic list', async () => {
       mockFetchSuccess(makeOverview())
       renderDashboard()
       await waitFor(() => screen.getAllByText('my-server'))
       // 'my-server' appears first in the repository health grid card (index 0)
       fireEvent.click(screen.getAllByText('my-server')[0])
-      expect(mockNavigate).toHaveBeenCalledWith('/repositories')
+      expect(mockNavigate).toHaveBeenCalledWith('/repositories?repo=1')
+    })
+
+    it('activates a repo card from the keyboard and lands on that repository', async () => {
+      mockFetchSuccess(makeOverview())
+      renderDashboard()
+      await waitFor(() => screen.getAllByText('backup-nas'))
+      const card = screen.getAllByText('backup-nas')[0].closest('[role="button"]')
+      fireEvent.keyDown(card!, { key: 'Enter' })
+      expect(mockNavigate).toHaveBeenCalledWith('/repositories?repo=2')
+    })
+
+    it('surfaces the warnings carried in the health payload', async () => {
+      mockFetchSuccess(makeOverview())
+      renderDashboard()
+      await waitFor(() => expect(screen.getByText('No archives detected')).toBeInTheDocument())
+    })
+
+    it('separates healthy and warning cards with the status tokens', async () => {
+      const data = makeOverview({
+        repository_health: makeOverview().repository_health.map((r, i) =>
+          i === 0 ? r : { ...r, health_status: 'warning' }
+        ),
+      })
+      mockFetchSuccess(data)
+      renderDashboard()
+      await waitFor(() => screen.getAllByText('my-server'))
+
+      const cards = screen
+        .getAllByRole('button')
+        .filter((el) => el.className.includes('rounded-lg'))
+      const healthyCard = cards.find((el) => el.textContent?.includes('my-server'))
+      const warningCard = cards.find((el) => el.textContent?.includes('backup-nas'))
+
+      expect(healthyCard?.className).toContain('bg-success-subtle')
+      expect(warningCard?.className).toContain('bg-warning-subtle')
+      expect(healthyCard?.className).not.toBe(warningCard?.className)
     })
 
     it('shows "manual" badge for repos without a schedule', async () => {
@@ -366,7 +408,39 @@ describe('DashboardV3', () => {
     })
   })
 
+  describe('page chrome', () => {
+    it('uses the design-system page title spec', async () => {
+      mockFetchSuccess(makeOverview())
+      renderDashboard()
+      const heading = await screen.findByRole('heading', { level: 1 })
+      expect(heading.className).toContain('text-2xl')
+      expect(heading.className).toContain('font-semibold')
+      expect(heading.className).toContain('tracking-tight')
+    })
+
+    it('holds the stat tiles at two columns until there is room for four', async () => {
+      mockFetchSuccess(makeOverview())
+      renderDashboard()
+      await waitFor(() => screen.getAllByText('my-server'))
+
+      const grid = screen.getByText('2').closest('.grid')
+      expect(grid?.className).toContain('xl:grid-cols-4')
+      expect(grid?.className).not.toContain('md:grid-cols-4')
+    })
+  })
+
   describe('activity section', () => {
+    it('gives a failed job a different badge from a completed one', async () => {
+      mockFetchSuccess(makeOverview())
+      renderDashboard()
+      await waitFor(() => expect(screen.getByText('Completed')).toBeInTheDocument())
+
+      const completed = screen.getByText('Completed').closest('[data-slot="badge"]')
+      const failed = screen.getByText('Failed').closest('[data-slot="badge"]')
+      expect(completed?.className).toContain('text-success')
+      expect(failed?.className).toContain('text-destructive')
+    })
+
     it('shows "No activity recorded yet" when feed is empty', async () => {
       mockFetchSuccess(makeOverview({ activity_feed: [] }))
       renderDashboard()

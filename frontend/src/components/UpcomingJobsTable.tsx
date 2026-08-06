@@ -63,7 +63,9 @@ const UpcomingJobsTable: React.FC<UpcomingJobsTableProps> = ({
                 {/* Name + repo */}
                 <div className="flex-1 min-w-0 flex items-center gap-3 overflow-hidden">
                   <p className="text-sm font-semibold truncate flex-shrink-0">{job.name}</p>
-                  <p className="text-sm text-muted-foreground truncate min-w-0">{getRepoLabel(job)}</p>
+                  <p className="text-sm text-muted-foreground truncate min-w-0">
+                    {getRepoLabel(job)}
+                  </p>
                 </div>
 
                 {/* Countdown */}

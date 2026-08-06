@@ -1,4 +1,13 @@
-import { User, Building2, Pencil, ShieldCheck, KeyRound, Calendar, Fingerprint, Loader2 } from 'lucide-react'
+import {
+  User,
+  Building2,
+  Pencil,
+  ShieldCheck,
+  KeyRound,
+  Calendar,
+  Fingerprint,
+  Loader2,
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import AccountSecuritySection from './AccountSecuritySection'
 import { formatDateShort } from '../utils/dateUtils'
@@ -102,7 +111,9 @@ export default function AccountProfileSection({
               {createdAt && (
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold text-muted-foreground border border-border bg-muted/40">
                   <Calendar size={12} style={{ opacity: 0.8 }} />
-                  {t('settings.account.profile.badges.memberSince', { date: formatDateShort(createdAt) })}
+                  {t('settings.account.profile.badges.memberSince', {
+                    date: formatDateShort(createdAt),
+                  })}
                 </span>
               )}
             </div>
@@ -119,10 +130,7 @@ export default function AccountProfileSection({
               { label: t('settings.users.fields.email'), value: profileForm.email || '—' },
               { label: t('settings.users.fields.fullName'), value: profileForm.full_name || '—' },
             ].map((item) => (
-              <div
-                key={item.label}
-                className="p-3.5 rounded-2xl border border-border bg-muted/30"
-              >
+              <div key={item.label} className="p-3.5 rounded-2xl border border-border bg-muted/30">
                 <p className="text-2xs font-bold uppercase tracking-[0.06em] text-muted-foreground mb-1.5">
                   {item.label}
                 </p>
@@ -148,7 +156,9 @@ export default function AccountProfileSection({
                 <Pencil size={16} style={{ opacity: 0.45 }} />
               </div>
               <div className="min-w-0 text-left">
-                <p className="text-sm font-semibold truncate">{t('settings.account.editProfile')}</p>
+                <p className="text-sm font-semibold truncate">
+                  {t('settings.account.editProfile')}
+                </p>
                 <p className="text-xs text-muted-foreground truncate">
                   {profileForm.username} · {profileForm.email}
                 </p>
@@ -168,27 +178,29 @@ export default function AccountProfileSection({
       {canManageSystem && (
         <div>
           <p className="text-sm font-bold mb-1">{t('settings.account.profile.deployment.title')}</p>
-          <p className="text-sm text-muted-foreground mb-4">{t('settings.account.profile.deployment.description')}</p>
+          <p className="text-sm text-muted-foreground mb-4">
+            {t('settings.account.profile.deployment.description')}
+          </p>
 
-          <div
-            className="p-5 rounded-2xl border border-border"
-          >
+          <div className="p-5 rounded-2xl border border-border">
             <div className="flex flex-col gap-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {([
-                  {
-                    key: 'individual',
-                    title: t('settings.account.profile.deployment.individual'),
-                    body: t('settings.account.profile.deployment.individualDesc'),
-                    icon: <User size={16} />,
-                  },
-                  {
-                    key: 'enterprise',
-                    title: t('settings.account.profile.deployment.enterprise'),
-                    body: t('settings.account.profile.deployment.enterpriseDesc'),
-                    icon: <Building2 size={16} />,
-                  },
-                ] as const).map((option) => {
+                {(
+                  [
+                    {
+                      key: 'individual',
+                      title: t('settings.account.profile.deployment.individual'),
+                      body: t('settings.account.profile.deployment.individualDesc'),
+                      icon: <User size={16} />,
+                    },
+                    {
+                      key: 'enterprise',
+                      title: t('settings.account.profile.deployment.enterprise'),
+                      body: t('settings.account.profile.deployment.enterpriseDesc'),
+                      icon: <Building2 size={16} />,
+                    },
+                  ] as const
+                ).map((option) => {
                   const isSelected = deploymentForm.deployment_type === option.key
                   return (
                     <button
@@ -198,7 +210,9 @@ export default function AccountProfileSection({
                       className={`p-4 rounded-2xl text-left border ${isSelected ? 'border-border bg-primary/5' : 'border-border'}`}
                     >
                       <div className="flex items-center gap-3 mb-2">
-                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center border border-border ${isSelected ? 'bg-primary/10' : 'bg-muted/30'}`}>
+                        <div
+                          className={`w-8 h-8 rounded-xl flex items-center justify-center border border-border ${isSelected ? 'bg-primary/10' : 'bg-muted/30'}`}
+                        >
                           {option.icon}
                         </div>
                         <p className="text-sm font-bold">{option.title}</p>
@@ -211,7 +225,10 @@ export default function AccountProfileSection({
 
               {deploymentForm.deployment_type === 'enterprise' && (
                 <div>
-                  <Label htmlFor="deployment-org-name" className="text-xs font-semibold mb-1.5 block">
+                  <Label
+                    htmlFor="deployment-org-name"
+                    className="text-xs font-semibold mb-1.5 block"
+                  >
                     {t('settings.account.profile.deployment.orgName')}
                   </Label>
                   <Input

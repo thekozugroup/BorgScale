@@ -7,6 +7,13 @@ import { activityAPI } from '../services/api'
 import { useAnalytics } from '../hooks/useAnalytics'
 import { useAuth } from '../hooks/useAuth'
 import BackupJobsTable from '../components/BackupJobsTable'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface ActivityItem {
   id: number
@@ -53,20 +60,24 @@ const Activity: React.FC = () => {
 
   const handleTypeFilterChange = (value: string) => {
     setTypeFilter(value)
-    track(EventCategory.NAVIGATION, EventAction.FILTER, { filter_kind: 'type', filter_value: value })
+    track(EventCategory.NAVIGATION, EventAction.FILTER, {
+      filter_kind: 'type',
+      filter_value: value,
+    })
   }
 
   const handleStatusFilterChange = (value: string) => {
     setStatusFilter(value)
-    track(EventCategory.NAVIGATION, EventAction.FILTER, { filter_kind: 'status', filter_value: value })
+    track(EventCategory.NAVIGATION, EventAction.FILTER, {
+      filter_kind: 'status',
+      filter_value: value,
+    })
   }
 
   const processedActivities = React.useMemo(() => {
     if (!activities) return { grouped: [], individual: [] }
     return { grouped: [], individual: activities }
   }, [activities])
-
-  const selectClass = "rounded-xl border border-input bg-background h-8 px-2 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-ring min-w-[140px]"
 
   return (
     <div>
@@ -75,7 +86,7 @@ const Activity: React.FC = () => {
         <div className="flex items-center gap-3">
           <History size={28} className="flex-shrink-0" />
           <div>
-            <h1 className="text-2xl font-bold">{t('activity.title')}</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">{t('activity.title')}</h1>
             <p className="text-sm text-muted-foreground">{t('activity.subtitle')}</p>
           </div>
         </div>
@@ -92,37 +103,47 @@ const Activity: React.FC = () => {
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3 items-center mb-6">
-        <label htmlFor="activity-type-filter" className="sr-only">{t('activity.filters.type')}</label>
-        <select
-          id="activity-type-filter"
-          value={typeFilter}
-          onChange={(e) => handleTypeFilterChange(e.target.value)}
-          className={selectClass}
-          aria-label={t('activity.filters.type')}
-        >
-          <option value="all">{t('activity.filters.allTypes')}</option>
-          <option value="backup">{t('activity.filters.types.backup')}</option>
-          <option value="restore">{t('activity.filters.types.restore')}</option>
-          <option value="check">{t('activity.filters.types.check')}</option>
-          <option value="compact">{t('activity.filters.types.compact')}</option>
-          <option value="prune">{t('activity.filters.types.prune')}</option>
-          <option value="package">{t('activity.filters.types.package')}</option>
-        </select>
+        <label htmlFor="activity-type-filter" className="sr-only">
+          {t('activity.filters.type')}
+        </label>
+        <Select value={typeFilter} onValueChange={handleTypeFilterChange}>
+          <SelectTrigger
+            id="activity-type-filter"
+            className="min-w-36"
+            aria-label={t('activity.filters.type')}
+          >
+            <SelectValue placeholder={t('activity.filters.allTypes')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('activity.filters.allTypes')}</SelectItem>
+            <SelectItem value="backup">{t('activity.filters.types.backup')}</SelectItem>
+            <SelectItem value="restore">{t('activity.filters.types.restore')}</SelectItem>
+            <SelectItem value="check">{t('activity.filters.types.check')}</SelectItem>
+            <SelectItem value="compact">{t('activity.filters.types.compact')}</SelectItem>
+            <SelectItem value="prune">{t('activity.filters.types.prune')}</SelectItem>
+            <SelectItem value="package">{t('activity.filters.types.package')}</SelectItem>
+          </SelectContent>
+        </Select>
 
-        <label htmlFor="activity-status-filter" className="sr-only">{t('activity.filters.status')}</label>
-        <select
-          id="activity-status-filter"
-          value={statusFilter}
-          onChange={(e) => handleStatusFilterChange(e.target.value)}
-          className={selectClass}
-          aria-label={t('activity.filters.status')}
-        >
-          <option value="all">{t('activity.filters.allStatus')}</option>
-          <option value="completed">{t('activity.filters.statuses.completed')}</option>
-          <option value="failed">{t('activity.filters.statuses.failed')}</option>
-          <option value="running">{t('activity.filters.statuses.running')}</option>
-          <option value="pending">{t('activity.filters.statuses.pending')}</option>
-        </select>
+        <label htmlFor="activity-status-filter" className="sr-only">
+          {t('activity.filters.status')}
+        </label>
+        <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
+          <SelectTrigger
+            id="activity-status-filter"
+            className="min-w-36"
+            aria-label={t('activity.filters.status')}
+          >
+            <SelectValue placeholder={t('activity.filters.allStatus')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('activity.filters.allStatus')}</SelectItem>
+            <SelectItem value="completed">{t('activity.filters.statuses.completed')}</SelectItem>
+            <SelectItem value="failed">{t('activity.filters.statuses.failed')}</SelectItem>
+            <SelectItem value="running">{t('activity.filters.statuses.running')}</SelectItem>
+            <SelectItem value="pending">{t('activity.filters.statuses.pending')}</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Activity List */}
@@ -132,7 +153,13 @@ const Activity: React.FC = () => {
           showTypeColumn={true}
           showTriggerColumn={true}
           loading={true}
-          actions={{ viewLogs: true, downloadLogs: true, errorInfo: true, breakLock: true, delete: true }}
+          actions={{
+            viewLogs: true,
+            downloadLogs: true,
+            errorInfo: true,
+            breakLock: true,
+            delete: true,
+          }}
           canBreakLocks={canManageActivityJobs}
           canDeleteJobs={canManageActivityJobs}
           getRowKey={(activity) => `${activity.type}-${activity.id}`}
@@ -146,7 +173,13 @@ const Activity: React.FC = () => {
           showTypeColumn={true}
           showTriggerColumn={true}
           loading={false}
-          actions={{ viewLogs: true, downloadLogs: true, errorInfo: true, breakLock: true, delete: true }}
+          actions={{
+            viewLogs: true,
+            downloadLogs: true,
+            errorInfo: true,
+            breakLock: true,
+            delete: true,
+          }}
           canBreakLocks={canManageActivityJobs}
           canDeleteJobs={canManageActivityJobs}
           getRowKey={(activity) => `${activity.type}-${activity.id}`}

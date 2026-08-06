@@ -2,11 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { renderWithProviders, screen } from '../../test/test-utils'
 import ProtectedRoute from '../ProtectedRoute'
 
-const {
-  getTabDisabledReasonMock,
-  useAppStateMock,
-  useTabEnablementMock,
-} = vi.hoisted(() => ({
+const { getTabDisabledReasonMock, useAppStateMock, useTabEnablementMock } = vi.hoisted(() => ({
   getTabDisabledReasonMock: vi.fn(),
   useAppStateMock: vi.fn(),
   useTabEnablementMock: vi.fn(),

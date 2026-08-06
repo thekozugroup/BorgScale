@@ -424,7 +424,9 @@ describe('RepositoryInfoDialog', () => {
           onClose={vi.fn()}
         />
       )
-      expect(screen.queryByRole('button', { name: /export this key file/i })).not.toBeInTheDocument()
+      expect(
+        screen.queryByRole('button', { name: /export this key file/i })
+      ).not.toBeInTheDocument()
     })
 
     it('calls repositoriesAPI.downloadKeyfile with correct repo id on click', async () => {

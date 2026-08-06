@@ -164,6 +164,7 @@ class TestProcessUtils:
             [],  # running check jobs
             [mock_prune_job],  # running prune jobs
             [mock_compact_job],  # running compact jobs
+            [],  # repository lookup for orphaned backup job
             [mock_backup_job],  # backup jobs stuck in running_prune
             [],  # repository lookup for orphaned compact job
             [mock_compact_backup_job],  # backup jobs stuck in running_compact

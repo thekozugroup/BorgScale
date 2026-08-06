@@ -74,17 +74,24 @@ export default function WizardStepRestoreDestination({
           onClick={() => handleLocationChange('local')}
           className={cn(
             'flex-1 min-w-[200px] flex items-center gap-3 p-4 rounded-xl border text-left cursor-pointer',
-            isLocalSelected
-              ? 'border-primary ring-1 ring-primary bg-primary/8'
-              : 'border-border'
+            isLocalSelected ? 'border-primary ring-1 ring-primary bg-primary/8' : 'border-border'
           )}
         >
-          <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors', isLocalSelected ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground')}>
+          <div
+            className={cn(
+              'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors',
+              isLocalSelected
+                ? 'bg-primary text-primary-foreground shadow-md'
+                : 'bg-muted text-muted-foreground'
+            )}
+          >
             <Server size={24} />
           </div>
           <div>
             <p className="text-sm font-semibold">{t('wizard.borgUiServer')}</p>
-            <p className="text-xs text-muted-foreground">{t('wizard.restoreDestination.borgUiServerDesc')}</p>
+            <p className="text-xs text-muted-foreground">
+              {t('wizard.restoreDestination.borgUiServerDesc')}
+            </p>
           </div>
         </button>
 
@@ -94,17 +101,26 @@ export default function WizardStepRestoreDestination({
             onClick={() => handleLocationChange('ssh')}
             className={cn(
               'flex-1 min-w-[200px] flex items-center gap-3 p-4 rounded-xl border text-left cursor-pointer',
-              isSSHSelected
-                ? 'border-primary ring-1 ring-primary bg-primary/8'
-                : 'border-border'
+              isSSHSelected ? 'border-primary ring-1 ring-primary bg-primary/8' : 'border-border'
             )}
           >
-            <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors', isSSHSelected ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground')}>
+            <div
+              className={cn(
+                'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors',
+                isSSHSelected
+                  ? 'bg-primary text-primary-foreground shadow-md'
+                  : 'bg-muted text-muted-foreground'
+              )}
+            >
               <Cloud size={24} />
             </div>
             <div>
-              <p className="text-sm font-semibold">{t('wizard.restoreDestination.remoteMachine')}</p>
-              <p className="text-xs text-muted-foreground">{t('wizard.restoreDestination.remoteMachineDesc')}</p>
+              <p className="text-sm font-semibold">
+                {t('wizard.restoreDestination.remoteMachine')}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {t('wizard.restoreDestination.remoteMachineDesc')}
+              </p>
             </div>
           </button>
         )}
@@ -126,16 +142,24 @@ export default function WizardStepRestoreDestination({
             </div>
           ) : (
             <div>
-              <Label className="text-xs font-semibold mb-1.5 block">{t('wizard.restoreDestination.selectSshConnection')}</Label>
+              <Label className="text-xs font-semibold mb-1.5 block">
+                {t('wizard.restoreDestination.selectSshConnection')}
+              </Label>
               <select
-                value={data.destinationConnectionId === '' ? '' : String(data.destinationConnectionId)}
-                onChange={(e) => { if (e.target.value) onChange({ destinationConnectionId: Number(e.target.value) }) }}
+                value={
+                  data.destinationConnectionId === '' ? '' : String(data.destinationConnectionId)
+                }
+                onChange={(e) => {
+                  if (e.target.value) onChange({ destinationConnectionId: Number(e.target.value) })
+                }}
                 className="w-full rounded-md border border-input bg-background h-10 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <option value="">— {t('wizard.restoreDestination.selectSshConnection')} —</option>
                 {sshConnections.map((conn) => (
                   <option key={conn.id} value={String(conn.id)}>
-                    {conn.username}@{conn.host} — Port {conn.port}{conn.mount_point ? ` • ${conn.mount_point}` : ''}{conn.status === 'connected' ? ' ✓' : ''}
+                    {conn.username}@{conn.host} — Port {conn.port}
+                    {conn.mount_point ? ` • ${conn.mount_point}` : ''}
+                    {conn.status === 'connected' ? ' ✓' : ''}
                   </option>
                 ))}
               </select>
@@ -145,15 +169,22 @@ export default function WizardStepRestoreDestination({
       )}
 
       {/* Restore Strategy */}
-      {(data.destinationType === 'local' || (data.destinationType === 'ssh' && data.destinationConnectionId)) && (
+      {(data.destinationType === 'local' ||
+        (data.destinationType === 'ssh' && data.destinationConnectionId)) && (
         <div className="flex flex-col gap-3">
           {(['original', 'custom'] as const).map((value) => {
             const isSelected = data.restoreStrategy === value
             const icon = value === 'original' ? <FileCheck size={18} /> : <FolderOpen size={18} />
-            const title = value === 'original' ? t('wizard.restoreDestination.restoreToOriginal') : t('wizard.restoreDestination.restoreToCustom')
-            const description = value === 'original'
-              ? (data.destinationType === 'ssh' ? t('wizard.restoreDestination.restoreToOriginalDescRemote') : t('wizard.restoreDestination.restoreToOriginalDescLocal'))
-              : t('wizard.restoreDestination.restoreToCustomDesc')
+            const title =
+              value === 'original'
+                ? t('wizard.restoreDestination.restoreToOriginal')
+                : t('wizard.restoreDestination.restoreToCustom')
+            const description =
+              value === 'original'
+                ? data.destinationType === 'ssh'
+                  ? t('wizard.restoreDestination.restoreToOriginalDescRemote')
+                  : t('wizard.restoreDestination.restoreToOriginalDescLocal')
+                : t('wizard.restoreDestination.restoreToCustomDesc')
             return (
               <button
                 key={value}
@@ -164,7 +195,13 @@ export default function WizardStepRestoreDestination({
                   isSelected ? 'border-primary ring-1 ring-primary bg-primary/8' : 'border-border'
                 )}
               >
-                <input type="radio" name="restoreStrategy" checked={isSelected} onChange={() => onChange({ restoreStrategy: value })} className="mt-0.5 flex-shrink-0" />
+                <input
+                  type="radio"
+                  name="restoreStrategy"
+                  checked={isSelected}
+                  onChange={() => onChange({ restoreStrategy: value })}
+                  className="mt-0.5 flex-shrink-0"
+                />
                 <div className="flex items-start gap-2 min-w-0">
                   <span className="flex-shrink-0 mt-0.5">{icon}</span>
                   <div className="min-w-0">
@@ -182,19 +219,29 @@ export default function WizardStepRestoreDestination({
       {data.restoreStrategy === 'custom' && (
         <div className="flex flex-col gap-3">
           <div>
-            <Label className="text-xs font-semibold mb-1.5 block">{t('wizard.restoreDestination.customPathLabel')}</Label>
+            <Label className="text-xs font-semibold mb-1.5 block">
+              {t('wizard.restoreDestination.customPathLabel')}
+            </Label>
             <div className="relative">
               <Input
                 value={data.customPath}
                 onChange={(e) => onChange({ customPath: e.target.value })}
-                placeholder={data.destinationType === 'ssh' ? '/mnt/backup/restored' : '/Users/yourusername/restored'}
+                placeholder={
+                  data.destinationType === 'ssh'
+                    ? '/mnt/backup/restored'
+                    : '/Users/yourusername/restored'
+                }
                 required
                 className="h-9 text-sm pr-9"
               />
               <button
                 type="button"
                 onClick={onBrowsePath}
-                title={data.destinationType === 'ssh' ? t('wizard.restoreDestination.browseRemoteFilesystem') : t('wizard.restoreDestination.browseFilesystem')}
+                title={
+                  data.destinationType === 'ssh'
+                    ? t('wizard.restoreDestination.browseRemoteFilesystem')
+                    : t('wizard.restoreDestination.browseFilesystem')
+                }
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 <FolderOpen size={16} />
@@ -213,7 +260,9 @@ export default function WizardStepRestoreDestination({
                 {data.destinationType === 'ssh' ? <Cloud size={16} /> : <Server size={16} />}
               </span>
               <div>
-                <p className="text-xs text-muted-foreground mb-1">{t('wizard.restoreDestination.filesWillBeRestoredTo')}</p>
+                <p className="text-xs text-muted-foreground mb-1">
+                  {t('wizard.restoreDestination.filesWillBeRestoredTo')}
+                </p>
                 <p className="text-sm font-semibold font-mono text-primary">
                   {data.destinationType === 'ssh' ? getSshUrlPreview() : data.customPath}
                 </p>

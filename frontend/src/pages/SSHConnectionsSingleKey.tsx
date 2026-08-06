@@ -560,9 +560,18 @@ export default function SSHConnectionsSingleKey() {
             <Skeleton className="h-6 w-16 rounded-full" />
           </div>
           <div className="flex flex-col gap-4">
-            <div><Skeleton className="h-3 w-12 mb-1" /><Skeleton className="h-4 w-20" /></div>
-            <div><Skeleton className="h-3 w-20 mb-1" /><Skeleton className="h-4 w-3/5" /></div>
-            <div><Skeleton className="h-3 w-18 mb-2" /><Skeleton className="h-14 w-full rounded-lg" /></div>
+            <div>
+              <Skeleton className="h-3 w-12 mb-1" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+            <div>
+              <Skeleton className="h-3 w-20 mb-1" />
+              <Skeleton className="h-4 w-3/5" />
+            </div>
+            <div>
+              <Skeleton className="h-3 w-18 mb-2" />
+              <Skeleton className="h-14 w-full rounded-lg" />
+            </div>
             <div className="flex flex-col sm:flex-row gap-3">
               <Skeleton className="h-9 w-40 rounded-lg" />
               <Skeleton className="h-9 w-36 rounded-lg" />
@@ -599,7 +608,10 @@ export default function SSHConnectionsSingleKey() {
                 <div className="rounded-lg border border-border overflow-hidden">
                   <div className="grid grid-cols-2">
                     {[0, 1].map((j) => (
-                      <div key={j} className={`px-3 py-2 ${j === 0 ? 'border-r border-border' : ''}`}>
+                      <div
+                        key={j}
+                        className={`px-3 py-2 ${j === 0 ? 'border-r border-border' : ''}`}
+                      >
                         <Skeleton className="h-2 w-8 mb-1" />
                         <Skeleton className="h-4 w-12" />
                       </div>
@@ -628,9 +640,21 @@ export default function SSHConnectionsSingleKey() {
 
   // Alert style helpers removed — replaced by shadcn Alert component variants below
 
-  const FormField = ({ label, children, helper, fieldId }: { label: string; children: React.ReactNode; helper?: string; fieldId?: string }) => (
+  const FormField = ({
+    label,
+    children,
+    helper,
+    fieldId,
+  }: {
+    label: string
+    children: React.ReactNode
+    helper?: string
+    fieldId?: string
+  }) => (
     <div>
-      <Label htmlFor={fieldId} className="text-xs font-semibold mb-1.5 block">{label}</Label>
+      <Label htmlFor={fieldId} className="text-xs font-semibold mb-1.5 block">
+        {label}
+      </Label>
       {children}
       {helper && <p className="text-xs text-muted-foreground mt-1">{helper}</p>}
     </div>
@@ -642,7 +666,10 @@ export default function SSHConnectionsSingleKey() {
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-1">
           <h1 className="text-2xl font-bold">{t('sshConnections.title')}</h1>
-          <span title={`${t('sshConnections.singleKeySystem.title')}: ${t('sshConnections.singleKeySystem.description')}`} className="cursor-help opacity-50">
+          <span
+            title={`${t('sshConnections.singleKeySystem.title')}: ${t('sshConnections.singleKeySystem.description')}`}
+            className="cursor-help opacity-50"
+          >
             <Info size={16} />
           </span>
         </div>
@@ -653,16 +680,40 @@ export default function SSHConnectionsSingleKey() {
       {keyExists && (
         <div className="grid grid-cols-3 rounded-xl border border-border overflow-hidden mb-6">
           {[
-            { label: t('sshConnections.stats.totalConnections'), value: stats.totalConnections, icon: <Wifi size={13} />, cls: 'text-foreground' },
-            { label: t('sshConnections.stats.active'), value: stats.activeConnections, icon: <CheckCircle size={13} />, cls: 'text-primary' },
-            { label: t('sshConnections.stats.failed'), value: stats.failedConnections, icon: <XCircle size={13} />, cls: 'text-destructive' },
+            {
+              label: t('sshConnections.stats.totalConnections'),
+              value: stats.totalConnections,
+              icon: <Wifi size={13} />,
+              cls: 'text-foreground',
+            },
+            {
+              label: t('sshConnections.stats.active'),
+              value: stats.activeConnections,
+              icon: <CheckCircle size={13} />,
+              cls: 'text-primary',
+            },
+            {
+              label: t('sshConnections.stats.failed'),
+              value: stats.failedConnections,
+              icon: <XCircle size={13} />,
+              cls: 'text-destructive',
+            },
           ].map((stat, i) => (
-            <div key={stat.label} className={`px-3 sm:px-4 py-3 sm:py-4 ${i < 2 ? 'border-r border-border' : ''}`}>
+            <div
+              key={stat.label}
+              className={`px-3 sm:px-4 py-3 sm:py-4 ${i < 2 ? 'border-r border-border' : ''}`}
+            >
               <div className="flex items-center gap-1 mb-1 sm:mb-1.5">
                 <span className={`${stat.cls} opacity-75`}>{stat.icon}</span>
-                <span className={`text-2xs font-bold uppercase tracking-wider whitespace-nowrap ${stat.cls} opacity-75`}>{stat.label}</span>
+                <span
+                  className={`text-2xs font-bold uppercase tracking-wider whitespace-nowrap ${stat.cls} opacity-75`}
+                >
+                  {stat.label}
+                </span>
               </div>
-              <p className="text-2xl sm:text-3xl font-bold tabular-nums leading-none">{stat.value}</p>
+              <p className="text-2xl sm:text-3xl font-bold tabular-nums leading-none">
+                {stat.value}
+              </p>
             </div>
           ))}
         </div>
@@ -692,7 +743,12 @@ export default function SSHConnectionsSingleKey() {
                 <Plus size={18} />
                 {t('sshConnections.systemKey.generate')}
               </Button>
-              <Button size="lg" variant="outline" onClick={() => setImportDialogOpen(true)} className="gap-1.5">
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => setImportDialogOpen(true)}
+                className="gap-1.5"
+              >
                 <Key size={18} />
                 {t('sshConnections.systemKey.import')}
               </Button>
@@ -703,19 +759,34 @@ export default function SSHConnectionsSingleKey() {
             {/* Key Type */}
             <div>
               <p className="text-xs text-muted-foreground">{t('sshConnections.systemKey.type')}</p>
-              <p className="text-sm font-medium">{systemKey?.key_type?.toUpperCase() || 'Unknown'}</p>
+              <p className="text-sm font-medium">
+                {systemKey?.key_type?.toUpperCase() || 'Unknown'}
+              </p>
             </div>
 
             {/* Fingerprint */}
             {systemKey?.fingerprint && (
               <div>
                 <div className="flex items-center gap-1 mb-0.5">
-                  <p className="text-xs text-muted-foreground">{t('sshConnections.systemKey.fingerprint')}</p>
-                  <button type="button" onClick={() => setFingerprintVisible((v) => !v)} className="p-0.5 text-muted-foreground hover:text-foreground transition-colors" title={fingerprintVisible ? 'Hide fingerprint' : 'Reveal fingerprint'}>
+                  <p className="text-xs text-muted-foreground">
+                    {t('sshConnections.systemKey.fingerprint')}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setFingerprintVisible((v) => !v)}
+                    className="p-0.5 text-muted-foreground hover:text-foreground transition-colors"
+                    title={fingerprintVisible ? 'Hide fingerprint' : 'Reveal fingerprint'}
+                  >
                     {fingerprintVisible ? <EyeOff size={13} /> : <Eye size={13} />}
                   </button>
                 </div>
-                <p className="text-sm font-medium font-mono break-all" style={{ filter: fingerprintVisible ? 'none' : 'blur(4px)', userSelect: fingerprintVisible ? 'auto' : 'none' }}>
+                <p
+                  className="text-sm font-medium font-mono break-all"
+                  style={{
+                    filter: fingerprintVisible ? 'none' : 'blur(4px)',
+                    userSelect: fingerprintVisible ? 'auto' : 'none',
+                  }}
+                >
                   {systemKey.fingerprint}
                 </p>
               </div>
@@ -724,16 +795,34 @@ export default function SSHConnectionsSingleKey() {
             {/* Public Key */}
             <div>
               <div className="flex items-center gap-1 mb-1">
-                <p className="text-xs text-muted-foreground">{t('sshConnections.systemKey.publicKey')}</p>
-                <button type="button" onClick={() => setKeyVisible((v) => !v)} className="p-0.5 text-muted-foreground hover:text-foreground transition-colors" title={keyVisible ? 'Hide key' : 'Reveal key'}>
+                <p className="text-xs text-muted-foreground">
+                  {t('sshConnections.systemKey.publicKey')}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setKeyVisible((v) => !v)}
+                  className="p-0.5 text-muted-foreground hover:text-foreground transition-colors"
+                  title={keyVisible ? 'Hide key' : 'Reveal key'}
+                >
                   {keyVisible ? <EyeOff size={13} /> : <Eye size={13} />}
                 </button>
               </div>
               <div className="relative bg-muted/30 p-3 pr-10 rounded-lg border border-border">
-                <p className="text-xs font-mono break-all max-h-24 overflow-auto" style={{ filter: keyVisible ? 'none' : 'blur(4px)', userSelect: keyVisible ? 'auto' : 'none' }}>
+                <p
+                  className="text-xs font-mono break-all max-h-24 overflow-auto"
+                  style={{
+                    filter: keyVisible ? 'none' : 'blur(4px)',
+                    userSelect: keyVisible ? 'auto' : 'none',
+                  }}
+                >
                   {systemKey?.public_key || 'N/A'}
                 </p>
-                <button type="button" onClick={handleCopyPublicKey} title="Copy to clipboard" className="absolute top-2 right-2 p-1 text-muted-foreground hover:text-foreground transition-colors">
+                <button
+                  type="button"
+                  onClick={handleCopyPublicKey}
+                  title="Copy to clipboard"
+                  className="absolute top-2 right-2 p-1 text-muted-foreground hover:text-foreground transition-colors"
+                >
                   <Copy size={15} />
                 </button>
               </div>
@@ -752,7 +841,13 @@ export default function SSHConnectionsSingleKey() {
                 <Zap size={18} />
                 {t('ssh.manualPair.quickConnectButton')}
               </Button>
-              <Button size="lg" variant="outline" onClick={() => setDeleteKeyDialogOpen(true)} className="w-full sm:w-auto gap-1.5 text-destructive border-destructive/40 hover:bg-destructive/10" title="Delete system SSH key (connections will be preserved)">
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => setDeleteKeyDialogOpen(true)}
+                className="w-full sm:w-auto gap-1.5 text-destructive border-destructive/40 hover:bg-destructive/10"
+                title="Delete system SSH key (connections will be preserved)"
+              >
                 <Trash2 size={18} />
                 {t('sshConnections.systemKey.actions.delete')}
               </Button>
@@ -764,11 +859,25 @@ export default function SSHConnectionsSingleKey() {
               testId="ssh-advanced-setup"
             >
               <div className="flex flex-wrap gap-3">
-                <Button size="lg" variant="outline" onClick={() => setDeployDialogOpen(true)} className="w-full sm:w-auto gap-1.5" aria-label="Automatically deploy SSH key using password authentication" title="Automatically deploy SSH key using password authentication">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => setDeployDialogOpen(true)}
+                  className="w-full sm:w-auto gap-1.5"
+                  aria-label="Automatically deploy SSH key using password authentication"
+                  title="Automatically deploy SSH key using password authentication"
+                >
                   <Plus size={18} />
                   {t('sshConnections.systemKey.actions.deploy')}
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => setTestConnectionDialogOpen(true)} className="w-full sm:w-auto gap-1.5" aria-label="Add a connection for a manually deployed SSH key" title="Add a connection for a manually deployed SSH key">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => setTestConnectionDialogOpen(true)}
+                  className="w-full sm:w-auto gap-1.5"
+                  aria-label="Add a connection for a manually deployed SSH key"
+                  title="Add a connection for a manually deployed SSH key"
+                >
                   <Wifi size={18} />
                   {t('sshConnections.systemKey.actions.addManual')}
                 </Button>
@@ -783,13 +892,20 @@ export default function SSHConnectionsSingleKey() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <div>
-              <p className="text-base font-bold leading-tight">{t('sshConnections.heading.remoteMachines')}</p>
+              <p className="text-base font-bold leading-tight">
+                {t('sshConnections.heading.remoteMachines')}
+              </p>
               {connections.length > 0 && (
-                <p className="text-xs text-muted-foreground">{connections.length} machine{connections.length !== 1 ? 's' : ''} configured</p>
+                <p className="text-xs text-muted-foreground">
+                  {connections.length} machine{connections.length !== 1 ? 's' : ''} configured
+                </p>
               )}
             </div>
             {!keyExists && connections.length > 0 && (
-              <span title={t('sshConnections.systemKey.noKey')} className="text-muted-foreground cursor-help">
+              <span
+                title={t('sshConnections.systemKey.noKey')}
+                className="text-muted-foreground cursor-help"
+              >
                 <Info size={18} />
               </span>
             )}
@@ -819,7 +935,10 @@ export default function SSHConnectionsSingleKey() {
         ) : (
           <div className="flex flex-wrap gap-4 sm:gap-5">
             {connections.map((connection) => (
-              <div key={connection.id} className="w-full sm:w-[calc(50%-10px)] md:w-[calc(33.333%-14px)] min-w-0 flex">
+              <div
+                key={connection.id}
+                className="w-full sm:w-[calc(50%-10px)] md:w-[calc(33.333%-14px)] min-w-0 flex"
+              >
                 <RemoteMachineCard
                   machine={connection}
                   onEdit={handleEditConnection}
@@ -836,26 +955,44 @@ export default function SSHConnectionsSingleKey() {
       </div>
 
       {/* Generate Key Dialog */}
-      <Dialog open={generateDialogOpen} onOpenChange={(open) => !open && setGenerateDialogOpen(false)}>
+      <Dialog
+        open={generateDialogOpen}
+        onOpenChange={(open) => !open && setGenerateDialogOpen(false)}
+      >
         <DialogContent className="max-w-sm">
-          <DialogHeader><DialogTitle>{t('sshConnections.generateDialog.title')}</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>{t('sshConnections.generateDialog.title')}</DialogTitle>
+          </DialogHeader>
           <div className="flex flex-col gap-4 pt-1">
             <Alert className="mb-0">
               <AlertDescription>
-                This will generate a new SSH key pair for your system. You can only have one system key at a time.
+                This will generate a new SSH key pair for your system. You can only have one system
+                key at a time.
               </AlertDescription>
             </Alert>
-            <FormField label={t('sshConnections.generateDialog.keyType')} fieldId="generate-keytype">
-              <select id="generate-keytype" value={keyType} onChange={(e) => setKeyType(e.target.value)} className="w-full rounded-md border border-input bg-background h-9 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring">
+            <FormField
+              label={t('sshConnections.generateDialog.keyType')}
+              fieldId="generate-keytype"
+            >
+              <select
+                id="generate-keytype"
+                value={keyType}
+                onChange={(e) => setKeyType(e.target.value)}
+                className="w-full rounded-md border border-input bg-background h-9 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              >
                 <option value="ed25519">{t('sshConnections.generateDialog.ed25519')}</option>
                 <option value="rsa">{t('sshConnections.generateDialog.rsa')}</option>
                 <option value="ecdsa">{t('sshConnections.generateDialog.ecdsa')}</option>
               </select>
             </FormField>
             <div className="flex justify-end gap-2 pt-1">
-              <Button variant="outline" onClick={() => setGenerateDialogOpen(false)}>Cancel</Button>
+              <Button variant="outline" onClick={() => setGenerateDialogOpen(false)}>
+                Cancel
+              </Button>
               <Button onClick={handleGenerateKey} disabled={generateKeyMutation.isPending}>
-                {generateKeyMutation.isPending ? t('sshConnections.generateDialog.generating') : t('sshConnections.generateDialog.generate')}
+                {generateKeyMutation.isPending
+                  ? t('sshConnections.generateDialog.generating')
+                  : t('sshConnections.generateDialog.generate')}
               </Button>
             </div>
           </div>
@@ -865,29 +1002,76 @@ export default function SSHConnectionsSingleKey() {
       {/* Import Key Dialog */}
       <Dialog open={importDialogOpen} onOpenChange={(open) => !open && setImportDialogOpen(false)}>
         <DialogContent className="max-w-sm">
-          <DialogHeader><DialogTitle>{t('sshConnections.importDialog.title')}</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>{t('sshConnections.importDialog.title')}</DialogTitle>
+          </DialogHeader>
           <div className="flex flex-col gap-4 pt-1">
             <Alert className="mb-0">
               <AlertDescription>
-                Import an existing SSH key from your filesystem (e.g., mounted volume). The key will be read from the specified paths and stored in the database.
+                Import an existing SSH key from your filesystem (e.g., mounted volume). The key will
+                be read from the specified paths and stored in the database.
               </AlertDescription>
             </Alert>
             <FormField label={t('sshConnections.importDialog.keyName')} fieldId="import-keyname">
-              <Input id="import-keyname" value={importForm.name} onChange={(e) => setImportForm({ ...importForm, name: e.target.value })} placeholder="System SSH Key" className="h-9 text-sm" />
+              <Input
+                id="import-keyname"
+                value={importForm.name}
+                onChange={(e) => setImportForm({ ...importForm, name: e.target.value })}
+                placeholder="System SSH Key"
+                className="h-9 text-sm"
+              />
             </FormField>
-            <FormField label={`${t('sshConnections.importDialog.privateKeyPath')} *`} helper={t('sshConnections.helpers.privateKeyPath')} fieldId="import-private-key-path">
-              <Input id="import-private-key-path" value={importForm.private_key_path} onChange={(e) => setImportForm({ ...importForm, private_key_path: e.target.value })} placeholder="/home/borg/.ssh/id_ed25519 or /root/.ssh/id_rsa" className="h-9 text-sm" required />
+            <FormField
+              label={`${t('sshConnections.importDialog.privateKeyPath')} *`}
+              helper={t('sshConnections.helpers.privateKeyPath')}
+              fieldId="import-private-key-path"
+            >
+              <Input
+                id="import-private-key-path"
+                value={importForm.private_key_path}
+                onChange={(e) => setImportForm({ ...importForm, private_key_path: e.target.value })}
+                placeholder="/home/borg/.ssh/id_ed25519 or /root/.ssh/id_rsa"
+                className="h-9 text-sm"
+                required
+              />
             </FormField>
-            <FormField label={t('sshConnections.importDialog.publicKeyPath')} helper={t('sshConnections.helpers.publicKeyPath')} fieldId="import-public-key-path">
-              <Input id="import-public-key-path" value={importForm.public_key_path} onChange={(e) => setImportForm({ ...importForm, public_key_path: e.target.value })} placeholder="Leave empty to auto-detect (adds .pub to private key path)" className="h-9 text-sm" />
+            <FormField
+              label={t('sshConnections.importDialog.publicKeyPath')}
+              helper={t('sshConnections.helpers.publicKeyPath')}
+              fieldId="import-public-key-path"
+            >
+              <Input
+                id="import-public-key-path"
+                value={importForm.public_key_path}
+                onChange={(e) => setImportForm({ ...importForm, public_key_path: e.target.value })}
+                placeholder="Leave empty to auto-detect (adds .pub to private key path)"
+                className="h-9 text-sm"
+              />
             </FormField>
-            <FormField label={t('sshConnections.importDialog.description')} fieldId="import-description">
-              <textarea id="import-description" value={importForm.description} onChange={(e) => setImportForm({ ...importForm, description: e.target.value })} placeholder="Imported system SSH key" rows={2} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
+            <FormField
+              label={t('sshConnections.importDialog.description')}
+              fieldId="import-description"
+            >
+              <textarea
+                id="import-description"
+                value={importForm.description}
+                onChange={(e) => setImportForm({ ...importForm, description: e.target.value })}
+                placeholder="Imported system SSH key"
+                rows={2}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+              />
             </FormField>
             <div className="flex justify-end gap-2 pt-1">
-              <Button variant="outline" onClick={() => setImportDialogOpen(false)}>Cancel</Button>
-              <Button onClick={handleImportKey} disabled={importKeyMutation.isPending || !importForm.private_key_path}>
-                {importKeyMutation.isPending ? t('sshConnections.importDialog.importing') : t('sshConnections.importDialog.import')}
+              <Button variant="outline" onClick={() => setImportDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleImportKey}
+                disabled={importKeyMutation.isPending || !importForm.private_key_path}
+              >
+                {importKeyMutation.isPending
+                  ? t('sshConnections.importDialog.importing')
+                  : t('sshConnections.importDialog.import')}
               </Button>
             </div>
           </div>
@@ -897,42 +1081,121 @@ export default function SSHConnectionsSingleKey() {
       {/* Deploy Key Dialog */}
       <Dialog open={deployDialogOpen} onOpenChange={(open) => !open && setDeployDialogOpen(false)}>
         <DialogContent className="max-w-sm">
-          <DialogHeader><DialogTitle>{t('sshConnections.deployDialog.title')}</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>{t('sshConnections.deployDialog.title')}</DialogTitle>
+          </DialogHeader>
           <div className="flex flex-col gap-4 pt-1">
             <FormField label={t('sshConnections.deployDialog.host')} fieldId="deploy-host">
-              <Input id="deploy-host" value={connectionForm.host} onChange={(e) => setConnectionForm({ ...connectionForm, host: e.target.value })} placeholder="192.168.1.100 or example.com" className="h-9 text-sm" />
+              <Input
+                id="deploy-host"
+                value={connectionForm.host}
+                onChange={(e) => setConnectionForm({ ...connectionForm, host: e.target.value })}
+                placeholder="192.168.1.100 or example.com"
+                className="h-9 text-sm"
+              />
             </FormField>
             <FormField label={t('sshConnections.deployDialog.username')} fieldId="deploy-username">
-              <Input id="deploy-username" value={connectionForm.username} onChange={(e) => setConnectionForm({ ...connectionForm, username: e.target.value })} placeholder="root" className="h-9 text-sm" />
+              <Input
+                id="deploy-username"
+                value={connectionForm.username}
+                onChange={(e) => setConnectionForm({ ...connectionForm, username: e.target.value })}
+                placeholder="root"
+                className="h-9 text-sm"
+              />
             </FormField>
             <FormField label={t('sshConnections.deployDialog.port')} fieldId="deploy-port">
-              <Input id="deploy-port" type="number" value={connectionForm.port} onChange={(e) => setConnectionForm({ ...connectionForm, port: parseInt(e.target.value) })} className="h-9 text-sm" />
+              <Input
+                id="deploy-port"
+                type="number"
+                value={connectionForm.port}
+                onChange={(e) =>
+                  setConnectionForm({ ...connectionForm, port: parseInt(e.target.value) })
+                }
+                className="h-9 text-sm"
+              />
             </FormField>
             <FormField label={t('sshConnections.deployDialog.password')} fieldId="deploy-password">
               <div className="relative">
-                <Input id="deploy-password" type="password" value={connectionForm.password} onChange={(e) => setConnectionForm({ ...connectionForm, password: e.target.value })} placeholder="Server password (for initial deployment)" className="h-9 text-sm pr-9" />
-                <span title="The password is used to deploy your public key to the server's authorized_keys file. After deployment, you'll connect using the SSH key." className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground cursor-help">
+                <Input
+                  id="deploy-password"
+                  type="password"
+                  value={connectionForm.password}
+                  onChange={(e) =>
+                    setConnectionForm({ ...connectionForm, password: e.target.value })
+                  }
+                  placeholder="Server password (for initial deployment)"
+                  className="h-9 text-sm pr-9"
+                />
+                <span
+                  title="The password is used to deploy your public key to the server's authorized_keys file. After deployment, you'll connect using the SSH key."
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground cursor-help"
+                >
                   <Info size={18} />
                 </span>
               </div>
             </FormField>
             <label className="flex items-start gap-2 cursor-pointer">
-              <input type="checkbox" checked={connectionForm.use_sftp_mode} onChange={(e) => setConnectionForm({ ...connectionForm, use_sftp_mode: e.target.checked })} className="mt-0.5" />
+              <input
+                type="checkbox"
+                checked={connectionForm.use_sftp_mode}
+                onChange={(e) =>
+                  setConnectionForm({ ...connectionForm, use_sftp_mode: e.target.checked })
+                }
+                className="mt-0.5"
+              />
               <div>
                 <p className="text-sm font-medium">{t('sshConnections.deployDialog.sftpMode')}</p>
-                <p className="text-xs text-muted-foreground">Required by Hetzner Storage Box. Disable for Synology NAS or older SSH servers.</p>
+                <p className="text-xs text-muted-foreground">
+                  Required by Hetzner Storage Box. Disable for Synology NAS or older SSH servers.
+                </p>
               </div>
             </label>
-            <FormField label={t('sshConnections.deployDialog.defaultPath')} helper="Starting directory for SSH file browsing (e.g., /home for Hetzner Storage Box)" fieldId="deploy-default-path">
-              <Input id="deploy-default-path" value={connectionForm.default_path} onChange={(e) => setConnectionForm({ ...connectionForm, default_path: e.target.value })} placeholder="/home" className="h-9 text-sm" />
+            <FormField
+              label={t('sshConnections.deployDialog.defaultPath')}
+              helper="Starting directory for SSH file browsing (e.g., /home for Hetzner Storage Box)"
+              fieldId="deploy-default-path"
+            >
+              <Input
+                id="deploy-default-path"
+                value={connectionForm.default_path}
+                onChange={(e) =>
+                  setConnectionForm({ ...connectionForm, default_path: e.target.value })
+                }
+                placeholder="/home"
+                className="h-9 text-sm"
+              />
             </FormField>
-            <FormField label={t('sshConnections.deployDialog.mountPoint')} helper="Friendly name for this remote machine (e.g., hetzner, backup-server)" fieldId="deploy-mount-point">
-              <Input id="deploy-mount-point" value={connectionForm.mount_point} onChange={(e) => setConnectionForm({ ...connectionForm, mount_point: e.target.value })} placeholder="hetzner or homeserver" className="h-9 text-sm" />
+            <FormField
+              label={t('sshConnections.deployDialog.mountPoint')}
+              helper="Friendly name for this remote machine (e.g., hetzner, backup-server)"
+              fieldId="deploy-mount-point"
+            >
+              <Input
+                id="deploy-mount-point"
+                value={connectionForm.mount_point}
+                onChange={(e) =>
+                  setConnectionForm({ ...connectionForm, mount_point: e.target.value })
+                }
+                placeholder="hetzner or homeserver"
+                className="h-9 text-sm"
+              />
             </FormField>
             <div className="flex justify-end gap-2 pt-1">
-              <Button variant="outline" onClick={() => setDeployDialogOpen(false)}>Cancel</Button>
-              <Button onClick={handleDeployKey} disabled={deployKeyMutation.isPending || !connectionForm.host || !connectionForm.username || !connectionForm.password}>
-                {deployKeyMutation.isPending ? t('sshConnections.deployDialog.deploying') : t('sshConnections.deployDialog.deploy')}
+              <Button variant="outline" onClick={() => setDeployDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleDeployKey}
+                disabled={
+                  deployKeyMutation.isPending ||
+                  !connectionForm.host ||
+                  !connectionForm.username ||
+                  !connectionForm.password
+                }
+              >
+                {deployKeyMutation.isPending
+                  ? t('sshConnections.deployDialog.deploying')
+                  : t('sshConnections.deployDialog.deploy')}
               </Button>
             </div>
           </div>
@@ -940,26 +1203,66 @@ export default function SSHConnectionsSingleKey() {
       </Dialog>
 
       {/* Test Manual Connection Dialog */}
-      <Dialog open={testConnectionDialogOpen} onOpenChange={(open) => !open && setTestConnectionDialogOpen(false)}>
+      <Dialog
+        open={testConnectionDialogOpen}
+        onOpenChange={(open) => !open && setTestConnectionDialogOpen(false)}
+      >
         <DialogContent className="max-w-sm">
-          <DialogHeader><DialogTitle>{t('sshConnections.manualConnectionDialog.title')}</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>{t('sshConnections.manualConnectionDialog.title')}</DialogTitle>
+          </DialogHeader>
           <div className="flex flex-col gap-4 pt-1">
             <Alert className="mb-0">
               <AlertDescription>
-                <p className="font-semibold mb-1">{t('sshConnections.manualConnectionDialog.instructions.title')}</p>
-                <p className="text-xs mb-0.5">1. {t('sshConnections.manualConnectionDialog.instructions.step1')}</p>
-                <p className="text-xs mb-0.5">2. {t('sshConnections.manualConnectionDialog.instructions.step2')}</p>
-                <p className="text-xs">3. {t('sshConnections.manualConnectionDialog.instructions.step3')}</p>
+                <p className="font-semibold mb-1">
+                  {t('sshConnections.manualConnectionDialog.instructions.title')}
+                </p>
+                <p className="text-xs mb-0.5">
+                  1. {t('sshConnections.manualConnectionDialog.instructions.step1')}
+                </p>
+                <p className="text-xs mb-0.5">
+                  2. {t('sshConnections.manualConnectionDialog.instructions.step2')}
+                </p>
+                <p className="text-xs">
+                  3. {t('sshConnections.manualConnectionDialog.instructions.step3')}
+                </p>
               </AlertDescription>
             </Alert>
             <FormField label={t('sshConnections.deployDialog.host')} fieldId="test-conn-host">
-              <Input id="test-conn-host" value={testConnectionForm.host} onChange={(e) => setTestConnectionForm({ ...testConnectionForm, host: e.target.value })} placeholder="192.168.1.100 or example.com" className="h-9 text-sm" />
+              <Input
+                id="test-conn-host"
+                value={testConnectionForm.host}
+                onChange={(e) =>
+                  setTestConnectionForm({ ...testConnectionForm, host: e.target.value })
+                }
+                placeholder="192.168.1.100 or example.com"
+                className="h-9 text-sm"
+              />
             </FormField>
-            <FormField label={t('sshConnections.deployDialog.username')} fieldId="test-conn-username">
-              <Input id="test-conn-username" value={testConnectionForm.username} onChange={(e) => setTestConnectionForm({ ...testConnectionForm, username: e.target.value })} placeholder="root" className="h-9 text-sm" />
+            <FormField
+              label={t('sshConnections.deployDialog.username')}
+              fieldId="test-conn-username"
+            >
+              <Input
+                id="test-conn-username"
+                value={testConnectionForm.username}
+                onChange={(e) =>
+                  setTestConnectionForm({ ...testConnectionForm, username: e.target.value })
+                }
+                placeholder="root"
+                className="h-9 text-sm"
+              />
             </FormField>
             <FormField label={t('sshConnections.deployDialog.port')} fieldId="test-conn-port">
-              <Input id="test-conn-port" type="number" value={testConnectionForm.port} onChange={(e) => setTestConnectionForm({ ...testConnectionForm, port: parseInt(e.target.value) })} className="h-9 text-sm" />
+              <Input
+                id="test-conn-port"
+                type="number"
+                value={testConnectionForm.port}
+                onChange={(e) =>
+                  setTestConnectionForm({ ...testConnectionForm, port: parseInt(e.target.value) })
+                }
+                className="h-9 text-sm"
+              />
             </FormField>
             <Alert className="mb-0">
               <AlertDescription>
@@ -967,9 +1270,20 @@ export default function SSHConnectionsSingleKey() {
               </AlertDescription>
             </Alert>
             <div className="flex justify-end gap-2 pt-1">
-              <Button variant="outline" onClick={() => setTestConnectionDialogOpen(false)}>Cancel</Button>
-              <Button onClick={handleTestManualConnection} disabled={testConnectionMutation.isPending || !testConnectionForm.host || !testConnectionForm.username}>
-                {testConnectionMutation.isPending ? t('sshConnections.actions.testing') : t('sshConnections.manualConnectionDialog.submit')}
+              <Button variant="outline" onClick={() => setTestConnectionDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleTestManualConnection}
+                disabled={
+                  testConnectionMutation.isPending ||
+                  !testConnectionForm.host ||
+                  !testConnectionForm.username
+                }
+              >
+                {testConnectionMutation.isPending
+                  ? t('sshConnections.actions.testing')
+                  : t('sshConnections.manualConnectionDialog.submit')}
               </Button>
             </div>
           </div>
@@ -977,38 +1291,117 @@ export default function SSHConnectionsSingleKey() {
       </Dialog>
 
       {/* Edit Connection Dialog */}
-      <Dialog open={editConnectionDialogOpen} onOpenChange={(open) => { if (!open) { setEditConnectionDialogOpen(false); setSelectedConnection(null) } }}>
+      <Dialog
+        open={editConnectionDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditConnectionDialogOpen(false)
+            setSelectedConnection(null)
+          }
+        }}
+      >
         <DialogContent className="max-w-sm">
-          <DialogHeader><DialogTitle>{t('sshConnections.editConnectionDialog.title')}</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>{t('sshConnections.editConnectionDialog.title')}</DialogTitle>
+          </DialogHeader>
           <div className="flex flex-col gap-4 pt-1">
             <FormField label={t('sshConnections.deployDialog.host')} fieldId="edit-conn-host">
-              <Input id="edit-conn-host" value={editConnectionForm.host} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, host: e.target.value })} placeholder="192.168.1.100 or example.com" className="h-9 text-sm" />
+              <Input
+                id="edit-conn-host"
+                value={editConnectionForm.host}
+                onChange={(e) =>
+                  setEditConnectionForm({ ...editConnectionForm, host: e.target.value })
+                }
+                placeholder="192.168.1.100 or example.com"
+                className="h-9 text-sm"
+              />
             </FormField>
-            <FormField label={t('sshConnections.deployDialog.username')} fieldId="edit-conn-username">
-              <Input id="edit-conn-username" value={editConnectionForm.username} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, username: e.target.value })} placeholder="root" className="h-9 text-sm" />
+            <FormField
+              label={t('sshConnections.deployDialog.username')}
+              fieldId="edit-conn-username"
+            >
+              <Input
+                id="edit-conn-username"
+                value={editConnectionForm.username}
+                onChange={(e) =>
+                  setEditConnectionForm({ ...editConnectionForm, username: e.target.value })
+                }
+                placeholder="root"
+                className="h-9 text-sm"
+              />
             </FormField>
             <FormField label={t('sshConnections.deployDialog.port')} fieldId="edit-conn-port">
-              <Input id="edit-conn-port" type="number" value={editConnectionForm.port} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, port: parseInt(e.target.value) })} className="h-9 text-sm" />
+              <Input
+                id="edit-conn-port"
+                type="number"
+                value={editConnectionForm.port}
+                onChange={(e) =>
+                  setEditConnectionForm({ ...editConnectionForm, port: parseInt(e.target.value) })
+                }
+                className="h-9 text-sm"
+              />
             </FormField>
             <label className="flex items-start gap-2 cursor-pointer">
-              <input type="checkbox" checked={editConnectionForm.use_sftp_mode} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, use_sftp_mode: e.target.checked })} className="mt-0.5" />
+              <input
+                type="checkbox"
+                checked={editConnectionForm.use_sftp_mode}
+                onChange={(e) =>
+                  setEditConnectionForm({ ...editConnectionForm, use_sftp_mode: e.target.checked })
+                }
+                className="mt-0.5"
+              />
               <div>
                 <p className="text-sm font-medium">{t('sshConnections.deployDialog.sftpMode')}</p>
-                <p className="text-xs text-muted-foreground">Required by Hetzner Storage Box. Disable for Synology NAS or older SSH servers.</p>
+                <p className="text-xs text-muted-foreground">
+                  Required by Hetzner Storage Box. Disable for Synology NAS or older SSH servers.
+                </p>
               </div>
             </label>
             <label className="flex items-start gap-2 cursor-pointer">
-              <input type="checkbox" checked={editConnectionForm.use_sudo} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, use_sudo: e.target.checked })} className="mt-0.5" />
+              <input
+                type="checkbox"
+                checked={editConnectionForm.use_sudo}
+                onChange={(e) =>
+                  setEditConnectionForm({ ...editConnectionForm, use_sudo: e.target.checked })
+                }
+                className="mt-0.5"
+              />
               <div>
                 <p className="text-sm font-medium">{t('sshConnections.deployDialog.useSudo')}</p>
-                <p className="text-xs text-muted-foreground">{t('sshConnections.deployDialog.useSudoHint')}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t('sshConnections.deployDialog.useSudoHint')}
+                </p>
               </div>
             </label>
-            <FormField label={t('sshConnections.deployDialog.defaultPath')} helper="Starting directory for SSH file browsing (e.g., /home for Hetzner Storage Box)" fieldId="edit-conn-default-path">
-              <Input id="edit-conn-default-path" value={editConnectionForm.default_path} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, default_path: e.target.value })} placeholder="/home" className="h-9 text-sm" />
+            <FormField
+              label={t('sshConnections.deployDialog.defaultPath')}
+              helper="Starting directory for SSH file browsing (e.g., /home for Hetzner Storage Box)"
+              fieldId="edit-conn-default-path"
+            >
+              <Input
+                id="edit-conn-default-path"
+                value={editConnectionForm.default_path}
+                onChange={(e) =>
+                  setEditConnectionForm({ ...editConnectionForm, default_path: e.target.value })
+                }
+                placeholder="/home"
+                className="h-9 text-sm"
+              />
             </FormField>
-            <FormField label={t('sshConnections.deployDialog.mountPoint')} helper="Friendly name for this remote machine (e.g., hetzner, backup-server)" fieldId="edit-conn-mount-point">
-              <Input id="edit-conn-mount-point" value={editConnectionForm.mount_point} onChange={(e) => setEditConnectionForm({ ...editConnectionForm, mount_point: e.target.value })} placeholder="hetzner or homeserver" className="h-9 text-sm" />
+            <FormField
+              label={t('sshConnections.deployDialog.mountPoint')}
+              helper="Friendly name for this remote machine (e.g., hetzner, backup-server)"
+              fieldId="edit-conn-mount-point"
+            >
+              <Input
+                id="edit-conn-mount-point"
+                value={editConnectionForm.mount_point}
+                onChange={(e) =>
+                  setEditConnectionForm({ ...editConnectionForm, mount_point: e.target.value })
+                }
+                placeholder="hetzner or homeserver"
+                className="h-9 text-sm"
+              />
             </FormField>
             <Alert className="mb-0">
               <AlertDescription>
@@ -1016,9 +1409,26 @@ export default function SSHConnectionsSingleKey() {
               </AlertDescription>
             </Alert>
             <div className="flex justify-end gap-2 pt-1">
-              <Button variant="outline" onClick={() => { setEditConnectionDialogOpen(false); setSelectedConnection(null) }}>Cancel</Button>
-              <Button onClick={handleUpdateConnection} disabled={updateConnectionMutation.isPending || !editConnectionForm.host || !editConnectionForm.username}>
-                {updateConnectionMutation.isPending ? t('sshConnections.actions.updating') : t('sshConnections.editConnectionDialog.submit')}
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setEditConnectionDialogOpen(false)
+                  setSelectedConnection(null)
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleUpdateConnection}
+                disabled={
+                  updateConnectionMutation.isPending ||
+                  !editConnectionForm.host ||
+                  !editConnectionForm.username
+                }
+              >
+                {updateConnectionMutation.isPending
+                  ? t('sshConnections.actions.updating')
+                  : t('sshConnections.editConnectionDialog.submit')}
               </Button>
             </div>
           </div>
@@ -1026,52 +1436,128 @@ export default function SSHConnectionsSingleKey() {
       </Dialog>
 
       {/* Delete Connection Dialog */}
-      <AlertDialog open={deleteConnectionDialogOpen} onOpenChange={(open) => { if (!open) { setDeleteConnectionDialogOpen(false); setSelectedConnection(null) } }}>
+      <AlertDialog
+        open={deleteConnectionDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteConnectionDialogOpen(false)
+            setSelectedConnection(null)
+          }
+        }}
+      >
         <AlertDialogContent className="max-w-xs">
           <AlertDialogHeader>
             <AlertDialogTitle>{t('sshConnections.deleteConnectionDialog.title')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('sshConnections.confirmations.deleteConnection')}</AlertDialogDescription>
+            <AlertDialogDescription>
+              {t('sshConnections.confirmations.deleteConnection')}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           {selectedConnection && (
             <div className="flex flex-col gap-1.5 text-sm">
-              <p><strong>{t('sshConnections.deployDialog.host')}:</strong> {selectedConnection.host}</p>
-              <p><strong>{t('sshConnections.deployDialog.username')}:</strong> {selectedConnection.username}</p>
-              <p><strong>{t('sshConnections.deployDialog.port')}:</strong> {selectedConnection.port}</p>
+              <p>
+                <strong>{t('sshConnections.deployDialog.host')}:</strong> {selectedConnection.host}
+              </p>
+              <p>
+                <strong>{t('sshConnections.deployDialog.username')}:</strong>{' '}
+                {selectedConnection.username}
+              </p>
+              <p>
+                <strong>{t('sshConnections.deployDialog.port')}:</strong> {selectedConnection.port}
+              </p>
             </div>
           )}
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => { setDeleteConnectionDialogOpen(false); setSelectedConnection(null) }}>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteConnection} disabled={deleteConnectionMutation.isPending} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
-              {deleteConnectionMutation.isPending ? t('sshConnections.actions.deleting') : t('sshConnections.deleteConnectionDialog.delete')}
+            <AlertDialogCancel
+              onClick={() => {
+                setDeleteConnectionDialogOpen(false)
+                setSelectedConnection(null)
+              }}
+            >
+              {t('common.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteConnection}
+              disabled={deleteConnectionMutation.isPending}
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+            >
+              {deleteConnectionMutation.isPending
+                ? t('sshConnections.actions.deleting')
+                : t('sshConnections.deleteConnectionDialog.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       {/* Redeploy Key Dialog */}
-      <Dialog open={redeployKeyDialogOpen} onOpenChange={(open) => { if (!open) { setRedeployKeyDialogOpen(false); setSelectedConnection(null); setRedeployPassword('') } }}>
+      <Dialog
+        open={redeployKeyDialogOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setRedeployKeyDialogOpen(false)
+            setSelectedConnection(null)
+            setRedeployPassword('')
+          }
+        }}
+      >
         <DialogContent className="max-w-sm">
-          <DialogHeader><DialogTitle>{t('sshConnections.dialogs.deployTitle')}</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>{t('sshConnections.dialogs.deployTitle')}</DialogTitle>
+          </DialogHeader>
           <div className="flex flex-col gap-4 pt-1">
             <Alert className="mb-0">
               <AlertDescription>
-                This will deploy your current system SSH key to this connection. You'll need to provide the password to authenticate.
+                This will deploy your current system SSH key to this connection. You'll need to
+                provide the password to authenticate.
               </AlertDescription>
             </Alert>
             {selectedConnection && (
               <div className="p-3 rounded-xl bg-muted/30 text-sm flex flex-col gap-1">
-                <p><strong>{t('sshConnections.deployDialog.host')}:</strong> {selectedConnection.host}</p>
-                <p><strong>{t('sshConnections.deployDialog.username')}:</strong> {selectedConnection.username}</p>
-                <p><strong>{t('sshConnections.deployDialog.port')}:</strong> {selectedConnection.port}</p>
+                <p>
+                  <strong>{t('sshConnections.deployDialog.host')}:</strong>{' '}
+                  {selectedConnection.host}
+                </p>
+                <p>
+                  <strong>{t('sshConnections.deployDialog.username')}:</strong>{' '}
+                  {selectedConnection.username}
+                </p>
+                <p>
+                  <strong>{t('sshConnections.deployDialog.port')}:</strong>{' '}
+                  {selectedConnection.port}
+                </p>
               </div>
             )}
-            <FormField label={t('sshConnections.deployDialog.password')} helper={t('sshConnections.helpers.passwordDeploy')} fieldId="redeploy-password">
-              <Input id="redeploy-password" type="password" value={redeployPassword} onChange={(e) => setRedeployPassword(e.target.value)} placeholder="Enter SSH password" className="h-9 text-sm" />
+            <FormField
+              label={t('sshConnections.deployDialog.password')}
+              helper={t('sshConnections.helpers.passwordDeploy')}
+              fieldId="redeploy-password"
+            >
+              <Input
+                id="redeploy-password"
+                type="password"
+                value={redeployPassword}
+                onChange={(e) => setRedeployPassword(e.target.value)}
+                placeholder="Enter SSH password"
+                className="h-9 text-sm"
+              />
             </FormField>
             <div className="flex justify-end gap-2 pt-1">
-              <Button variant="outline" onClick={() => { setRedeployKeyDialogOpen(false); setSelectedConnection(null); setRedeployPassword('') }}>{t('common.cancel')}</Button>
-              <Button onClick={handleConfirmRedeployKey} disabled={redeployKeyMutation.isPending || !redeployPassword}>
-                {redeployKeyMutation.isPending ? t('sshConnections.actions.deploying') : t('sshConnections.dialogs.deployButton')}
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setRedeployKeyDialogOpen(false)
+                  setSelectedConnection(null)
+                  setRedeployPassword('')
+                }}
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button
+                onClick={handleConfirmRedeployKey}
+                disabled={redeployKeyMutation.isPending || !redeployPassword}
+              >
+                {redeployKeyMutation.isPending
+                  ? t('sshConnections.actions.deploying')
+                  : t('sshConnections.dialogs.deployButton')}
               </Button>
             </div>
           </div>
@@ -1079,20 +1565,36 @@ export default function SSHConnectionsSingleKey() {
       </Dialog>
 
       {/* Delete SSH Key Dialog */}
-      <AlertDialog open={deleteKeyDialogOpen} onOpenChange={(open) => !open && setDeleteKeyDialogOpen(false)}>
+      <AlertDialog
+        open={deleteKeyDialogOpen}
+        onOpenChange={(open) => !open && setDeleteKeyDialogOpen(false)}
+      >
         <AlertDialogContent className="max-w-sm">
           <AlertDialogHeader>
             <AlertDialogTitle>{t('sshConnections.dialogs.deleteKeyTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('sshConnections.deleteKeyDialog.confirm')}</AlertDialogDescription>
+            <AlertDialogDescription>
+              {t('sshConnections.deleteKeyDialog.confirm')}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="flex flex-col gap-4">
             {systemKey && (
               <div className="p-3 rounded-xl border border-border bg-muted/10 flex flex-col gap-1.5 text-sm">
-                <p><strong>{t('sshConnections.fields.keyName')}:</strong> {systemKey.name}</p>
-                <p><strong>{t('sshConnections.systemKey.type')}:</strong> {systemKey.key_type?.toUpperCase()}</p>
-                <p><strong>{t('sshConnections.fields.activeConnections')}:</strong> {connections.length}</p>
+                <p>
+                  <strong>{t('sshConnections.fields.keyName')}:</strong> {systemKey.name}
+                </p>
+                <p>
+                  <strong>{t('sshConnections.systemKey.type')}:</strong>{' '}
+                  {systemKey.key_type?.toUpperCase()}
+                </p>
+                <p>
+                  <strong>{t('sshConnections.fields.activeConnections')}:</strong>{' '}
+                  {connections.length}
+                </p>
                 {systemKey.fingerprint && (
-                  <p className="font-mono text-xs break-all"><strong>{t('sshConnections.systemKey.fingerprint')}:</strong> {systemKey.fingerprint}</p>
+                  <p className="font-mono text-xs break-all">
+                    <strong>{t('sshConnections.systemKey.fingerprint')}:</strong>{' '}
+                    {systemKey.fingerprint}
+                  </p>
                 )}
               </div>
             )}
@@ -1107,9 +1609,17 @@ export default function SSHConnectionsSingleKey() {
             </Alert>
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDeleteKeyDialogOpen(false)}>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteKey} disabled={deleteKeyMutation.isPending} className="bg-destructive hover:bg-destructive/90 text-destructive-foreground">
-              {deleteKeyMutation.isPending ? t('sshConnections.actions.deleting') : t('sshConnections.dialogs.deleteKeyButton')}
+            <AlertDialogCancel onClick={() => setDeleteKeyDialogOpen(false)}>
+              {t('common.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteKey}
+              disabled={deleteKeyMutation.isPending}
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+            >
+              {deleteKeyMutation.isPending
+                ? t('sshConnections.actions.deleting')
+                : t('sshConnections.dialogs.deleteKeyButton')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

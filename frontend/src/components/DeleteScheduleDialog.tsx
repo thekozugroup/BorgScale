@@ -63,10 +63,18 @@ const DeleteScheduleDialog: React.FC<DeleteScheduleDialogProps> = ({
         </p>
         <p className="text-sm text-muted-foreground mb-6">{t('dialogs.deleteSchedule.warning')}</p>
         <div className="flex justify-end gap-2">
-          <Button variant="ghost" onClick={onClose}>{t('common.buttons.cancel')}</Button>
+          <Button variant="ghost" onClick={onClose}>
+            {t('common.buttons.cancel')}
+          </Button>
           <Button variant="destructive" onClick={onConfirm} disabled={isDeleting}>
-            {isDeleting ? <Loader2 size={16} className="mr-2 animate-spin" /> : <Trash2 size={16} className="mr-2" />}
-            {isDeleting ? t('dialogs.deleteSchedule.deleting') : t('dialogs.deleteSchedule.confirm')}
+            {isDeleting ? (
+              <Loader2 size={16} className="mr-2 animate-spin" />
+            ) : (
+              <Trash2 size={16} className="mr-2" />
+            )}
+            {isDeleting
+              ? t('dialogs.deleteSchedule.deleting')
+              : t('dialogs.deleteSchedule.confirm')}
           </Button>
         </div>
       </div>

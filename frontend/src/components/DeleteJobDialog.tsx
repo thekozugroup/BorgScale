@@ -50,7 +50,9 @@ export default function DeleteJobDialog({
         </Alert>
 
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose}>{t('common.buttons.cancel')}</Button>
+          <Button variant="outline" onClick={onClose}>
+            {t('common.buttons.cancel')}
+          </Button>
           <Button variant="destructive" onClick={onConfirm}>
             <AlertTriangle size={16} className="mr-2" />
             {t('dialogs.deleteJob.confirm')}

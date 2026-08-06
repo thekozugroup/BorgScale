@@ -36,7 +36,7 @@ const CronExpressionInput: React.FC<CronExpressionInputProps> = ({
   // Live human-readable description via cronstrue
   const description = useMemo(
     () => describeCronHuman(value, i18n.resolvedLanguage),
-    [value, i18n.resolvedLanguage],
+    [value, i18n.resolvedLanguage]
   )
 
   // Live "Next N runs" preview from the backend. Debounced 300 ms so we
@@ -54,12 +54,9 @@ const CronExpressionInput: React.FC<CronExpressionInputProps> = ({
     }
     debounceRef.current = setTimeout(() => {
       api
-        .get<{ expression: string; next_runs: string[] }>(
-          '/schedule/preview',
-          {
-            params: { expr: value, count: 3 },
-          },
-        )
+        .get<{ expression: string; next_runs: string[] }>('/schedule/preview', {
+          params: { expr: value, count: 3 },
+        })
         .then((resp) => {
           setNextRuns(resp.data.next_runs)
           setPreviewError(false)
@@ -81,9 +78,7 @@ const CronExpressionInput: React.FC<CronExpressionInputProps> = ({
       {effectiveLabel && (
         <Label
           htmlFor={inputId}
-          className={
-            required ? 'after:content-["*"] after:ml-0.5 after:text-destructive' : ''
-          }
+          className={required ? 'after:content-["*"] after:ml-0.5 after:text-destructive' : ''}
         >
           {effectiveLabel}
         </Label>
@@ -96,10 +91,7 @@ const CronExpressionInput: React.FC<CronExpressionInputProps> = ({
 
       {/* Plain-English description (cronstrue) */}
       {description && (
-        <p
-          className="text-sm text-foreground/80"
-          data-testid="cron-description"
-        >
+        <p className="text-sm text-foreground/80" data-testid="cron-description">
           {description}
         </p>
       )}
@@ -141,9 +133,7 @@ const CronExpressionInput: React.FC<CronExpressionInputProps> = ({
           className={cn('font-mono tracking-[0.1em]', fontSizeCls)}
           aria-label={effectiveLabel}
         />
-        {helperText && (
-          <p className="text-xs text-muted-foreground">{helperText}</p>
-        )}
+        {helperText && <p className="text-xs text-muted-foreground">{helperText}</p>}
       </AdvancedDisclosure>
     </div>
   )

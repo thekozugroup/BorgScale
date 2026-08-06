@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { renderWithProviders, screen, fireEvent } from '../../test/test-utils'
+import { renderWithProviders, screen, fireEvent, userEvent } from '../../test/test-utils'
 import { User, Bell } from 'lucide-react'
 import NavGroup from '../NavGroup'
 
@@ -46,6 +46,33 @@ describe('NavGroup', () => {
     )
     const accountLink = screen.getByRole('link', { name: /account/i })
     expect(accountLink).toHaveAttribute('aria-current', 'page')
+  })
+
+  it('exposes aria-expanded=false on the group toggle when collapsed', () => {
+    renderWithProviders(<NavGroup {...defaultProps} isExpanded={false} />)
+    const toggle = screen.getByRole('button', { name: /personal/i })
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('exposes aria-expanded=true and aria-controls pointing at the sub-menu when expanded', () => {
+    renderWithProviders(<NavGroup {...defaultProps} isExpanded={true} />)
+    const toggle = screen.getByRole('button', { name: /personal/i })
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+
+    const subMenu = screen.getByRole('list')
+    expect(subMenu.id).not.toBe('')
+    expect(toggle).toHaveAttribute('aria-controls', subMenu.id)
+  })
+
+  it('toggles from the keyboard with Enter', async () => {
+    const user = userEvent.setup()
+    const onToggle = vi.fn()
+    renderWithProviders(<NavGroup {...defaultProps} onToggle={onToggle} />)
+
+    await user.tab()
+    expect(screen.getByRole('button', { name: /personal/i })).toHaveFocus()
+    await user.keyboard('{Enter}')
+    expect(onToggle).toHaveBeenCalledOnce()
   })
 
   it('uses navLabel to translate sub-item names', () => {

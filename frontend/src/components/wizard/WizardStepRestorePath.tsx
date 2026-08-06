@@ -71,7 +71,6 @@ export default function WizardStepRestorePath({
     return sshPrefix ? `${sshPrefix}${path}` : path
   }
 
-
   return (
     <div className="flex flex-col gap-5">
       {/* Header */}
@@ -93,12 +92,20 @@ export default function WizardStepRestorePath({
               : 'border-border'
           )}
         >
-          <input type="radio" name="restoreStrategy" checked={data.restoreStrategy === 'original'} onChange={() => onChange({ restoreStrategy: 'original' })}  className="mt-0.5 flex-shrink-0" />
+          <input
+            type="radio"
+            name="restoreStrategy"
+            checked={data.restoreStrategy === 'original'}
+            onChange={() => onChange({ restoreStrategy: 'original' })}
+            className="mt-0.5 flex-shrink-0"
+          />
           <div className="flex items-start gap-2">
             <FileCheck size={18} className="flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-semibold">{t('wizard.restorePath.restoreToOriginal')}</p>
-              <p className="text-sm text-muted-foreground">{t('wizard.restorePath.restoreToOriginalDesc')}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('wizard.restorePath.restoreToOriginalDesc')}
+              </p>
             </div>
           </div>
         </button>
@@ -114,12 +121,20 @@ export default function WizardStepRestorePath({
               : 'border-border'
           )}
         >
-          <input type="radio" name="restoreStrategy" checked={data.restoreStrategy === 'custom'} onChange={() => onChange({ restoreStrategy: 'custom' })}  className="mt-0.5 flex-shrink-0" />
+          <input
+            type="radio"
+            name="restoreStrategy"
+            checked={data.restoreStrategy === 'custom'}
+            onChange={() => onChange({ restoreStrategy: 'custom' })}
+            className="mt-0.5 flex-shrink-0"
+          />
           <div className="flex items-start gap-2">
             <FolderOpen size={18} className="flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-semibold">{t('wizard.restorePath.restoreToCustom')}</p>
-              <p className="text-sm text-muted-foreground">{t('wizard.restorePath.restoreToCustomDesc')}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('wizard.restorePath.restoreToCustomDesc')}
+              </p>
             </div>
           </div>
         </button>
@@ -128,7 +143,9 @@ export default function WizardStepRestorePath({
       {/* Custom Path Input */}
       {data.restoreStrategy === 'custom' && (
         <div>
-          <Label className="text-xs font-semibold mb-1.5 block">{t('wizard.restorePath.customPathLabel')}</Label>
+          <Label className="text-xs font-semibold mb-1.5 block">
+            {t('wizard.restorePath.customPathLabel')}
+          </Label>
           <div className="relative">
             <Input
               value={data.customPath}
@@ -147,7 +164,9 @@ export default function WizardStepRestorePath({
               <FolderOpen size={16} />
             </button>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">{t('wizard.restorePath.customPathHelper')}</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {t('wizard.restorePath.customPathHelper')}
+          </p>
         </div>
       )}
 

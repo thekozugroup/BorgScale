@@ -5,8 +5,7 @@ import GuidedSetup from '../GuidedSetup'
 
 const navigateMock = vi.fn()
 vi.mock('react-router-dom', async () => {
-  const actual =
-    await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
+  const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
   return {
     ...actual,
     useNavigate: () => navigateMock,
@@ -32,14 +31,11 @@ const toastSuccessMock = vi.fn()
 const toastWarningMock = vi.fn()
 const toastErrorMock = vi.fn()
 vi.mock('sonner', () => ({
-  toast: Object.assign(
-    (msg: string) => toastSuccessMock(msg),
-    {
-      success: (msg: string) => toastSuccessMock(msg),
-      warning: (msg: string) => toastWarningMock(msg),
-      error: (msg: string) => toastErrorMock(msg),
-    }
-  ),
+  toast: Object.assign((msg: string) => toastSuccessMock(msg), {
+    success: (msg: string) => toastSuccessMock(msg),
+    warning: (msg: string) => toastWarningMock(msg),
+    error: (msg: string) => toastErrorMock(msg),
+  }),
 }))
 
 function defaultApiGet(url: string) {
@@ -47,9 +43,7 @@ function defaultApiGet(url: string) {
     return Promise.resolve({
       data: {
         current_path: '/local/home',
-        items: [
-          { name: 'alice', is_directory: true, path: '/local/home/alice' },
-        ],
+        items: [{ name: 'alice', is_directory: true, path: '/local/home/alice' }],
         parent_path: '/local',
         is_inside_local_mount: true,
       },
@@ -88,16 +82,12 @@ function defaultApiPost(url: string) {
 
 async function advanceToStage4() {
   // Stage 1 → 2: continue (path is pre-filled, defaults to valid via mock)
-  await waitFor(() =>
-    expect(screen.getByTestId('guided-setup-continue')).not.toBeDisabled()
-  )
+  await waitFor(() => expect(screen.getByTestId('guided-setup-continue')).not.toBeDisabled())
   fireEvent.click(screen.getByTestId('guided-setup-continue'))
 
   // Stage 2: add a source
   fireEvent.click(screen.getByTestId('guided-use-home'))
-  await waitFor(() =>
-    expect(screen.getByTestId('guided-sources-list')).toBeInTheDocument()
-  )
+  await waitFor(() => expect(screen.getByTestId('guided-sources-list')).toBeInTheDocument())
   fireEvent.click(screen.getByTestId('guided-setup-continue'))
 
   // Stage 3: matching passphrase
@@ -108,9 +98,7 @@ async function advanceToStage4() {
     target: { value: 'a-very-strong-passphrase' },
   })
   fireEvent.click(screen.getByTestId('guided-passphrase-saved'))
-  await waitFor(() =>
-    expect(screen.getByTestId('guided-setup-continue')).not.toBeDisabled()
-  )
+  await waitFor(() => expect(screen.getByTestId('guided-setup-continue')).not.toBeDisabled())
   fireEvent.click(screen.getByTestId('guided-setup-continue'))
 }
 
@@ -138,36 +126,26 @@ describe('GuidedSetup', () => {
     fireEvent.change(screen.getByTestId('guided-path'), {
       target: { value: '/data/borg/x' },
     })
-    await waitFor(() =>
-      expect(screen.getByTestId('guided-setup-continue')).not.toBeDisabled()
-    )
+    await waitFor(() => expect(screen.getByTestId('guided-setup-continue')).not.toBeDisabled())
   })
 
   it('Stage 2 starts empty; "Use my home folder" populates a directory', async () => {
     renderWithProviders(<GuidedSetup />)
-    await waitFor(() =>
-      expect(screen.getByTestId('guided-setup-continue')).not.toBeDisabled()
-    )
+    await waitFor(() => expect(screen.getByTestId('guided-setup-continue')).not.toBeDisabled())
     fireEvent.click(screen.getByTestId('guided-setup-continue'))
     // Stage 2
     expect(screen.queryByTestId('guided-sources-list')).not.toBeInTheDocument()
     fireEvent.click(screen.getByTestId('guided-use-home'))
-    await waitFor(() =>
-      expect(screen.getByTestId('guided-sources-list')).toBeInTheDocument()
-    )
+    await waitFor(() => expect(screen.getByTestId('guided-sources-list')).toBeInTheDocument())
     expect(screen.getByText('/local/home/alice')).toBeInTheDocument()
   })
 
   it('Stage 3 blocks Continue when passphrases mismatch', async () => {
     renderWithProviders(<GuidedSetup />)
-    await waitFor(() =>
-      expect(screen.getByTestId('guided-setup-continue')).not.toBeDisabled()
-    )
+    await waitFor(() => expect(screen.getByTestId('guided-setup-continue')).not.toBeDisabled())
     fireEvent.click(screen.getByTestId('guided-setup-continue'))
     fireEvent.click(screen.getByTestId('guided-use-home'))
-    await waitFor(() =>
-      expect(screen.getByTestId('guided-sources-list')).toBeInTheDocument()
-    )
+    await waitFor(() => expect(screen.getByTestId('guided-sources-list')).toBeInTheDocument())
     fireEvent.click(screen.getByTestId('guided-setup-continue'))
     // Stage 3
     fireEvent.change(screen.getByTestId('guided-passphrase'), {
@@ -176,22 +154,16 @@ describe('GuidedSetup', () => {
     fireEvent.change(screen.getByTestId('guided-passphrase-confirm'), {
       target: { value: 'different-value-here' },
     })
-    expect(
-      screen.getByTestId('guided-passphrase-mismatch')
-    ).toBeInTheDocument()
+    expect(screen.getByTestId('guided-passphrase-mismatch')).toBeInTheDocument()
     expect(screen.getByTestId('guided-setup-continue')).toBeDisabled()
   })
 
   it('Stage 3 blocks Continue when "saved passphrase" checkbox unchecked', async () => {
     renderWithProviders(<GuidedSetup />)
-    await waitFor(() =>
-      expect(screen.getByTestId('guided-setup-continue')).not.toBeDisabled()
-    )
+    await waitFor(() => expect(screen.getByTestId('guided-setup-continue')).not.toBeDisabled())
     fireEvent.click(screen.getByTestId('guided-setup-continue'))
     fireEvent.click(screen.getByTestId('guided-use-home'))
-    await waitFor(() =>
-      expect(screen.getByTestId('guided-sources-list')).toBeInTheDocument()
-    )
+    await waitFor(() => expect(screen.getByTestId('guided-sources-list')).toBeInTheDocument())
     fireEvent.click(screen.getByTestId('guided-setup-continue'))
     fireEvent.change(screen.getByTestId('guided-passphrase'), {
       target: { value: 'a-very-strong-passphrase' },
@@ -210,9 +182,7 @@ describe('GuidedSetup', () => {
     expect(daily.getAttribute('aria-checked')).toBe('true')
     fireEvent.click(screen.getByTestId('guided-submit'))
     await waitFor(() => expect(apiPostMock).toHaveBeenCalled())
-    const guidedCall = apiPostMock.mock.calls.find(
-      (c) => c[0] === '/repositories/guided-setup'
-    )
+    const guidedCall = apiPostMock.mock.calls.find((c) => c[0] === '/repositories/guided-setup')
     expect(guidedCall).toBeTruthy()
     const body = guidedCall![1] as {
       repository: { path: string; encryption: string; passphrase: string }
@@ -229,9 +199,7 @@ describe('GuidedSetup', () => {
     renderWithProviders(<GuidedSetup />)
     await advanceToStage4()
     fireEvent.click(screen.getByTestId('guided-submit'))
-    await waitFor(() =>
-      expect(navigateMock).toHaveBeenCalledWith('/dashboard?just_setup=42')
-    )
+    await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/dashboard?just_setup=42'))
   })
 
   it('renders inline error on 409 and stays on stage 4', async () => {
@@ -251,9 +219,7 @@ describe('GuidedSetup', () => {
     renderWithProviders(<GuidedSetup />)
     await advanceToStage4()
     fireEvent.click(screen.getByTestId('guided-submit'))
-    await waitFor(() =>
-      expect(screen.getByTestId('guided-submit-error')).toBeInTheDocument()
-    )
+    await waitFor(() => expect(screen.getByTestId('guided-submit-error')).toBeInTheDocument())
     // Still on stage 4
     expect(screen.getByTestId('guided-submit')).toBeInTheDocument()
     expect(navigateMock).not.toHaveBeenCalled()
@@ -281,9 +247,7 @@ describe('GuidedSetup', () => {
     renderWithProviders(<GuidedSetup />)
     await advanceToStage4()
     fireEvent.click(screen.getByTestId('guided-submit'))
-    await waitFor(() =>
-      expect(navigateMock).toHaveBeenCalledWith('/dashboard?just_setup=99')
-    )
+    await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/dashboard?just_setup=99'))
     expect(toastWarningMock).toHaveBeenCalled()
   })
 })

@@ -319,26 +319,37 @@ describe('FileExplorerDialog', () => {
         data: {
           current_path: currentPath,
           items: [
-            { name: itemName, path: `${currentPath}/${itemName}`, is_directory: true, is_borg_repo: false },
+            {
+              name: itemName,
+              path: `${currentPath}/${itemName}`,
+              is_directory: true,
+              is_borg_repo: false,
+            },
           ],
           is_inside_local_mount: false,
         },
       })
 
-      vi.mocked(api.get).mockImplementation((_url, config) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const path = (config as any)?.params?.path
+      // The mock returns whatever axios would; typing it precisely here adds
+      // nothing to the assertion, so it is narrowed once at the boundary.
+      type MockedGet = typeof api.get
+      type GetReturn = ReturnType<MockedGet>
+
+      vi.mocked(api.get).mockImplementation(((
+        _url: string,
+        config?: { params?: { path?: string } }
+      ) => {
+        const path = config?.params?.path
         if (path === '/home') {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          return new Promise((resolve) => { resolveHome = resolve }) as any
+          return new Promise((resolve) => {
+            resolveHome = resolve
+          }) as GetReturn
         }
         if (path === '/') {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          return Promise.resolve(listing('/', 'from-root')) as any
+          return Promise.resolve(listing('/', 'from-root')) as GetReturn
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return Promise.resolve(mockDirectoryResponse) as any
-      })
+        return Promise.resolve(mockDirectoryResponse) as GetReturn
+      }) as MockedGet)
 
       renderWithProviders(
         <FileExplorerDialog

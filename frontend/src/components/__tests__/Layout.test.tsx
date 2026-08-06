@@ -2,12 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders, screen, userEvent, waitFor } from '../../test/test-utils'
 import Layout from '../Layout'
 
-const {
-  logoutMock,
-  refreshUserMock,
-  announcementSurfaceMock,
-  useAuthMock,
-} = vi.hoisted(() => ({
+const { logoutMock, refreshUserMock, announcementSurfaceMock, useAuthMock } = vi.hoisted(() => ({
   logoutMock: vi.fn(),
   refreshUserMock: vi.fn(),
   announcementSurfaceMock: vi.fn(),
@@ -254,6 +249,23 @@ describe('Layout', () => {
     })
   })
 
+  it('offers a skip link as the first focusable element, targeting the main region', async () => {
+    const user = userEvent.setup()
+
+    renderWithProviders(
+      <Layout>
+        <div>Page Content</div>
+      </Layout>
+    )
+
+    await user.tab()
+
+    const skipLink = screen.getByRole('link', { name: /skip to main content/i })
+    expect(skipLink).toHaveFocus()
+    expect(skipLink).toHaveAttribute('href', '#main-content')
+    expect(screen.getByRole('main')).toHaveAttribute('id', 'main-content')
+  })
+
   it('suppresses announcements while the passkey prompt is active', async () => {
     sessionStorage.setItem('recent_password_login', '1')
     announcementSurfaceMock.mockReturnValue({
@@ -277,5 +289,4 @@ describe('Layout', () => {
     expect(await screen.findByText('Passkey Prompt')).toBeInTheDocument()
     expect(screen.queryByText('Announcement Modal')).not.toBeInTheDocument()
   })
-
 })

@@ -2,24 +2,20 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderWithProviders, screen, waitFor, userEvent } from '../../test/test-utils'
 import AppSidebar from '../AppSidebar'
 
-const {
-  mockApiGet,
-  mockGetSystemSettings,
-  mockTabEnablement,
-  mockGetTabDisabledReason,
-} = vi.hoisted(() => ({
-  mockApiGet: vi.fn().mockResolvedValue({ data: {} }),
-  mockGetSystemSettings: vi.fn().mockResolvedValue({ data: { settings: {} } }),
-  mockTabEnablement: {
-    dashboard: true,
-    connections: true,
-    repositories: true,
-    backups: true,
-    archives: true,
-    schedule: true,
-  },
-  mockGetTabDisabledReason: vi.fn<(key: string) => string | null>(() => null),
-}))
+const { mockApiGet, mockGetSystemSettings, mockTabEnablement, mockGetTabDisabledReason } =
+  vi.hoisted(() => ({
+    mockApiGet: vi.fn().mockResolvedValue({ data: {} }),
+    mockGetSystemSettings: vi.fn().mockResolvedValue({ data: { settings: {} } }),
+    mockTabEnablement: {
+      dashboard: true,
+      connections: true,
+      repositories: true,
+      backups: true,
+      archives: true,
+      schedule: true,
+    },
+    mockGetTabDisabledReason: vi.fn<(key: string) => string | null>(() => null),
+  }))
 
 vi.mock('../../services/api', () => ({
   default: { get: mockApiGet },

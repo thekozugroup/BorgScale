@@ -8,7 +8,11 @@ interface SettingsTabContentProps {
   className?: string
 }
 
-export default function SettingsTabContent({ children, maxWidth, className }: SettingsTabContentProps) {
+export default function SettingsTabContent({
+  children,
+  maxWidth,
+  className,
+}: SettingsTabContentProps) {
   return (
     <div
       className={cn(className)}

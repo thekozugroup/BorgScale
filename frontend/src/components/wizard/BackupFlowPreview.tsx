@@ -35,18 +35,19 @@ function FlowNode({
   bgClass: string
 }) {
   return (
-    <div className={`flex items-center gap-2 flex-1 min-w-0 overflow-hidden rounded-lg px-3 py-2 ${bgClass}`}>
+    <div
+      className={`flex items-center gap-2 flex-1 min-w-0 overflow-hidden rounded-lg px-3 py-2 ${bgClass}`}
+    >
       {/* Icon badge */}
-      <div className={`w-8 h-8 rounded-[9px] flex items-center justify-center shrink-0 ${colorClass}`}>
+      <div
+        className={`w-8 h-8 rounded-[9px] flex items-center justify-center shrink-0 ${colorClass}`}
+      >
         {icon}
       </div>
 
       {/* Text */}
       <div className="min-w-0 overflow-hidden">
-        <p
-          className="text-sm font-semibold leading-tight text-foreground truncate"
-          title={label}
-        >
+        <p className="text-sm font-semibold leading-tight text-foreground truncate" title={label}>
           {label}
         </p>
         {subtitle && (
@@ -135,9 +136,7 @@ export default function BackupFlowPreview({
         <span className="text-2xs text-muted-foreground font-bold uppercase tracking-widest shrink-0">
           Backup Flow
         </span>
-        <span className="text-xs font-medium text-foreground">
-          {getSummaryText()}
-        </span>
+        <span className="text-xs font-medium text-foreground">{getSummaryText()}</span>
       </div>
 
       {/* Pipeline row */}

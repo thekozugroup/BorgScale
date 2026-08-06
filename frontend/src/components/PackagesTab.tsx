@@ -288,9 +288,7 @@ export default function PackagesTab() {
       render: (pkg) => (
         <div>
           <p className="text-sm font-medium">{pkg.name}</p>
-          {pkg.description && (
-            <p className="text-xs text-muted-foreground">{pkg.description}</p>
-          )}
+          {pkg.description && <p className="text-xs text-muted-foreground">{pkg.description}</p>}
         </div>
       ),
     },
@@ -396,22 +394,33 @@ export default function PackagesTab() {
           icon: <Package size={48} />,
           title: t('packages.empty'),
           description: t('packages.emptyDesc'),
-          action: <Button size="sm" onClick={() => setShowCreateDialog(true)}>{t('packages.addPackage')}</Button>,
+          action: (
+            <Button size="sm" onClick={() => setShowCreateDialog(true)}>
+              {t('packages.addPackage')}
+            </Button>
+          ),
         }}
         variant="outlined"
       />
 
       {/* Create/Edit Dialog */}
-      <Dialog open={showCreateDialog || !!editingPackage} onOpenChange={(v) => !v && handleCloseDialog()}>
+      <Dialog
+        open={showCreateDialog || !!editingPackage}
+        onOpenChange={(v) => !v && handleCloseDialog()}
+      >
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>
-              {editingPackage ? t('packages.createDialog.titleEdit') : t('packages.createDialog.titleAdd')}
+              {editingPackage
+                ? t('packages.createDialog.titleEdit')
+                : t('packages.createDialog.titleAdd')}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmitPackage} className="flex flex-col gap-4 pt-2">
             <div>
-              <Label htmlFor="packages-name" className="text-xs font-semibold mb-1.5 block">{t('packages.fields.packageName')}</Label>
+              <Label htmlFor="packages-name" className="text-xs font-semibold mb-1.5 block">
+                {t('packages.fields.packageName')}
+              </Label>
               <Input
                 id="packages-name"
                 value={packageForm.name}
@@ -437,28 +446,41 @@ export default function PackagesTab() {
 
             {advancedMode && (
               <div>
-                <Label htmlFor="packages-install-command" className="text-xs font-semibold mb-1.5 block">{t('packages.fields.installCommand')}</Label>
+                <Label
+                  htmlFor="packages-install-command"
+                  className="text-xs font-semibold mb-1.5 block"
+                >
+                  {t('packages.fields.installCommand')}
+                </Label>
                 <textarea
                   id="packages-install-command"
                   value={packageForm.install_command}
-                  onChange={(e) => setPackageForm({ ...packageForm, install_command: e.target.value })}
+                  onChange={(e) =>
+                    setPackageForm({ ...packageForm, install_command: e.target.value })
+                  }
                   required={advancedMode}
                   rows={3}
                   className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
                 />
-                <p className="text-xs text-muted-foreground mt-1">{t('packages.fields.installCommandHint')}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {t('packages.fields.installCommandHint')}
+                </p>
               </div>
             )}
 
             <div>
-              <Label htmlFor="packages-description" className="text-xs font-semibold mb-1.5 block">{t('packages.fields.description')}</Label>
+              <Label htmlFor="packages-description" className="text-xs font-semibold mb-1.5 block">
+                {t('packages.fields.description')}
+              </Label>
               <Input
                 id="packages-description"
                 value={packageForm.description}
                 onChange={(e) => setPackageForm({ ...packageForm, description: e.target.value })}
                 className="h-9 text-sm"
               />
-              <p className="text-xs text-muted-foreground mt-1">{t('packages.fields.descriptionHint')}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {t('packages.fields.descriptionHint')}
+              </p>
             </div>
 
             <div className="flex items-center justify-end gap-2 pt-1">
@@ -488,7 +510,10 @@ export default function PackagesTab() {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={!!deleteConfirmPackage} onOpenChange={(v) => !v && setDeleteConfirmPackage(null)}>
+      <Dialog
+        open={!!deleteConfirmPackage}
+        onOpenChange={(v) => !v && setDeleteConfirmPackage(null)}
+      >
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle>{t('packages.deleteDialog.title')}</DialogTitle>
@@ -505,7 +530,9 @@ export default function PackagesTab() {
               <Button
                 variant="destructive"
                 size="sm"
-                onClick={() => deleteConfirmPackage && deletePackageMutation.mutate(deleteConfirmPackage.id)}
+                onClick={() =>
+                  deleteConfirmPackage && deletePackageMutation.mutate(deleteConfirmPackage.id)
+                }
                 disabled={deletePackageMutation.isPending}
                 className="gap-1.5"
               >
@@ -554,13 +581,17 @@ export default function PackagesTab() {
             {jobStatus?.status === 'installing' && (
               <div className="flex items-center gap-3">
                 <Loader2 size={18} className="animate-spin text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">{t('packages.resultDialog.installingDesc')}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t('packages.resultDialog.installingDesc')}
+                </p>
               </div>
             )}
 
             {jobStatus?.stdout && (
               <div>
-                <p className="text-xs text-muted-foreground mb-1.5">{t('packages.resultDialog.stdout')}</p>
+                <p className="text-xs text-muted-foreground mb-1.5">
+                  {t('packages.resultDialog.stdout')}
+                </p>
                 <div className="p-3 rounded-xl overflow-auto max-h-72 bg-foreground">
                   <pre className="text-sm whitespace-pre-wrap break-words m-0 text-background font-mono">
                     {jobStatus.stdout}
@@ -571,7 +602,9 @@ export default function PackagesTab() {
 
             {jobStatus?.stderr && (
               <div>
-                <p className="text-xs text-muted-foreground mb-1.5">{t('packages.resultDialog.stderr')}</p>
+                <p className="text-xs text-muted-foreground mb-1.5">
+                  {t('packages.resultDialog.stderr')}
+                </p>
                 <div className="p-3 rounded-xl overflow-auto max-h-72 bg-foreground">
                   <pre className="text-sm whitespace-pre-wrap break-words m-0 text-destructive font-mono">
                     {jobStatus.stderr}
@@ -596,11 +629,16 @@ export default function PackagesTab() {
             <div className="flex justify-end pt-1">
               <Button
                 size="sm"
-                onClick={() => { setShowResultDialog(false); setJobStatus(null) }}
+                onClick={() => {
+                  setShowResultDialog(false)
+                  setJobStatus(null)
+                }}
                 disabled={jobStatus?.status === 'installing'}
                 className="gap-1.5"
               >
-                {jobStatus?.status === 'installing' && <Loader2 size={13} className="animate-spin" />}
+                {jobStatus?.status === 'installing' && (
+                  <Loader2 size={13} className="animate-spin" />
+                )}
                 {jobStatus?.status === 'installing'
                   ? t('packages.resultDialog.installing')
                   : t('packages.resultDialog.close')}

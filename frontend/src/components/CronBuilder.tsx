@@ -41,56 +41,137 @@ const parseCron = (cronExpression: string): CronState => {
   const parts = cronExpression.trim().split(/\s+/)
   if (parts.length !== 5) {
     return {
-      frequency: 'daily', minuteInterval: 5, hourInterval: 6, startingMinute: 0,
-      hour: 2, minute: 0, selectedDays: [true, false, false, false, false, false, false],
-      dayOfMonth: 1, customCron: cronExpression,
+      frequency: 'daily',
+      minuteInterval: 5,
+      hourInterval: 6,
+      startingMinute: 0,
+      hour: 2,
+      minute: 0,
+      selectedDays: [true, false, false, false, false, false, false],
+      dayOfMonth: 1,
+      customCron: cronExpression,
     }
   }
   const [minute, hour, day, , dayOfWeek] = parts
 
   if (minute.startsWith('*/') && hour === '*' && day === '*' && dayOfWeek === '*') {
-    return { frequency: 'minute', minuteInterval: parseInt(minute.replace('*/', '')) || 5, hourInterval: 6, startingMinute: 0, hour: 2, minute: 0, selectedDays: [true, false, false, false, false, false, false], dayOfMonth: 1, customCron: cronExpression }
+    return {
+      frequency: 'minute',
+      minuteInterval: parseInt(minute.replace('*/', '')) || 5,
+      hourInterval: 6,
+      startingMinute: 0,
+      hour: 2,
+      minute: 0,
+      selectedDays: [true, false, false, false, false, false, false],
+      dayOfMonth: 1,
+      customCron: cronExpression,
+    }
   }
   if (/^\d+$/.test(minute) && hour.startsWith('*/') && day === '*' && dayOfWeek === '*') {
-    return { frequency: 'hourly', minuteInterval: 5, hourInterval: parseInt(hour.replace('*/', '')) || 6, startingMinute: parseInt(minute), hour: 2, minute: 0, selectedDays: [true, false, false, false, false, false, false], dayOfMonth: 1, customCron: cronExpression }
+    return {
+      frequency: 'hourly',
+      minuteInterval: 5,
+      hourInterval: parseInt(hour.replace('*/', '')) || 6,
+      startingMinute: parseInt(minute),
+      hour: 2,
+      minute: 0,
+      selectedDays: [true, false, false, false, false, false, false],
+      dayOfMonth: 1,
+      customCron: cronExpression,
+    }
   }
   if (/^\d+$/.test(minute) && /^\d+$/.test(hour) && day === '*' && dayOfWeek === '*') {
-    return { frequency: 'daily', minuteInterval: 5, hourInterval: 6, startingMinute: 0, hour: parseInt(hour), minute: parseInt(minute), selectedDays: [true, false, false, false, false, false, false], dayOfMonth: 1, customCron: cronExpression }
+    return {
+      frequency: 'daily',
+      minuteInterval: 5,
+      hourInterval: 6,
+      startingMinute: 0,
+      hour: parseInt(hour),
+      minute: parseInt(minute),
+      selectedDays: [true, false, false, false, false, false, false],
+      dayOfMonth: 1,
+      customCron: cronExpression,
+    }
   }
   if (/^\d+$/.test(minute) && /^\d+$/.test(hour) && day === '*' && /^[\d,]+$/.test(dayOfWeek)) {
     const selectedDayNums = dayOfWeek.split(',').map((d) => parseInt(d))
-    return { frequency: 'weekly', minuteInterval: 5, hourInterval: 6, startingMinute: 0, hour: parseInt(hour), minute: parseInt(minute), selectedDays: DAY_NUMBERS.map((dayNum) => selectedDayNums.includes(dayNum)), dayOfMonth: 1, customCron: cronExpression }
+    return {
+      frequency: 'weekly',
+      minuteInterval: 5,
+      hourInterval: 6,
+      startingMinute: 0,
+      hour: parseInt(hour),
+      minute: parseInt(minute),
+      selectedDays: DAY_NUMBERS.map((dayNum) => selectedDayNums.includes(dayNum)),
+      dayOfMonth: 1,
+      customCron: cronExpression,
+    }
   }
   if (/^\d+$/.test(minute) && /^\d+$/.test(hour) && /^\d+$/.test(day) && dayOfWeek === '*') {
-    return { frequency: 'monthly', minuteInterval: 5, hourInterval: 6, startingMinute: 0, hour: parseInt(hour), minute: parseInt(minute), selectedDays: [true, false, false, false, false, false, false], dayOfMonth: parseInt(day), customCron: cronExpression }
+    return {
+      frequency: 'monthly',
+      minuteInterval: 5,
+      hourInterval: 6,
+      startingMinute: 0,
+      hour: parseInt(hour),
+      minute: parseInt(minute),
+      selectedDays: [true, false, false, false, false, false, false],
+      dayOfMonth: parseInt(day),
+      customCron: cronExpression,
+    }
   }
-  return { frequency: 'custom', minuteInterval: 5, hourInterval: 6, startingMinute: 0, hour: 2, minute: 0, selectedDays: [true, false, false, false, false, false, false], dayOfMonth: 1, customCron: cronExpression }
+  return {
+    frequency: 'custom',
+    minuteInterval: 5,
+    hourInterval: 6,
+    startingMinute: 0,
+    hour: 2,
+    minute: 0,
+    selectedDays: [true, false, false, false, false, false, false],
+    dayOfMonth: 1,
+    customCron: cronExpression,
+  }
 }
 
 const buildCron = (state: CronState): string => {
   switch (state.frequency) {
-    case 'minute': return `*/${state.minuteInterval} * * * *`
-    case 'hourly': return `${state.startingMinute} */${state.hourInterval} * * *`
-    case 'daily': return `${state.minute} ${state.hour} * * *`
+    case 'minute':
+      return `*/${state.minuteInterval} * * * *`
+    case 'hourly':
+      return `${state.startingMinute} */${state.hourInterval} * * *`
+    case 'daily':
+      return `${state.minute} ${state.hour} * * *`
     case 'weekly': {
-      const nums = state.selectedDays.map((s, i) => (s ? DAY_NUMBERS[i] : null)).filter((d) => d !== null)
+      const nums = state.selectedDays
+        .map((s, i) => (s ? DAY_NUMBERS[i] : null))
+        .filter((d) => d !== null)
       if (nums.length === 0) return `${state.minute} ${state.hour} * * 1`
       return `${state.minute} ${state.hour} * * ${nums.join(',')}`
     }
-    case 'monthly': return `${state.minute} ${state.hour} ${state.dayOfMonth} * *`
-    case 'custom': return state.customCron
-    default: return '0 2 * * *'
+    case 'monthly':
+      return `${state.minute} ${state.hour} ${state.dayOfMonth} * *`
+    case 'custom':
+      return state.customCron
+    default:
+      return '0 2 * * *'
   }
 }
 
-const generatePreview = (state: CronState, t: (key: string, opts?: Record<string, unknown>) => string): string => {
+const generatePreview = (
+  state: CronState,
+  t: (key: string, opts?: Record<string, unknown>) => string
+): string => {
   switch (state.frequency) {
-    case 'minute': return t('cronBuilder.everyMinutes', { count: state.minuteInterval })
-    case 'hourly': return t('cronBuilder.everyHours', { count: state.hourInterval })
+    case 'minute':
+      return t('cronBuilder.everyMinutes', { count: state.minuteInterval })
+    case 'hourly':
+      return t('cronBuilder.everyHours', { count: state.hourInterval })
     case 'daily': {
       const hour12 = state.hour === 0 ? 12 : state.hour > 12 ? state.hour - 12 : state.hour
       const ampm = state.hour >= 12 ? t('cronBuilder.pm') : t('cronBuilder.am')
-      return t('cronBuilder.dailyAt', { time: `${hour12}:${state.minute.toString().padStart(2, '0')} ${ampm}` })
+      return t('cronBuilder.dailyAt', {
+        time: `${hour12}:${state.minute.toString().padStart(2, '0')} ${ampm}`,
+      })
     }
     case 'weekly': {
       const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -98,17 +179,33 @@ const generatePreview = (state: CronState, t: (key: string, opts?: Record<string
       if (selectedDayNames.length === 0) return t('cronBuilder.noDaysSelected')
       const hour12 = state.hour === 0 ? 12 : state.hour > 12 ? state.hour - 12 : state.hour
       const ampm = state.hour >= 12 ? t('cronBuilder.pm') : t('cronBuilder.am')
-      const daysStr = selectedDayNames.length === 7 ? t('cronBuilder.daily') : selectedDayNames.join(', ')
-      return t('cronBuilder.weeklyAt', { days: daysStr, time: `${hour12}:${state.minute.toString().padStart(2, '0')} ${ampm}` })
+      const daysStr =
+        selectedDayNames.length === 7 ? t('cronBuilder.daily') : selectedDayNames.join(', ')
+      return t('cronBuilder.weeklyAt', {
+        days: daysStr,
+        time: `${hour12}:${state.minute.toString().padStart(2, '0')} ${ampm}`,
+      })
     }
     case 'monthly': {
       const hour12 = state.hour === 0 ? 12 : state.hour > 12 ? state.hour - 12 : state.hour
       const ampm = state.hour >= 12 ? t('cronBuilder.pm') : t('cronBuilder.am')
-      const suffix = state.dayOfMonth === 1 ? 'st' : state.dayOfMonth === 2 ? 'nd' : state.dayOfMonth === 3 ? 'rd' : 'th'
-      return t('cronBuilder.monthlyOn', { day: `${state.dayOfMonth}${suffix}`, time: `${hour12}:${state.minute.toString().padStart(2, '0')} ${ampm}` })
+      const suffix =
+        state.dayOfMonth === 1
+          ? 'st'
+          : state.dayOfMonth === 2
+            ? 'nd'
+            : state.dayOfMonth === 3
+              ? 'rd'
+              : 'th'
+      return t('cronBuilder.monthlyOn', {
+        day: `${state.dayOfMonth}${suffix}`,
+        time: `${hour12}:${state.minute.toString().padStart(2, '0')} ${ampm}`,
+      })
     }
-    case 'custom': return t('cronBuilder.customSchedule', { cron: state.customCron })
-    default: return ''
+    case 'custom':
+      return t('cronBuilder.customSchedule', { cron: state.customCron })
+    default:
+      return ''
   }
 }
 
@@ -125,7 +222,9 @@ export default function CronBuilder({ value, onChange, label, helperText }: Cron
   const { t } = useTranslation()
   const [state, setState] = useState<CronState>(parseCron(value))
 
-  useEffect(() => { setState(parseCron(value)) }, [value])
+  useEffect(() => {
+    setState(parseCron(value))
+  }, [value])
 
   const handleStateChange = (newState: Partial<CronState>) => {
     const updated = { ...state, ...newState }
@@ -148,19 +247,36 @@ export default function CronBuilder({ value, onChange, label, helperText }: Cron
       <Input
         type="number"
         value={hour12}
-        onChange={(e) => handleTimeChange(Math.max(1, Math.min(12, parseInt(e.target.value) || 1)), state.minute, ampm as 'AM' | 'PM')}
-        min={1} max={12}
+        onChange={(e) =>
+          handleTimeChange(
+            Math.max(1, Math.min(12, parseInt(e.target.value) || 1)),
+            state.minute,
+            ampm as 'AM' | 'PM'
+          )
+        }
+        min={1}
+        max={12}
         className="w-12 text-center text-sm px-1.5 py-1 h-8"
       />
       <span className="text-sm text-muted-foreground font-medium">:</span>
       <Input
         type="number"
         value={state.minute.toString().padStart(2, '0')}
-        onChange={(e) => handleTimeChange(hour12, Math.max(0, Math.min(59, parseInt(e.target.value) || 0)), ampm as 'AM' | 'PM')}
-        min={0} max={59}
+        onChange={(e) =>
+          handleTimeChange(
+            hour12,
+            Math.max(0, Math.min(59, parseInt(e.target.value) || 0)),
+            ampm as 'AM' | 'PM'
+          )
+        }
+        min={0}
+        max={59}
         className="w-12 text-center text-sm px-1.5 py-1 h-8"
       />
-      <Select value={ampm} onValueChange={(v) => handleTimeChange(hour12, state.minute, v as 'AM' | 'PM')}>
+      <Select
+        value={ampm}
+        onValueChange={(v) => handleTimeChange(hour12, state.minute, v as 'AM' | 'PM')}
+      >
         <SelectTrigger className="w-16 h-8 text-sm px-2">
           <SelectValue />
         </SelectTrigger>
@@ -207,8 +323,11 @@ export default function CronBuilder({ value, onChange, label, helperText }: Cron
               <Input
                 type="number"
                 value={state.minuteInterval}
-                onChange={(e) => handleStateChange({ minuteInterval: Math.max(1, parseInt(e.target.value) || 1) })}
-                min={1} max={59}
+                onChange={(e) =>
+                  handleStateChange({ minuteInterval: Math.max(1, parseInt(e.target.value) || 1) })
+                }
+                min={1}
+                max={59}
                 className="w-16 text-center text-sm h-8"
               />
               <span className="text-sm">{t('cronBuilderComponent.minutesSuffix')}</span>
@@ -221,16 +340,24 @@ export default function CronBuilder({ value, onChange, label, helperText }: Cron
               <Input
                 type="number"
                 value={state.hourInterval}
-                onChange={(e) => handleStateChange({ hourInterval: Math.max(1, parseInt(e.target.value) || 1) })}
-                min={1} max={23}
+                onChange={(e) =>
+                  handleStateChange({ hourInterval: Math.max(1, parseInt(e.target.value) || 1) })
+                }
+                min={1}
+                max={23}
                 className="w-16 text-center text-sm h-8"
               />
               <span className="text-sm">{t('cronBuilderComponent.hoursAtMinute')}</span>
               <Input
                 type="number"
                 value={state.startingMinute}
-                onChange={(e) => handleStateChange({ startingMinute: Math.max(0, Math.min(59, parseInt(e.target.value) || 0)) })}
-                min={0} max={59}
+                onChange={(e) =>
+                  handleStateChange({
+                    startingMinute: Math.max(0, Math.min(59, parseInt(e.target.value) || 0)),
+                  })
+                }
+                min={0}
+                max={59}
                 className="w-16 text-center text-sm h-8"
               />
               <span className="text-sm">{t('cronBuilderComponent.pastTheHour')}</span>
@@ -293,7 +420,9 @@ export default function CronBuilder({ value, onChange, label, helperText }: Cron
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">
                   {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
-                    <SelectItem key={d} value={String(d)} className="text-sm">{d}</SelectItem>
+                    <SelectItem key={d} value={String(d)} className="text-sm">
+                      {d}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -304,7 +433,10 @@ export default function CronBuilder({ value, onChange, label, helperText }: Cron
 
           {state.frequency === 'custom' && (
             <div className="relative w-full">
-              <Code size={15} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Code
+                size={15}
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+              />
               <Input
                 value={state.customCron}
                 onChange={(e) => handleStateChange({ customCron: e.target.value })}

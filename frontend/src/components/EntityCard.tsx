@@ -57,7 +57,6 @@ const STAT_TEXT: Record<string, string> = {
   secondary: 'text-muted-foreground',
 }
 
-
 export default function EntityCard({
   title,
   subtitle,
@@ -69,18 +68,14 @@ export default function EntityCard({
   primaryAction,
 }: EntityCardProps) {
   return (
-    <div
-      className="relative rounded-lg border border-border bg-card text-card-foreground overflow-hidden max-w-full min-w-0 shadow-sm"
-    >
+    <div className="relative rounded-lg border border-border bg-card text-card-foreground overflow-hidden max-w-full min-w-0 shadow-sm">
       <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3.5 sm:pb-4">
         {/* Header */}
         <div className="flex items-start justify-between gap-2 mb-3">
           <div className="min-w-0 flex-1">
             <p className="text-sm font-bold truncate leading-tight">{title}</p>
             {subtitle && (
-              <p className="text-xs truncate leading-snug text-muted-foreground/60">
-                {subtitle}
-              </p>
+              <p className="text-xs truncate leading-snug text-muted-foreground/60">{subtitle}</p>
             )}
           </div>
           {badge && <div className="flex-shrink-0">{badge}</div>}
@@ -108,11 +103,16 @@ export default function EntityCard({
                     )}
                   >
                     <div className="flex items-center gap-1 mb-1">
-                      <span className={cn('flex items-center text-muted-foreground/60', statColorCls)}>
+                      <span
+                        className={cn('flex items-center text-muted-foreground/60', statColorCls)}
+                      >
                         {stat.icon}
                       </span>
                       <span
-                        className={cn('text-3xs font-bold uppercase tracking-widest leading-none text-muted-foreground/60', statColorCls)}
+                        className={cn(
+                          'text-3xs font-bold uppercase tracking-widest leading-none text-muted-foreground/60',
+                          statColorCls
+                        )}
                       >
                         {stat.label}
                       </span>
@@ -132,13 +132,13 @@ export default function EntityCard({
             {meta.map((m) => (
               <Tooltip key={m.label}>
                 <TooltipTrigger asChild>
-                  <div
-                    className={cn('flex items-center gap-1', m.tooltip ? 'cursor-help' : '')}
-                  >
+                  <div className={cn('flex items-center gap-1', m.tooltip ? 'cursor-help' : '')}>
                     <span className="text-2xs leading-none text-muted-foreground/60">
                       {m.label}:
                     </span>
-                    <span className="text-2xs font-semibold text-muted-foreground leading-none">{m.value}</span>
+                    <span className="text-2xs font-semibold text-muted-foreground leading-none">
+                      {m.value}
+                    </span>
                   </div>
                 </TooltipTrigger>
                 {m.tooltip && <TooltipContent>{m.tooltip}</TooltipContent>}
@@ -151,9 +151,7 @@ export default function EntityCard({
         {tags && <div className="mb-3">{tags}</div>}
 
         {/* Footer actions */}
-        <div
-          className="flex items-center gap-1 pt-3 border-t border-border"
-        >
+        <div className="flex items-center gap-1 pt-3 border-t border-border">
           <div className="flex items-center gap-0.5">
             {actions
               .filter((a) => !a.hidden)

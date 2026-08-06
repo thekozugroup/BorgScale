@@ -20,24 +20,32 @@ describe('SourceDirectoriesInput', () => {
     })
 
     it('renders required asterisk when required=true', () => {
-      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} required={true} />)
+      renderWithProviders(
+        <SourceDirectoriesInput directories={[]} onChange={mockOnChange} required={true} />
+      )
       expect(screen.getByText('*')).toBeInTheDocument()
       expect(screen.getByText(/at least one required/)).toBeInTheDocument()
     })
 
     it('does not render required asterisk when required=false', () => {
-      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} required={false} />)
+      renderWithProviders(
+        <SourceDirectoriesInput directories={[]} onChange={mockOnChange} required={false} />
+      )
       expect(screen.queryByText('*')).not.toBeInTheDocument()
       expect(screen.getByText(/optional/)).toBeInTheDocument()
     })
 
     it('shows tooltip helper icon when required and no directories', () => {
-      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} required={true} />)
+      renderWithProviders(
+        <SourceDirectoriesInput directories={[]} onChange={mockOnChange} required={true} />
+      )
       expect(screen.getByRole('button', { name: /source directories.*help/i })).toBeInTheDocument()
     })
 
     it('does not show tooltip helper icon when required=false and no directories', () => {
-      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} required={false} />)
+      renderWithProviders(
+        <SourceDirectoriesInput directories={[]} onChange={mockOnChange} required={false} />
+      )
       expect(
         screen.queryByRole('button', { name: /source directories.*help/i })
       ).not.toBeInTheDocument()
@@ -114,7 +122,9 @@ describe('SourceDirectoriesInput', () => {
 
     it('appends to existing directories', async () => {
       const user = userEvent.setup()
-      renderWithProviders(<SourceDirectoriesInput directories={['/existing/dir']} onChange={mockOnChange} />)
+      renderWithProviders(
+        <SourceDirectoriesInput directories={['/existing/dir']} onChange={mockOnChange} />
+      )
 
       const input = screen.getByPlaceholderText('/home/user/documents or /var/log/app.log')
       await user.type(input, '/new/directory')
@@ -237,12 +247,16 @@ describe('SourceDirectoriesInput', () => {
 
   describe('Disabled state', () => {
     it('disables input when disabled=true', () => {
-      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} disabled={true} />)
+      renderWithProviders(
+        <SourceDirectoriesInput directories={[]} onChange={mockOnChange} disabled={true} />
+      )
       expect(screen.getByPlaceholderText('/home/user/documents or /var/log/app.log')).toBeDisabled()
     })
 
     it('disables Add button when disabled=true', () => {
-      renderWithProviders(<SourceDirectoriesInput directories={[]} onChange={mockOnChange} disabled={true} />)
+      renderWithProviders(
+        <SourceDirectoriesInput directories={[]} onChange={mockOnChange} disabled={true} />
+      )
       expect(screen.getByRole('button', { name: /Add/i })).toBeDisabled()
     })
 

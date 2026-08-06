@@ -68,7 +68,9 @@ export default function AdvancedRepositoryOptions({
           onChange={(e) => onRemotePathChange(e.target.value)}
           placeholder="/usr/local/bin/borg"
         />
-        <p className="text-xs text-muted-foreground">{t('advancedRepositoryOptions.remoteBorgPathHint')}</p>
+        <p className="text-xs text-muted-foreground">
+          {t('advancedRepositoryOptions.remoteBorgPathHint')}
+        </p>
       </div>
 
       {/* Custom Flags - Only show for full repositories */}
@@ -81,7 +83,9 @@ export default function AdvancedRepositoryOptions({
             onChange={(e) => onCustomFlagsChange(e.target.value)}
             placeholder="--stats --list --filter AME"
           />
-          <p className="text-xs text-muted-foreground">{t('advancedRepositoryOptions.customFlagsHint')}</p>
+          <p className="text-xs text-muted-foreground">
+            {t('advancedRepositoryOptions.customFlagsHint')}
+          </p>
         </div>
       )}
 

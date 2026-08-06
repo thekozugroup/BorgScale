@@ -13,7 +13,9 @@ const defaultData = {
 describe('WizardStepSecurity', () => {
   describe('Create Mode', () => {
     it('renders encryption tiles', () => {
-      renderWithProviders(<WizardStepSecurity mode="create" data={defaultData} onChange={vi.fn()} />)
+      renderWithProviders(
+        <WizardStepSecurity mode="create" data={defaultData} onChange={vi.fn()} />
+      )
 
       expect(screen.getByTestId('encryption-tile-encrypted')).toBeInTheDocument()
       expect(screen.getByTestId('encryption-tile-keyfile')).toBeInTheDocument()
@@ -22,7 +24,9 @@ describe('WizardStepSecurity', () => {
 
     it('keeps the advanced dropdown hidden by default when encryption matches a tile', () => {
       const tileMatchData = { ...defaultData, encryption: 'repokey-blake2' }
-      renderWithProviders(<WizardStepSecurity mode="create" data={tileMatchData} onChange={vi.fn()} />)
+      renderWithProviders(
+        <WizardStepSecurity mode="create" data={tileMatchData} onChange={vi.fn()} />
+      )
 
       // Advanced disclosure container exists but the select is collapsed.
       expect(screen.getByTestId('security-advanced')).toBeInTheDocument()
@@ -38,13 +42,17 @@ describe('WizardStepSecurity', () => {
     })
 
     it('renders passphrase input', () => {
-      renderWithProviders(<WizardStepSecurity mode="create" data={defaultData} onChange={vi.fn()} />)
+      renderWithProviders(
+        <WizardStepSecurity mode="create" data={defaultData} onChange={vi.fn()} />
+      )
 
       expect(screen.getByPlaceholderText(/Enter passphrase/i)).toBeInTheDocument()
     })
 
     it('renders remote borg path input', () => {
-      renderWithProviders(<WizardStepSecurity mode="create" data={defaultData} onChange={vi.fn()} />)
+      renderWithProviders(
+        <WizardStepSecurity mode="create" data={defaultData} onChange={vi.fn()} />
+      )
 
       expect(screen.getByLabelText(/Remote Borg Path/i)).toBeInTheDocument()
     })
@@ -53,7 +61,9 @@ describe('WizardStepSecurity', () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
 
-      renderWithProviders(<WizardStepSecurity mode="create" data={defaultData} onChange={onChange} />)
+      renderWithProviders(
+        <WizardStepSecurity mode="create" data={defaultData} onChange={onChange} />
+      )
 
       await user.type(screen.getByPlaceholderText(/Enter passphrase/i), 'mysecret')
 
@@ -67,7 +77,9 @@ describe('WizardStepSecurity', () => {
     it('shows security warning when no encryption is selected', () => {
       const noEncryptionData = { ...defaultData, encryption: 'none' }
 
-      renderWithProviders(<WizardStepSecurity mode="create" data={noEncryptionData} onChange={vi.fn()} />)
+      renderWithProviders(
+        <WizardStepSecurity mode="create" data={noEncryptionData} onChange={vi.fn()} />
+      )
 
       expect(screen.getByText(/Security Warning/i)).toBeInTheDocument()
       expect(screen.getByText(/stored without encryption/i)).toBeInTheDocument()
@@ -76,13 +88,17 @@ describe('WizardStepSecurity', () => {
     it('hides passphrase input when encryption is none', () => {
       const noEncryptionData = { ...defaultData, encryption: 'none' }
 
-      renderWithProviders(<WizardStepSecurity mode="create" data={noEncryptionData} onChange={vi.fn()} />)
+      renderWithProviders(
+        <WizardStepSecurity mode="create" data={noEncryptionData} onChange={vi.fn()} />
+      )
 
       expect(screen.queryByPlaceholderText(/Enter passphrase/i)).not.toBeInTheDocument()
     })
 
     it('does NOT show encryption warning in create mode', () => {
-      renderWithProviders(<WizardStepSecurity mode="create" data={defaultData} onChange={vi.fn()} />)
+      renderWithProviders(
+        <WizardStepSecurity mode="create" data={defaultData} onChange={vi.fn()} />
+      )
 
       expect(screen.queryByText(/Encryption settings cannot be changed/i)).not.toBeInTheDocument()
     })
@@ -130,7 +146,9 @@ describe('WizardStepSecurity', () => {
     })
 
     it('does NOT show encryption settings warning', () => {
-      renderWithProviders(<WizardStepSecurity mode="import" data={defaultData} onChange={vi.fn()} />)
+      renderWithProviders(
+        <WizardStepSecurity mode="import" data={defaultData} onChange={vi.fn()} />
+      )
 
       // Import mode should not show the "cannot change encryption" warning
       expect(screen.queryByText(/Encryption settings cannot be changed/i)).not.toBeInTheDocument()
@@ -138,7 +156,9 @@ describe('WizardStepSecurity', () => {
 
     it('renders keyfile upload option', () => {
       const keyfileData = { ...defaultData, encryption: 'keyfile' }
-      renderWithProviders(<WizardStepSecurity mode="import" data={keyfileData} onChange={vi.fn()} />)
+      renderWithProviders(
+        <WizardStepSecurity mode="import" data={keyfileData} onChange={vi.fn()} />
+      )
 
       expect(screen.getByText(/Encryption key file \(optional\)/i)).toBeInTheDocument()
       expect(screen.getByText(/Choose key file/i)).toBeInTheDocument()
@@ -151,7 +171,9 @@ describe('WizardStepSecurity', () => {
         selectedKeyfile: new File([''], 'my-key.key', { type: 'application/octet-stream' }),
       }
 
-      renderWithProviders(<WizardStepSecurity mode="import" data={dataWithKeyfile} onChange={vi.fn()} />)
+      renderWithProviders(
+        <WizardStepSecurity mode="import" data={dataWithKeyfile} onChange={vi.fn()} />
+      )
 
       expect(screen.getByText(/Selected: my-key.key/i)).toBeInTheDocument()
     })
@@ -163,7 +185,9 @@ describe('WizardStepSecurity', () => {
         selectedKeyfile: new File([''], 'my-key.key', { type: 'application/octet-stream' }),
       }
 
-      renderWithProviders(<WizardStepSecurity mode="import" data={dataWithKeyfile} onChange={vi.fn()} />)
+      renderWithProviders(
+        <WizardStepSecurity mode="import" data={dataWithKeyfile} onChange={vi.fn()} />
+      )
 
       expect(screen.getByText(/Your key file will be uploaded after import/i)).toBeInTheDocument()
     })
@@ -174,7 +198,9 @@ describe('WizardStepSecurity', () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
 
-      renderWithProviders(<WizardStepSecurity mode="create" data={defaultData} onChange={onChange} />)
+      renderWithProviders(
+        <WizardStepSecurity mode="create" data={defaultData} onChange={onChange} />
+      )
 
       await user.click(screen.getByTestId('encryption-tile-keyfile'))
 
@@ -190,7 +216,9 @@ describe('WizardStepSecurity', () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
 
-      renderWithProviders(<WizardStepSecurity mode="create" data={defaultData} onChange={onChange} />)
+      renderWithProviders(
+        <WizardStepSecurity mode="create" data={defaultData} onChange={onChange} />
+      )
 
       await user.click(screen.getByTestId('encryption-tile-none'))
 
@@ -206,12 +234,7 @@ describe('WizardStepSecurity', () => {
       const onChange = vi.fn()
 
       renderWithProviders(
-        <WizardStepSecurity
-          mode="create"
-          borgVersion={2}
-          data={defaultData}
-          onChange={onChange}
-        />
+        <WizardStepSecurity mode="create" borgVersion={2} data={defaultData} onChange={onChange} />
       )
 
       await user.click(screen.getByTestId('encryption-tile-encrypted'))
@@ -227,7 +250,9 @@ describe('WizardStepSecurity', () => {
       const user = userEvent.setup()
       const onChange = vi.fn()
 
-      renderWithProviders(<WizardStepSecurity mode="create" data={defaultData} onChange={onChange} />)
+      renderWithProviders(
+        <WizardStepSecurity mode="create" data={defaultData} onChange={onChange} />
+      )
 
       await user.type(screen.getByLabelText(/Remote Borg Path/i), '/usr/local/bin/borg')
 
@@ -239,7 +264,9 @@ describe('WizardStepSecurity', () => {
     })
 
     it('shows placeholder for remote borg path', () => {
-      renderWithProviders(<WizardStepSecurity mode="create" data={defaultData} onChange={vi.fn()} />)
+      renderWithProviders(
+        <WizardStepSecurity mode="create" data={defaultData} onChange={vi.fn()} />
+      )
 
       expect(screen.getByPlaceholderText(/\/usr\/local\/bin\/borg/i)).toBeInTheDocument()
     })

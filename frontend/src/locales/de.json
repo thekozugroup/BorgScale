@@ -55,7 +55,100 @@
     "undoneWarning": "Diese Aktion kann nicht rückgängig gemacht werden.",
     "version": "Version",
     "errors": {
-      "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten"
+      "unexpectedError": "Ein unerwarteter Fehler ist aufgetreten",
+      "clipboardFailed": "Kopieren in die Zwischenablage fehlgeschlagen"
+    }
+  },
+  "ssh": {
+    "manualPair": {
+      "title": "Schnellverbindung",
+      "quickConnectButton": "Schnellverbindung",
+      "advancedSetupLabel": "Erweiterte Einrichtung (Bereitstellung per Passwort / manuell hinzufügen)",
+      "intro": "Füge einen Remote-Host hinzu, indem du einen Schlüssel in ~/.ssh/authorized_keys einträgst. Kein Passwort erforderlich.",
+      "hostLabel": "Host",
+      "userLabel": "Benutzername",
+      "portLabel": "Port",
+      "preparing": "Schlüssel wird vorbereitet...",
+      "continue": "Weiter",
+      "pasteIntro": "Füge diesen öffentlichen Schlüssel auf {{user}}@{{host}} in ~/.ssh/authorized_keys ein und klicke dann auf „Verbindung testen“.",
+      "publicKey": "Öffentlicher Schlüssel",
+      "step1": "Verbinde dich per SSH mit {{target}} – auf einem Weg, den du ohnehin schon nutzt.",
+      "step2": "Führe diesen Befehl aus (er hängt den Schlüssel sicher an):",
+      "step3": "Klicke unten auf „Verbindung testen“.",
+      "testConnection": "Verbindung testen",
+      "verifying": "Verbindung zu {{target}} wird hergestellt...",
+      "connectedTitle": "Verbunden!",
+      "connected": "BorgScale kann diesen Host jetzt erreichen.",
+      "connectedWithVersion": "BorgScale hat Borg {{version}} auf dem Remote-Host gefunden.",
+      "successToast": "SSH-Verbindung gespeichert",
+      "failedTitle": "Verbindung nicht möglich",
+      "failedGeneric": "Überprüfung fehlgeschlagen. Prüfe die Schritte oben und versuche es erneut.",
+      "rawErrorToggle": "Original-Fehlermeldung von SSH anzeigen",
+      "retryTest": "Test wiederholen",
+      "copiedKey": "Öffentlicher Schlüssel kopiert",
+      "copiedCommand": "Befehl kopiert",
+      "initFailed": "Der Schlüssel konnte nicht vorbereitet werden – bitte versuche es erneut"
+    }
+  },
+  "firstRun": {
+    "title": "Richten wir deine erste Sicherung ein",
+    "subtitle": "Wähle, wie du starten möchtest. Du kannst das später jederzeit ändern.",
+    "tile": {
+      "new": {
+        "title": "Neu beginnen",
+        "desc": "Erstelle ein ganz neues Borg-Repository auf diesem Server oder einem Remote-Host.",
+        "cta": "Neu erstellen"
+      },
+      "discoverLocal": {
+        "title": "Vorhandene Sicherungen auf diesem Server finden",
+        "desc": "Lokale Ordner nach bereits vorhandenen Borg-Repositories durchsuchen.",
+        "cta": "Diesen Server durchsuchen"
+      },
+      "discoverRemote": {
+        "title": "Sicherungen auf einem anderen Server finden",
+        "desc": "Per SSH verbinden und auf einem Remote-Host nach Borg-Repositories suchen.",
+        "cta": "Remote-Host durchsuchen"
+      }
+    },
+    "helpLink": "Hilfe nötig? Sieh dir die Einstiegsanleitung von BorgScale an."
+  },
+  "discovery": {
+    "startScan": "Nach Sicherungen suchen",
+    "scanning": "Suche läuft...",
+    "importing": "Wird hinzugefügt...",
+    "foundCount_one": "{{count}} Sicherung gefunden",
+    "foundCount_other": "{{count}} Sicherungen gefunden",
+    "noneFound": "In den durchsuchten Verzeichnissen wurden keine Borg-Repositories gefunden.",
+    "partialResults": "Es werden Teilergebnisse angezeigt – die Suche wurde beim Zeitlimit abgebrochen.",
+    "scannedRoots": "Durchsucht: {{roots}}",
+    "alreadyImported": "Bereits hinzugefügt",
+    "importButton": "Hinzufügen",
+    "passphraseRequired": "Passphrase",
+    "passphraseOptional": "Passphrase (optional)",
+    "passphrasePlaceholder": "Passphrase des Repositories eingeben",
+    "modePickerObserve": "Nur beobachten (vorhandene Archive lesen)",
+    "modePickerFull": "Sichern und verwalten (empfohlen)",
+    "localHeading": "Vorhandene Sicherungen auf diesem Server finden",
+    "remoteHeading": "Sicherungen auf einem Remote-Server finden",
+    "pickConnection": "SSH-Verbindung:",
+    "pickConnectionPlaceholder": "SSH-Verbindung auswählen",
+    "noConnections": "Noch keine SSH-Verbindungen konfiguriert.",
+    "addConnection": "Eine hinzufügen",
+    "guess": {
+      "encrypted": "Verschlüsselt",
+      "unencrypted": "Nicht verschlüsselt",
+      "unknown": "Verschlüsselung: unbekannt"
+    },
+    "importDialog": {
+      "title": "Diese Sicherung hinzufügen",
+      "nameLabel": "Anzeigename",
+      "modeLabel": "Wie soll BorgScale dieses Repository verwenden?"
+    },
+    "importSuccess": "Zu BorgScale hinzugefügt",
+    "importFailed": "Hinzufügen fehlgeschlagen – prüfe Passphrase oder Pfad",
+    "errors": {
+      "noConnection": "Wähle zuerst eine SSH-Verbindung aus",
+      "scanFailed": "Suche fehlgeschlagen – bitte versuche es erneut"
     }
   },
   "login": {
@@ -241,8 +334,10 @@
     "banner": {
       "systemStatus": "Systemstatus",
       "allNominal": "Alle Systeme nominal",
-      "warnings": "{{count}} Warnung{{s}}",
-      "critical": "{{count}} kritisch",
+      "warnings_one": "{{count}} Warnung",
+      "warnings_other": "{{count}} Warnungen",
+      "critical_one": "{{count}} kritisch",
+      "critical_other": "{{count}} kritisch",
       "warnChip": "{{count}} Warn.",
       "okChip": "{{count}} ok",
       "stats": {
@@ -1908,7 +2003,8 @@
     "keepQuarterly": "Vierteljährlich behalten",
     "keepQuarterlyHint": "Vierteljährliche Sicherungen zum Behalten (0 = deaktiviert)",
     "keepYearly": "Jährlich behalten",
-    "keepYearlyHint": "Jährliche Sicherungen zum Behalten"
+    "keepYearlyHint": "Jährliche Sicherungen zum Behalten",
+    "suffix": "Snapshots"
   },
   "compressionSettings": {
     "title": "Komprimierungseinstellungen",
@@ -1941,7 +2037,9 @@
   "archiveNameTemplate": {
     "label": "Archivnamen-Vorlage",
     "hint": "Archivbenennung anpassen. Verfügbare Platzhalter: {job_name}, {now}, {date}, {time}, {timestamp}",
-    "preview": "Vorschau:"
+    "preview": "Vorschau:",
+    "advancedLabel": "Archivbenennung anpassen (erweitert)",
+    "previewIntro": "Die Dateien werden so benannt:"
   },
   "remoteMachineCard": {
     "status": {
@@ -2743,7 +2841,10 @@
     }
   },
   "cronExpressionInput": {
-    "label": "Zeitplan"
+    "label": "Zeitplan",
+    "advancedLabel": "Eigener Zeitplan (cron-Syntax)",
+    "nextRuns": "Nächste Ausführungen",
+    "description": "{{description}}"
   },
   "pathSelectorField": {
     "browseFilesystem": "Dateisystem durchsuchen",
@@ -2947,95 +3048,102 @@
         "passkeyNotFound": "Passkey nicht gefunden"
       },
       "repo": {
-        "repositoryNotFound": "Repository nicht gefunden",
-        "repositoryNameExists": "Repository-Name bereits vorhanden",
-        "repositoryPathExists": "Repository-Pfad bereits vorhanden",
-        "repositoryDirNotExist": "Repository-Verzeichnis existiert nicht: {{path}}",
-        "notValidBorgRepository": "Kein gültiges Borg-Repository: {{path}}",
-        "parentDirectoryNotWritable": "Übergeordnetes Verzeichnis ist nicht beschreibbar: {{path}}. Bitte stellen Sie sicher, dass das Verzeichnis mit den richtigen Berechtigungen vorhanden ist.",
-        "permissionDeniedCreateDirectory": "Zugriff verweigert: Verzeichnis kann nicht unter '{{path}}' erstellt werden. Um Repositories auf Ihrem Host-Rechner zu speichern, verwenden Sie Pfade, die mit '/local/' beginnen.",
-        "permissionDeniedCreateParentDirectory": "Zugriff verweigert: Übergeordnetes Verzeichnis '{{path}}' kann nicht erstellt werden. Stellen Sie sicher, dass das Verzeichnis auf Ihrem Host-Rechner mit den entsprechenden Berechtigungen vorhanden ist.",
-        "encryptedPassphraseRequired": "Passphrase ist für den Verschlüsselungsmodus '{{mode}}' erforderlich",
-        "encryptedPassphraseIncorrect": "Das Repository ist verschlüsselt, aber die Passphrase ist falsch oder fehlt. Bitte geben Sie die korrekte Passphrase an.",
-        "encryptionKeyfileNotRequired": "Das Repository verwendet die Verschlüsselung '{{mode}}', für die keine Schlüsseldatei erforderlich ist. Der Upload einer Schlüsseldatei ist nur für die Verschlüsselungsmodi 'keyfile' oder 'keyfile-blake2' erforderlich.",
         "adminAccessRequired": "Administratorzugriff erforderlich",
-        "sshConnectionNotFound": "SSH-Verbindung mit ID {{id}} nicht gefunden",
         "atLeastOneSourceDirRequired": "Mindestens ein Quellverzeichnis ist für Repositories im vollständigen Modus erforderlich",
-        "keyfileEmpty": "Schlüsseldatei ist leer",
-        "repoHasNoKeyfile": "Dieses Repository hat keine Schlüsseldatei",
-        "cannotSwitchToFullModeNoSourceDirs": "Wechsel in den vollständigen Modus nicht möglich: mindestens ein Quellverzeichnis ist erforderlich",
-        "cannotDeleteRepoWithArchives": "Repository mit vorhandenen Archiven kann nicht gelöscht werden. Bitte löschen Sie zuerst alle Archive.",
-        "checkAlreadyRunning": "Für dieses Repository wird bereits eine Überprüfungsoperation ausgeführt",
-        "compactAlreadyRunning": "Für dieses Repository wird bereits eine Komprimierungsoperation ausgeführt",
         "breakLockTimeout": "Timeout beim Versuch, die Sperre aufzuheben",
+        "cannotDeleteRepoWithArchives": "Repository mit vorhandenen Archiven kann nicht gelöscht werden. Bitte löschen Sie zuerst alle Archive.",
+        "cannotSwitchToFullModeNoSourceDirs": "Wechsel in den vollständigen Modus nicht möglich: mindestens ein Quellverzeichnis ist erforderlich",
+        "checkAlreadyRunning": "Für dieses Repository wird bereits eine Überprüfungsoperation ausgeführt",
         "checkJobNotFound": "Prüfauftrag nicht gefunden",
+        "compactAlreadyRunning": "Für dieses Repository wird bereits eine Komprimierungsoperation ausgeführt",
         "compactJobNotFound": "Komprimierungsauftrag nicht gefunden",
-        "sshUrlWithoutConnectionId": "Der Pfad scheint eine SSH-URL zu sein, aber es wurde keine connection_id angegeben. Bitte wählen Sie eine SSH-Verbindung aus.",
-        "failedToRetrieveRepositories": "Repositories konnten nicht abgerufen werden",
-        "failedToCreateParentDirectory": "Übergeordnetes Verzeichnis konnte nicht erstellt werden",
-        "failedToInitializeRepository": "Repository konnte nicht initialisiert werden",
-        "failedToCreateRepository": "Repository konnte nicht erstellt werden",
-        "failedToVerifyRepository": "Repository konnte nicht verifiziert werden",
-        "failedToImportRepository": "Repository konnte nicht importiert werden",
-        "failedToUploadKeyfile": "Schlüsseldatei konnte nicht hochgeladen werden",
-        "failedToExportKeyfile": "Schlüsseldatei konnte nicht exportiert werden",
-        "failedToRetrieveRepository": "Repository konnte nicht abgerufen werden",
-        "failedToUpdateRepository": "Repository konnte nicht aktualisiert werden",
-        "failedToDeleteRepository": "Repository konnte nicht gelöscht werden",
-        "failedToStartCheck": "Überprüfung konnte nicht gestartet werden",
-        "failedToStartCompact": "Komprimierung konnte nicht gestartet werden",
-        "pruneAlreadyRunning": "Für dieses Repository wird bereits eine Bereinigungsoperation ausgeführt",
-        "failedToStartPrune": "Bereinigung konnte nicht gestartet werden",
-        "failedToGetStatistics": "Repository-Statistiken konnten nicht abgerufen werden",
-        "failedToListArchives": "Archive konnten nicht aufgelistet werden",
-        "failedToGetRepositoryInfo": "Repository-Informationen konnten nicht abgerufen werden",
-        "failedToBreakLock": "Sperre konnte nicht aufgehoben werden",
-        "failedToGetArchiveInfo": "Archivinformationen konnten nicht abgerufen werden",
-        "failedToListArchiveFiles": "Archivdateien konnten nicht aufgelistet werden",
-        "failedToGetJobStatus": "Auftragsstatus konnte nicht abgerufen werden",
-        "failedToGetCheckJobs": "Prüfaufträge konnten nicht abgerufen werden",
-        "failedToGetCompactJobs": "Komprimierungsaufträge konnten nicht abgerufen werden",
-        "failedToGetRunningJobs": "Laufende Aufträge konnten nicht abgerufen werden",
-        "invalidCronExpression": "Ungültiger Cron-Ausdruck",
-        "failedToUpdateCheckSchedule": "Überprüfungszeitplan konnte nicht aktualisiert werden",
-        "failedToGetCheckSchedule": "Überprüfungszeitplan konnte nicht abgerufen werden",
+        "encryptedPassphraseIncorrect": "Das Repository ist verschlüsselt, aber die Passphrase ist falsch oder fehlt. Bitte geben Sie die korrekte Passphrase an.",
+        "encryptedPassphraseRequired": "Passphrase ist für den Verschlüsselungsmodus '{{mode}}' erforderlich",
+        "encryptionKeyfileNotRequired": "Das Repository verwendet die Verschlüsselung '{{mode}}', für die keine Schlüsseldatei erforderlich ist. Der Upload einer Schlüsseldatei ist nur für die Verschlüsselungsmodi 'keyfile' oder 'keyfile-blake2' erforderlich.",
+        "failedExportKeyfile": "Fehler beim Exportieren der Schlüsseldatei",
+        "failedParseArchiveInfo": "Fehler beim Parsen der Archiv-Informationen",
         "failedParseArchiveList": "Fehler beim Parsen der Archivliste",
         "failedParseRepositoryInfo": "Fehler beim Parsen der Repository-Informationen",
-        "failedParseArchiveInfo": "Fehler beim Parsen der Archiv-Informationen",
-        "failedExportKeyfile": "Fehler beim Exportieren der Schlüsseldatei"
+        "failedToBreakLock": "Sperre konnte nicht aufgehoben werden",
+        "failedToCreateParentDirectory": "Übergeordnetes Verzeichnis konnte nicht erstellt werden",
+        "failedToCreateRepository": "Repository konnte nicht erstellt werden",
+        "failedToDeleteRepository": "Repository konnte nicht gelöscht werden",
+        "failedToExportKeyfile": "Schlüsseldatei konnte nicht exportiert werden",
+        "failedToGetArchiveInfo": "Archivinformationen konnten nicht abgerufen werden",
+        "failedToGetCheckJobs": "Prüfaufträge konnten nicht abgerufen werden",
+        "failedToGetCheckSchedule": "Überprüfungszeitplan konnte nicht abgerufen werden",
+        "failedToGetCompactJobs": "Komprimierungsaufträge konnten nicht abgerufen werden",
+        "failedToGetJobStatus": "Auftragsstatus konnte nicht abgerufen werden",
+        "failedToGetRepositoryInfo": "Repository-Informationen konnten nicht abgerufen werden",
+        "failedToGetRunningJobs": "Laufende Aufträge konnten nicht abgerufen werden",
+        "failedToGetStatistics": "Repository-Statistiken konnten nicht abgerufen werden",
+        "failedToImportRepository": "Repository konnte nicht importiert werden",
+        "failedToInitializeRepository": "Repository konnte nicht initialisiert werden",
+        "failedToListArchiveFiles": "Archivdateien konnten nicht aufgelistet werden",
+        "failedToListArchives": "Archive konnten nicht aufgelistet werden",
+        "failedToRetrieveRepositories": "Repositories konnten nicht abgerufen werden",
+        "failedToRetrieveRepository": "Repository konnte nicht abgerufen werden",
+        "failedToStartCheck": "Überprüfung konnte nicht gestartet werden",
+        "failedToStartCompact": "Komprimierung konnte nicht gestartet werden",
+        "failedToStartPrune": "Bereinigung konnte nicht gestartet werden",
+        "failedToUpdateCheckSchedule": "Überprüfungszeitplan konnte nicht aktualisiert werden",
+        "failedToUpdateRepository": "Repository konnte nicht aktualisiert werden",
+        "failedToUploadKeyfile": "Schlüsseldatei konnte nicht hochgeladen werden",
+        "failedToVerifyRepository": "Repository konnte nicht verifiziert werden",
+        "invalidCronExpression": "Ungültiger Cron-Ausdruck",
+        "keyfileEmpty": "Schlüsseldatei ist leer",
+        "notValidBorgRepository": "Kein gültiges Borg-Repository: {{path}}",
+        "parentDirectoryNotWritable": "Übergeordnetes Verzeichnis ist nicht beschreibbar: {{path}}. Bitte stellen Sie sicher, dass das Verzeichnis mit den richtigen Berechtigungen vorhanden ist.",
+        "parentIsFile": "{{path}} ist eine Datei, daher kann darin nichts erstellt werden. Wählen Sie einen anderen Speicherort.",
+        "pathIsFile": "{{path}} ist eine Datei, kein Ordner. Wählen Sie einen Ordner für das Repository.",
+        "pathRequired": "Geben Sie einen Pfad für das Repository an",
+        "permissionDeniedCreateDirectory": "Zugriff verweigert: Verzeichnis kann nicht unter '{{path}}' erstellt werden. Um Repositories auf Ihrem Host-Rechner zu speichern, verwenden Sie Pfade, die mit '/local/' beginnen.",
+        "permissionDeniedCreateParentDirectory": "Zugriff verweigert: Übergeordnetes Verzeichnis '{{path}}' kann nicht erstellt werden. Stellen Sie sicher, dass das Verzeichnis auf Ihrem Host-Rechner mit den entsprechenden Berechtigungen vorhanden ist.",
+        "pruneAlreadyRunning": "Für dieses Repository wird bereits eine Bereinigungsoperation ausgeführt",
+        "repoHasNoKeyfile": "Dieses Repository hat keine Schlüsseldatei",
+        "repositoryDirNotExist": "Repository-Verzeichnis existiert nicht: {{path}}",
+        "repositoryNameExists": "Repository-Name bereits vorhanden",
+        "repositoryNotFound": "Repository nicht gefunden",
+        "repositoryPathExists": "Repository-Pfad bereits vorhanden",
+        "sshConnectionNotFound": "SSH-Verbindung mit ID {{id}} nicht gefunden",
+        "sshUrlWithoutConnectionId": "Der Pfad scheint eine SSH-URL zu sein, aber es wurde keine connection_id angegeben. Bitte wählen Sie eine SSH-Verbindung aus."
       },
       "backup": {
         "backupJobNotFound": "Sicherungsauftrag nicht gefunden",
         "canOnlyCancelRunningJobs": "Nur laufende Aufträge können abgebrochen werden",
         "cancelledByUser": "Backup vom Benutzer abgebrochen",
         "cancelledByUserProcessNotFound": "Backup vom Benutzer abgebrochen (Prozess nicht gefunden, möglicherweise bereits abgeschlossen)",
-        "noLogsAvailable": "Keine Protokolle für diese Sicherung verfügbar (erfolgreiche Sicherungen speichern keine Protokolle)",
-        "logFileNotFound": "Protokolldatei nicht gefunden: {{filename}}",
+        "cannotDownloadLogsForRunningBackup": "Protokolle einer laufenden Sicherung können nicht heruntergeladen werden",
+        "failedCancelBackup": "Fehler beim Abbrechen der Sicherung",
         "failedGetBackupJobs": "Fehler beim Abrufen der Sicherungsaufträge",
         "failedGetBackupStatus": "Fehler beim Abrufen des Sicherungsstatus",
-        "failedCancelBackup": "Fehler beim Abbrechen der Sicherung",
-        "cannotDownloadLogsForRunningBackup": "Protokolle einer laufenden Sicherung können nicht heruntergeladen werden"
+        "logFileNotFound": "Protokolldatei nicht gefunden: {{filename}}",
+        "noLogsAvailable": "Keine Protokolle für diese Sicherung verfügbar (erfolgreiche Sicherungen speichern keine Protokolle)",
+        "operatorAccessRequired": "Operator- oder Administratorzugriff erforderlich"
       },
       "restore": {
+        "canOnlyCancelRunningJobs": "Nur laufende Aufträge können abgebrochen werden",
         "cancelledByUser": "Wiederherstellung vom Benutzer abgebrochen",
         "cancelledByUserProcessNotFound": "Wiederherstellung vom Benutzer abgebrochen (Prozess nicht gefunden, möglicherweise bereits abgeschlossen)",
-        "canOnlyCancelRunningJobs": "Nur laufende Aufträge können abgebrochen werden",
         "failedCancelRestore": "Wiederherstellung konnte nicht abgebrochen werden",
+        "failedFetchArchiveContents": "Fehler beim Abrufen des Archivinhalts",
+        "failedFetchArchives": "Fehler beim Abrufen der Archive",
         "failedFetchRepositories": "Repositories konnten nicht abgerufen werden",
         "failedGetRestoreJobs": "Wiederherstellungsaufträge konnten nicht abgerufen werden",
         "failedGetRestoreStatus": "Wiederherstellungsstatus konnte nicht abgerufen werden",
         "failedPreviewRestore": "Vorschau der Wiederherstellung fehlgeschlagen",
+        "failedStartRestore": "Fehler beim Starten der Wiederherstellung",
+        "operatorAccessRequired": "Operator- oder Administratorzugriff erforderlich",
         "repositoryNotFound": "Repository nicht gefunden",
         "restoreJobNotFound": "Wiederherstellungsauftrag nicht gefunden",
-        "sshToSshNotSupported": "Die Wiederherstellung von einem SSH-Repository auf ein SSH-Ziel wird nicht unterstützt",
-        "failedStartRestore": "Fehler beim Starten der Wiederherstellung",
-        "failedFetchArchives": "Fehler beim Abrufen der Archive",
-        "failedFetchArchiveContents": "Fehler beim Abrufen des Archivinhalts"
+        "sshToSshNotSupported": "Die Wiederherstellung von einem SSH-Repository auf ein SSH-Ziel wird nicht unterstützt"
       },
       "schedule": {
         "adminAccessRequired": "Administratorzugriff erforderlich",
         "operatorAccessRequired": "Operator- oder Administratorzugriff erforderlich",
         "invalidCronExpression": "Ungültiger Cron-Ausdruck",
+        "invalidCron": "Der Zeitplan ist ungültig. Verwende die Vorlagenauswahl oder prüfe die eigene Syntax.",
+        "previewCountOutOfRange": "Die Anzahl der Vorschauen muss zwischen 1 und 12 liegen.",
         "jobNameExists": "Auftragsname bereits vorhanden",
         "noRepositoriesConfigured": "Für den geplanten Auftrag sind keine Repositories konfiguriert",
         "observabilityOnlyRepo": "Für Repositories, die nur zur Beobachtung dienen, können keine Sicherungen geplant werden",
@@ -3166,6 +3274,7 @@
         "folderAlreadyExists": "Ordner '{{name}}' bereits vorhanden",
         "invalidConnectionType": "Ungültiger Verbindungstyp",
         "invalidFolderName": "Ungültiger Ordnername",
+        "operatorAccessRequired": "Operator- oder Administratorzugriff erforderlich",
         "pathNotDirectory": "Pfad ist kein Verzeichnis: {{path}}",
         "pathNotFound": "Pfad nicht gefunden: {{path}}",
         "permissionDenied": "Zugriff verweigert: {{path}}",
@@ -3338,6 +3447,18 @@
       "repo": {
         "repositoryLocked": "Das Repository ist durch einen anderen Prozess gesperrt oder hat eine veraltete Sperre"
       }
+    },
+    "ssh": {
+      "hint": {
+        "publicKeyNotAuthorized": "Der Remote-Host hat den Schlüssel abgelehnt. Stelle sicher, dass du den öffentlichen Schlüssel für den richtigen Benutzer an ~/.ssh/authorized_keys angehängt hast.",
+        "borgNotInstalled": "Verbunden, aber auf dem Remote-Host ist Borg nicht installiert. Installiere dort zuerst borgbackup.",
+        "connectionRefused": "Auf diesem Port lauscht nichts. Prüfe Host, Port und Firewall.",
+        "timeout": "Zeitüberschreitung bei der Verbindung. Prüfe den Hostnamen und die Firewall.",
+        "hostKeyFailed": "Die Identität des Remote-Hosts hat sich geändert. Entferne sie manuell aus known_hosts und versuche es erneut.",
+        "noRoute": "Keine Netzwerkroute zum Host. Prüfe VPN/Tailscale.",
+        "dnsFailed": "DNS konnte den Hostnamen nicht auflösen.",
+        "unknownFailure": "Die Verbindung ist aus unbekanntem Grund fehlgeschlagen. Siehe die Original-Fehlermeldung unten."
+      }
     }
   },
   "announcements": {
@@ -3353,5 +3474,97 @@
       "migration_notice": "Migration notice",
       "custom_announcement": "Announcement"
     }
+  },
+  "guidedSetup": {
+    "title": "Sicherungen einrichten",
+    "subtitle": "In weniger als einer Minute bist du startklar.",
+    "step": {
+      "destination": {
+        "title": "Wo sollen die Sicherungen liegen?",
+        "subtitle": "Wähle einen sicheren Ort für deine Sicherungen."
+      },
+      "sources": {
+        "title": "Was sollen wir sichern?",
+        "subtitle": "Füge die Ordner hinzu, die geschützt werden sollen."
+      },
+      "encryption": {
+        "title": "Alles absichern",
+        "subtitle": "Lege fest, wie BorgScale deine Daten schützt."
+      },
+      "schedule": {
+        "title": "Wie oft?",
+        "subtitle": "BorgScale läuft unauffällig im Hintergrund."
+      }
+    },
+    "stepBadge": "Schritt {{current}} von {{total}}",
+    "destination": {
+      "localTile": {
+        "title": "Auf diesem Server",
+        "desc": "Sicherungen auf demselben Rechner speichern, auf dem BorgScale läuft."
+      },
+      "sshTile": {
+        "title": "Auf einem anderen Rechner",
+        "desc": "Sicherungen per SSH an einen Remote-Server senden."
+      },
+      "pathLabel": "Speicherort für Sicherungen",
+      "pathHelper": "Wir legen diesen Ordner an, falls er noch nicht existiert.",
+      "pathStatusOk": "Sieht gut aus – leerer Ordner, bereit für borg init.",
+      "pathStatusExisting": "Dieser Ordner enthält bereits ein Borg-Repository.",
+      "pathStatusNotEmpty": "Dieser Ordner ist nicht leer. Wähle einen neuen Pfad.",
+      "pathStatusMissing": "Der Ordner existiert noch nicht – BorgScale legt ihn an.",
+      "sshConnection": "Remote-Rechner auswählen",
+      "manageSshLink": "Zuerst SSH einrichten"
+    },
+    "sources": {
+      "addFolder": "Ordner hinzufügen",
+      "suggestHome": "Mein Home-Verzeichnis verwenden",
+      "noneAdded": "Noch keine Ordner hinzugefügt. Füge mindestens einen hinzu, um fortzufahren.",
+      "removeFolder": "Entfernen"
+    },
+    "encryption": {
+      "tileEncrypted": {
+        "title": "Verschlüsselt (empfohlen)",
+        "desc": "Starker Schutz mit einer Passphrase, die nur du kennst."
+      },
+      "tileNone": {
+        "title": "Keine Verschlüsselung",
+        "desc": "Schneller und einfacher – nutze das nur bei Speicher, dem du voll vertraust."
+      },
+      "passphrase": "Passphrase",
+      "confirm": "Passphrase bestätigen",
+      "passphraseMismatch": "Die Passphrasen stimmen nicht überein.",
+      "passphraseShort": "Verwende für die Passphrase mindestens 12 Zeichen.",
+      "lossWarning": "Wenn du diese Passphrase verlierst, lassen sich deine Sicherungen nie wieder öffnen. Eine Wiederherstellung ist nicht möglich.",
+      "savedConfirm": "Ich habe diese Passphrase an einem sicheren Ort gespeichert."
+    },
+    "schedule": {
+      "presetDaily": {
+        "title": "Jede Nacht um 3 Uhr",
+        "desc": "Das passt für die meisten."
+      },
+      "presetWeekly": {
+        "title": "Jeden Sonntag um 3 Uhr",
+        "desc": "Für Rechner, die nicht jede Nacht laufen."
+      },
+      "presetHourly": {
+        "title": "Stündlich",
+        "desc": "Für Systeme, die sich häufig ändern."
+      },
+      "nextRunsLabel": "Die nächsten Sicherungen laufen am:",
+      "autoStartLabel": "Meine erste Sicherung jetzt starten",
+      "autoStartHelper": "Empfohlen – so siehst du sofort, dass alles richtig eingerichtet ist.",
+      "advancedCron": "Eigener Zeitplan (cron-Syntax)"
+    },
+    "confirm": {
+      "summary": "Startklar",
+      "submitButton": "Erste Sicherung starten",
+      "submitting": "Einrichtung läuft…",
+      "successToast": "Sicherungen sind konfiguriert. Deine erste Sicherung ist eingeplant.",
+      "partialToast": "Repository und Zeitplan wurden gespeichert – die erste Sicherung ist nicht gestartet. Du kannst sie im Dashboard manuell ausführen.",
+      "failureToast": "Einrichtung fehlgeschlagen. {{error}}"
+    },
+    "back": "Zurück",
+    "continue": "Weiter",
+    "skip": "Überspringen"
   }
 }

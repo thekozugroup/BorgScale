@@ -32,10 +32,7 @@ export default function RepoMenuItem({
           <span className="text-sm font-medium">{name}</span>
           <BorgVersionChip borgVersion={borgVersion} compact />
           {mode === 'observe' && (
-            <Badge
-              variant="secondary"
-              className="h-4 text-2xs font-semibold px-1 border-none"
-            >
+            <Badge variant="secondary" className="h-4 text-2xs font-semibold px-1 border-none">
               {t('repositories.observeOnly')}
             </Badge>
           )}
@@ -43,13 +40,7 @@ export default function RepoMenuItem({
             <span className="text-xs text-muted-foreground">{maintenanceLabel}</span>
           )}
         </div>
-        {!hidePath && (
-          <p
-            className="text-xs text-muted-foreground truncate font-mono"
-          >
-            {path}
-          </p>
-        )}
+        {!hidePath && <p className="text-xs text-muted-foreground truncate font-mono">{path}</p>}
       </div>
     </div>
   )

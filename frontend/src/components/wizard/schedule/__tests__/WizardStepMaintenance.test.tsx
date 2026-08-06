@@ -122,7 +122,9 @@ describe('WizardStepMaintenance', () => {
       runPruneAfter: true,
     }
 
-    renderWithProviders(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} onChange={onChange} />)
+    renderWithProviders(
+      <WizardStepMaintenance {...defaultProps} data={dataWithPrune} onChange={onChange} />
+    )
 
     const dailyInput = screen.getByLabelText(/Keep Daily/i)
     fireEvent.change(dailyInput, { target: { value: '14' } })
@@ -194,7 +196,9 @@ describe('WizardStepMaintenance', () => {
       runPruneAfter: true,
     }
 
-    renderWithProviders(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} onChange={onChange} />)
+    renderWithProviders(
+      <WizardStepMaintenance {...defaultProps} data={dataWithPrune} onChange={onChange} />
+    )
 
     const hourlyInput = screen.getByLabelText(/Keep Hourly/i)
     fireEvent.change(hourlyInput, { target: { value: '24' } })
@@ -254,7 +258,9 @@ describe('WizardStepMaintenance', () => {
       runPruneAfter: true,
     }
 
-    renderWithProviders(<WizardStepMaintenance {...defaultProps} data={dataWithPrune} onChange={onChange} />)
+    renderWithProviders(
+      <WizardStepMaintenance {...defaultProps} data={dataWithPrune} onChange={onChange} />
+    )
 
     const monthlyInput = screen.getByLabelText(/Keep Monthly/i)
     fireEvent.change(monthlyInput, { target: { value: '12' } })

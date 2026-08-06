@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 import structlog
@@ -224,7 +225,31 @@ async def get_all_backup_jobs(
         manual_only: If True, only return manual backup jobs (not scheduled)
     """
     try:
-        query = db.query(BackupJob)
+        # The list response only needs to know whether logs exist; loading the
+        # blob for every row is what made this endpoint expensive. /status/{job_id}
+        # still returns the logs themselves.
+        query = db.query(
+            BackupJob.id,
+            BackupJob.repository,
+            BackupJob.status,
+            BackupJob.started_at,
+            BackupJob.completed_at,
+            BackupJob.progress,
+            BackupJob.error_message,
+            BackupJob.maintenance_status,
+            BackupJob.scheduled_job_id,
+            BackupJob.archive_name,
+            BackupJob.current_file,
+            BackupJob.progress_percent,
+            BackupJob.backup_speed,
+            BackupJob.total_expected_size,
+            BackupJob.estimated_time_remaining,
+            BackupJob.nfiles,
+            BackupJob.original_size,
+            BackupJob.compressed_size,
+            BackupJob.deduplicated_size,
+            (func.coalesce(func.length(BackupJob.logs), 0) > 0).label("has_logs"),
+        )
 
         if scheduled_only:
             # Filter to only jobs with scheduled_job_id set
@@ -237,18 +262,38 @@ async def get_all_backup_jobs(
             query = query.filter(BackupJob.repository == repository)
 
         jobs = query.order_by(BackupJob.id.desc()).limit(limit).all()
+
+        # Resolve every repository on the page in one go. The per-job lookup ran
+        # twice per row — once to authorise, once to pick the progress contract —
+        # while the frontend polls this endpoint during running backups.
+        job_paths = {job.repository for job in jobs if job.repository}
+        repositories = (
+            {
+                repo.path: repo
+                for repo in db.query(Repository)
+                .filter(Repository.path.in_(job_paths))
+                .all()
+            }
+            if job_paths
+            else {}
+        )
+
+        accessible_paths = set()
+        for path, repo in repositories.items():
+            try:
+                check_repo_access(db, current_user, repo, "viewer")
+            except HTTPException:
+                continue
+            accessible_paths.add(path)
+
         visible_jobs = []
         for job in jobs:
-            repo = _get_job_repository(db, job.repository)
+            repo = repositories.get(job.repository)
             if repo is None:
                 if current_user.role == "admin":
                     visible_jobs.append(job)
-                continue
-            try:
-                check_repo_access(db, current_user, repo, "viewer")
+            elif job.repository in accessible_paths:
                 visible_jobs.append(job)
-            except HTTPException:
-                continue
 
         return {
             "jobs": [
@@ -260,13 +305,13 @@ async def get_all_backup_jobs(
                     "completed_at": serialize_datetime(job.completed_at),
                     "progress": job.progress,
                     "error_message": job.error_message,
-                    "has_logs": bool(job.logs),  # Indicate if logs are available
+                    "has_logs": bool(job.has_logs),  # Indicate if logs are available
                     "maintenance_status": job.maintenance_status,
                     "scheduled_job_id": job.scheduled_job_id,  # Include for filtering by schedule
-                    "archive_name": getattr(job, "archive_name", None),
+                    "archive_name": job.archive_name,
                     "progress_details": serialize_backup_progress_details(
                         job,
-                        _get_job_repository(db, job.repository),
+                        repositories.get(job.repository),
                     ),
                 }
                 for job in visible_jobs

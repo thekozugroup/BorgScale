@@ -11,44 +11,16 @@ export const cronMatchesPreset = (value: string): boolean => {
   const [minute, hour, day, month, dayOfWeek] = parts
   if (month !== '*') return false
   // Every N minutes: */N * * * *
-  if (
-    minute.startsWith('*/') &&
-    hour === '*' &&
-    day === '*' &&
-    dayOfWeek === '*'
-  )
-    return true
+  if (minute.startsWith('*/') && hour === '*' && day === '*' && dayOfWeek === '*') return true
   // Every N hours: M */N * * *
-  if (
-    /^\d+$/.test(minute) &&
-    hour.startsWith('*/') &&
-    day === '*' &&
-    dayOfWeek === '*'
-  )
-    return true
+  if (/^\d+$/.test(minute) && hour.startsWith('*/') && day === '*' && dayOfWeek === '*') return true
   // Daily: M H * * *
-  if (
-    /^\d+$/.test(minute) &&
-    /^\d+$/.test(hour) &&
-    day === '*' &&
-    dayOfWeek === '*'
-  )
-    return true
+  if (/^\d+$/.test(minute) && /^\d+$/.test(hour) && day === '*' && dayOfWeek === '*') return true
   // Weekly: M H * * D[,D...]
-  if (
-    /^\d+$/.test(minute) &&
-    /^\d+$/.test(hour) &&
-    day === '*' &&
-    /^[\d,]+$/.test(dayOfWeek)
-  )
+  if (/^\d+$/.test(minute) && /^\d+$/.test(hour) && day === '*' && /^[\d,]+$/.test(dayOfWeek))
     return true
   // Monthly: M H D * *
-  if (
-    /^\d+$/.test(minute) &&
-    /^\d+$/.test(hour) &&
-    /^\d+$/.test(day) &&
-    dayOfWeek === '*'
-  )
+  if (/^\d+$/.test(minute) && /^\d+$/.test(hour) && /^\d+$/.test(day) && dayOfWeek === '*')
     return true
   return false
 }

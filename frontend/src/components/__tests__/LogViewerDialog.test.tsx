@@ -50,7 +50,9 @@ describe('LogViewerDialog', () => {
 
   describe('Dialog Visibility', () => {
     it('does not render when job is null', () => {
-      const { container } = renderWithProviders(<LogViewerDialog job={null} open={true} onClose={vi.fn()} />)
+      const { container } = renderWithProviders(
+        <LogViewerDialog job={null} open={true} onClose={vi.fn()} />
+      )
       // Dialog exists but content should be minimal/hidden
       expect(container.querySelector('[role="dialog"]')).toBeNull()
     })

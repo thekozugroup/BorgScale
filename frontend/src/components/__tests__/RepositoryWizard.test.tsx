@@ -785,7 +785,9 @@ describe('RepositoryWizard', () => {
           expect(screen.getByTestId('mode-card-full')).toBeInTheDocument()
         })
 
-        expect(screen.queryByText(/Allow access during another tool's writes/i)).not.toBeInTheDocument()
+        expect(
+          screen.queryByText(/Allow access during another tool's writes/i)
+        ).not.toBeInTheDocument()
         expect(screen.queryByTestId('location-advanced')).not.toBeInTheDocument()
       })
     })

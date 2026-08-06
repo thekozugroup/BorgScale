@@ -36,14 +36,18 @@ export default function CompactWarningDialog({
               <Lock size={14} className="text-muted-foreground mt-0.5 flex-shrink-0" />
               <span>
                 <span className="font-medium">{t('dialogs.compact.repoWillBeLocked')}</span>
-                <span className="block text-xs text-muted-foreground">{t('dialogs.compact.otherOperationsUnavailable')}</span>
+                <span className="block text-xs text-muted-foreground">
+                  {t('dialogs.compact.otherOperationsUnavailable')}
+                </span>
               </span>
             </li>
             <li className="flex items-start gap-2 text-sm">
               <Minimize2 size={14} className="text-muted-foreground mt-0.5 flex-shrink-0" />
               <span>
                 <span className="font-medium">{t('dialogs.compact.progressTracking')}</span>
-                <span className="block text-xs text-muted-foreground">{t('dialogs.compact.progressTrackingDetail')}</span>
+                <span className="block text-xs text-muted-foreground">
+                  {t('dialogs.compact.progressTrackingDetail')}
+                </span>
               </span>
             </li>
           </ul>
@@ -55,12 +59,12 @@ export default function CompactWarningDialog({
           <Button variant="ghost" onClick={onCancel} disabled={isLoading}>
             {t('dialogs.compactWarning.cancel')}
           </Button>
-          <Button
-            onClick={onConfirm}
-            disabled={isLoading}
-            variant="default"
-          >
-            {isLoading ? <Loader2 size={16} className="mr-2 animate-spin" /> : <Minimize2 size={16} className="mr-2" />}
+          <Button onClick={onConfirm} disabled={isLoading} variant="default">
+            {isLoading ? (
+              <Loader2 size={16} className="mr-2 animate-spin" />
+            ) : (
+              <Minimize2 size={16} className="mr-2" />
+            )}
             {isLoading ? t('status.running') : t('dialogs.compactWarning.confirm')}
           </Button>
         </div>

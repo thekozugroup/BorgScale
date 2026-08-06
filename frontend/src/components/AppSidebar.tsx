@@ -37,7 +37,13 @@ import {
   SidebarGroupLabel,
   SidebarGroupContent,
 } from '@/components/ui/sidebar'
-import { Sheet, SheetContent, SheetTitle, SheetDescription, SheetHeader as SheetHdr } from '@/components/ui/sheet'
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetDescription,
+  SheetHeader as SheetHdr,
+} from '@/components/ui/sheet'
 import { Separator } from '@/components/ui/separator'
 
 interface SystemInfo {
@@ -153,8 +159,8 @@ function SidebarNavInner({
 
                   const isActive = Boolean(
                     item.href &&
-                      (location.pathname === item.href ||
-                        location.pathname.startsWith(item.href + '/'))
+                    (location.pathname === item.href ||
+                      location.pathname.startsWith(item.href + '/'))
                   )
 
                   return (
@@ -264,7 +270,7 @@ function useNavigationSections({
                   icon: SettingsIcon,
                   key: 'dashboard' as const,
                   subItems: [
-                      { name: 'System', href: '/settings/system', icon: SettingsIcon },
+                    { name: 'System', href: '/settings/system', icon: SettingsIcon },
                     ...(showMqttNav && canManageMqtt
                       ? [{ name: 'MQTT', href: '/settings/mqtt', icon: Wifi }]
                       : []),
@@ -472,7 +478,12 @@ export default function AppSidebar({ mobileOpen, onClose }: AppSidebarProps) {
       </div>
 
       {/* Mobile overlay via Sheet */}
-      <Sheet open={mobileOpen} onOpenChange={(open) => { if (!open) onClose() }}>
+      <Sheet
+        open={mobileOpen}
+        onOpenChange={(open) => {
+          if (!open) onClose()
+        }}
+      >
         <SheetContent
           side="left"
           className="w-60 p-0 bg-sidebar text-sidebar-foreground"

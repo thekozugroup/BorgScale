@@ -78,14 +78,18 @@ describe('ArchiveCard', () => {
   })
 
   it('disables Mount button when mountDisabled is true', () => {
-    renderWithProviders(<ArchiveCard archive={mockArchive} {...mockHandlers} mountDisabled={true} />)
+    renderWithProviders(
+      <ArchiveCard archive={mockArchive} {...mockHandlers} mountDisabled={true} />
+    )
 
     const mountButton = screen.getByRole('button', { name: /mount/i })
     expect(mountButton).toBeDisabled()
   })
 
   it('enables Mount button when mountDisabled is false', () => {
-    renderWithProviders(<ArchiveCard archive={mockArchive} {...mockHandlers} mountDisabled={false} />)
+    renderWithProviders(
+      <ArchiveCard archive={mockArchive} {...mockHandlers} mountDisabled={false} />
+    )
 
     const mountButton = screen.getByRole('button', { name: /mount/i })
     expect(mountButton).not.toBeDisabled()
@@ -116,7 +120,9 @@ describe('ArchiveCard', () => {
   })
 
   it('has hover effect styling', () => {
-    const { container } = renderWithProviders(<ArchiveCard archive={mockArchive} {...mockHandlers} />)
+    const { container } = renderWithProviders(
+      <ArchiveCard archive={mockArchive} {...mockHandlers} />
+    )
 
     // Row uses a transition class for hover effect
     const card = container.querySelector('[class*="transition"]') as HTMLElement

@@ -26,7 +26,12 @@ export default function DeleteArchiveDialog({
 }: DeleteArchiveDialogProps) {
   const { t } = useTranslation()
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose() }}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onClose()
+      }}
+    >
       <DialogContent showCloseButton={false} className="max-w-sm">
         <DialogHeader>
           <div className="flex items-center gap-3">
@@ -41,13 +46,10 @@ export default function DeleteArchiveDialog({
 
         <div className="space-y-3">
           <div className="rounded-md border border-border bg-muted/40 px-3 py-2">
-            <p className="text-sm text-muted-foreground">
-              {t('dialogs.deleteArchive.warning')}
-            </p>
+            <p className="text-sm text-muted-foreground">{t('dialogs.deleteArchive.warning')}</p>
           </div>
           <p className="text-sm">
-            {t('dialogs.deleteArchive.subtitle')}{' '}
-            <strong>&quot;{archiveName}&quot;</strong>
+            {t('dialogs.deleteArchive.subtitle')} <strong>&quot;{archiveName}&quot;</strong>
           </p>
           <p className="text-sm text-muted-foreground">
             {t('dialogs.deleteArchive.archiveName', { name: archiveName })}

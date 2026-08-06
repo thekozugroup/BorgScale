@@ -431,6 +431,19 @@ async def get_dashboard_overview(
         # Get all schedules
         schedules = db.query(ScheduledJob).all()
 
+        # The multi-repo junction is read once here. Resolving it inline below
+        # cost one query per repository x schedule pair on every poll.
+        schedule_repo_ids: Dict[int, List[int]] = {}
+        for link in db.query(
+            ScheduledJobRepository.scheduled_job_id,
+            ScheduledJobRepository.repository_id,
+        ).all():
+            schedule_repo_ids.setdefault(link.scheduled_job_id, []).append(
+                link.repository_id
+            )
+
+        repositories_by_id = {repo.id: repo for repo in repositories}
+
         # Get SSH connections
         ssh_connections = db.query(SSHConnection).all()
 
@@ -458,17 +471,8 @@ async def get_dashboard_overview(
                 matched = False
                 if schedule.repository_id == repo.id:
                     matched = True
-                else:
-                    multi_repos = (
-                        db.query(ScheduledJobRepository)
-                        .filter(
-                            ScheduledJobRepository.scheduled_job_id == schedule.id,
-                            ScheduledJobRepository.repository_id == repo.id,
-                        )
-                        .first()
-                    )
-                    if multi_repos:
-                        matched = True
+                elif repo.id in schedule_repo_ids.get(schedule.id, []):
+                    matched = True
                 if matched:
                     if schedule.enabled:
                         repo_schedule = schedule
@@ -553,9 +557,19 @@ async def get_dashboard_overview(
             )
 
         # Calculate backup success rate (last 30 days)
+        # Only the columns below are read, and loading whole rows dragged every
+        # job's log blob into memory for a 30-day window.
         thirty_days_ago = now - timedelta(days=30)
         recent_jobs = (
-            db.query(BackupJob).filter(BackupJob.started_at >= thirty_days_ago).all()
+            db.query(
+                BackupJob.id,
+                BackupJob.status,
+                BackupJob.started_at,
+                BackupJob.error_message,
+                BackupJob.repository,
+            )
+            .filter(BackupJob.started_at >= thirty_days_ago)
+            .all()
         )
 
         # Only count terminal jobs — running/pending skew the rate and don't match passed+failed
@@ -600,26 +614,13 @@ async def get_dashboard_overview(
             repo_names = []
             if schedule.repository_id:
                 # Single-repo schedule
-                repo = (
-                    db.query(Repository)
-                    .filter(Repository.id == schedule.repository_id)
-                    .first()
-                )
+                repo = repositories_by_id.get(schedule.repository_id)
                 if repo:
                     repo_names.append(repo.name)
             else:
                 # Multi-repo schedule - get all associated repos
-                multi_repos = (
-                    db.query(ScheduledJobRepository)
-                    .filter(ScheduledJobRepository.scheduled_job_id == schedule.id)
-                    .all()
-                )
-                for mr in multi_repos:
-                    repo = (
-                        db.query(Repository)
-                        .filter(Repository.id == mr.repository_id)
-                        .first()
-                    )
+                for repo_id in schedule_repo_ids.get(schedule.id, []):
+                    repo = repositories_by_id.get(repo_id)
                     if repo:
                         repo_names.append(repo.name)
 
@@ -693,14 +694,31 @@ async def get_dashboard_overview(
 
         # Get activity for the last 14 days — matches the timeline window exactly
         fourteen_days_ago = now - timedelta(days=14)
-        recent_backups = (
-            db.query(BackupJob).filter(BackupJob.started_at >= fourteen_days_ago).all()
-        )
+        # The 14-day window is contained in the 30-day set already in memory.
+        recent_backups = [
+            job for job in recent_jobs if job.started_at >= fourteen_days_ago
+        ]
         recent_checks = (
-            db.query(CheckJob).filter(CheckJob.started_at >= fourteen_days_ago).all()
+            db.query(
+                CheckJob.id,
+                CheckJob.status,
+                CheckJob.started_at,
+                CheckJob.error_message,
+                CheckJob.repository_id,
+                CheckJob.repository_path,
+            )
+            .filter(CheckJob.started_at >= fourteen_days_ago)
+            .all()
         )
         recent_compacts = (
-            db.query(CompactJob)
+            db.query(
+                CompactJob.id,
+                CompactJob.status,
+                CompactJob.started_at,
+                CompactJob.error_message,
+                CompactJob.repository_id,
+                CompactJob.repository_path,
+            )
             .filter(CompactJob.started_at >= fourteen_days_ago)
             .all()
         )

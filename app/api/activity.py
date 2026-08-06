@@ -6,6 +6,7 @@ Provides a unified view of all operations (backups, restores, checks, compacts, 
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import FileResponse
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
@@ -64,6 +65,22 @@ class ActivityItem(BaseModel):
         json_encoders = {datetime: lambda v: serialize_datetime(v)}
 
 
+def _has_logs_flag(column):
+    """Truthiness of a log blob evaluated in SQL, so the blob stays in the database."""
+    return func.coalesce(func.length(column), 0) > 0
+
+
+def _recent_jobs(query, model, job_status: Optional[str], limit: int):
+    """Newest-first page of one job table.
+
+    The status filter belongs in SQL: applied in Python after the limit it both
+    reads rows that are discarded and silently returns fewer than `limit` matches.
+    """
+    if job_status:
+        query = query.filter(model.status == job_status)
+    return query.order_by(model.started_at.desc()).limit(limit).all()
+
+
 @router.get("/recent", response_model=List[ActivityItem])
 async def list_recent_activity(
     limit: int = 200,
@@ -81,33 +98,51 @@ async def list_recent_activity(
 
     activities = []
 
+    # One snapshot of the repository table replaces the lookup this endpoint used
+    # to run for every row it returned, on a three-second poll.
+    repositories = db.query(Repository.id, Repository.name, Repository.path).all()
+    repo_name_by_path = {repo.path: repo.name for repo in repositories}
+    repo_by_id = {repo.id: repo for repo in repositories}
+
     # Fetch backup jobs
     if not job_type or job_type == "backup":
-        backup_jobs = (
-            db.query(BackupJob).order_by(BackupJob.started_at.desc()).limit(limit).all()
+        backup_jobs = _recent_jobs(
+            db.query(
+                BackupJob.id,
+                BackupJob.status,
+                BackupJob.started_at,
+                BackupJob.completed_at,
+                BackupJob.error_message,
+                BackupJob.repository,
+                BackupJob.log_file_path,
+                BackupJob.scheduled_job_id,
+                BackupJob.archive_name,
+                _has_logs_flag(BackupJob.logs).label("has_stored_logs"),
+            ),
+            BackupJob,
+            status,
+            limit,
         )
-        for job in backup_jobs:
-            if status and job.status != status:
-                continue
-            # Get repository name from path
-            repo = (
-                db.query(Repository).filter(Repository.path == job.repository).first()
+
+        schedule_ids = {
+            job.scheduled_job_id for job in backup_jobs if job.scheduled_job_id
+        }
+        schedule_names = (
+            dict(
+                db.query(ScheduledJob.id, ScheduledJob.name)
+                .filter(ScheduledJob.id.in_(schedule_ids))
+                .all()
             )
-            repo_name = repo.name if repo else job.repository
+            if schedule_ids
+            else {}
+        )
+
+        for job in backup_jobs:
+            # Get repository name from path
+            repo_name = repo_name_by_path.get(job.repository, job.repository)
 
             # Determine trigger type
             triggered_by = "schedule" if job.scheduled_job_id else "manual"
-
-            # Get schedule name if this is a scheduled backup
-            schedule_name = None
-            if job.scheduled_job_id:
-                scheduled_job = (
-                    db.query(ScheduledJob)
-                    .filter(ScheduledJob.id == job.scheduled_job_id)
-                    .first()
-                )
-                if scheduled_job:
-                    schedule_name = scheduled_job.name
 
             activities.append(
                 {
@@ -122,29 +157,33 @@ async def list_recent_activity(
                     "log_file_path": job.log_file_path,
                     "triggered_by": triggered_by,
                     "schedule_id": job.scheduled_job_id,
-                    "schedule_name": schedule_name,
-                    "archive_name": getattr(job, "archive_name", None),
+                    "schedule_name": schedule_names.get(job.scheduled_job_id),
+                    "archive_name": job.archive_name,
                     "package_name": None,
-                    "has_logs": bool(job.log_file_path or job.logs),
+                    "has_logs": bool(job.log_file_path or job.has_stored_logs),
                 }
             )
 
     # Fetch restore jobs
     if not job_type or job_type == "restore":
-        restore_jobs = (
-            db.query(RestoreJob)
-            .order_by(RestoreJob.started_at.desc())
-            .limit(limit)
-            .all()
+        restore_jobs = _recent_jobs(
+            db.query(
+                RestoreJob.id,
+                RestoreJob.status,
+                RestoreJob.started_at,
+                RestoreJob.completed_at,
+                RestoreJob.error_message,
+                RestoreJob.repository,
+                RestoreJob.archive,
+                _has_logs_flag(RestoreJob.logs).label("has_stored_logs"),
+            ),
+            RestoreJob,
+            status,
+            limit,
         )
         for job in restore_jobs:
-            if status and job.status != status:
-                continue
             # Get repository name from path
-            repo = (
-                db.query(Repository).filter(Repository.path == job.repository).first()
-            )
-            repo_name = repo.name if repo else job.repository
+            repo_name = repo_name_by_path.get(job.repository, job.repository)
 
             activities.append(
                 {
@@ -161,24 +200,31 @@ async def list_recent_activity(
                     "schedule_id": None,
                     "archive_name": job.archive,
                     "package_name": None,
-                    "has_logs": bool(
-                        job.logs
-                    ),  # Check logs field instead of log_file_path
+                    # Check logs field instead of log_file_path
+                    "has_logs": bool(job.has_stored_logs),
                 }
             )
 
     # Fetch check jobs
     if not job_type or job_type == "check":
-        check_jobs = (
-            db.query(CheckJob).order_by(CheckJob.started_at.desc()).limit(limit).all()
+        check_jobs = _recent_jobs(
+            db.query(
+                CheckJob.id,
+                CheckJob.status,
+                CheckJob.started_at,
+                CheckJob.completed_at,
+                CheckJob.error_message,
+                CheckJob.repository_id,
+                CheckJob.repository_path,
+                CheckJob.log_file_path,
+            ),
+            CheckJob,
+            status,
+            limit,
         )
         for job in check_jobs:
-            if status and job.status != status:
-                continue
             # Get repository name from repository_id, with fallback to stored path
-            repo = (
-                db.query(Repository).filter(Repository.id == job.repository_id).first()
-            )
+            repo = repo_by_id.get(job.repository_id)
             repo_name = repo.name if repo else f"Repository #{job.repository_id}"
             repo_path = repo.path if repo else job.repository_path
 
@@ -192,37 +238,41 @@ async def list_recent_activity(
                     "error_message": job.error_message,
                     "repository": repo_name,
                     "repository_path": repo_path,
-                    "log_file_path": getattr(job, "log_file_path", None),
+                    "log_file_path": job.log_file_path,
                     "triggered_by": "manual",  # Check jobs are always manual
                     "schedule_id": None,
                     "archive_name": None,
                     "package_name": None,
-                    "has_logs": bool(getattr(job, "log_file_path", None)),
+                    "has_logs": bool(job.log_file_path),
                 }
             )
 
     # Fetch compact jobs
     if not job_type or job_type == "compact":
-        compact_jobs = (
-            db.query(CompactJob)
-            .order_by(CompactJob.started_at.desc())
-            .limit(limit)
-            .all()
+        compact_jobs = _recent_jobs(
+            db.query(
+                CompactJob.id,
+                CompactJob.status,
+                CompactJob.started_at,
+                CompactJob.completed_at,
+                CompactJob.error_message,
+                CompactJob.repository_id,
+                CompactJob.repository_path,
+                CompactJob.log_file_path,
+                CompactJob.scheduled_compact,
+            ),
+            CompactJob,
+            status,
+            limit,
         )
         for job in compact_jobs:
-            if status and job.status != status:
-                continue
             # Get repository name from repository_id, with fallback to stored path
-            repo = (
-                db.query(Repository).filter(Repository.id == job.repository_id).first()
-            )
+            repo = repo_by_id.get(job.repository_id)
             repo_name = repo.name if repo else f"Repository #{job.repository_id}"
             repo_path = repo.path if repo else job.repository_path
 
             # Determine trigger type based on scheduled_compact field
-            triggered_by = (
-                "schedule" if getattr(job, "scheduled_compact", False) else "manual"
-            )
+            triggered_by = "schedule" if job.scheduled_compact else "manual"
 
             activities.append(
                 {
@@ -234,34 +284,42 @@ async def list_recent_activity(
                     "error_message": job.error_message,
                     "repository": repo_name,
                     "repository_path": repo_path,
-                    "log_file_path": getattr(job, "log_file_path", None),
+                    "log_file_path": job.log_file_path,
                     "triggered_by": triggered_by,
                     "schedule_id": None,
                     "archive_name": None,
                     "package_name": None,
-                    "has_logs": bool(getattr(job, "log_file_path", None)),
+                    "has_logs": bool(job.log_file_path),
                 }
             )
 
     # Fetch prune jobs
     if not job_type or job_type == "prune":
-        prune_jobs = (
-            db.query(PruneJob).order_by(PruneJob.started_at.desc()).limit(limit).all()
+        prune_jobs = _recent_jobs(
+            db.query(
+                PruneJob.id,
+                PruneJob.status,
+                PruneJob.started_at,
+                PruneJob.completed_at,
+                PruneJob.error_message,
+                PruneJob.repository_id,
+                PruneJob.repository_path,
+                PruneJob.log_file_path,
+                PruneJob.scheduled_prune,
+                _has_logs_flag(PruneJob.logs).label("has_stored_logs"),
+            ),
+            PruneJob,
+            status,
+            limit,
         )
         for job in prune_jobs:
-            if status and job.status != status:
-                continue
             # Get repository name from repository_id, with fallback to stored path
-            repo = (
-                db.query(Repository).filter(Repository.id == job.repository_id).first()
-            )
+            repo = repo_by_id.get(job.repository_id)
             repo_name = repo.name if repo else f"Repository #{job.repository_id}"
             repo_path = repo.path if repo else job.repository_path
 
             # Determine trigger type based on scheduled_prune field
-            triggered_by = (
-                "schedule" if getattr(job, "scheduled_prune", False) else "manual"
-            )
+            triggered_by = "schedule" if job.scheduled_prune else "manual"
 
             activities.append(
                 {
@@ -273,33 +331,49 @@ async def list_recent_activity(
                     "error_message": job.error_message,
                     "repository": repo_name,
                     "repository_path": repo_path,
-                    "log_file_path": getattr(job, "log_file_path", None),
+                    "log_file_path": job.log_file_path,
                     "triggered_by": triggered_by,
                     "schedule_id": None,
                     "archive_name": None,
                     "package_name": None,
-                    "has_logs": bool(job.logs),
+                    "has_logs": bool(job.has_stored_logs),
                 }
             )
 
     # Fetch package install jobs
     if not job_type or job_type == "package":
-        package_jobs = (
-            db.query(PackageInstallJob)
-            .order_by(PackageInstallJob.started_at.desc())
-            .limit(limit)
-            .all()
+        package_jobs = _recent_jobs(
+            db.query(
+                PackageInstallJob.id,
+                PackageInstallJob.status,
+                PackageInstallJob.started_at,
+                PackageInstallJob.completed_at,
+                PackageInstallJob.error_message,
+                PackageInstallJob.package_id,
+            ),
+            PackageInstallJob,
+            status,
+            limit,
         )
-        for job in package_jobs:
-            if status and job.status != status:
-                continue
-            # Get package name from package_id
-            package = (
-                db.query(InstalledPackage)
-                .filter(InstalledPackage.id == job.package_id)
-                .first()
+
+        package_ids = {job.package_id for job in package_jobs}
+        package_names = (
+            dict(
+                db.query(InstalledPackage.id, InstalledPackage.name)
+                .filter(InstalledPackage.id.in_(package_ids))
+                .all()
             )
-            package_name = package.name if package else f"Package #{job.package_id}"
+            if package_ids
+            else {}
+        )
+
+        for job in package_jobs:
+            # Get package name from package_id
+            package_name = (
+                package_names[job.package_id]
+                if job.package_id in package_names
+                else f"Package #{job.package_id}"
+            )
 
             activities.append(
                 {
@@ -310,12 +384,12 @@ async def list_recent_activity(
                     "completed_at": job.completed_at,
                     "error_message": job.error_message,
                     "repository": None,
-                    "log_file_path": getattr(job, "log_file_path", None),
+                    "log_file_path": None,  # Package jobs have no log file column
                     "triggered_by": "manual",  # Package jobs are always manual
                     "schedule_id": None,
                     "archive_name": None,
                     "package_name": package_name,
-                    "has_logs": bool(getattr(job, "log_file_path", None)),
+                    "has_logs": False,
                 }
             )
 

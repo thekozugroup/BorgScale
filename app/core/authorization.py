@@ -157,6 +157,100 @@ ENDPOINT_POLICIES: Dict[Tuple[str, str], EndpointPolicy] = {
     ("POST", "/api/schedule/{job_id}/run-now"): EndpointPolicy(
         ("admin", "operator"), "backend.errors.schedule.operatorAccessRequired"
     ),
+    # Running a backup is an operator action, matching schedule run-now. Without
+    # these a viewer could start arbitrary backup jobs.
+    ("POST", "/api/backup/run"): EndpointPolicy(
+        ("admin", "operator"), "backend.errors.backup.operatorAccessRequired"
+    ),
+    ("POST", "/api/backup/start"): EndpointPolicy(
+        ("admin", "operator"), "backend.errors.backup.operatorAccessRequired"
+    ),
+    ("POST", "/api/backup/cancel/{job_id}"): EndpointPolicy(
+        ("admin", "operator"), "backend.errors.backup.operatorAccessRequired"
+    ),
+    # Restores write to the filesystem.
+    ("POST", "/api/restore/start"): EndpointPolicy(
+        ("admin", "operator"), "backend.errors.restore.operatorAccessRequired"
+    ),
+    ("POST", "/api/restore/cancel/{job_id}"): EndpointPolicy(
+        ("admin", "operator"), "backend.errors.restore.operatorAccessRequired"
+    ),
+    # Discovery enumerates the host filesystem and probes remote hosts, so it
+    # carries the same weight as creating a repository.
+    ("POST", "/api/repositories/discover/local"): EndpointPolicy(
+        ("admin",), "backend.errors.repo.adminAccessRequired"
+    ),
+    ("POST", "/api/repositories/discover/remote"): EndpointPolicy(
+        ("admin",), "backend.errors.repo.adminAccessRequired"
+    ),
+    ("POST", "/api/repositories/quick-import"): EndpointPolicy(
+        ("admin",), "backend.errors.repo.adminAccessRequired"
+    ),
+    # Pairing generates a keypair and can persist an SSH connection, which is
+    # the same privilege as POST /api/ssh-keys/generate.
+    ("POST", "/api/ssh-keys/manual-pair/init"): EndpointPolicy(
+        ("admin",), "backend.errors.ssh.adminAccessRequired"
+    ),
+    ("POST", "/api/ssh-keys/manual-pair/verify"): EndpointPolicy(
+        ("admin",), "backend.errors.ssh.adminAccessRequired"
+    ),
+    ("PUT", "/api/ssh-keys/connections/{connection_id}"): EndpointPolicy(
+        ("admin",), "backend.errors.ssh.adminAccessRequired"
+    ),
+    ("DELETE", "/api/ssh-keys/connections/{connection_id}"): EndpointPolicy(
+        ("admin",), "backend.errors.ssh.adminAccessRequired"
+    ),
+    ("POST", "/api/ssh-keys/connections/{connection_id}/redeploy"): EndpointPolicy(
+        ("admin",), "backend.errors.ssh.adminAccessRequired"
+    ),
+    # Script bodies are executed on the host as the application user, so
+    # authoring and running them is administrator-only.
+    ("POST", "/api/scripts"): EndpointPolicy(
+        ("admin",), "backend.errors.scripts.adminAccessRequired"
+    ),
+    ("PUT", "/api/scripts/{script_id}"): EndpointPolicy(
+        ("admin",), "backend.errors.scripts.adminAccessRequired"
+    ),
+    ("DELETE", "/api/scripts/{script_id}"): EndpointPolicy(
+        ("admin",), "backend.errors.scripts.adminAccessRequired"
+    ),
+    ("POST", "/api/scripts/test"): EndpointPolicy(
+        ("admin",), "backend.errors.scripts.adminAccessRequired"
+    ),
+    ("POST", "/api/scripts/{script_id}/test"): EndpointPolicy(
+        ("admin",), "backend.errors.scripts.adminAccessRequired"
+    ),
+    ("POST", "/api/scripts/cleanup-orphans"): EndpointPolicy(
+        ("admin",), "backend.errors.scripts.adminAccessRequired"
+    ),
+    # Writes to the host filesystem outside any repository.
+    ("POST", "/api/filesystem/create-folder"): EndpointPolicy(
+        ("admin", "operator"), "backend.errors.filesystem.operatorAccessRequired"
+    ),
+    # Granting repository access is a privilege-escalation primitive.
+    ("POST", "/api/settings/users/{user_id}/permissions"): EndpointPolicy(
+        ("admin",), "backend.errors.settings.adminAccessRequired"
+    ),
+    ("PUT", "/api/settings/users/{user_id}/permissions/{repo_id}"): EndpointPolicy(
+        ("admin",), "backend.errors.settings.adminAccessRequired"
+    ),
+    ("DELETE", "/api/settings/users/{user_id}/permissions/{repo_id}"): EndpointPolicy(
+        ("admin",), "backend.errors.settings.adminAccessRequired"
+    ),
+    ("PUT", "/api/settings/users/{user_id}/permissions/scope"): EndpointPolicy(
+        ("admin",), "backend.errors.settings.adminAccessRequired"
+    ),
+    # The /api/auth user-management routes mirror /api/settings/users and need
+    # the same gate; only the settings copy had one.
+    ("POST", "/api/auth/users"): EndpointPolicy(
+        ("admin",), "backend.errors.settings.adminAccessRequired"
+    ),
+    ("PUT", "/api/auth/users/{user_id}"): EndpointPolicy(
+        ("admin",), "backend.errors.settings.adminAccessRequired"
+    ),
+    ("DELETE", "/api/auth/users/{user_id}"): EndpointPolicy(
+        ("admin",), "backend.errors.settings.adminAccessRequired"
+    ),
 }
 
 

@@ -39,9 +39,7 @@ describe('CodeEditor', () => {
   })
 
   it('highlights shell comments, strings, variables and keywords', () => {
-    renderWithProviders(
-      <CodeEditor value={'# note\nif [ -n "$HOME" ]; then'} onChange={vi.fn()} />,
-    )
+    renderWithProviders(<CodeEditor value={'# note\nif [ -n "$HOME" ]; then'} onChange={vi.fn()} />)
 
     expect(screen.getByText('# note')).toHaveClass('italic')
     expect(screen.getByText('if')).toHaveClass('font-semibold')
@@ -53,7 +51,9 @@ describe('CodeEditor', () => {
     renderWithProviders(<CodeEditor value="if then" onChange={vi.fn()} language="plaintext" />)
 
     expect(screen.queryByText('if')).not.toBeInTheDocument()
-    expect(within(screen.getByTestId('code-editor-highlight')).getByText('if then')).toBeInTheDocument()
+    expect(
+      within(screen.getByTestId('code-editor-highlight')).getByText('if then')
+    ).toBeInTheDocument()
   })
 
   it('reports edits through onChange', () => {
@@ -67,7 +67,7 @@ describe('CodeEditor', () => {
 
   it('associates the label and helper text with the input', () => {
     renderWithProviders(
-      <CodeEditor value="" onChange={vi.fn()} label="Script" helperText="Runs before backup" />,
+      <CodeEditor value="" onChange={vi.fn()} label="Script" helperText="Runs before backup" />
     )
 
     expect(screen.getByLabelText('Script')).toBe(getInput())

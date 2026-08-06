@@ -57,7 +57,7 @@ async def test_check_scheduler_creates_job_and_updates_next_run(db_session):
 
 @pytest.mark.unit
 @pytest.mark.asyncio
-async def test_check_scheduler_ignores_invalid_cron_expression(db_session):
+async def test_check_scheduler_disables_schedule_on_invalid_cron_expression(db_session):
     repo = Repository(
         name="Broken Cron Repo",
         path="/tmp/repo",
@@ -76,16 +76,22 @@ async def test_check_scheduler_ignores_invalid_cron_expression(db_session):
         with patch(
             "app.services.check_scheduler.start_background_maintenance_job"
         ) as mock_start:
-            mock_start.side_effect = lambda db, repo, job_model, **kwargs: CheckJob(
-                id=43,
-                repository_id=repo.id,
-                status="pending",
-            )
             await run_due_scheduled_checks(db_session)
 
+    # No check job may be dispatched for an unschedulable expression, and the
+    # schedule must be disabled so the next cycle does not re-dispatch forever
+    mock_start.assert_not_called()
     db_session.refresh(repo)
-    assert repo.last_scheduled_check is not None
+    assert repo.check_cron_expression is None
     assert repo.next_scheduled_check is None
+
+    with patch("app.services.check_scheduler.BorgRouter", return_value=fake_router):
+        with patch(
+            "app.services.check_scheduler.start_background_maintenance_job"
+        ) as mock_start_second_cycle:
+            await run_due_scheduled_checks(db_session)
+
+    mock_start_second_cycle.assert_not_called()
 
 
 class _AsyncLineStream:

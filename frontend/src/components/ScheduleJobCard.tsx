@@ -94,10 +94,7 @@ export default function ScheduleJobCard({
 }: ScheduleJobCardProps) {
   const { t, i18n } = useTranslation()
   const localCronExpression = convertCronToLocal(job.cron_expression)
-  const scheduleDisplay = describeCronHuman(
-    localCronExpression,
-    i18n.resolvedLanguage,
-  )
+  const scheduleDisplay = describeCronHuman(localCronExpression, i18n.resolvedLanguage)
 
   const stats: StatItem[] = [
     {
@@ -144,7 +141,10 @@ export default function ScheduleJobCard({
       tooltip: formatDateTimeFull(job.last_prune),
     })
   if (job.run_compact_after)
-    meta.push({ label: t('schedule.card.meta.compact'), value: t('schedule.card.meta.afterBackup') })
+    meta.push({
+      label: t('schedule.card.meta.compact'),
+      value: t('schedule.card.meta.afterBackup'),
+    })
   if (job.last_compact)
     meta.push({
       label: t('schedule.card.meta.lastCompact'),
@@ -190,16 +190,16 @@ export default function ScheduleJobCard({
             onCheckedChange={() => {}}
             className="pointer-events-none scale-75"
           />
-          <span
-            className={`text-xs font-semibold mr-1 ${job.enabled ? 'text-primary' : ''}`}
-          >
+          <span className={`text-xs font-semibold mr-1 ${job.enabled ? 'text-primary' : ''}`}>
             {job.enabled ? t('schedule.card.badge.enabled') : t('schedule.card.badge.disabled')}
           </span>
         </div>
       </TooltipTrigger>
       {canManage && (
         <TooltipContent>
-          {job.enabled ? t('schedule.card.badge.clickToDisable') : t('schedule.card.badge.clickToEnable')}
+          {job.enabled
+            ? t('schedule.card.badge.clickToDisable')
+            : t('schedule.card.badge.clickToEnable')}
         </TooltipContent>
       )}
     </Tooltip>

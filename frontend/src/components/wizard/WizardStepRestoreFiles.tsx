@@ -1,5 +1,14 @@
 import { useState, useEffect } from 'react'
-import { Folder, File, ChevronRight, Home, CheckSquare, Square, MinusSquare, Loader2 } from 'lucide-react'
+import {
+  Folder,
+  File,
+  ChevronRight,
+  Home,
+  CheckSquare,
+  Square,
+  MinusSquare,
+  Loader2,
+} from 'lucide-react'
 import { BorgApiClient, type Repository } from '../../services/borgApi/client'
 import type { Archive } from '../../types'
 import { useTranslation } from 'react-i18next'
@@ -73,7 +82,11 @@ export default function WizardStepRestoreFiles({
 
   const toggleSelection = (path: string) => {
     const newPaths = new Set(selectedPaths)
-    if (newPaths.has(path)) { newPaths.delete(path) } else { newPaths.add(path) }
+    if (newPaths.has(path)) {
+      newPaths.delete(path)
+    } else {
+      newPaths.add(path)
+    }
     onChange({ selectedPaths: Array.from(newPaths) })
   }
 
@@ -125,7 +138,9 @@ export default function WizardStepRestoreFiles({
                 onClick={() => !isLast && setCurrentPath(pathUpToHere)}
                 className={cn(
                   'text-sm whitespace-nowrap',
-                  isLast ? 'font-semibold cursor-default' : 'text-primary hover:underline cursor-pointer'
+                  isLast
+                    ? 'font-semibold cursor-default'
+                    : 'text-primary hover:underline cursor-pointer'
                 )}
               >
                 {part}
@@ -138,7 +153,10 @@ export default function WizardStepRestoreFiles({
       {/* File list */}
       <div className="flex-1 flex flex-col border border-border rounded-xl overflow-hidden bg-background">
         {/* Selection header */}
-        <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-primary/5" style={{ height: 40, minHeight: 40, maxHeight: 40 }}>
+        <div
+          className="flex items-center gap-2 px-4 py-2 border-b border-border bg-primary/5"
+          style={{ height: 40, minHeight: 40, maxHeight: 40 }}
+        >
           <CheckSquare size={14} />
           <p className="text-sm font-medium">
             {selectedPaths.size > 0
@@ -172,14 +190,19 @@ export default function WizardStepRestoreFiles({
 
           {!loading && !error && items.length === 0 && (
             <div className="p-8 text-center">
-              <p className="text-sm text-muted-foreground">{t('wizard.restoreFiles.noItemsFound')}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('wizard.restoreFiles.noItemsFound')}
+              </p>
             </div>
           )}
 
           {!loading && !error && items.length > 0 && (
             <div className="divide-y divide-border">
               {items.map((item) => (
-                <div key={item.path} className="flex items-center hover:bg-muted/30 transition-colors">
+                <div
+                  key={item.path}
+                  className="flex items-center hover:bg-muted/30 transition-colors"
+                >
                   <button
                     type="button"
                     onClick={() => handleItemClick(item)}
@@ -194,7 +217,9 @@ export default function WizardStepRestoreFiles({
                         <File size={18} />
                       )}
                     </span>
-                    <span className={cn('text-sm truncate', isSelected(item.path) && 'font-semibold')}>
+                    <span
+                      className={cn('text-sm truncate', isSelected(item.path) && 'font-semibold')}
+                    >
                       {item.name}
                     </span>
                     {item.size && (

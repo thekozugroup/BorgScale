@@ -24,7 +24,9 @@ const mockColumns: Column<TestData>[] = [
 
 describe('DataTable', () => {
   it('renders loading state correctly', () => {
-    renderWithProviders(<DataTable data={[]} columns={mockColumns} getRowKey={(row) => row.id} loading={true} />)
+    renderWithProviders(
+      <DataTable data={[]} columns={mockColumns} getRowKey={(row) => row.id} loading={true} />
+    )
     expect(screen.getByRole('table')).toBeInTheDocument()
     expect(screen.getAllByText('Name').length).toBeGreaterThan(0)
   })
@@ -51,7 +53,9 @@ describe('DataTable', () => {
   })
 
   it('renders table headers and data rows correctly', () => {
-    renderWithProviders(<DataTable data={mockData} columns={mockColumns} getRowKey={(row) => row.id} />)
+    renderWithProviders(
+      <DataTable data={mockData} columns={mockColumns} getRowKey={(row) => row.id} />
+    )
 
     // Check headers
     expect(screen.getByText('Name')).toBeInTheDocument()
@@ -74,7 +78,9 @@ describe('DataTable', () => {
       },
     ]
 
-    renderWithProviders(<DataTable data={mockData} columns={customColumns} getRowKey={(row) => row.id} />)
+    renderWithProviders(
+      <DataTable data={mockData} columns={customColumns} getRowKey={(row) => row.id} />
+    )
 
     expect(screen.getByText('Edit John Doe')).toBeInTheDocument()
   })
@@ -164,5 +170,54 @@ describe('DataTable', () => {
 
     // Second button (Bob) should be enabled
     expect(actionButtons[1]).not.toBeDisabled()
+  })
+
+  it('renders enabled action icons at full opacity', () => {
+    const actions: ActionButton<TestData>[] = [
+      { label: 'Action', icon: <span>Action</span>, onClick: vi.fn() },
+    ]
+
+    renderWithProviders(
+      <DataTable
+        data={mockData}
+        columns={mockColumns}
+        getRowKey={(row) => row.id}
+        actions={actions}
+      />
+    )
+
+    const actionButton = screen.getAllByRole('button', { name: 'Action' })[0]
+    expect(actionButton.style.opacity).toBe('')
+    expect(actionButton.className).toContain('text-muted-foreground')
+  })
+
+  it('activates a clickable row with Enter and Space', () => {
+    const handleRowClick = vi.fn()
+    renderWithProviders(
+      <DataTable
+        data={mockData}
+        columns={mockColumns}
+        getRowKey={(row) => row.id}
+        onRowClick={handleRowClick}
+      />
+    )
+
+    const row = screen.getByText('John Doe').closest('tr')!
+    expect(row).toHaveAttribute('tabindex', '0')
+
+    fireEvent.keyDown(row, { key: 'Enter' })
+    expect(handleRowClick).toHaveBeenCalledWith(mockData[0])
+
+    fireEvent.keyDown(row, { key: ' ' })
+    expect(handleRowClick).toHaveBeenCalledTimes(2)
+  })
+
+  it('leaves non-interactive rows out of the tab order', () => {
+    renderWithProviders(
+      <DataTable data={mockData} columns={mockColumns} getRowKey={(row) => row.id} />
+    )
+
+    const row = screen.getByText('John Doe').closest('tr')!
+    expect(row).not.toHaveAttribute('tabindex')
   })
 })

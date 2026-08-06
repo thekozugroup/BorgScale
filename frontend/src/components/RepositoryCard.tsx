@@ -197,6 +197,24 @@ export default function RepositoryCard({
   const iconBtnBase =
     'inline-flex size-11 items-center justify-center rounded-md border-0 bg-transparent text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-30'
 
+  // One hover recipe for the whole cluster; the running state is the only
+  // variation, and delete keeps its destructive tint because it is destructive.
+  const iconBtnRunning = 'bg-accent text-foreground'
+
+  // Named for what the action does to the user's data. The Borg subcommand
+  // rides along in parentheses for anyone who already knows it.
+  const maintenanceLabels = {
+    check: t('repositoryCard.actionDescriptions.check', {
+      defaultValue: 'Check this repository for damage',
+    }),
+    compact: t('repositoryCard.actionDescriptions.compact', {
+      defaultValue: 'Reclaim disk space (compact)',
+    }),
+    prune: t('repositoryCard.actionDescriptions.prune', {
+      defaultValue: 'Remove old backups by retention rules (prune)',
+    }),
+  }
+
   return (
     <div
       className={cn(
@@ -328,9 +346,7 @@ export default function RepositoryCard({
                     m.tooltip ? 'cursor-help' : 'cursor-default'
                   )}
                 >
-                  <span className="text-2xs leading-none text-muted-foreground/70">
-                    {m.label}:
-                  </span>
+                  <span className="text-2xs leading-none text-muted-foreground/70">{m.label}:</span>
                   <span className="text-2xs font-semibold leading-none text-muted-foreground">
                     {m.value}
                   </span>
@@ -357,10 +373,7 @@ export default function RepositoryCard({
                       }}
                       aria-label={t('repositoryCard.buttons.info')}
                       disabled={isMaintenanceRunning}
-                      className={cn(
-                        iconBtnBase,
-                        'text-primary/55 hover:bg-primary/10 hover:text-primary'
-                      )}
+                      className={iconBtnBase}
                     >
                       <Info size={16} />
                     </button>
@@ -377,14 +390,9 @@ export default function RepositoryCard({
                     <button
                       type="button"
                       onClick={onCheck}
-                      aria-label={t('repositoryCard.buttons.check')}
+                      aria-label={maintenanceLabels.check}
                       disabled={isMaintenanceRunning}
-                      className={cn(
-                        iconBtnBase,
-                        checkJob
-                          ? 'bg-primary/10 text-primary hover:bg-primary/18 hover:text-primary'
-                          : 'text-muted-foreground/55 hover:bg-accent hover:text-foreground'
-                      )}
+                      className={cn(iconBtnBase, checkJob && iconBtnRunning)}
                     >
                       {checkJob ? (
                         <RefreshCw size={16} className="animate-spin" />
@@ -394,7 +402,7 @@ export default function RepositoryCard({
                     </button>
                   </span>
                 </TooltipTrigger>
-                <TooltipContent>{t('repositoryCard.buttons.check')}</TooltipContent>
+                <TooltipContent>{maintenanceLabels.check}</TooltipContent>
               </Tooltip>
             )}
 
@@ -405,14 +413,9 @@ export default function RepositoryCard({
                     <button
                       type="button"
                       onClick={onCompact}
-                      aria-label={t('repositoryCard.buttons.compact')}
+                      aria-label={maintenanceLabels.compact}
                       disabled={isMaintenanceRunning}
-                      className={cn(
-                        iconBtnBase,
-                        compactJob
-                          ? 'bg-primary/10 text-primary hover:bg-primary/18 hover:text-primary'
-                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                      )}
+                      className={cn(iconBtnBase, compactJob && iconBtnRunning)}
                     >
                       {compactJob ? (
                         <RefreshCw size={16} className="animate-spin" />
@@ -422,7 +425,7 @@ export default function RepositoryCard({
                     </button>
                   </span>
                 </TooltipTrigger>
-                <TooltipContent>{t('repositoryCard.buttons.compact')}</TooltipContent>
+                <TooltipContent>{maintenanceLabels.compact}</TooltipContent>
               </Tooltip>
             )}
 
@@ -433,14 +436,9 @@ export default function RepositoryCard({
                     <button
                       type="button"
                       onClick={onPrune}
-                      aria-label={t('repositoryCard.buttons.prune')}
+                      aria-label={maintenanceLabels.prune}
                       disabled={isMaintenanceRunning}
-                      className={cn(
-                        iconBtnBase,
-                        pruneJob
-                          ? 'bg-primary/10 text-primary hover:bg-primary/18 hover:text-primary'
-                          : 'text-muted-foreground/55 hover:bg-accent hover:text-foreground'
-                      )}
+                      className={cn(iconBtnBase, pruneJob && iconBtnRunning)}
                     >
                       {pruneJob ? (
                         <RefreshCw size={16} className="animate-spin" />
@@ -450,7 +448,7 @@ export default function RepositoryCard({
                     </button>
                   </span>
                 </TooltipTrigger>
-                <TooltipContent>{t('repositoryCard.buttons.prune')}</TooltipContent>
+                <TooltipContent>{maintenanceLabels.prune}</TooltipContent>
               </Tooltip>
             )}
 
@@ -466,10 +464,7 @@ export default function RepositoryCard({
                       }}
                       aria-label={t('repositoryCard.buttons.viewArchives')}
                       disabled={isMaintenanceRunning}
-                      className={cn(
-                        iconBtnBase,
-                        'text-muted-foreground/55 hover:bg-accent hover:text-foreground'
-                      )}
+                      className={iconBtnBase}
                     >
                       <FolderOpen size={16} />
                     </button>
@@ -491,7 +486,7 @@ export default function RepositoryCard({
                       aria-label={t('repositoryCard.buttons.delete')}
                       className={cn(
                         iconBtnBase,
-                        'text-destructive/60 hover:bg-destructive/10 hover:text-destructive'
+                        'text-destructive hover:bg-destructive/10 hover:text-destructive'
                       )}
                     >
                       <Trash2 size={16} />
@@ -518,7 +513,9 @@ export default function RepositoryCard({
                     className="h-11 shrink-0 px-2 text-xs disabled:bg-muted disabled:text-muted-foreground sm:px-3"
                   >
                     <Play size={13} />
-                    <span className="hidden sm:inline">{t('repositoryCard.buttons.backupNow')}</span>
+                    <span className="hidden sm:inline">
+                      {t('repositoryCard.buttons.backupNow')}
+                    </span>
                   </Button>
                 </span>
               </TooltipTrigger>

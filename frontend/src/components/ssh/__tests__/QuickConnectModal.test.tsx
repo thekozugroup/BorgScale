@@ -31,9 +31,7 @@ describe('QuickConnectModal', () => {
   })
 
   it('renders the form step initially', async () => {
-    renderWithProviders(
-      <QuickConnectModal open={true} onOpenChange={() => {}} />
-    )
+    renderWithProviders(<QuickConnectModal open={true} onOpenChange={() => {}} />)
     expect(await screen.findByLabelText(/host/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/username/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/port/i)).toBeInTheDocument()

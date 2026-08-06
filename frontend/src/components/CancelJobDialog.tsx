@@ -17,7 +17,9 @@ export default function CancelJobDialog({ open, onClose, onConfirm }: CancelJobD
         <h3 className="text-lg font-semibold mb-2">{t('dialogs.cancelJob.title')}</h3>
         <p className="text-sm text-muted-foreground mb-6">{t('dialogs.cancelJob.message')}</p>
         <div className="flex justify-end gap-2">
-          <Button variant="ghost" onClick={onClose}>{t('common.buttons.cancel')}</Button>
+          <Button variant="ghost" onClick={onClose}>
+            {t('common.buttons.cancel')}
+          </Button>
           <Button variant="destructive" onClick={onConfirm}>
             {t('dialogs.cancelJob.confirm')}
           </Button>

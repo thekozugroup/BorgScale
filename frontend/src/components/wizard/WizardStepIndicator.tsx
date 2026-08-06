@@ -47,9 +47,7 @@ export default function WizardStepIndicator({
           <span className="text-xs text-muted-foreground font-medium">
             {`Step ${currentStep + 1} / ${steps.length}`}
           </span>
-          <span className="text-xs font-semibold text-foreground">
-            {activeStep?.label}
-          </span>
+          <span className="text-xs font-semibold text-foreground">{activeStep?.label}</span>
         </div>
 
         {/* Icon circles row — labels hidden, circles only */}

@@ -35,9 +35,7 @@ describe('TerminalLogViewer', () => {
   it('does not re-render log lines that did not change between polls', async () => {
     const onFetchLogs = vi.fn().mockResolvedValue(logsResponse([jsonLine(1, 'one.txt')]))
 
-    renderWithProviders(
-      <TerminalLogViewer jobId="7" status="running" onFetchLogs={onFetchLogs} />
-    )
+    renderWithProviders(<TerminalLogViewer jobId="7" status="running" onFetchLogs={onFetchLogs} />)
 
     await advance(0)
     expect(onFetchLogs).toHaveBeenCalledTimes(1)
@@ -80,9 +78,7 @@ describe('TerminalLogViewer', () => {
   it('does not fetch logs while the tab is hidden', async () => {
     const onFetchLogs = vi.fn().mockResolvedValue(logsResponse([jsonLine(1, 'one.txt')]))
 
-    renderWithProviders(
-      <TerminalLogViewer jobId="7" status="running" onFetchLogs={onFetchLogs} />
-    )
+    renderWithProviders(<TerminalLogViewer jobId="7" status="running" onFetchLogs={onFetchLogs} />)
 
     await advance(0)
     expect(onFetchLogs).toHaveBeenCalledTimes(1)
@@ -99,9 +95,7 @@ describe('TerminalLogViewer', () => {
   it('renders the streaming badge while the job runs', async () => {
     const onFetchLogs = vi.fn().mockResolvedValue(logsResponse([jsonLine(1, 'one.txt')]))
 
-    renderWithProviders(
-      <TerminalLogViewer jobId="7" status="running" onFetchLogs={onFetchLogs} />
-    )
+    renderWithProviders(<TerminalLogViewer jobId="7" status="running" onFetchLogs={onFetchLogs} />)
 
     await advance(0)
     expect(screen.getByText('Live Streaming (Last 500 lines)')).toBeInTheDocument()

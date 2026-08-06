@@ -166,9 +166,7 @@ function ColorizedOutput({ text, isFailed = false }: ColorizedOutputProps) {
   const lines = text.split('\n').map(extractMessage)
 
   return (
-    <div
-      className="font-mono overflow-auto text-xs leading-[1.7] p-2 max-h-[380px]"
-    >
+    <div className="font-mono overflow-auto text-xs leading-[1.7] p-2 max-h-[380px]">
       {lines.map((line, i) => {
         const type = classifyLine(line)
 
@@ -183,7 +181,9 @@ function ColorizedOutput({ text, isFailed = false }: ColorizedOutputProps) {
               {segs.map((seg, j) => {
                 const segClass =
                   seg.kind === 'verb'
-                    ? type === 'keep' ? 'text-primary font-bold' : 'text-destructive font-bold'
+                    ? type === 'keep'
+                      ? 'text-primary font-bold'
+                      : 'text-destructive font-bold'
                     : seg.kind === 'rule'
                       ? 'text-muted-foreground font-semibold'
                       : seg.kind === 'name'
@@ -299,11 +299,7 @@ function PruneResultsDialog({
           </Button>
         </>
       ) : (
-        <Button
-          size="sm"
-          variant={isFailed ? 'destructive' : 'default'}
-          onClick={onCloseAll}
-        >
+        <Button size="sm" variant={isFailed ? 'destructive' : 'default'} onClick={onCloseAll}>
           {isFailed ? t('dialogs.prune.close') : t('dialogs.prune.done')}
         </Button>
       )}
@@ -330,9 +326,7 @@ function PruneResultsDialog({
               </span>
             </div>
             {repository?.name && (
-              <p
-                className="text-xs text-muted-foreground truncate mt-0.5 font-mono"
-              >
+              <p className="text-xs text-muted-foreground truncate mt-0.5 font-mono">
                 {repository.name}
               </p>
             )}
@@ -359,7 +353,9 @@ function PruneResultsDialog({
             {stderr && (
               <div className={stdout ? 'border-t border-border' : ''}>
                 {stdout && (
-                  <div className={`flex items-center gap-2 px-3 py-1.5 border-b ${stderrSectionBorderClass}`}>
+                  <div
+                    className={`flex items-center gap-2 px-3 py-1.5 border-b ${stderrSectionBorderClass}`}
+                  >
                     <span
                       className={`text-2xs font-bold uppercase tracking-[0.08em] ${isFailed ? 'text-destructive' : 'text-muted-foreground'}`}
                     >
@@ -432,12 +428,32 @@ export default function PruneRepositoryDialog({
   }
 
   const retentionFields = [
-    { key: 'keep_hourly' as const, icon: <Clock size={14} />, label: t('dialogs.prune.keepHourly') },
+    {
+      key: 'keep_hourly' as const,
+      icon: <Clock size={14} />,
+      label: t('dialogs.prune.keepHourly'),
+    },
     { key: 'keep_daily' as const, icon: <Sun size={14} />, label: t('dialogs.prune.keepDaily') },
-    { key: 'keep_weekly' as const, icon: <CalendarDays size={14} />, label: t('dialogs.prune.keepWeekly') },
-    { key: 'keep_monthly' as const, icon: <CalendarRange size={14} />, label: t('dialogs.prune.keepMonthly') },
-    { key: 'keep_quarterly' as const, icon: <CalendarRange size={14} />, label: t('dialogs.prune.keepQuarterly') },
-    { key: 'keep_yearly' as const, icon: <Calendar size={14} />, label: t('dialogs.prune.keepYearly') },
+    {
+      key: 'keep_weekly' as const,
+      icon: <CalendarDays size={14} />,
+      label: t('dialogs.prune.keepWeekly'),
+    },
+    {
+      key: 'keep_monthly' as const,
+      icon: <CalendarRange size={14} />,
+      label: t('dialogs.prune.keepMonthly'),
+    },
+    {
+      key: 'keep_quarterly' as const,
+      icon: <CalendarRange size={14} />,
+      label: t('dialogs.prune.keepQuarterly'),
+    },
+    {
+      key: 'keep_yearly' as const,
+      icon: <Calendar size={14} />,
+      label: t('dialogs.prune.keepYearly'),
+    },
   ]
 
   const footer = (
@@ -484,9 +500,7 @@ export default function PruneRepositoryDialog({
         {/* ── Title ── */}
         <div className="px-5 pt-5 pb-4">
           <div className="flex items-start gap-3">
-            <div
-              className="flex items-center justify-center w-9 h-9 rounded-xl flex-shrink-0 bg-muted text-muted-foreground"
-            >
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl flex-shrink-0 bg-muted text-muted-foreground">
               <Scissors size={18} />
             </div>
             <div className="min-w-0 flex-1">
@@ -494,9 +508,7 @@ export default function PruneRepositoryDialog({
                 {t('dialogs.pruneRepository.title')}
               </p>
               {repository?.name && (
-                <p
-                  className="text-xs text-muted-foreground truncate font-mono"
-                >
+                <p className="text-xs text-muted-foreground truncate font-mono">
                   {repository.name}
                 </p>
               )}
@@ -532,10 +544,7 @@ export default function PruneRepositoryDialog({
                 className={`flex items-center gap-3 px-4 py-2.5 transition-colors duration-150 bg-foreground/[0.015] hover:bg-foreground/[0.03]${i < retentionFields.length - 1 ? ' border-b border-border' : ''}`}
               >
                 <span className="text-muted-foreground flex flex-shrink-0">{field.icon}</span>
-                <label
-                  htmlFor={`prune-${field.key}`}
-                  className="flex-1 text-sm cursor-pointer"
-                >
+                <label htmlFor={`prune-${field.key}`} className="flex-1 text-sm cursor-pointer">
                   {field.label}
                 </label>
                 <div
@@ -571,9 +580,7 @@ export default function PruneRepositoryDialog({
               <p className="text-sm font-semibold text-foreground">
                 {t('dialogs.prune.warningTitle')}
               </p>
-              <p className="text-xs text-muted-foreground">
-                {t('dialogs.prune.warningCompact')}
-              </p>
+              <p className="text-xs text-muted-foreground">{t('dialogs.prune.warningCompact')}</p>
             </div>
           </div>
         </div>
