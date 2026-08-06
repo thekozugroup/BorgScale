@@ -16,6 +16,7 @@ def about() -> dict:
         "name": "BorgScale",
         "version": get_runtime_app_version(),
         "source": "https://github.com/thekozugroup/BorgScale",
+        "upstream": "https://github.com/karanhudia/borg-ui",
         "license": "AGPL-3.0",
         "license_url": "https://www.gnu.org/licenses/agpl-3.0.html",
     }

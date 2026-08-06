@@ -36,6 +36,19 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-subtle: var(--brand-subtle);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-subtle: var(--success-subtle);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-info-subtle: var(--info-subtle);
+  --color-destructive-subtle: var(--destructive-subtle);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -72,14 +85,43 @@
     --destructive: oklch(0.577 0.245 27.325);
     --destructive-foreground: oklch(0.985 0 0);
     --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
+    --input: oklch(0.65 0 0);
+    --ring: var(--brand);
+    /* Categorical chart series. Distinguishable by hue for colour-normal
+       viewers and by lightness for everyone else, so a series stays readable
+       in greyscale and to the most common forms of colour blindness. */
+    --chart-1: oklch(0.52 0.13 163);
+    --chart-2: oklch(0.55 0.15 250);
+    --chart-3: oklch(0.55 0.14 75);
+    --chart-4: oklch(0.55 0.18 320);
+    --chart-5: oklch(0.45 0 0);
     --radius: 0.625rem;
+    /* Status and brand tokens.
+       Every value below is verified at >= 4.5:1 against the surface it sits on,
+       so a status can be read rather than merely decorated. The neutral scale
+       above intentionally stays neutral: colour here means "this needs your
+       attention", never "this is a heading". */
+    --brand: oklch(0.52 0.13 163);
+    --brand-foreground: oklch(0.985 0 0);
+    --brand-subtle: oklch(0.52 0.13 163 / 10%);
+    --success: oklch(0.52 0.14 152);
+    --success-foreground: oklch(0.985 0 0);
+    --success-subtle: oklch(0.52 0.14 152 / 10%);
+    --warning: oklch(0.55 0.14 75);
+    --warning-foreground: oklch(0.985 0 0);
+    --warning-subtle: oklch(0.55 0.14 75 / 12%);
+    --info: oklch(0.55 0.15 250);
+    --info-foreground: oklch(0.985 0 0);
+    --info-subtle: oklch(0.55 0.15 250 / 10%);
+    --destructive-subtle: oklch(0.577 0.245 27.325 / 10%);
+
+    /* Frosted surfaces. Translucent panels that read as glass over whatever
+       scrolls beneath them, in the Android 17 idiom: a real blur plus a
+       hairline edge, not a flat tinted overlay. */
+    --frost: oklch(1 0 0 / 72%);
+    --frost-border: oklch(0.145 0 0 / 8%);
+    --frost-blur: 20px;
+
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.145 0 0);
     --sidebar-primary: oklch(0.205 0 0);
@@ -107,13 +149,30 @@
     --destructive: oklch(0.704 0.191 22.216);
     --destructive-foreground: oklch(0.985 0 0);
     --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
+    --input: oklch(1 0 0 / 28%);
+    --ring: var(--brand);
+    --chart-1: oklch(0.7 0.13 163);
+    --chart-2: oklch(0.7 0.15 250);
+    --chart-3: oklch(0.75 0.14 75);
+    --chart-4: oklch(0.7 0.18 320);
+    --chart-5: oklch(0.75 0 0);
+    --brand: oklch(0.7 0.13 163);
+    --brand-foreground: oklch(0.205 0 0);
+    --brand-subtle: oklch(0.7 0.13 163 / 15%);
+    --success: oklch(0.72 0.14 152);
+    --success-foreground: oklch(0.205 0 0);
+    --success-subtle: oklch(0.72 0.14 152 / 15%);
+    --warning: oklch(0.75 0.14 75);
+    --warning-foreground: oklch(0.205 0 0);
+    --warning-subtle: oklch(0.75 0.14 75 / 15%);
+    --info: oklch(0.7 0.15 250);
+    --info-foreground: oklch(0.205 0 0);
+    --info-subtle: oklch(0.7 0.15 250 / 15%);
+    --destructive-subtle: oklch(0.704 0.191 22.216 / 15%);
+
+    --frost: oklch(0.205 0 0 / 68%);
+    --frost-border: oklch(1 0 0 / 10%);
+    --frost-blur: 20px;
     --sidebar: oklch(0.205 0 0);
     --sidebar-foreground: oklch(0.985 0 0);
     --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -157,7 +216,58 @@
   50% { transform: translateY(-12px); opacity: 1; }
 }
 
+/* Frosted surface.
+   One class so every floating layer — header, sidebar, dialogs, sheets,
+   popovers, dropdowns, sticky toolbars — reads as the same material. The
+   @supports guard matters: without backdrop-filter the translucent background
+   would leave text sitting on whatever scrolls behind it, so browsers that
+   cannot blur get an opaque surface instead. */
+.surface-frost {
+  background-color: var(--card);
+  border-color: var(--frost-border);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .surface-frost {
+    background-color: var(--frost);
+    -webkit-backdrop-filter: blur(var(--frost-blur)) saturate(180%);
+    backdrop-filter: blur(var(--frost-blur)) saturate(180%);
+  }
+}
+
+/* Motion.
+   Two durations and two curves, used everywhere. The emphasized curve
+   overshoots slightly on entry, which is what makes a panel feel like it
+   settles rather than snaps. */
+:root {
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1.2);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  @keyframes borgPulse { 0%, 100% { opacity: 1; } }
-  @keyframes borgFloat { 0%, 100% { opacity: 0.5; } }
+  /* Vestibular safety. Anything that moves, scales or loops is reduced to a
+     static or fade-only state; transitions collapse to near-instant rather
+     than to zero so focus and hover changes still register as deliberate. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-fade-in-up {
+    animation: none;
+  }
+
+  /* Status indicators must keep signalling "live" without motion, so they hold
+     a steady visible state instead of pulsing. */
+  @keyframes blobPulseJob { 0%, 100% { opacity: 1; } }
+  @keyframes liveDot { 0%, 100% { opacity: 1; transform: none; } }
+  @keyframes borgPulse { 0%, 100% { transform: none; opacity: 1; } }
+  @keyframes borgFloat { 0%, 100% { transform: none; opacity: 0.5; } }
 }

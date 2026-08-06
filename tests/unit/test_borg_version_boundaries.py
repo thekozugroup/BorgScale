@@ -71,7 +71,10 @@ def test_direct_borg_v1_command_construction_is_confined_to_known_boundaries():
     }
 
     offenders = []
-    pattern = re.compile(r"""\[\s*["']borg["']""")
+    # A command list literal, e.g. ["borg", "list", ...]. The leading guard
+    # rejects subscripts such as checks["borg"] or results['borg'], where the
+    # bracket follows a name, a call, or another subscript.
+    pattern = re.compile(r"""(?<![\w\)\]])\[\s*["']borg["']""")
     for path in (REPO_ROOT / "app").rglob("*.py"):
         relative_path = path.relative_to(REPO_ROOT).as_posix()
         if relative_path in {"app/core/borg.py", "app/core/borg2.py"}:

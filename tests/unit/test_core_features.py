@@ -1,67 +1,56 @@
+"""BorgScale is AGPL-3.0 and gates nothing behind a plan.
+
+These tests pin that contract so a plan restriction cannot be reintroduced by
+accident, and so the shape /api/system/info publishes stays stable.
+"""
+
 import pytest
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.features import (
     FEATURES,
+    USER_LIMITS,
     Plan,
     get_current_plan,
     plan_includes,
-    require_feature,
 )
 
 
 @pytest.mark.unit
 class TestPlanIncludes:
     @pytest.mark.parametrize(
-        ("current", "required", "expected"),
+        ("current", "required"),
         [
-            (Plan.COMMUNITY, Plan.COMMUNITY, True),
-            (Plan.PRO, Plan.COMMUNITY, True),
-            (Plan.ENTERPRISE, Plan.PRO, True),
-            (Plan.COMMUNITY, Plan.PRO, False),
-            (Plan.PRO, Plan.ENTERPRISE, False),
+            (Plan.COMMUNITY, Plan.COMMUNITY),
+            (Plan.COMMUNITY, Plan.PRO),
+            (Plan.COMMUNITY, Plan.ENTERPRISE),
+            (Plan.PRO, Plan.ENTERPRISE),
         ],
     )
-    def test_plan_includes(self, current, required, expected):
-        assert plan_includes(current, required) is expected
+    def test_every_plan_includes_every_requirement(self, current, required):
+        assert plan_includes(current, required) is True
 
 
 @pytest.mark.unit
 class TestCurrentPlan:
-    def test_get_current_plan_defaults_to_community(self, db_session: Session):
-        """Stub always returns community (BorgScale is unrestricted at the stub layer)."""
+    def test_get_current_plan_is_always_community(self, db_session: Session):
         assert get_current_plan(db_session) == Plan.COMMUNITY
+
+    def test_get_current_plan_does_not_require_a_session(self):
+        """Callers outside a request scope must be able to ask without a db."""
+        assert get_current_plan() == Plan.COMMUNITY
 
 
 @pytest.mark.unit
-class TestRequireFeature:
-    def test_require_feature_rejects_unknown_feature(self, db_session: Session):
-        dependency = require_feature("unknown_feature").dependency
+class TestNothingIsGated:
+    def test_every_feature_is_available_on_community(self):
+        assert FEATURES, "feature map should not be empty; /api/system/info publishes it"
+        assert set(FEATURES.values()) == {Plan.COMMUNITY}
 
-        with pytest.raises(ValueError, match="Unknown feature"):
-            dependency(db_session)
+    def test_borg_v2_is_not_gated(self):
+        """Borg 2 is a headline capability and must never be plan-restricted."""
+        assert FEATURES["borg_v2"] is Plan.COMMUNITY
 
-    def test_require_feature_blocks_community_from_enterprise_feature(
-        self, db_session: Session
-    ):
-        """The stub returns community; enterprise-gated features return 403."""
-        dependency = require_feature("rbac").dependency
-
-        with pytest.raises(HTTPException) as exc:
-            dependency(db_session)
-
-        assert exc.value.status_code == 403
-        assert exc.value.detail == {
-            "key": "backend.errors.plan.featureNotAvailable",
-            "feature": "rbac",
-            "required": FEATURES["rbac"].value,
-            "current": Plan.COMMUNITY.value,
-        }
-
-    def test_require_feature_allows_community_for_community_feature(
-        self, db_session: Session
-    ):
-        """borg_v2 is community-accessible; should not raise."""
-        dependency = require_feature("borg_v2").dependency
-        assert dependency(db_session) is None
+    def test_no_plan_caps_the_number_of_users(self):
+        assert set(USER_LIMITS) == set(Plan)
+        assert all(limit is None for limit in USER_LIMITS.values())

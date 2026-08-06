@@ -41,7 +41,7 @@ def admin_user(test_db):
         username="admin",
         email="admin@test.com",
         password_hash=get_password_hash("admin123"),
-        is_admin=True,
+        role="admin",
         is_active=True,
     )
     test_db.add(user)
@@ -57,7 +57,7 @@ def regular_user(test_db):
         username="user",
         email="user@test.com",
         password_hash=get_password_hash("user123"),
-        is_admin=False,
+        role="viewer",
         is_active=True,
     )
     test_db.add(user)

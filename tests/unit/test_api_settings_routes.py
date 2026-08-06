@@ -4,6 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.api import settings as settings_api
+from app.config import get_runtime_app_version
 from app.database.models import LicensingState, Repository, SystemSettings, User
 
 
@@ -41,7 +42,9 @@ class TestSystemSettingsContracts:
         assert settings["max_concurrent_scheduled_checks"] == 4
         assert settings["log_retention_days"] == 30
         assert settings["timeout_sources"]["backup_timeout"] in (None, "env")
-        assert settings["app_version"] == "2.0.0"
+        # Read from the same source the app does, so a release bump does not
+        # require editing this assertion.
+        assert settings["app_version"] == get_runtime_app_version()
         assert test_db.query(SystemSettings).count() == 1
 
     def test_get_system_settings_falls_back_when_log_storage_lookup_fails(

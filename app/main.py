@@ -244,11 +244,17 @@ async def _run_startup() -> None:
     # Run database migrations
     from app.database.migrations import run_migrations
 
+    # Startup continues even when migrations fail, so an operator can still
+    # reach the UI to diagnose. The outcome is recorded on app.state and
+    # reported by /health/ready, which is what stops traffic being routed to an
+    # instance whose schema is incomplete.
+    app.state.migration_failures = []
     try:
-        run_migrations()
+        result = run_migrations()
+        app.state.migration_failures = result.get("failed", [])
     except Exception as e:
         logger.error("Failed to run migrations", error=str(e))
-        # Don't fail startup, just log the error
+        app.state.migration_failures = ["<migration runner crashed>"]
 
     # BorgScale runs unrestricted; no activation step.
     logger.info("BorgScale runs unrestricted.")
@@ -468,6 +474,13 @@ async def readiness_check():
     except Exception as e:
         checks["database"] = f"error: {e}"
         healthy = False
+
+    migration_failures = getattr(app.state, "migration_failures", [])
+    if migration_failures:
+        checks["migrations"] = "failed: " + ", ".join(migration_failures)
+        healthy = False
+    else:
+        checks["migrations"] = "ok"
 
     try:
         from app.core.borg import borg

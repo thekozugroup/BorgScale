@@ -28,7 +28,7 @@ class TestApiTokens:
         assert response.status_code == 201
         data = response.json()
         assert data["name"] == "My CI token"
-        assert data["token"].startswith("borgui_")
+        assert data["token"].startswith("borgscale_")
         assert len(data["token"]) > 20
         assert data["prefix"] == data["token"][:12]
 
@@ -44,7 +44,7 @@ class TestApiTokens:
         tokens = response.json()
         assert len(tokens) == 1
         assert "token" not in tokens[0]
-        assert tokens[0]["prefix"].startswith("borgui_")
+        assert tokens[0]["prefix"].startswith("borgscale_")
 
     def test_generate_token_empty_name_returns_422(
         self, test_client: TestClient, admin_headers

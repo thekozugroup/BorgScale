@@ -7,6 +7,7 @@ These tests use actual borg repositories to verify end-to-end functionality.
 import pytest
 import shutil
 import subprocess
+import tempfile
 from fastapi.testclient import TestClient
 from app.database.models import Repository
 from tests.integration.test_helpers import (
@@ -952,19 +953,24 @@ class TestRepositoryValidation:
 
         WHY: Verifies validation catches bad paths
         PREVENTS: Repositories created in inaccessible locations
+
+        Uses a path nested under a regular file. That is structurally
+        impossible on every platform, unlike a merely unreadable directory,
+        which is writable when the suite runs as root.
         """
-        response = test_client.post(
-            "/api/repositories/",
-            json={
-                "name": "Invalid Path Repo",
-                "path": "/root/forbidden/path",  # Likely not accessible
-                "encryption": "none",
-                "compression": "lz4",
-                "repository_type": "local",
-                "source_directories": ["/tmp"],
-            },
-            headers=admin_headers,
-        )
+        with tempfile.NamedTemporaryFile(suffix=".not-a-dir") as blocker:
+            response = test_client.post(
+                "/api/repositories/",
+                json={
+                    "name": "Invalid Path Repo",
+                    "path": f"{blocker.name}/forbidden/path",
+                    "encryption": "none",
+                    "compression": "lz4",
+                    "repository_type": "local",
+                    "source_directories": ["/tmp"],
+                },
+                headers=admin_headers,
+            )
 
         assert response.status_code == 400
 

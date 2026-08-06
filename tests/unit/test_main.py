@@ -64,12 +64,12 @@ class TestStartupEvent:
                                                                 "asyncio.create_task"
                                                             ):
                                                                 from app.main import (
-                                                                    startup_event,
+                                                                    _run_startup,
                                                                     app,
                                                                 )
 
                                                                 app.state.background_tasks = []
-                                                                await startup_event()
+                                                                await _run_startup()
                                                                 mock_mqtt.configure.assert_called_once()
                                                                 mock_mqtt.sync_state_with_db.assert_called_once()
 
