@@ -82,7 +82,7 @@ const Activity: React.FC = () => {
   return (
     <div>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+      <div className="flex flex-col justify-between gap-4 mb-6 lg:flex-row lg:items-center">
         <div className="flex items-center gap-3">
           <History size={28} className="flex-shrink-0" />
           <div>

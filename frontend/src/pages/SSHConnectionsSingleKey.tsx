@@ -665,7 +665,7 @@ export default function SSHConnectionsSingleKey() {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-1">
-          <h1 className="text-2xl font-bold">{t('sshConnections.title')}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('sshConnections.title')}</h1>
           <span
             title={`${t('sshConnections.singleKeySystem.title')}: ${t('sshConnections.singleKeySystem.description')}`}
             className="cursor-help opacity-50"

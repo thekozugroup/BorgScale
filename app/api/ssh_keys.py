@@ -57,15 +57,15 @@ def _redact_secrets(blob: str) -> str:
 
 _HINT_PATTERNS: tuple = (
     ("Permission denied (publickey)", "backend.ssh.hint.publicKeyNotAuthorized"),
-    ("Permission denied (publickey",  "backend.ssh.hint.publicKeyNotAuthorized"),
-    ("command not found",             "backend.ssh.hint.borgNotInstalled"),
-    ("borg: not found",               "backend.ssh.hint.borgNotInstalled"),
-    ("Connection refused",            "backend.ssh.hint.connectionRefused"),
-    ("Connection timed out",          "backend.ssh.hint.timeout"),
-    ("Host key verification failed",  "backend.ssh.hint.hostKeyFailed"),
-    ("No route to host",              "backend.ssh.hint.noRoute"),
-    ("Could not resolve hostname",    "backend.ssh.hint.dnsFailed"),
-    ("Operation timed out",           "backend.ssh.hint.timeout"),
+    ("Permission denied (publickey", "backend.ssh.hint.publicKeyNotAuthorized"),
+    ("command not found", "backend.ssh.hint.borgNotInstalled"),
+    ("borg: not found", "backend.ssh.hint.borgNotInstalled"),
+    ("Connection refused", "backend.ssh.hint.connectionRefused"),
+    ("Connection timed out", "backend.ssh.hint.timeout"),
+    ("Host key verification failed", "backend.ssh.hint.hostKeyFailed"),
+    ("No route to host", "backend.ssh.hint.noRoute"),
+    ("Could not resolve hostname", "backend.ssh.hint.dnsFailed"),
+    ("Operation timed out", "backend.ssh.hint.timeout"),
 )
 
 
@@ -84,7 +84,7 @@ def _build_authorize_command(public_key: str) -> str:
     safe = public_key.replace('"', '\\"').strip()
     return (
         "mkdir -p ~/.ssh && chmod 700 ~/.ssh && "
-        f"echo \"{safe}\" >> ~/.ssh/authorized_keys && "
+        f'echo "{safe}" >> ~/.ssh/authorized_keys && '
         "chmod 600 ~/.ssh/authorized_keys"
     )
 
@@ -103,22 +103,27 @@ async def _ssh_run_command(
     Returns (return_code, stdout, stderr). Honors BatchMode so no prompt ever
     blocks the worker.
     """
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".key", delete=False
-    ) as keyfile:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".key", delete=False) as keyfile:
         keyfile.write(private_key_pem)
         keyfile_path = keyfile.name
     try:
         os.chmod(keyfile_path, 0o600)
         argv = [
             "ssh",
-            "-o", "BatchMode=yes",
-            "-o", f"ConnectTimeout={connect_timeout}",
-            "-o", "StrictHostKeyChecking=accept-new",
-            "-o", "UserKnownHostsFile=/dev/null",
-            "-o", "LogLevel=ERROR",
-            "-i", keyfile_path,
-            "-p", str(port),
+            "-o",
+            "BatchMode=yes",
+            "-o",
+            f"ConnectTimeout={connect_timeout}",
+            "-o",
+            "StrictHostKeyChecking=accept-new",
+            "-o",
+            "UserKnownHostsFile=/dev/null",
+            "-o",
+            "LogLevel=ERROR",
+            "-i",
+            keyfile_path,
+            "-p",
+            str(port),
             f"{username}@{host}",
             command,
         ]
@@ -1150,7 +1155,11 @@ async def manual_pair_verify(
 
     # If borg is missing, classify hint even if rc==0 (script returns 0 with BORG_MISSING)
     if borg_version is None and hint is None:
-        if "BORG_MISSING" in stdout or "command not found" in stdout or "borg: not found" in stdout:
+        if (
+            "BORG_MISSING" in stdout
+            or "command not found" in stdout
+            or "borg: not found" in stdout
+        ):
             hint = "backend.ssh.hint.borgNotInstalled"
 
     success = rc == 0 and borg_version is not None

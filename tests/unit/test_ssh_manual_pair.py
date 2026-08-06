@@ -1,5 +1,4 @@
 """Unit tests for manual-pair SSH helpers in app.api.ssh_keys."""
-import pytest
 
 from app.api.ssh_keys import (
     _redact_secrets,
@@ -32,19 +31,31 @@ def test_redact_leaves_short_strings_alone():
 
 
 def test_classify_hint_publickey():
-    assert _classify_hint("Permission denied (publickey).") == "backend.ssh.hint.publicKeyNotAuthorized"
+    assert (
+        _classify_hint("Permission denied (publickey).")
+        == "backend.ssh.hint.publicKeyNotAuthorized"
+    )
 
 
 def test_classify_hint_borg_missing():
-    assert _classify_hint("bash: borg: command not found") == "backend.ssh.hint.borgNotInstalled"
+    assert (
+        _classify_hint("bash: borg: command not found")
+        == "backend.ssh.hint.borgNotInstalled"
+    )
 
 
 def test_classify_hint_refused():
-    assert _classify_hint("ssh: connect to host x port 22: Connection refused") == "backend.ssh.hint.connectionRefused"
+    assert (
+        _classify_hint("ssh: connect to host x port 22: Connection refused")
+        == "backend.ssh.hint.connectionRefused"
+    )
 
 
 def test_classify_hint_dns():
-    assert _classify_hint("ssh: Could not resolve hostname foo.bar") == "backend.ssh.hint.dnsFailed"
+    assert (
+        _classify_hint("ssh: Could not resolve hostname foo.bar")
+        == "backend.ssh.hint.dnsFailed"
+    )
 
 
 def test_classify_hint_unknown_returns_none():

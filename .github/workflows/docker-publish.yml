@@ -58,7 +58,9 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Backend lint
-        run: ruff check app/
+        run: |
+          ruff check app tests
+          ruff format --check app tests
 
       - name: Backend tests
         run: python -m pytest -q

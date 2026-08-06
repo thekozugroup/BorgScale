@@ -74,7 +74,6 @@ class TestStartupEvent:
                                                                 mock_mqtt.sync_state_with_db.assert_called_once()
 
 
-
 @pytest.mark.unit
 class TestProxyAuthStartupWarnings:
     def test_no_proxy_warning_when_proxy_auth_disabled(self):

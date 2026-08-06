@@ -3,6 +3,7 @@
 All functions must return the constant open-source entitlement.
 No HTTP, no DB writes, no activation keys.
 """
+
 import pytest
 from unittest.mock import MagicMock
 
@@ -84,6 +85,7 @@ async def test_refresh_entitlement_returns_unchanged(db):
 @pytest.mark.unit
 def test_utc_now_returns_aware_datetime():
     from datetime import timezone
+
     dt = utc_now()
     assert dt.tzinfo is not None
     assert dt.tzinfo == timezone.utc

@@ -1,6 +1,6 @@
 """Integration tests for /api/repositories/discover/* and /quick-import."""
+
 import configparser
-import os
 import shutil
 import subprocess
 import tempfile

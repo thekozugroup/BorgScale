@@ -15,14 +15,15 @@ from datetime import datetime, timezone
 
 import pytest
 
-from app.core.security import create_access_token, get_password_hash
+from app.core.security import create_access_token
+from tests.fixtures.api import cached_password_hash
 from app.database.models import Repository, User, UserRepositoryPermission
 
 
 def _make_user(db, username: str, role: str = "viewer") -> User:
     user = User(
         username=username,
-        password_hash=get_password_hash("x"),
+        password_hash=cached_password_hash("x"),
         is_active=True,
         role=role,
     )
@@ -58,7 +59,9 @@ def _grant(db, user: User, repo: Repository, role: str = "viewer") -> None:
 
 
 def _headers(user: User) -> dict:
-    return {"X-Borg-Authorization": f"Bearer {create_access_token(data={'sub': user.username})}"}
+    return {
+        "X-Borg-Authorization": f"Bearer {create_access_token(data={'sub': user.username})}"
+    }
 
 
 @pytest.fixture

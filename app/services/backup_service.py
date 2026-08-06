@@ -43,7 +43,10 @@ def classify_borg_exit_code(returncode: int) -> str:
     """Return "success", "warning", or "error" for a borg exit code."""
     if returncode == 0:
         return "success"
-    if returncode == BORG_LEGACY_WARNING_EXIT_CODE or returncode in BORG_WARNING_EXIT_CODES:
+    if (
+        returncode == BORG_LEGACY_WARNING_EXIT_CODE
+        or returncode in BORG_WARNING_EXIT_CODES
+    ):
         return "warning"
     return "error"
 

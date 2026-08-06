@@ -284,9 +284,7 @@ def cleanup_orphaned_jobs(db: Session):
                     repository_id=repository.id,
                 )
                 job.error_message += "\n" + json.dumps(
-                    {
-                        "key": "backend.errors.service.warningRemoteProcessMayBeRunning"
-                    }
+                    {"key": "backend.errors.service.warningRemoteProcessMayBeRunning"}
                 )
 
     # Process restore jobs

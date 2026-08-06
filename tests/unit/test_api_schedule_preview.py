@@ -42,9 +42,7 @@ class TestSchedulePreview:
         assert resp.status_code == 200, resp.text
         assert len(resp.json()["next_runs"]) == 5
 
-    def test_preview_count_out_of_range(
-        self, test_client: TestClient, admin_headers
-    ):
+    def test_preview_count_out_of_range(self, test_client: TestClient, admin_headers):
         resp = test_client.get(
             "/api/schedule/preview?expr=0 3 * * *&count=99",
             headers=admin_headers,

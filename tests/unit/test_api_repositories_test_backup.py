@@ -126,9 +126,7 @@ class TestTestBackupEndpoint:
         )
 
         canned_stdout = (
-            b"A /home/test/file1.txt\n"
-            b"A /home/test/file2.txt\n"
-            b"M /home/test/file3.txt\n"
+            b"A /home/test/file1.txt\nA /home/test/file2.txt\nM /home/test/file3.txt\n"
         )
         canned_stderr = (
             b"------------------------------------------------------------------------------\n"
@@ -150,9 +148,7 @@ class TestTestBackupEndpoint:
         )
         fake_proc = AsyncMock()
         fake_proc.returncode = 0
-        fake_proc.communicate = AsyncMock(
-            return_value=(canned_stdout, canned_stderr)
-        )
+        fake_proc.communicate = AsyncMock(return_value=(canned_stdout, canned_stderr))
 
         with patch(
             "app.api.repositories.asyncio.create_subprocess_exec",
@@ -210,9 +206,7 @@ class TestTestBackupEndpoint:
         assert "code 2" in body["error_message"]
         assert "repository does not exist" in (body["raw_output_tail"] or "")
 
-    def test_test_backup_timeout(
-        self, test_client: TestClient, admin_headers, test_db
-    ):
+    def test_test_backup_timeout(self, test_client: TestClient, admin_headers, test_db):
         """A subprocess that exceeds the 60s budget reports timed_out=True."""
         repo = _make_repo(
             test_db,
@@ -231,10 +225,13 @@ class TestTestBackupEndpoint:
         async def _raise_timeout(*_args, **_kwargs):
             raise asyncio.TimeoutError()
 
-        with patch(
-            "app.api.repositories.asyncio.create_subprocess_exec",
-            AsyncMock(return_value=fake_proc),
-        ), patch("app.api.repositories.asyncio.wait_for", _raise_timeout):
+        with (
+            patch(
+                "app.api.repositories.asyncio.create_subprocess_exec",
+                AsyncMock(return_value=fake_proc),
+            ),
+            patch("app.api.repositories.asyncio.wait_for", _raise_timeout),
+        ):
             resp = test_client.post(
                 f"/api/repositories/{repo.id}/test-backup",
                 headers=admin_headers,

@@ -1,14 +1,10 @@
 """Unit tests for app.services.repository_discovery."""
+
 import configparser
-import os
-import time
 from pathlib import Path
 
-import pytest
 
 from app.services.repository_discovery import (
-    DEFAULT_EXCLUDES,
-    FoundRepo,
     is_borg_repo,
     scan_for_repos,
     _is_excluded,
@@ -133,9 +129,7 @@ def test_scan_excludes_hard_paths(tmp_path):
 def test_scan_deadline_returns_partial(tmp_path):
     _make_fake_repo(tmp_path, name="r1")
     # force budget exhaustion by setting budget to 0
-    results, partial = scan_for_repos(
-        [str(tmp_path)], max_depth=4, budget_seconds=0.0
-    )
+    results, partial = scan_for_repos([str(tmp_path)], max_depth=4, budget_seconds=0.0)
     assert partial is True  # at minimum, deadline already passed
     # results may be 0 or 1 depending on race; both acceptable
     assert isinstance(results, list)

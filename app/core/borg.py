@@ -229,9 +229,7 @@ class BorgInterface:
                     # Bound the wait on each line. Checking the clock only after
                     # a line arrives never fires when borg stops emitting output
                     # entirely, which is exactly the hang the timeout exists for.
-                    remaining = timeout - (
-                        asyncio.get_event_loop().time() - start_time
-                    )
+                    remaining = timeout - (asyncio.get_event_loop().time() - start_time)
                     if remaining <= 0:
                         raise asyncio.TimeoutError
 

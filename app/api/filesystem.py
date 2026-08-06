@@ -650,7 +650,12 @@ async def validate_path(
                     is_dir = "directory" in output_lower or "dir" in output_lower
                 is_borg = (
                     await asyncio.to_thread(
-                        is_borg_repository_ssh, host, username, temp_key_file, path, port
+                        is_borg_repository_ssh,
+                        host,
+                        username,
+                        temp_key_file,
+                        path,
+                        port,
                     )
                     if is_dir
                     else False

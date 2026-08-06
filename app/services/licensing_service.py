@@ -5,6 +5,7 @@ public function names of the upstream activation client so existing
 callers compile, but every call returns the constant "full access"
 entitlement. No HTTP, no database writes.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -56,8 +57,10 @@ def get_feature_access(db: Session) -> dict[str, Any]:
 
 def get_or_create_licensing_state(db: Session) -> Any:
     """Return a minimal object with instance_id for back-compat."""
+
     class _State:
         instance_id = "open-source"
+
     return _State()
 
 
@@ -73,9 +76,13 @@ async def refresh_entitlement(db: Session, *, app_version: str) -> dict[str, Any
     return {"result": "unchanged", "entitlement": dict(UNRESTRICTED_ENTITLEMENT)}
 
 
-async def activate_paid_license(db: Session, *args: Any, **kwargs: Any) -> dict[str, Any]:
+async def activate_paid_license(
+    db: Session, *args: Any, **kwargs: Any
+) -> dict[str, Any]:
     return {"result": "open-source", "entitlement": dict(UNRESTRICTED_ENTITLEMENT)}
 
 
-async def deactivate_paid_license(db: Session, *args: Any, **kwargs: Any) -> dict[str, Any]:
+async def deactivate_paid_license(
+    db: Session, *args: Any, **kwargs: Any
+) -> dict[str, Any]:
     return {"result": "open-source", "entitlement": dict(UNRESTRICTED_ENTITLEMENT)}

@@ -50,9 +50,20 @@
 
 ## Release Readiness
 
-- Current generated line coverage reports: backend `58.82%`, frontend `81.66%`, combined `64.36%`
-- Release confidence is built on multiple test lanes: backend unit coverage, backend API integration, frontend unit coverage, frontend build validation, and core, extended, and SSH smoke suites against a built app
-- Docker Hub publishes the user-facing app image `ainullcode/borgscale`; the separate `borgscale-runtime-base` image is an internal CI artifact and should remain private
+Every push runs backend lint and format checks, the full backend unit and
+integration suites, frontend typecheck, lint, format and unit tests, a
+locale-parity check, a design-token contrast check, and core, extended and SSH
+smoke suites against a built app. A release additionally has to pass that same
+gate before any image is pushed, so a red commit cannot reach Docker Hub.
+
+Two checks exist specifically to keep this fork honest:
+`tests/test_no_phone_home.py` denies all outbound HTTP and fails on any
+unexpected request, and `tests/unit/test_authorization_coverage.py` calls every
+state-changing route as a signed-out client and as a low-privilege user and
+fails if either gets through.
+
+Docker Hub publishes the user-facing app image `ainullcode/borgscale`; the
+separate `borgscale-runtime-base` image is an internal CI artifact.
 
 ## Interface
 

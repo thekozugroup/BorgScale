@@ -6,7 +6,6 @@ and (optionally) queueing the first backup.
 """
 
 import os
-import shutil
 import pytest
 
 from unittest.mock import patch
@@ -112,9 +111,7 @@ def test_guided_setup_rejects_missing_passphrase_when_encrypted(
     assert resp.json()["detail"]["key"] == "backend.errors.repo.passphraseRequired"
 
 
-def test_guided_setup_rejects_invalid_cron(
-    test_client, admin_headers, fresh_repo_path
-):
+def test_guided_setup_rejects_invalid_cron(test_client, admin_headers, fresh_repo_path):
     body = _payload(
         fresh_repo_path,
         name="cron",
@@ -127,12 +124,8 @@ def test_guided_setup_rejects_invalid_cron(
     assert resp.json()["detail"]["key"] == "backend.errors.schedule.invalidCron"
 
 
-def test_guided_setup_rejects_invalid_mode(
-    test_client, admin_headers, fresh_repo_path
-):
-    body = _payload(
-        fresh_repo_path, name="bad-mode", repo={"mode": "bogus"}
-    )
+def test_guided_setup_rejects_invalid_mode(test_client, admin_headers, fresh_repo_path):
+    body = _payload(fresh_repo_path, name="bad-mode", repo={"mode": "bogus"})
     resp = test_client.post(
         "/api/repositories/guided-setup", headers=admin_headers, json=body
     )
@@ -147,9 +140,7 @@ def test_guided_setup_rejects_invalid_mode(
 
 @pytest.mark.integration
 @pytest.mark.requires_borg
-def test_guided_setup_rejects_duplicate_name(
-    test_client, admin_headers, tmp_path
-):
+def test_guided_setup_rejects_duplicate_name(test_client, admin_headers, tmp_path):
     first_path = str(tmp_path / "first-repo")
     second_path = str(tmp_path / "second-repo")
     r1 = test_client.post(
@@ -168,9 +159,7 @@ def test_guided_setup_rejects_duplicate_name(
     assert r2.json()["detail"]["key"] == "backend.errors.repo.nameTaken"
 
 
-def test_guided_setup_rejects_non_empty_path(
-    test_client, admin_headers, tmp_path
-):
+def test_guided_setup_rejects_non_empty_path(test_client, admin_headers, tmp_path):
     # Pre-populate the target path with an unrelated file so it is non-empty
     # and not a borg repo.
     path = tmp_path / "occupied"
@@ -214,15 +203,12 @@ def test_guided_setup_rolls_back_on_schedule_failure(
 
     assert resp.status_code == 500, resp.text
     assert (
-        resp.json()["detail"]["key"]
-        == "backend.errors.guidedSetup.scheduleStageFailed"
+        resp.json()["detail"]["key"] == "backend.errors.guidedSetup.scheduleStageFailed"
     )
 
     # Repo row must be gone.
     leftover = (
-        test_db.query(Repository)
-        .filter(Repository.name == "rollback-me")
-        .first()
+        test_db.query(Repository).filter(Repository.name == "rollback-me").first()
     )
     assert leftover is None, "Repository row was not rolled back"
 
@@ -237,9 +223,7 @@ def test_guided_setup_rolls_back_on_schedule_failure(
 # --------------------------------------------------------------------------- #
 
 
-def test_guided_setup_requires_admin(
-    test_client, operator_headers, fresh_repo_path
-):
+def test_guided_setup_requires_admin(test_client, operator_headers, fresh_repo_path):
     """Operators must not be able to call guided-setup — same gate as POST /repositories."""
     resp = test_client.post(
         "/api/repositories/guided-setup",

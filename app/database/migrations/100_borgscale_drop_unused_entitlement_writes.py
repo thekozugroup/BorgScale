@@ -6,6 +6,7 @@ analytics columns that are likewise retained. This migration is a no-op
 that records the deprecation for future readers.
 """
 
+
 def run(_connection) -> None:
     pass
 

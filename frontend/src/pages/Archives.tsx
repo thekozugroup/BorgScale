@@ -433,12 +433,12 @@ const Archives: React.FC = () => {
   return (
     <div>
       {/* Header: title + repo selector inline */}
-      <div className="flex items-start sm:items-center flex-col sm:flex-row gap-4 mb-6">
+      <div className="flex flex-col items-start gap-4 mb-6 lg:flex-row lg:items-center">
         <div className="flex-1 min-w-0">
-          <h1 className="text-xl font-bold leading-snug">{t('archives.title')}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('archives.title')}</h1>
           <p className="text-sm text-muted-foreground">{t('archives.subtitle')}</p>
         </div>
-        <div className="w-full sm:w-[340px] shrink-0">
+        <div className="w-full shrink-0 lg:w-[340px]">
           <RepositorySelectorCard
             repositories={repositories}
             value={selectedRepositoryId}

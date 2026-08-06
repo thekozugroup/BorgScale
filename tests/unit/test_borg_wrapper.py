@@ -220,7 +220,7 @@ class TestStreamingCommandTimeout:
 
         try:
             await borg._execute_command_streaming(
-                ["sh", "-c", f'echo $$ > {pid_path}; exec sleep 30'],
+                ["sh", "-c", f"echo $$ > {pid_path}; exec sleep 30"],
                 timeout=1,
             )
 

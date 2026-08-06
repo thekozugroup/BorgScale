@@ -3,6 +3,7 @@
 Never recurses into a borg repo's `data/` subtree (millions of small files).
 Detection is signature-based (config + data/ dir + INI [repository] section).
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -17,11 +18,21 @@ from typing import Iterable
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_EXCLUDES: frozenset = frozenset({
-    "/proc", "/sys", "/dev", "/run", "/tmp",
-    "/var/lib/docker", "/var/lib/containerd", "/var/lib/snapd",
-    "/snap", "/var/cache", "/var/run",
-})
+DEFAULT_EXCLUDES: frozenset = frozenset(
+    {
+        "/proc",
+        "/sys",
+        "/dev",
+        "/run",
+        "/tmp",
+        "/var/lib/docker",
+        "/var/lib/containerd",
+        "/var/lib/snapd",
+        "/snap",
+        "/var/cache",
+        "/var/run",
+    }
+)
 
 DEFAULT_LOCAL_ROOTS: tuple = (
     "/data/backup",
@@ -39,10 +50,10 @@ class FoundRepo:
     repository_id: "str | None" = None
     last_modified_ts: "float | None" = None
     size_bytes: "int | None" = None
-    encryption_guess: str = "unknown"          # "encrypted", "unencrypted", "unknown"
+    encryption_guess: str = "unknown"  # "encrypted", "unencrypted", "unknown"
     archive_count: "int | None" = None
     already_imported: bool = False
-    source: str = "local"                       # "local" or "remote"
+    source: str = "local"  # "local" or "remote"
 
     def to_dict(self) -> dict:
         return {
@@ -145,15 +156,17 @@ def _scan_one_root(
 
         is_repo, meta = is_borg_repo(current)
         if is_repo and meta is not None:
-            found.append(FoundRepo(
-                path=current,
-                borg_version=meta["version"],
-                repository_id=meta["id"],
-                last_modified_ts=meta["last_modified_ts"],
-                size_bytes=meta["size_bytes"],
-                encryption_guess=meta["encryption_guess"],
-                source="local",
-            ))
+            found.append(
+                FoundRepo(
+                    path=current,
+                    borg_version=meta["version"],
+                    repository_id=meta["id"],
+                    last_modified_ts=meta["last_modified_ts"],
+                    size_bytes=meta["size_bytes"],
+                    encryption_guess=meta["encryption_guess"],
+                    source="local",
+                )
+            )
             # short-circuit: never descend into a repo
             continue
 
@@ -251,8 +264,14 @@ def _get_connection_for_discovery(connection_id: int, db):
     }
 
 
-def _build_ssh_argv(host: str, username: str, port: int, key_file: "str | None",
-                    command: str, connect_timeout: int = 10) -> list:
+def _build_ssh_argv(
+    host: str,
+    username: str,
+    port: int,
+    key_file: "str | None",
+    command: str,
+    connect_timeout: int = 10,
+) -> list:
     """Build an argv list for an SSH invocation.
 
     Local helper used because app/api/ssh_keys.py does not export a public
@@ -264,10 +283,14 @@ def _build_ssh_argv(host: str, username: str, port: int, key_file: "str | None",
     if key_file:
         argv += ["-i", key_file]
     argv += [
-        "-o", "StrictHostKeyChecking=no",
-        "-o", "BatchMode=yes",
-        "-o", f"ConnectTimeout={int(connect_timeout)}",
-        "-p", str(int(port)),
+        "-o",
+        "StrictHostKeyChecking=no",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        f"ConnectTimeout={int(connect_timeout)}",
+        "-p",
+        str(int(port)),
         f"{username}@{host}",
         command,
     ]
@@ -305,7 +328,7 @@ async def scan_remote_for_repos(
         safe_roots = " ".join(_shell_quote(r) for r in roots)
         cmd_str = (
             f"timeout {int(budget_seconds)} sh -c "
-            f"\"find {safe_roots} -maxdepth {int(max_depth)} -type f -name config "
+            f'"find {safe_roots} -maxdepth {int(max_depth)} -type f -name config '
             f"-not -path '*/data/*' -printf '%h\\n' 2>/dev/null | sort -u\""
         )
 
@@ -335,7 +358,8 @@ async def scan_remote_for_repos(
         if proc.returncode not in (0, 124):  # 124 = `timeout` cmd hit its limit
             logger.warning(
                 "remote scan failed rc=%s stderr=%s",
-                proc.returncode, stderr[:200] if stderr else b"",
+                proc.returncode,
+                stderr[:200] if stderr else b"",
             )
             return [], False
 
@@ -351,10 +375,10 @@ async def scan_remote_for_repos(
         paths_arg = " ".join(_shell_quote(p) for p in candidate_paths)
         inspect_cmd = (
             f"for d in {paths_arg}; do "
-            f"  if [ -f \"$d/config\" ] && [ -d \"$d/data\" ]; then "
-            f"    echo \"===PATH=== $d\"; "
-            f"    cat \"$d/config\" 2>/dev/null; "
-            f"    stat -c \"===MTIME=== %Y\" \"$d/config\" 2>/dev/null; "
+            f'  if [ -f "$d/config" ] && [ -d "$d/data" ]; then '
+            f'    echo "===PATH=== $d"; '
+            f'    cat "$d/config" 2>/dev/null; '
+            f'    stat -c "===MTIME=== %Y" "$d/config" 2>/dev/null; '
             f"  fi; "
             f"done"
         )
@@ -405,14 +429,16 @@ def _parse_remote_inspect(blob: str) -> list:
                 sec = parser["repository"]
                 if "id" in sec and "version" in sec:
                     enc = "encrypted" if sec.get("key", "").strip() else "unencrypted"
-                    results.append(FoundRepo(
-                        path=state["path"],
-                        borg_version=int(sec["version"]),
-                        repository_id=sec["id"],
-                        last_modified_ts=state["mtime"],
-                        encryption_guess=enc,
-                        source="remote",
-                    ))
+                    results.append(
+                        FoundRepo(
+                            path=state["path"],
+                            borg_version=int(sec["version"]),
+                            repository_id=sec["id"],
+                            last_modified_ts=state["mtime"],
+                            encryption_guess=enc,
+                            source="remote",
+                        )
+                    )
         except (configparser.Error, ValueError) as exc:
             logger.debug("parse remote config(%s) failed: %s", state["path"], exc)
         state["path"], state["lines"], state["mtime"] = None, [], None
@@ -420,10 +446,10 @@ def _parse_remote_inspect(blob: str) -> list:
     for line in blob.splitlines():
         if line.startswith("===PATH==="):
             flush()
-            state["path"] = line[len("===PATH==="):].strip()
+            state["path"] = line[len("===PATH===") :].strip()
         elif line.startswith("===MTIME==="):
             try:
-                state["mtime"] = float(line[len("===MTIME==="):].strip())
+                state["mtime"] = float(line[len("===MTIME===") :].strip())
             except ValueError:
                 state["mtime"] = None
         else:

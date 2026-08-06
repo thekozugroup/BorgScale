@@ -876,7 +876,9 @@ class TestHomeAssistantDiscoveryPublisher:
         status_topic = "homeassistant/sensor/borg_ui/borg_ui_repo_7_status/config"
         payload = _payload_for_topic(mqtt_service.publish, status_topic)
 
-        assert payload["json_attributes_topic"] == "test-borgscale/repositories/7/status"
+        assert (
+            payload["json_attributes_topic"] == "test-borgscale/repositories/7/status"
+        )
         assert payload["value_template"] == "{{ value_json.status }}"
 
     def test_remove_repository_from_home_assistant(self):

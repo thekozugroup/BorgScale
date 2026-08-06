@@ -35,7 +35,9 @@ class TestParseArchiveItems:
                 json.dumps({"path": "/docs/", "type": "d", "mtime": "t"}),
                 "not-json",
                 "",
-                json.dumps({"path": "docs/a.txt", "type": "f", "size": 4, "mtime": "t"}),
+                json.dumps(
+                    {"path": "docs/a.txt", "type": "f", "size": 4, "mtime": "t"}
+                ),
                 json.dumps({"path": "", "type": "f", "size": 4, "mtime": "t"}),
             ]
         )

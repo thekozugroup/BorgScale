@@ -1,4 +1,5 @@
 """Endpoint-level tests for /api/ssh-keys/manual-pair/*"""
+
 from unittest.mock import AsyncMock, patch
 
 import pytest

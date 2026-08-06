@@ -3,12 +3,12 @@
 Uses respx to default-deny every outbound httpx call. Any unmocked
 httpx request fails the test with the offending URL captured.
 """
+
 from __future__ import annotations
 
 import importlib
 import pkgutil
 
-import pytest
 import respx
 from fastapi.testclient import TestClient
 

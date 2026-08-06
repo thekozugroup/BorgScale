@@ -44,7 +44,9 @@ class TestCurrentPlan:
 @pytest.mark.unit
 class TestNothingIsGated:
     def test_every_feature_is_available_on_community(self):
-        assert FEATURES, "feature map should not be empty; /api/system/info publishes it"
+        assert FEATURES, (
+            "feature map should not be empty; /api/system/info publishes it"
+        )
         assert set(FEATURES.values()) == {Plan.COMMUNITY}
 
     def test_borg_v2_is_not_gated(self):

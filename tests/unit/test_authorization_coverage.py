@@ -83,7 +83,9 @@ def _fill(path: str) -> str:
         start = filled.index("{")
         end = filled.index("}", start)
         name = filled[start + 1 : end].split(":")[0]
-        filled = filled[:start] + str(PARAM_VALUES.get(name, MISSING_ID)) + filled[end + 1 :]
+        filled = (
+            filled[:start] + str(PARAM_VALUES.get(name, MISSING_ID)) + filled[end + 1 :]
+        )
     return filled
 
 

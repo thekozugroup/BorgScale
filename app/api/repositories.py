@@ -2353,11 +2353,9 @@ async def check_repository(
             repository,
             CheckJob,
             error_key="backend.errors.repo.checkAlreadyRunning",
-            dispatcher=lambda job,
-            router_repo=SimpleNamespace(
-                id=repository.id,
-                borg_version=repository.borg_version,
-            ): BorgRouter(router_repo).check(job.id),
+            dispatcher=lambda job, router_repo=SimpleNamespace(id=repository.id, borg_version=repository.borg_version): (
+                BorgRouter(router_repo).check(job.id)
+            ),
             extra_fields={"max_duration": max_duration},
         )
 
@@ -2398,11 +2396,9 @@ async def compact_repository(
             repository,
             CompactJob,
             error_key="backend.errors.repo.compactAlreadyRunning",
-            dispatcher=lambda job,
-            router_repo=SimpleNamespace(
-                id=repository.id,
-                borg_version=repository.borg_version,
-            ): BorgRouter(router_repo).compact(job.id),
+            dispatcher=lambda job, router_repo=SimpleNamespace(id=repository.id, borg_version=repository.borg_version): (
+                BorgRouter(router_repo).compact(job.id)
+            ),
             extra_fields={"scheduled_compact": False},
         )
 
@@ -3522,9 +3518,7 @@ async def _compensate_delete_repo(repo_id: int, db: Session) -> None:
         db.delete(repo)
         db.commit()
     except Exception as exc:
-        logger.warning(
-            "guided_setup rollback failed", repo_id=repo_id, error=str(exc)
-        )
+        logger.warning("guided_setup rollback failed", repo_id=repo_id, error=str(exc))
         try:
             db.rollback()
         except Exception:
@@ -3594,15 +3588,17 @@ async def guided_setup(
 
                     try:
                         result = is_borg_repo(candidate_path)
-                        is_repo = bool(result[0]) if isinstance(result, tuple) else bool(result)
+                        is_repo = (
+                            bool(result[0])
+                            if isinstance(result, tuple)
+                            else bool(result)
+                        )
                     except Exception:
                         is_repo = False
                     if is_repo:
                         raise HTTPException(
                             status_code=409,
-                            detail={
-                                "key": "backend.errors.repo.pathAlreadyBorgRepo"
-                            },
+                            detail={"key": "backend.errors.repo.pathAlreadyBorgRepo"},
                         )
                     raise HTTPException(
                         status_code=409,
@@ -3611,9 +3607,7 @@ async def guided_setup(
 
     # 3. Name uniqueness pre-check
     if (
-        db.query(Repository)
-        .filter(Repository.name == req.repository.name)
-        .first()
+        db.query(Repository).filter(Repository.name == req.repository.name).first()
         is not None
     ):
         raise HTTPException(
@@ -3707,9 +3701,7 @@ async def guided_setup(
         try:
             # Look up the persisted repository to get its canonical path
             # (path normalisation happens inside create_repository).
-            repo_row = (
-                db.query(Repository).filter(Repository.id == repo_id).first()
-            )
+            repo_row = db.query(Repository).filter(Repository.id == repo_id).first()
             backup_target = repo_row.path if repo_row is not None else None
             backup_result = await _start_backup_impl(
                 _BackupRequest(repository=backup_target), current_user, db

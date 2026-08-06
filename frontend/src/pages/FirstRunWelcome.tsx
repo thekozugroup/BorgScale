@@ -50,7 +50,7 @@ export default function FirstRunWelcome() {
     <div className="min-h-[80vh] flex items-center justify-center p-6">
       <div className="w-full max-w-4xl">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-semibold tracking-tight">{t('firstRun.title')}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('firstRun.title')}</h1>
           <p className="mt-2 text-muted-foreground">{t('firstRun.subtitle')}</p>
         </div>
         <div className="grid gap-4 md:grid-cols-3">

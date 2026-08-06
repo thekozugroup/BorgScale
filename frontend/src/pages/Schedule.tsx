@@ -427,9 +427,9 @@ const Schedule: React.FC = () => {
   return (
     <div>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+      <div className="flex flex-col justify-between gap-4 mb-6 lg:flex-row lg:items-center">
         <div>
-          <h1 className="text-2xl font-bold">{t('schedule.title')}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">{t('schedule.title')}</h1>
           <p className="text-sm text-muted-foreground">{t('schedule.subtitle')}</p>
         </div>
 

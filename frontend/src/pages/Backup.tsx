@@ -186,10 +186,10 @@ const Backup: React.FC = () => {
   return (
     <div>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4 mb-8">
+      <div className="flex flex-col justify-between gap-4 mb-8 lg:flex-row lg:items-start">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <h1 className="text-2xl font-bold">{t('backup.title')}</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">{t('backup.title')}</h1>
             {repositoriesData?.data?.repositories?.some(
               (repo: Repository) => !getRepoCapabilities(repo).canBackup
             ) &&

@@ -10,7 +10,21 @@ from sqlalchemy.orm import sessionmaker
 # Import app lazily to avoid initialization issues
 from app.database.database import Base, get_db
 from app.database.models import User
+from functools import lru_cache
+
 from app.core.security import get_password_hash, create_access_token
+
+
+@lru_cache(maxsize=None)
+def cached_password_hash(password: str) -> str:
+    """bcrypt a fixture password once per session instead of once per test.
+
+    These fixtures are function-scoped and requested by hundreds of tests, and
+    a single hash costs ~270ms — roughly a third of the suite's runtime spent
+    deriving keys that verify nothing. Hashing itself is covered by
+    tests/unit/test_security.py; here the hash only has to be valid and stable.
+    """
+    return get_password_hash(password)
 
 
 @pytest.fixture(scope="function")
@@ -112,7 +126,7 @@ def test_user(test_db):
     """Create a test user in the database"""
     user = User(
         username="testuser",
-        password_hash=get_password_hash("testpass123"),
+        password_hash=cached_password_hash("testpass123"),
         is_active=True,
         role="viewer",
     )
@@ -127,7 +141,7 @@ def admin_user(test_db):
     """Create an admin user in the database"""
     user = User(
         username="admin",
-        password_hash=get_password_hash("admin123"),
+        password_hash=cached_password_hash("admin123"),
         is_active=True,
         role="admin",
     )
@@ -166,7 +180,7 @@ def operator_user(test_db):
     """Create an operator user in the database"""
     user = User(
         username="operator",
-        password_hash=get_password_hash("operator123"),
+        password_hash=cached_password_hash("operator123"),
         is_active=True,
         role="operator",
     )
