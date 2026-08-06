@@ -27,6 +27,23 @@ export default defineConfig({
   },
   build: {
     outDir: 'build',
-    sourcemap: true,
+    // Source maps are ~7 MB and are shipped with the container image. The code
+    // is AGPL and published, so they add weight without adding disclosure.
+    // Set VITE_SOURCEMAP=true when you need to debug a production build.
+    sourcemap: process.env.VITE_SOURCEMAP === 'true',
+    rollupOptions: {
+      output: {
+        // Split rarely-changing vendor code out of the app chunk so a release
+        // does not invalidate the browser cache for the whole framework, and so
+        // the heavy editor/chart libraries only download on pages that use them.
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          query: ['@tanstack/react-query', 'axios'],
+          charts: ['recharts'],
+          editor: ['@monaco-editor/react'],
+          i18n: ['i18next', 'react-i18next'],
+        },
+      },
+    },
   },
-}) 
+})

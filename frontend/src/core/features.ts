@@ -1,17 +1,15 @@
 export type Plan = 'community' | 'pro' | 'enterprise'
 
-const PLAN_RANK: Record<Plan, number> = {
-  community: 0,
-  pro: 1,
-  enterprise: 2,
-}
-
-// Mirror of app/core/features.py - keep in sync when adding features
+// Mirror of app/core/features.py — keep in sync when adding features.
+//
+// BorgScale is AGPL-3.0 and runs unrestricted: every feature is available on
+// every instance. The `Plan` union and this map survive only because
+// /api/system/info publishes them and announcement targeting deserializes them.
 export const FEATURES = {
-  borg_v2: 'pro',
+  borg_v2: 'community',
   multi_user: 'community',
-  extra_users: 'pro',
-  rbac: 'enterprise',
+  extra_users: 'community',
+  rbac: 'community',
 } as const satisfies Record<string, Plan>
 
 export type Feature = keyof typeof FEATURES
@@ -22,11 +20,10 @@ export const PLAN_LABEL: Record<Plan, string> = {
   enterprise: 'Enterprise',
 }
 
-
-export function planIncludes(current: Plan, required: Plan): boolean {
-  return PLAN_RANK[current] >= PLAN_RANK[required]
+export function planIncludes(_current: Plan, _required: Plan): boolean {
+  return true
 }
 
-export function canAccess(plan: Plan, feature: Feature): boolean {
-  return planIncludes(plan, FEATURES[feature])
+export function canAccess(_plan: Plan, _feature: Feature): boolean {
+  return true
 }

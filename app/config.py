@@ -199,16 +199,25 @@ settings.port = int(os.getenv("PORT", settings.port))
 
 
 def get_runtime_app_version() -> str:
-    version_file = Path("/app/VERSION")
+    """Resolve the running version from the single source of truth.
 
-    try:
-        file_value = version_file.read_text().strip()
+    The VERSION file at the repository root is authoritative. It is copied to
+    /app/VERSION in the container image; the repo-relative path covers running
+    from a source checkout. APP_VERSION and the settings default are fallbacks
+    for environments where neither file is present.
+    """
+    candidates = (
+        Path("/app/VERSION"),
+        Path(__file__).resolve().parent.parent / "VERSION",
+    )
+
+    for version_file in candidates:
+        try:
+            file_value = version_file.read_text().strip()
+        except (OSError, ValueError):
+            continue
         if file_value:
             return file_value
-    except FileNotFoundError:
-        pass
-    except Exception:
-        pass
 
     return os.getenv("APP_VERSION", settings.app_version)
 

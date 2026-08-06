@@ -20,11 +20,17 @@ services:
     container_name: borg-web-ui
     restart: unless-stopped
 
-    # Privileged mode: Required ONLY for remote-to-remote backups via SSHFS
-    # This allows mounting remote SSH locations as local filesystems
-    # If you only use local or direct SSH backups, you can disable this
-    # See: docs/installation.md for details
-    privileged: true
+    # FUSE access, required for `borg mount` and for remote-to-remote backups
+    # via SSHFS. This is the least-privilege equivalent of `privileged: true`:
+    # it grants the mount syscall and /dev/fuse, and nothing else.
+    # If you never mount archives or use remote-to-remote backups, you can
+    # delete all three keys below. See docs/installation.md for details.
+    cap_add:
+      - SYS_ADMIN
+    devices:
+      - /dev/fuse
+    security_opt:
+      - apparmor:unconfined
 
     ports:
       - "${PORT:-8081}:${PORT:-8081}"
@@ -56,10 +62,12 @@ services:
       # - /home/user:/home:rw
       # (also set: LOCAL_MOUNT_POINTS=/disk1,/home)
 
-      # Optional: Docker container management in backup scripts
-      # Required for stopping/starting containers during backups
+      # Optional: Docker container management in backup scripts.
+      # Required only for stopping/starting containers during backups.
+      # ⚠️ Access to the Docker socket is equivalent to root on the host.
+      # Leave this commented out unless you actually use Docker hooks.
       # See: docs/docker-hooks.md
-      - /var/run/docker.sock:/var/run/docker.sock:rw
+      # - /var/run/docker.sock:/var/run/docker.sock:rw
 
     environment:
       # Core settings (optional, all have defaults)
@@ -104,7 +112,7 @@ services:
       # Redis cache settings (for 600x faster archive browsing)
       # ⚙️ Configure via Settings → Cache tab in UI (recommended)
       # Environment variables below set initial defaults only
-      # See: https://karanhudia.github.io/borgscale/cache
+      # See: docs/cache.md
 
       # Local Redis connection (uses redis service below)
       - REDIS_HOST=redis
@@ -121,12 +129,10 @@ services:
       # Disable authentication
       # - DISABLE_AUTHENTICATION=true
 
-      # Licensing / activation
-      - ACTIVATION_SERVICE_URL=${ACTIVATION_SERVICE_URL:-https://github.com/thekozugroup/BorgScale
-      - ACTIVATION_TIMEOUT_SECONDS=${ACTIVATION_TIMEOUT_SECONDS:-10}
-      - ENABLE_STARTUP_LICENSE_SYNC=${ENABLE_STARTUP_LICENSE_SYNC:-true}
     healthcheck:
-      test: ["CMD", "sh", "-c", "curl -f http://localhost:$${PORT:-8081}/"]
+      # /health/ready verifies the database and borg binary, not just that a
+      # socket is listening. Use /health for a plain liveness probe.
+      test: ["CMD", "sh", "-c", "curl -fsS http://localhost:$${PORT:-8081}/health/ready"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -151,8 +157,10 @@ services:
       --save ""
       --appendonly no
 
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
+    # Redis is reached by the app over the internal compose network only.
+    # Uncomment to expose it on the host (binds to loopback, not 0.0.0.0).
+    # ports:
+    #   - "127.0.0.1:${REDIS_PORT:-6379}:6379"
 
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]

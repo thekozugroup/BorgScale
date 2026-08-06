@@ -1,21 +1,28 @@
+import { lazy, Suspense } from 'react'
 import { ShieldAlert, AlertTriangle } from 'lucide-react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './hooks/useAuth.tsx'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
-import Dashboard from './pages/DashboardV3'
-import FirstRunWelcome from './pages/FirstRunWelcome'
-import GuidedSetup from './pages/GuidedSetup'
 import { useFirstRun } from './hooks/useFirstRun'
-import Backup from './pages/Backup'
-import Archives from './pages/Archives'
-import Schedule from './pages/Schedule'
-import Repositories from './pages/Repositories'
-import SSHConnectionsSingleKey from './pages/SSHConnectionsSingleKey'
-import Activity from './pages/Activity'
-import Settings from './pages/Settings'
 import AuthLayout from './components/AuthLayout'
+import NotFound from './pages/NotFound'
+import PageLoader from './components/PageLoader'
+
+// Route-level code splitting. Login stays eager because it is the first paint
+// for a signed-out visitor; every other page arrives as its own chunk so the
+// initial download is a fraction of the app.
+const Dashboard = lazy(() => import('./pages/DashboardV3'))
+const FirstRunWelcome = lazy(() => import('./pages/FirstRunWelcome'))
+const GuidedSetup = lazy(() => import('./pages/GuidedSetup'))
+const Backup = lazy(() => import('./pages/Backup'))
+const Archives = lazy(() => import('./pages/Archives'))
+const Schedule = lazy(() => import('./pages/Schedule'))
+const Repositories = lazy(() => import('./pages/Repositories'))
+const SSHConnectionsSingleKey = lazy(() => import('./pages/SSHConnectionsSingleKey'))
+const Activity = lazy(() => import('./pages/Activity'))
+const Settings = lazy(() => import('./pages/Settings'))
 
 function DashboardOrWelcome() {
   const { showWelcome } = useFirstRun()
@@ -58,7 +65,7 @@ function App() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary-600 border-t-transparent"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-2 border-primary border-t-transparent"></div>
       </div>
     )
   }
@@ -132,62 +139,65 @@ function App() {
 
   return (
     <Layout>
-      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        {insecureNoAuthEnabled ? (
-          <Route path="/login" element={<Navigate to="/dashboard" replace />} />
-        ) : null}
-        <Route path="/dashboard" element={<DashboardOrWelcome />} />
-        <Route path="/welcome" element={<FirstRunWelcome />} />
-        <Route path="/guided-setup" element={<GuidedSetup />} />
-        <Route
-          path="/backup"
-          element={
-            <ProtectedRoute requiredTab="backups">
-              <Backup />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/archives"
-          element={
-            <ProtectedRoute requiredTab="archives">
-              <Archives />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/restore" element={<Navigate to="/archives" replace />} />
-        <Route
-          path="/schedule/*"
-          element={
-            <ProtectedRoute requiredTab="schedule">
-              <Schedule />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/repositories"
-          element={
-            <ProtectedRoute requiredTab="repositories">
-              <Repositories />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/ssh-connections"
-          element={
-            <ProtectedRoute requiredTab="connections">
-              <SSHConnectionsSingleKey />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/ssh-keys" element={<Navigate to="/ssh-connections" replace />} />
-        <Route path="/connections" element={<Navigate to="/ssh-connections" replace />} />
-        <Route path="/scripts" element={<Navigate to="/settings/scripts" replace />} />
-        <Route path="/activity" element={<Activity />} />
-        <Route path="/settings" element={<Navigate to="/settings/account" replace />} />
-        <Route path="/settings/:tab" element={<Settings />} />
-      </Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          {insecureNoAuthEnabled ? (
+            <Route path="/login" element={<Navigate to="/dashboard" replace />} />
+          ) : null}
+          <Route path="/dashboard" element={<DashboardOrWelcome />} />
+          <Route path="/welcome" element={<FirstRunWelcome />} />
+          <Route path="/guided-setup" element={<GuidedSetup />} />
+          <Route
+            path="/backup"
+            element={
+              <ProtectedRoute requiredTab="backups">
+                <Backup />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/archives"
+            element={
+              <ProtectedRoute requiredTab="archives">
+                <Archives />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/restore" element={<Navigate to="/archives" replace />} />
+          <Route
+            path="/schedule/*"
+            element={
+              <ProtectedRoute requiredTab="schedule">
+                <Schedule />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/repositories"
+            element={
+              <ProtectedRoute requiredTab="repositories">
+                <Repositories />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ssh-connections"
+            element={
+              <ProtectedRoute requiredTab="connections">
+                <SSHConnectionsSingleKey />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/ssh-keys" element={<Navigate to="/ssh-connections" replace />} />
+          <Route path="/connections" element={<Navigate to="/ssh-connections" replace />} />
+          <Route path="/scripts" element={<Navigate to="/settings/scripts" replace />} />
+          <Route path="/activity" element={<Activity />} />
+          <Route path="/settings" element={<Navigate to="/settings/account" replace />} />
+          <Route path="/settings/:tab" element={<Settings />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
     </Layout>
   )
 }

@@ -38,7 +38,6 @@ from app.core.security import get_current_user, check_repo_access, decrypt_secre
 from app.core.borg import BorgInterface
 from app.core.borg_router import BorgRouter
 from app.core.borg_errors import is_lock_error
-from app.core.features import FEATURES, get_current_plan, plan_includes
 from app.config import settings
 from app.services.mqtt_service import mqtt_service
 from app.services.repository_command_lock import run_serialized_repository_command
@@ -750,18 +749,12 @@ def _uses_borg2_payload(data: Union[RepositoryCreate, RepositoryImport]) -> bool
 
 
 def _require_borg2_feature(db: Session) -> None:
-    current_plan = get_current_plan(db)
-    required = FEATURES["borg_v2"]
-    if not plan_includes(current_plan, required):
-        raise HTTPException(
-            status_code=403,
-            detail={
-                "key": "backend.errors.plan.featureNotAvailable",
-                "feature": "borg_v2",
-                "required": required.value,
-                "current": current_plan.value,
-            },
-        )
+    """No-op. Borg 2 support is available to every BorgScale instance.
+
+    Kept as a seam so the v2 creation paths keep a single place to add a real
+    precondition (for example, "borg2 binary present") if one is ever needed.
+    """
+    return None
 
 
 @router.get("/")

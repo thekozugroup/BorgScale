@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import asyncio
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, HTMLResponse
@@ -157,14 +160,25 @@ logger = structlog.get_logger()
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    await _run_startup()
+    try:
+        yield
+    finally:
+        await _run_shutdown()
+
+
 # Create FastAPI app
 app = FastAPI(
     title="BorgScale",
     description="A lightweight web interface for Borg backup management",
-    version="2.0.0",
+    version=get_runtime_app_version(),
     docs_url="/api/docs",
     redoc_url="/api/redoc",
     root_path=BASE_PATH if BASE_PATH else None,
+    lifespan=lifespan,
 )
 
 # Configure CORS
@@ -220,8 +234,7 @@ app.include_router(v2_router, prefix="/api/v2")  # Borg 2 versioned API
 app.include_router(about_routes.router, prefix="/api", tags=["about"])
 
 
-@app.on_event("startup")
-async def startup_event():
+async def _run_startup() -> None:
     """Initialize application on startup"""
     logger.info("Starting BorgScale")
     _log_insecure_no_auth_warning()
@@ -385,8 +398,7 @@ async def startup_event():
     logger.info("BorgScale started successfully")
 
 
-@app.on_event("shutdown")
-async def shutdown_event():
+async def _run_shutdown() -> None:
     """Cleanup on application shutdown"""
     logger.info("Shutting down BorgScale")
 
@@ -404,14 +416,15 @@ async def shutdown_event():
         except Exception as e:
             logger.warning("Error waiting for background tasks to cancel", error=str(e))
 
-        # Cleanup MQTT service on shutdown
-        from app.services.mqtt_service import mqtt_service
+    # Cleanup MQTT service on shutdown. This runs whether or not any background
+    # task was registered, because configure() may have connected during startup.
+    from app.services.mqtt_service import mqtt_service
 
-        try:
-            mqtt_service.disconnect()
-            logger.info("MQTT service disconnected")
-        except Exception as e:
-            logger.warning("Error disconnecting MQTT service", error=str(e))
+    try:
+        mqtt_service.disconnect()
+        logger.info("MQTT service disconnected")
+    except Exception as e:
+        logger.warning("Error disconnecting MQTT service", error=str(e))
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -422,6 +435,66 @@ async def root():
     return HTMLResponse(
         content="<h1>BorgScale</h1><p>Frontend not built yet. Please run the build process.</p>"
     )
+
+
+# NOTE: every non-SPA route must be declared ABOVE the catch-all below. Starlette
+# matches routes in registration order, so `/{full_path:path}` swallows anything
+# registered after it and silently serves index.html instead.
+
+
+@app.get("/health", tags=["Health"])
+async def health_check():
+    """Liveness probe. Answers as soon as the process can serve requests."""
+    return {"status": "healthy", "service": "borgscale"}
+
+
+@app.get("/health/ready", tags=["Health"])
+async def readiness_check():
+    """Readiness probe.
+
+    Verifies the dependencies BorgScale cannot work without: the database is
+    reachable and the borg binary is usable. Returns 503 when either is
+    unavailable so orchestrators stop routing traffic to a broken instance.
+    """
+    from sqlalchemy import text
+
+    checks: dict[str, str] = {}
+    healthy = True
+
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+        checks["database"] = "ok"
+    except Exception as e:
+        checks["database"] = f"error: {e}"
+        healthy = False
+
+    try:
+        from app.core.borg import borg
+
+        info = await borg.get_system_info()
+        checks["borg"] = info.get("borg_version") or "ok"
+    except Exception as e:
+        checks["borg"] = f"error: {e}"
+        healthy = False
+
+    body = {
+        "status": "ready" if healthy else "not_ready",
+        "version": get_runtime_app_version(),
+        "checks": checks,
+    }
+    return JSONResponse(content=body, status_code=200 if healthy else 503)
+
+
+@app.get("/api", tags=["Health"])
+async def api_info():
+    """API information endpoint"""
+    return {
+        "name": "BorgScale API",
+        "version": get_runtime_app_version(),
+        "docs": "/api/docs",
+        "status": "running",
+    }
 
 
 @app.get("/{full_path:path}", response_class=HTMLResponse)
@@ -448,23 +521,6 @@ async def catch_all(full_path: str):
     return HTMLResponse(
         content="<h1>BorgScale</h1><p>Frontend not built yet. Please run the build process.</p>"
     )
-
-
-@app.get("/health")
-async def health_check():
-    """Health check endpoint for container orchestration and startup scripts"""
-    return {"status": "healthy", "service": "borg-web-ui"}
-
-
-@app.get("/api")
-async def api_info():
-    """API information endpoint"""
-    return {
-        "name": "BorgScale API",
-        "version": get_runtime_app_version(),
-        "docs": "/api/docs",
-        "status": "running",
-    }
 
 
 @app.middleware("http")

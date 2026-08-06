@@ -13,7 +13,6 @@ from app.core.security import (
     get_password_hash,
     verify_password,
 )
-from app.core.features import get_current_plan, USER_LIMITS
 from app.core.permissions import (
     default_repository_role_for_global_role,
     normalize_repository_role_for_global_role,
@@ -751,19 +750,7 @@ async def create_user(
 ):
     """Create a new user (admin only)"""
     try:
-        # Check user limit by plan
-        current_plan = get_current_plan(db)
-        user_count = db.query(User).count()
-        limit = USER_LIMITS[current_plan]
-        if limit is not None and user_count >= limit:
-            raise HTTPException(
-                status_code=403,
-                detail={
-                    "key": "backend.errors.plan.userLimitReached",
-                    "current": current_plan.value,
-                    "limit": limit,
-                },
-            )
+        # BorgScale places no cap on the number of users.
 
         # Check if username already exists
         existing_user = (

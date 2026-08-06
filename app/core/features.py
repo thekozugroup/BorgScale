@@ -2,64 +2,42 @@ from __future__ import annotations
 
 from enum import Enum
 from typing import Optional
-from fastapi import Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from app.database.database import get_db
-from app.services.licensing_service import get_effective_plan_value
 
 
 class Plan(str, Enum):
+    """Retained so the /api/system/info contract keeps a stable `plan` field.
+
+    BorgScale is AGPL-3.0 and runs unrestricted: every instance is COMMUNITY and
+    every feature is available. The other members exist only so older clients
+    and stored announcement targeting rules still deserialize.
+    """
+
     COMMUNITY = "community"
     PRO = "pro"
     ENTERPRISE = "enterprise"
 
 
-_RANK = {Plan.COMMUNITY: 0, Plan.PRO: 1, Plan.ENTERPRISE: 2}
-
-# Single source of truth: feature name → minimum plan required
-# BorgScale runs unrestricted: all features available on community plan.
+# Every feature is available on every plan. Kept as an explicit mapping because
+# /api/system/info publishes it and the frontend renders capability hints from it.
 FEATURES: dict[str, Plan] = {
     "borg_v2": Plan.COMMUNITY,
     "multi_user": Plan.COMMUNITY,
     "extra_users": Plan.COMMUNITY,
-    "rbac": Plan.ENTERPRISE,  # intentionally kept to preserve test coverage of gate logic
+    "rbac": Plan.COMMUNITY,
 }
 
-# User limits per plan (None = unlimited)
+# No plan caps the number of users.
 USER_LIMITS: dict[Plan, Optional[int]] = {
-    Plan.COMMUNITY: 5,
-    Plan.PRO: 10,
+    Plan.COMMUNITY: None,
+    Plan.PRO: None,
     Plan.ENTERPRISE: None,
 }
 
 
 def plan_includes(current: Plan, required: Plan) -> bool:
-    return _RANK[current] >= _RANK[required]
+    """Always true. BorgScale gates nothing behind a plan."""
+    return True
 
 
-def get_current_plan(db: Session) -> Plan:
-    return Plan(get_effective_plan_value(db))
-
-
-def require_feature(feature: str):
-    """FastAPI dependency factory. Usage: dependencies=[require_feature("borg_v2")]"""
-
-    def _check(db: Session = Depends(get_db)):
-        current = get_current_plan(db)
-        required = FEATURES.get(feature)
-        if required is None:
-            raise ValueError(
-                f"Unknown feature: {feature!r}. Valid features: {list(FEATURES)}"
-            )
-        if not plan_includes(current, required):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail={
-                    "key": "backend.errors.plan.featureNotAvailable",
-                    "feature": feature,
-                    "required": required.value,
-                    "current": current.value,
-                },
-            )
-
-    return Depends(_check)
+def get_current_plan(db=None) -> Plan:
+    return Plan.COMMUNITY

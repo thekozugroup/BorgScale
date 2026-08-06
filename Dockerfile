@@ -1,5 +1,32 @@
 ARG BASE_IMAGE=docker.io/ainullcode/borgscale-runtime-base:runtime-borg1-1.4.4-borg2-2.0.0b21-r1
 
+# Selects where the production stage gets its static frontend assets from.
+#   frontend-builder  (default) — build the frontend inside Docker. This is what
+#                      `docker compose up --build` uses, so a clean checkout of
+#                      the repository builds end-to-end with no prior steps.
+#   frontend-prebuilt — reuse assets already built into docker/frontend-build-output/.
+#                      CI uses this so the same bundle is shared across architectures
+#                      instead of being rebuilt once per arch under emulation.
+ARG FRONTEND_STAGE=frontend-builder
+
+# Build stage for the frontend. Pinned to the build platform so cross-arch
+# images do not pay for an emulated Node build.
+FROM --platform=$BUILDPLATFORM node:22-alpine AS frontend-builder
+WORKDIR /frontend
+# Dependency manifests first so the install layer caches independently of source.
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY frontend/ ./
+RUN npm run build && test -f build/index.html
+
+# CI fast path: assets built once outside Docker and copied into the context.
+# BuildKit skips this stage entirely unless FRONTEND_STAGE selects it.
+FROM scratch AS frontend-prebuilt
+COPY docker/frontend-build-output/ /frontend/build/
+
+# Resolves to whichever of the two stages above was selected.
+FROM ${FRONTEND_STAGE} AS frontend-assets
+
 # Build stage for backend
 FROM python:3.10-slim AS backend-builder
 WORKDIR /app
@@ -50,8 +77,6 @@ ENV DATABASE_URL=sqlite:////data/borg.db
 ENV BORG_BACKUP_PATH=/backups
 ENV ENABLE_CRON_BACKUPS=false
 ENV PORT=8081
-ENV ACTIVATION_SERVICE_URL=https://github.com/thekozugroup/BorgScale
-ENV ENABLE_STARTUP_LICENSE_SYNC=true
 
 EXPOSE 8081
 
@@ -81,9 +106,9 @@ WORKDIR /app
 COPY --from=backend-builder /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
 COPY --from=backend-builder /usr/local/bin /usr/local/bin
 
-# Frontend assets are prepared outside Docker in CI and copied into the
-# build context to avoid rebuilding the same static bundle per architecture.
-COPY docker/frontend-build-output/ ./app/static/
+# Static frontend bundle. See the FRONTEND_STAGE arg at the top of this file
+# for how this resolves to either an in-Docker build or CI's prebuilt assets.
+COPY --from=frontend-assets /frontend/build/ ./app/static/
 
 # Copy application code
 COPY app/ ./app/
@@ -112,15 +137,15 @@ ENV DATABASE_URL=sqlite:////data/borg.db
 ENV BORG_BACKUP_PATH=/backups
 ENV ENABLE_CRON_BACKUPS=false
 ENV PORT=8081
-ENV ACTIVATION_SERVICE_URL=https://github.com/thekozugroup/BorgScale
-ENV ENABLE_STARTUP_LICENSE_SYNC=true
 
 # Expose port
 EXPOSE 8081
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-8081}/ || exit 1
+# Health check. /health/ready verifies the database and the borg binary, so a
+# container that boots but cannot actually run backups is reported unhealthy.
+# The start period covers migrations on first boot of a large existing database.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -fsS http://localhost:${PORT:-8081}/health/ready || exit 1
 
 # Use entrypoint that handles UID/GID changes
 ENTRYPOINT ["/entrypoint.sh"]

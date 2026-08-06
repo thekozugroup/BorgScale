@@ -1,10 +1,6 @@
 from fastapi import APIRouter
 
-try:
-    from app import __version__ as APP_VERSION  # type: ignore[attr-defined]
-except Exception:
-    APP_VERSION = "0.1.0"
-
+from app.config import get_runtime_app_version
 
 router = APIRouter()
 
@@ -18,7 +14,7 @@ def about() -> dict:
     """
     return {
         "name": "BorgScale",
-        "version": APP_VERSION,
+        "version": get_runtime_app_version(),
         "source": "https://github.com/thekozugroup/BorgScale",
         "license": "AGPL-3.0",
         "license_url": "https://www.gnu.org/licenses/agpl-3.0.html",
