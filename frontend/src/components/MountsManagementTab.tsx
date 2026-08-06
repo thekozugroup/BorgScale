@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import { getApiErrorDetail } from '../utils/apiErrors'
 import { translateBackendKey } from '../utils/translateBackendKey'
 import { formatDate } from '../utils/dateUtils'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { useAuth } from '../hooks/useAuth'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -167,7 +166,6 @@ function MountCard({
 export default function MountsManagementTab() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const { track, EventCategory, EventAction } = useAnalytics()
   const { hasGlobalPermission } = useAuth()
   const canManageMounts = hasGlobalPermission('settings.mounts.manage')
 
@@ -198,9 +196,6 @@ export default function MountsManagementTab() {
   const mounts: Mount[] = mountsData || []
 
   const handleUnmount = (mountId: string, force: boolean = false) => {
-    track(EventCategory.MOUNT, force ? EventAction.DELETE : EventAction.UNMOUNT, {
-      operation: force ? 'force_unmount' : 'unmount',
-    })
     unmountMutation.mutate({ mountId, force })
   }
 
@@ -209,7 +204,6 @@ export default function MountsManagementTab() {
     const command = `docker exec -it ${containerName} bash -c "cd ${mount.mount_point} && bash"`
     navigator.clipboard.writeText(command)
     toast.success(t('mounts.copiedToClipboard', { label: t('mounts.actions.accessCommand') }))
-    track(EventCategory.MOUNT, EventAction.VIEW, { operation: 'copy_access_command' })
   }
 
   if (!canManageMounts) {

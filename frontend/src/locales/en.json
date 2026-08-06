@@ -181,7 +181,6 @@
     "overline": "First login",
     "title": "Set a new password or continue",
     "description": "You can set a new password now or skip this step and continue to the dashboard.",
-    "flowHint": "After this step, BorgScale will continue with passkeys, analytics consent, and any active announcements.",
     "skipHint": "You can skip for now and change it later from account settings.",
     "skip": "Skip for now"
   },
@@ -212,7 +211,6 @@
       "appearance": "Appearance",
       "notifications": "Notifications",
       "preferences": "Preferences",
-      "licensing": "Licensing",
       "systemLabel": "System",
       "mqtt": "MQTT",
       "cache": "Cache",
@@ -227,14 +225,14 @@
     "menu": {
       "accountAndSecurityDesc": "Profile, password, 2FA, passkeys",
       "appearanceDesc": "Theme, language",
-      "notificationsDesc": "Alerts & preferences"
+      "notificationsDesc": "Alerts & preferences",
+      "openSourceDesc": "Free and open source (AGPL-3.0)"
     },
     "versionInfo": "Version Info",
     "app": "App:",
     "loading": "Loading...",
     "welcome": "Welcome,",
-    "logout": "Logout",
-    "yourPlan": "Your Plan"
+    "logout": "Logout"
   },
   "status": {
     "completed": "Completed",
@@ -1800,17 +1798,11 @@
     "save": "Save Preferences",
     "saving": "Saving...",
     "updatedSuccessfully": "Preferences updated successfully",
-    "analyticsTitle": "Anonymous Usage Analytics",
-    "analyticsDescription": "Help us improve BorgScale by sharing anonymous usage data. We collect page views, feature clicks, and browser type, without tracking IP addresses, hostnames, cookies, or any personally identifiable information.",
-    "enableAnalytics": "Enable analytics",
     "languageTitle": "Language",
     "languageDescription": "Choose the interface language",
     "languageLabel": "Interface Language",
     "languageSaved": "Language updated successfully",
-    "updateFailed": "Failed to update preferences",
-    "analyticsTransparencyBold": "Full Transparency:",
-    "analyticsTransparencyLink": "View our analytics dashboard publicly",
-    "analyticsTransparencyAfterLink": "to see exactly what we collect. Anonymous and privacy-focused."
+    "updateFailed": "Failed to update preferences"
   },
   "betaFeatures": {
     "title": "Beta Features",
@@ -2071,19 +2063,6 @@
     "eta": "ETA:",
     "currentFile": "Current File:",
     "duration": "Duration:"
-  },
-  "analyticsConsent": {
-    "title": "Help Improve BorgScale",
-    "message": "We collect anonymous usage data to understand how BorgScale is used and make it better. No personal information, IP addresses, hostnames, or backup data is ever collected.",
-    "accept": "Accept",
-    "decline": "Decline",
-    "learnMore": "Learn more",
-    "viewDashboard": "View our public analytics dashboard",
-    "viewDashboardSuffix": "to see exactly what we collect.",
-    "enableToggle": "Enable anonymous analytics",
-    "continue": "Continue",
-    "saving": "Saving...",
-    "changeAnytime": "You can change this anytime in Settings → Preferences"
   },
   "lastRestoreSection": {
     "title": "Last Restore",
@@ -2940,11 +2919,6 @@
     "failedToDownloadKeyfile": "Failed to download keyfile",
     "noArchivesDescription": "This repository has been initialized but contains no archives. Storage statistics will appear here after you create your first backup.",
     "failedToLoad": "Failed to load repository information. Make sure the repository is accessible and properly initialized."
-  },
-  "analyticsBanner": {
-    "viewDashboardLink": "View our public analytics dashboard",
-    "viewDashboardSuffix": "to see exactly what we collect.",
-    "changeAnytimeNote": "You can change this anytime in Settings → Preferences"
   },
   "repositoryScripts": {
     "errors": {

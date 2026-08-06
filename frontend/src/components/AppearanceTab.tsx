@@ -1,14 +1,12 @@
 import { useTranslation } from 'react-i18next'
 import SettingsCard from './SettingsCard'
 import { Moon, Sun, Monitor } from 'lucide-react'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { useTheme } from '../context/ThemeContext'
 import { availableThemes } from '../theme'
 import { cn } from '@/lib/utils'
 
 export default function AppearanceTab() {
   const { t } = useTranslation()
-  const { trackSettings, EventAction } = useAnalytics()
   const { mode, effectiveMode, setTheme } = useTheme()
 
   const appearanceAccent =
@@ -77,11 +75,6 @@ export default function AppearanceTab() {
                   onClick={() => {
                     const theme = themeOption.id as typeof mode
                     setTheme(theme)
-                    trackSettings(EventAction.EDIT, {
-                      section: 'appearance',
-                      setting: 'theme',
-                      theme,
-                    })
                   }}
                   className={cn(
                     'p-3 rounded-2xl border text-left cursor-pointer',

@@ -1,7 +1,7 @@
 # Contributing to BorgScale
 
-Thanks for your interest in BorgScale, the AGPL-3.0 fork of
-`karanhudia/borgscale`.
+Thanks for your interest in BorgScale, the AGPL-3.0 self-hosted web
+UI for BorgBackup.
 
 ## Setup
 
@@ -49,16 +49,3 @@ The following are out-of-scope and will be blocked by the QAQC
 agent: phone-home telemetry, paid-tier scaffolding, license
 activation flows, and "premium feature" gates. Open an issue if
 you think a feature crosses the line.
-
-## Upstream sync
-
-While upstream remains AGPL-3.0:
-
-```bash
-git fetch upstream
-git merge upstream/main         # resolve conflicts manually
-```
-
-After upstream relicenses, do NOT merge any post-relicense commit
-without legal review — the AGPL-protected baseline must remain
-clean.

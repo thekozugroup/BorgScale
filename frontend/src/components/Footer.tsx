@@ -7,7 +7,6 @@ interface AboutPayload {
   source: string
   license: string
   license_url: string
-  upstream: string
 }
 
 /**

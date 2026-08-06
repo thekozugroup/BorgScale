@@ -1,10 +1,9 @@
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { Plus, HardDrive, Upload, Search, Filter } from 'lucide-react'
 import { repositoriesAPI, RepositoryData } from '../services/api'
 import { BorgApiClient } from '../services/borgApi'
@@ -23,7 +22,6 @@ import DiscoveryPicker from '../components/discovery/DiscoveryPicker'
 import { sshKeysAPI } from '../services/api'
 import PruneRepositoryDialog from '../components/PruneRepositoryDialog'
 import RepositoryInfoDialog from '../components/RepositoryInfoDialog'
-import { getJobDurationSeconds } from '../utils/analyticsProperties'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
@@ -103,10 +101,6 @@ export default function Repositories() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const wizardParam = searchParams.get('wizard')
-  const { trackMaintenance, trackRepository, EventAction } = useAnalytics()
-  const maintenanceTrackingRef = useRef<Map<number, { operation: 'Check' | 'Compact' | 'Prune' }>>(
-    new Map()
-  )
 
   // Wizard state
   const [showWizard, setShowWizard] = useState(false)
@@ -138,7 +132,6 @@ export default function Repositories() {
   const [groupBy, setGroupBy] = useState<string>(() => {
     return localStorage.getItem('repos_group') || 'none'
   })
-  const deferredSearchQuery = React.useDeferredValue(searchQuery)
 
   // Queries
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -175,13 +168,11 @@ export default function Repositories() {
   // Mutations
   const deleteRepositoryMutation = useMutation({
     mutationFn: repositoriesAPI.deleteRepository,
-    onSuccess: (_response, repositoryId) => {
+    onSuccess: () => {
       toast.success(t('repositories.toasts.deleted'))
       queryClient.invalidateQueries({ queryKey: ['repositories'] })
       queryClient.invalidateQueries({ queryKey: ['app-repositories'] })
       appState.refetch()
-      const repository = repositories.find((repo: Repository) => repo.id === repositoryId)
-      trackRepository(EventAction.DELETE, repository)
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -200,10 +191,6 @@ export default function Repositories() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSuccess: (_response: any, variables: { repositoryId: number; maxDuration: number }) => {
       toast.success(t('repositories.toasts.checkStarted'))
-      trackMaintenance(EventAction.START, 'Check', checkingRepository || undefined)
-      maintenanceTrackingRef.current.set(variables.repositoryId, {
-        operation: 'Check',
-      })
       setCheckingRepository(null)
       setRepositoriesWithJobs((prev) => new Set(prev).add(variables.repositoryId))
       queryClient.invalidateQueries({ queryKey: ['running-jobs', variables.repositoryId] })
@@ -230,10 +217,6 @@ export default function Repositories() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSuccess: (_response: any, repositoryId: number) => {
       toast.success(t('repositories.toasts.compactStarted'))
-      trackMaintenance(EventAction.START, 'Compact', compactingRepository || undefined)
-      maintenanceTrackingRef.current.set(repositoryId, {
-        operation: 'Compact',
-      })
       setCompactingRepository(null)
       setRepositoriesWithJobs((prev) => new Set(prev).add(repositoryId))
       queryClient.invalidateQueries({ queryKey: ['running-jobs', repositoryId] })
@@ -263,18 +246,8 @@ export default function Repositories() {
       setPruneResults(response.data)
       if (response.data.dry_run) {
         toast.success(t('repositories.toasts.dryRunCompleted'))
-        trackMaintenance(EventAction.COMPLETE, 'Prune', pruningRepository || undefined, {
-          mode: 'dry_run',
-          status: 'completed',
-        })
       } else {
         toast.success(t('repositories.toasts.pruned'))
-        trackMaintenance(EventAction.START, 'Prune', pruningRepository || undefined)
-        if (pruningRepository) {
-          maintenanceTrackingRef.current.set(pruningRepository.id, {
-            operation: 'Prune',
-          })
-        }
         queryClient.invalidateQueries({ queryKey: ['repositories'] })
         queryClient.invalidateQueries({ queryKey: ['repository-archives', pruningRepository?.id] })
       }
@@ -320,37 +293,7 @@ export default function Repositories() {
     }
   }
 
-  const handleJobCompleted = async (repositoryId: number) => {
-    const tracked = maintenanceTrackingRef.current.get(repositoryId)
-    if (tracked) {
-      const repository = repositories.find((repo: Repository) => repo.id === repositoryId)
-      try {
-        const response =
-          tracked.operation === 'Check'
-            ? await repositoriesAPI.getRepositoryCheckJobs(repositoryId, 1)
-            : tracked.operation === 'Compact'
-              ? await repositoriesAPI.getRepositoryCompactJobs(repositoryId, 1)
-              : await repositoriesAPI.getRepositoryPruneJobs(repositoryId, 1)
-        const latestJob = response.data?.jobs?.[0]
-
-        if (latestJob?.status) {
-          const action =
-            latestJob.status === 'completed' || latestJob.status === 'completed_with_warnings'
-              ? EventAction.COMPLETE
-              : EventAction.FAIL
-          trackMaintenance(action, tracked.operation, repository, {
-            job_id: latestJob.id,
-            status: latestJob.status,
-            duration_seconds: getJobDurationSeconds(latestJob.started_at, latestJob.completed_at),
-            error_present: !!latestJob.error_message,
-          })
-        }
-      } catch {
-        // Best-effort analytics should not affect maintenance UX.
-      }
-      maintenanceTrackingRef.current.delete(repositoryId)
-    }
-
+  const handleJobCompleted = (repositoryId: number) => {
     setRepositoriesWithJobs((prev) => {
       const newSet = new Set(prev)
       newSet.delete(repositoryId)
@@ -581,31 +524,6 @@ export default function Repositories() {
     return { groups: groups.length > 0 ? groups : [{ name: null, repositories: sorted }] }
   }, [repositoriesData, searchQuery, sortBy, groupBy, t])
 
-  React.useEffect(() => {
-    const trimmedQuery = deferredSearchQuery.trim()
-    if (!trimmedQuery) return
-
-    const resultCount = processedRepositories.groups.reduce(
-      (total, group) => total + group.repositories.length,
-      0
-    )
-
-    trackRepository(EventAction.SEARCH, undefined, {
-      section: 'repositories',
-      query_length: trimmedQuery.length,
-      result_count: resultCount,
-      sort_by: sortBy,
-      group_by: groupBy,
-    })
-  }, [
-    deferredSearchQuery,
-    groupBy,
-    processedRepositories.groups,
-    sortBy,
-    trackRepository,
-    EventAction,
-  ])
-
   const repositories = repositoriesData?.data?.repositories || []
 
   return (
@@ -726,24 +644,7 @@ export default function Repositories() {
           </div>
 
           {/* Sort By */}
-          <Select
-            value={sortBy}
-            onValueChange={(nextSort) => {
-              setSortBy(nextSort)
-              const resultCount = processedRepositories.groups.reduce(
-                (total, group) => total + group.repositories.length,
-                0
-              )
-              trackRepository(EventAction.FILTER, undefined, {
-                section: 'repositories',
-                filter_kind: 'sort',
-                sort_by: nextSort,
-                group_by: groupBy,
-                query_length: searchQuery.trim().length,
-                result_count: resultCount,
-              })
-            }}
-          >
+          <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger
               className="min-w-[160px] flex-1 text-xs font-semibold"
               aria-label={t('repositories.sort.ariaLabel', 'Sort repositories')}
@@ -765,24 +666,7 @@ export default function Repositories() {
           </Select>
 
           {/* Group By */}
-          <Select
-            value={groupBy}
-            onValueChange={(nextGroup) => {
-              setGroupBy(nextGroup)
-              const resultCount = processedRepositories.groups.reduce(
-                (total, group) => total + group.repositories.length,
-                0
-              )
-              trackRepository(EventAction.FILTER, undefined, {
-                section: 'repositories',
-                filter_kind: 'group',
-                sort_by: sortBy,
-                group_by: nextGroup,
-                query_length: searchQuery.trim().length,
-                result_count: resultCount,
-              })
-            }}
-          >
+          <Select value={groupBy} onValueChange={setGroupBy}>
             <SelectTrigger
               className="min-w-[120px] flex-1 text-xs font-semibold"
               aria-label={t('repositories.group.ariaLabel', 'Group by')}

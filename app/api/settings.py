@@ -95,8 +95,11 @@ class PasswordReset(BaseModel):
 
 
 class UserPreferencesUpdate(BaseModel):
-    analytics_enabled: Optional[bool] = None
-    analytics_consent_given: Optional[bool] = None
+    """Per-user preferences.
+
+    Empty for now. The endpoints remain so clients have a stable place to read
+    and write preferences as they are introduced.
+    """
 
 
 class SystemSettingsUpdate(BaseModel):
@@ -1118,13 +1121,7 @@ async def update_profile(
 @router.get("/preferences")
 async def get_preferences(current_user: User = Depends(get_current_user)):
     """Get current user's preferences"""
-    return {
-        "success": True,
-        "preferences": {
-            "analytics_enabled": False,
-            "analytics_consent_given": False,
-        },
-    }
+    return {"success": True, "preferences": {}}
 
 
 @router.put("/preferences")
@@ -1135,19 +1132,10 @@ async def update_preferences(
 ):
     """Update current user's preferences"""
     try:
-        # BorgScale: analytics fields are accepted for back-compat but ignored.
-        _ = preferences.analytics_enabled
-        _ = preferences.analytics_consent_given
-
         current_user.updated_at = datetime.utcnow()
         db.commit()
 
-        logger.info(
-            "User preferences updated",
-            username=current_user.username,
-            analytics_enabled=preferences.analytics_enabled,
-            analytics_consent_given=preferences.analytics_consent_given,
-        )
+        logger.info("User preferences updated", username=current_user.username)
 
         return {
             "success": True,

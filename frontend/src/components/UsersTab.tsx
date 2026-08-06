@@ -16,7 +16,6 @@ import {
 import { settingsAPI, repositoriesAPI } from '../services/api'
 import { toast } from 'sonner'
 import { useAuth } from '../hooks/useAuth'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { useAuthorization } from '../hooks/useAuthorization'
 import { formatDateShort } from '../utils/dateUtils'
 import { formatRoleLabel, getGlobalRolePresentation } from '../utils/rolePresentation'
@@ -94,7 +93,6 @@ const UsersTab: React.FC = () => {
   const { t } = useTranslation()
   const { hasGlobalPermission } = useAuth()
   const { roleHasGlobalPermission } = useAuthorization()
-  const { trackSettings, EventAction } = useAnalytics()
   const queryClient = useQueryClient()
   const canManageUsers = hasGlobalPermission('settings.users.manage')
 
@@ -154,10 +152,6 @@ const UsersTab: React.FC = () => {
       toast.success(t('settings.toasts.userCreated'))
       queryClient.invalidateQueries({ queryKey: ['users'] })
       setShowCreateUser(false)
-      trackSettings(EventAction.CREATE, {
-        section: 'users',
-        role: userForm.role,
-      })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -175,10 +169,6 @@ const UsersTab: React.FC = () => {
       toast.success(t('settings.toasts.userUpdated'))
       queryClient.invalidateQueries({ queryKey: ['users'] })
       setEditingUser(null)
-      trackSettings(EventAction.EDIT, {
-        section: 'users',
-        role: userForm.role,
-      })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -194,7 +184,6 @@ const UsersTab: React.FC = () => {
       toast.success(t('settings.toasts.userDeleted'))
       queryClient.invalidateQueries({ queryKey: ['users'] })
       setDeleteConfirmUser(null)
-      trackSettings(EventAction.DELETE, { section: 'users' })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -211,7 +200,6 @@ const UsersTab: React.FC = () => {
       toast.success(t('settings.toasts.passwordReset'))
       setShowUserPasswordModal(false)
       setSelectedUserId(null)
-      trackSettings(EventAction.EDIT, { section: 'users', operation: 'reset_password' })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {

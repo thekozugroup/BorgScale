@@ -12,7 +12,6 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { formatRoleLabel } from '../utils/rolePresentation'
 import { useNavigate } from 'react-router-dom'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -38,7 +37,6 @@ function getRoleBadgeClass(roleLabel: string) {
 export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
   const { t } = useTranslation()
   const { user, logout } = useAuth()
-  const { trackAuth, trackNavigation, EventAction } = useAnalytics()
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
 
@@ -92,15 +90,7 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
       <div className="flex-1" />
 
       {/* User menu */}
-      <Popover
-        open={open}
-        onOpenChange={(val) => {
-          setOpen(val)
-          if (val) {
-            trackNavigation(EventAction.VIEW, { surface: 'user_menu' })
-          }
-        }}
-      >
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <button
             aria-label="User menu"
@@ -164,14 +154,9 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
                 <Sparkles size={15} className="text-muted-foreground" />
               </div>
               <div className="flex-1 text-left">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-foreground">BorgScale</span>
-                  <span className="inline-flex items-center gap-1 rounded border border-border/30 bg-muted px-1.5 py-0.5 text-3xs font-bold uppercase tracking-wide text-muted-foreground">
-                    {t('plan.activeStatus', 'Active')}
-                  </span>
-                </div>
+                <span className="text-xs font-bold text-foreground">BorgScale</span>
                 <p className="mt-0.5 text-2xs text-muted-foreground">
-                  {t('plan.openSourceDesc', 'Free and open source (AGPL-3.0)')}
+                  {t('navigation.menu.openSourceDesc', 'Free and open source (AGPL-3.0)')}
                 </p>
               </div>
             </div>
@@ -213,7 +198,6 @@ export default function AppHeader({ onToggleMobileMenu }: AppHeaderProps) {
               type="button"
               onClick={() => {
                 setOpen(false)
-                trackAuth(EventAction.LOGOUT, { surface: 'user_menu' })
                 logout()
               }}
               className="flex w-full cursor-pointer items-center gap-3 border-0 bg-transparent px-3 py-1.75 font-[inherit] text-left transition-colors hover:bg-destructive/5"

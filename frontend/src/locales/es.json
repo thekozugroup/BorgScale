@@ -181,7 +181,6 @@
     "overline": "Primer inicio de sesión",
     "title": "Configura una nueva contraseña o continúa",
     "description": "Puedes configurar una nueva contraseña ahora o saltarte este paso y continuar al panel.",
-    "flowHint": "Después de este paso, BorgScale continuará con passkeys, consentimiento de analíticas y cualquier anuncio activo.",
     "skipHint": "Puedes omitir este paso por ahora y cambiarla más tarde desde la configuración de la cuenta.",
     "skip": "Omitir por ahora"
   },
@@ -212,7 +211,6 @@
       "appearance": "Apariencia",
       "notifications": "Notificaciones",
       "preferences": "Preferencias",
-      "licensing": "Licencias",
       "systemLabel": "Sistema",
       "mqtt": "MQTT",
       "cache": "Caché",
@@ -227,14 +225,14 @@
     "menu": {
       "accountAndSecurityDesc": "Perfil, contraseña, 2FA, passkeys",
       "appearanceDesc": "Tema, idioma",
-      "notificationsDesc": "Alertas y preferencias"
+      "notificationsDesc": "Alertas y preferencias",
+      "openSourceDesc": "Libre y de código abierto (AGPL-3.0)"
     },
     "versionInfo": "Información de versión",
     "app": "App:",
     "loading": "Cargando...",
     "welcome": "Bienvenido,",
-    "logout": "Cerrar sesión",
-    "yourPlan": "Your Plan"
+    "logout": "Cerrar sesión"
   },
   "status": {
     "completed": "Completado",
@@ -1800,17 +1798,11 @@
     "save": "Guardar preferencias",
     "saving": "Guardando...",
     "updatedSuccessfully": "Preferencias actualizadas correctamente",
-    "analyticsTitle": "Análisis de uso anónimo",
-    "analyticsDescription": "Ayúdanos a mejorar BorgScale compartiendo datos de uso anónimos. Recopilamos vistas de página, clics en funciones y tipo de navegador, sin rastrear direcciones IP, nombres de host, cookies ni información de identificación personal.",
-    "enableAnalytics": "Habilitar análisis",
     "languageTitle": "Idioma",
     "languageDescription": "Elige el idioma de la interfaz",
     "languageLabel": "Idioma de la interfaz",
     "languageSaved": "Idioma actualizado correctamente",
-    "updateFailed": "Error al actualizar las preferencias",
-    "analyticsTransparencyBold": "Transparencia total:",
-    "analyticsTransparencyLink": "Ver nuestro panel de análisis públicamente",
-    "analyticsTransparencyAfterLink": "para ver exactamente qué recopilamos. Anónimo y centrado en la privacidad."
+    "updateFailed": "Error al actualizar las preferencias"
   },
   "betaFeatures": {
     "title": "Funciones beta",
@@ -2071,19 +2063,6 @@
     "eta": "ETA:",
     "currentFile": "Archivo actual:",
     "duration": "Duración:"
-  },
-  "analyticsConsent": {
-    "title": "Ayuda a mejorar BorgScale",
-    "message": "Recopilamos datos de uso anónimos para entender cómo se usa BorgScale y mejorarlo. No se recopila información personal, direcciones IP, nombres de host ni datos de copia de seguridad.",
-    "accept": "Aceptar",
-    "decline": "Rechazar",
-    "learnMore": "Más información",
-    "viewDashboard": "Ver nuestro panel de análisis público",
-    "viewDashboardSuffix": "para ver exactamente lo que recopilamos.",
-    "enableToggle": "Habilitar análisis anónimos",
-    "continue": "Continuar",
-    "saving": "Guardando...",
-    "changeAnytime": "Puedes cambiar esto en cualquier momento en Configuración → Preferencias"
   },
   "lastRestoreSection": {
     "title": "Última restauración",
@@ -2940,11 +2919,6 @@
     "failedToDownloadKeyfile": "Error al descargar el archivo de clave",
     "noArchivesDescription": "Este repositorio ha sido inicializado pero no contiene archivos. Las estadísticas de almacenamiento aparecerán aquí después de crear tu primera copia de seguridad.",
     "failedToLoad": "Error al cargar la información del repositorio. Asegúrate de que el repositorio sea accesible y esté correctamente inicializado."
-  },
-  "analyticsBanner": {
-    "viewDashboardLink": "Ver nuestro panel de análisis público",
-    "viewDashboardSuffix": "para ver exactamente lo que recopilamos.",
-    "changeAnytimeNote": "Puedes cambiar esto en cualquier momento en Configuración → Preferencias"
   },
   "repositoryScripts": {
     "errors": {

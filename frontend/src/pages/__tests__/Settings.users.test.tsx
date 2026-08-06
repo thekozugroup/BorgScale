@@ -12,8 +12,6 @@ import Settings from '../Settings'
 import * as apiModule from '../../services/api'
 import { toast } from 'sonner'
 
-const trackSettings = vi.fn()
-
 vi.mock('../../hooks/useAuth', () => ({
   useAuth: () => ({
     user: {
@@ -39,18 +37,6 @@ vi.mock('../../hooks/useAuthorization', () => ({
   useAuthorization: () => ({
     roleHasGlobalPermission: (role: string, permission: string) =>
       role === 'admin' && permission === 'settings.users.manage',
-  }),
-}))
-
-vi.mock('../../hooks/useAnalytics', () => ({
-  useAnalytics: () => ({
-    trackSettings,
-    EventAction: {
-      VIEW: 'View',
-      CREATE: 'Create',
-      EDIT: 'Edit',
-      DELETE: 'Delete',
-    },
   }),
 }))
 
@@ -154,21 +140,6 @@ describe('Settings users tab', () => {
     vi.mocked(apiModule.settingsAPI.deleteUser).mockResolvedValue({ data: {} } as never)
   })
 
-  it('tracks the users tab view on render', async () => {
-    renderWithProviders(
-      <ThemeProvider>
-        <Settings />
-      </ThemeProvider>
-    )
-
-    await screen.findByText('User Management')
-
-    expect(trackSettings).toHaveBeenCalledWith('View', {
-      section: 'settings',
-      tab: 'users',
-    })
-  })
-
   it('creates, resets password for, and deletes users via settings actions', async () => {
     const user = userEvent.setup()
 
@@ -206,10 +177,6 @@ describe('Settings users tab', () => {
       password: 'strong-password',
       role: 'viewer',
     })
-    expect(trackSettings).toHaveBeenCalledWith('Create', {
-      section: 'users',
-      role: 'viewer',
-    })
     await waitFor(() => {
       expect(screen.queryByRole('dialog', { name: /create user/i })).not.toBeInTheDocument()
     })
@@ -232,10 +199,6 @@ describe('Settings users tab', () => {
       2,
       'new-reset-password',
     ])
-    expect(trackSettings).toHaveBeenCalledWith('Edit', {
-      section: 'users',
-      operation: 'reset_password',
-    })
     await waitFor(() => {
       expect(screen.queryByRole('dialog', { name: /reset password/i })).not.toBeInTheDocument()
     })
@@ -248,7 +211,6 @@ describe('Settings users tab', () => {
       expect(apiModule.settingsAPI.deleteUser).toHaveBeenCalled()
     })
     expect(vi.mocked(apiModule.settingsAPI.deleteUser).mock.calls.slice(-1)[0]?.[0]).toBe(2)
-    expect(trackSettings).toHaveBeenCalledWith('Delete', { section: 'users' })
   })
 
   it('edits an existing user via the settings actions', async () => {
@@ -278,10 +240,6 @@ describe('Settings users tab', () => {
           role: 'viewer',
         })
       )
-    })
-    expect(trackSettings).toHaveBeenCalledWith('Edit', {
-      section: 'users',
-      role: 'viewer',
     })
   })
 
@@ -313,10 +271,6 @@ describe('Settings users tab', () => {
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith('Failed to create user')
     })
-    expect(trackSettings).not.toHaveBeenCalledWith('Create', {
-      section: 'users',
-      role: 'user',
-    })
     expect(screen.getByRole('dialog', { name: /create user/i })).toBeInTheDocument()
   })
 
@@ -341,7 +295,6 @@ describe('Settings users tab', () => {
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith('Cannot delete the last admin')
     })
-    expect(trackSettings).not.toHaveBeenCalledWith('Delete', { section: 'users' })
     expect(screen.getByRole('dialog', { name: /delete user/i })).toBeInTheDocument()
   })
 })

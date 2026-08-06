@@ -58,14 +58,13 @@
         "de": "Upgrade-Details",
         "it": "Dettagli dell'aggiornamento"
       },
-      "cta_url": "https://github.com/karanhudia/borgscale/releases",
+      "cta_url": "https://github.com/thekozugroup/BorgScale/releases",
       "dismissible": true,
       "snooze_days": 7,
       "starts_at": "2026-04-14T00:00:00Z",
       "ends_at": "2027-04-14T00:00:00Z",
       "min_app_version": "2.0.0",
-      "max_app_version": "2.0.3-beta.999",
-      "target_plans": ["community", "pro", "enterprise"]
+      "max_app_version": "2.0.3-beta.999"
     },
     {
       "id": "release-2.0.3-whats-new",
@@ -88,7 +87,7 @@
         "New first-login password setup and post-login onboarding flow",
         "Refreshed account, profile, and security surfaces",
         "Redesigned archive browsing and archive views",
-        "Updated profile menu, plan drawer, and system settings surfaces",
+        "Updated profile menu and system settings surfaces",
         "Secured Prometheus metrics configuration and monitoring dashboards",
         "Better Borg 2 support and improved remote SSH reliability"
       ],
@@ -98,7 +97,7 @@
           "Nuevo flujo de configuracion de contrasena y onboarding tras el primer acceso",
           "Renovacion de las superficies de cuenta, perfil y seguridad",
           "Navegacion de archivos y vistas de archivo redisenadas",
-          "Menu de perfil, panel del plan y superficies de ajustes del sistema actualizados",
+          "Menu de perfil y superficies de ajustes del sistema actualizados",
           "Configuracion segura de metricas de Prometheus y paneles de monitorizacion",
           "Mejor soporte para Borg 2 y mejor fiabilidad con SSH remoto"
         ],
@@ -107,7 +106,7 @@
           "Neuer Passwort- und Onboarding-Ablauf nach dem ersten Login",
           "Auffrischung der Konto-, Profil- und Sicherheitsoberflachen",
           "Neu gestaltetes Archive-Browsing und Archivansichten",
-          "Aktualisiertes Profilmenu, Plan-Drawer und Oberflachen der Systemeinstellungen",
+          "Aktualisiertes Profilmenu und Oberflachen der Systemeinstellungen",
           "Gesicherte Prometheus-Metrik-Konfiguration und Monitoring-Dashboards",
           "Bessere Borg-2-Unterstutzung und bessere Zuverlassigkeit fur Remote-SSH"
         ],
@@ -116,7 +115,7 @@
           "Nuovo flusso di configurazione password e onboarding dopo il primo accesso",
           "Aggiornamento delle superfici di account, profilo e sicurezza",
           "Navigazione degli archivi e viste archivio riprogettate",
-          "Menu profilo, pannello del piano e superfici delle impostazioni di sistema aggiornati",
+          "Menu profilo e superfici delle impostazioni di sistema aggiornati",
           "Configurazione sicura delle metriche Prometheus e dashboard di monitoraggio",
           "Migliore supporto per Borg 2 e migliore affidabilita per SSH remoto"
         ]
@@ -127,14 +126,13 @@
         "de": "Release Notes ansehen",
         "it": "Vedi note di rilascio"
       },
-      "cta_url": "https://github.com/karanhudia/borgscale/releases",
+      "cta_url": "https://github.com/thekozugroup/BorgScale/releases",
       "dismissible": true,
       "snooze_days": 7,
       "starts_at": "2026-04-14T00:00:00Z",
       "ends_at": "2027-04-14T00:00:00Z",
       "min_app_version": "2.0.3",
-      "max_app_version": "2.0.3",
-      "target_plans": ["community", "pro", "enterprise"]
+      "max_app_version": "2.0.3"
     },
     {
       "id": "release-2.0.0-whats-new",
@@ -157,9 +155,6 @@
         "Responsive UI built for desktop and mobile",
         "RBAC, permissions, and API tokens for multi-user setups",
         "A redesigned interface with a fresh new look across the app",
-        "Community stays available, with most features continuing to stay free",
-        "Pro and Enterprise are available for users who need more advanced capabilities",
-        "New installs include 60 days of full access to explore everything",
         "Cleaner architecture and broader test coverage for a more reliable product"
       ],
       "highlights_localized": {
@@ -168,9 +163,6 @@
           "Interfaz adaptable pensada para escritorio y movil",
           "RBAC, permisos y tokens API para entornos multiusuario",
           "Una interfaz redisenada con un aspecto nuevo en toda la app",
-          "Community sigue disponible y la mayoria de las funciones continuan siendo gratuitas",
-          "Pro y Enterprise estan disponibles para quienes necesiten capacidades mas avanzadas",
-          "Las instalaciones nuevas incluyen 60 dias de acceso completo para explorar todo",
           "Arquitectura mas limpia y mayor cobertura de pruebas para un producto mas fiable"
         ],
         "de": [
@@ -178,9 +170,6 @@
           "Responsive Oberflache fur Desktop und Mobilgerate",
           "RBAC, Berechtigungen und API-Tokens fur Multi-User-Umgebungen",
           "Eine neu gestaltete Oberflache mit frischem Look in der ganzen App",
-          "Community bleibt verfugbar und die meisten Funktionen bleiben kostenlos",
-          "Pro und Enterprise stehen fur Nutzer bereit, die erweiterte Funktionen brauchen",
-          "Neue Installationen enthalten 60 Tage vollen Zugriff, um alles auszuprobieren",
           "Saubere Architektur und breitere Testabdeckung fur ein zuverlassigeres Produkt"
         ],
         "it": [
@@ -188,9 +177,6 @@
           "Interfaccia reattiva progettata per desktop e mobile",
           "RBAC, permessi e token API per configurazioni multiutente",
           "Un'interfaccia riprogettata con un look nuovo in tutta l'app",
-          "Community resta disponibile e la maggior parte delle funzionalita continua a essere gratuita",
-          "Pro ed Enterprise sono disponibili per chi ha bisogno di capacita piu avanzate",
-          "Le nuove installazioni includono 60 giorni di accesso completo per esplorare tutto",
           "Architettura piu pulita e copertura test piu ampia per un prodotto piu affidabile"
         ]
       },
@@ -200,14 +186,13 @@
         "de": "Release Notes ansehen",
         "it": "Vedi note di rilascio"
       },
-      "cta_url": "https://github.com/karanhudia/borgscale/releases/tag/v2.0.0",
+      "cta_url": "https://github.com/thekozugroup/BorgScale/releases/tag/v2.0.0",
       "dismissible": true,
       "snooze_days": 7,
       "starts_at": "2026-04-11T00:00:00Z",
       "ends_at": "2026-04-13T23:59:59Z",
       "min_app_version": "2.0.0",
-      "max_app_version": "2.0.0",
-      "target_plans": ["community", "pro", "enterprise"]
+      "max_app_version": "2.0.0"
     }
   ]
 }

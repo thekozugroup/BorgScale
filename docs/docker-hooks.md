@@ -599,9 +599,9 @@ echo "[$(date)] Post-backup hook completed"
 
 ## Related Documentation
 
-- [Pre/Post Backup Scripts](./backup-hooks.md) - General hook documentation
-- [Installation Guide](../docs/installation.md) - Setting up BorgScale
-- [Repository Configuration](./repositories.md) - Configuring repositories
+- [Usage Guide](usage-guide) - Pre/post backup hooks and repository setup
+- [Installation Guide](installation) - Setting up BorgScale
+- [Script Parameters](script-parameters) - Passing values into hook scripts
 
 ## Support
 

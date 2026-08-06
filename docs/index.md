@@ -62,7 +62,6 @@ See [Installation Guide](installation) for other methods and security best pract
 - **[Installation Guide](installation)** - Docker Compose, Portainer, Unraid installation
 - **[Configuration Guide](configuration)** - Environment variables, volumes, permissions
 - **[Usage Guide](usage-guide)** - Create your first backup
-- **[Licensing](licensing)** - AGPL-3.0, and what §13 asks of you if you host a modified instance
 
 ### Features
 
@@ -243,6 +242,6 @@ GNU Affero General Public License v3.0 - See [LICENSE](https://github.com/thekoz
 
 ## Acknowledgments
 
-Built with [Borg Backup](https://borgbackup.readthedocs.io/), [FastAPI](https://fastapi.tiangolo.com/), [React](https://react.dev/), and [Material-UI](https://mui.com/)
+Built with [Borg Backup](https://borgbackup.readthedocs.io/), [FastAPI](https://fastapi.tiangolo.com/), [React](https://react.dev/), [Tailwind CSS](https://tailwindcss.com/) and [shadcn/ui](https://ui.shadcn.com/)
 
-Made by [Karan Hudia](https://github.com/karanhudia)
+Maintained by [The Kozu Group](https://github.com/thekozugroup)

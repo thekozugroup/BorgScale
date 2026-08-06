@@ -4,7 +4,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Trash2, Plus, Database, ShieldOff, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { permissionsAPI } from '../services/api'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { useAuth } from '../hooks/useAuth'
 import { useAuthorization } from '../hooks/useAuthorization'
 import { formatRoleLabel } from '../utils/rolePresentation'
@@ -68,7 +67,6 @@ export default function UserPermissionsPanel({
   const { user: currentUser, refreshUser } = useAuth()
   const availableRoles = assignableRepositoryRolesFor(targetUserRole)
   const queryClient = useQueryClient()
-  const { trackSettings, EventAction } = useAnalytics()
   const [addRepoId, setAddRepoId] = useState<number | ''>('')
   const [addRole, setAddRole] = useState('viewer')
   const [wildcardRole, setWildcardRole] = useState<string>('')
@@ -109,11 +107,6 @@ export default function UserPermissionsPanel({
       setAddRole('viewer')
       await syncCurrentUserPermissions()
       toast.success(t('settings.permissions.toasts.assigned'))
-      trackSettings(EventAction.EDIT, {
-        section: 'users',
-        operation: 'assign_repository_permission',
-        role: addRole,
-      })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -127,10 +120,6 @@ export default function UserPermissionsPanel({
       queryClient.invalidateQueries({ queryKey })
       await syncCurrentUserPermissions()
       toast.success(t('settings.permissions.toasts.removed'))
-      trackSettings(EventAction.DELETE, {
-        section: 'users',
-        operation: 'remove_repository_permission',
-      })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -141,15 +130,10 @@ export default function UserPermissionsPanel({
   const updateMutation = useMutation({
     mutationFn: ({ repoId, role }: { repoId: number; role: string }) =>
       permissionsAPI.update(userId!, repoId, role),
-    onSuccess: async (_, variables) => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey })
       await syncCurrentUserPermissions()
       toast.success(t('settings.permissions.toasts.updated'))
-      trackSettings(EventAction.EDIT, {
-        section: 'users',
-        operation: 'update_repository_permission',
-        role: variables.role,
-      })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -168,11 +152,6 @@ export default function UserPermissionsPanel({
           ? t('settings.permissions.toasts.automaticUpdated')
           : t('settings.permissions.toasts.automaticCleared')
       )
-      trackSettings(EventAction.EDIT, {
-        section: 'users',
-        operation: 'update_repository_scope',
-        role: nextRole ?? 'none',
-      })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {

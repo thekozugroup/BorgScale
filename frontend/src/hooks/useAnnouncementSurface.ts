@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { useAnalytics } from './useAnalytics'
 import { useSystemInfo } from './useSystemInfo'
 import type { Announcement } from '../types/announcements'
 import {
@@ -20,15 +19,12 @@ interface UseAnnouncementSurfaceResult {
   announcement: Announcement | null
   acknowledgeAnnouncement: () => void
   snoozeAnnouncement: () => void
-  trackAnnouncementCtaClick: () => void
 }
 
 export function useAnnouncementSurface(): UseAnnouncementSurfaceResult {
   const [hiddenAnnouncementIds, setHiddenAnnouncementIds] = useState<string[]>([])
   const { i18n } = useTranslation()
-  const { trackAnnouncement, EventAction } = useAnalytics()
   const { data: systemInfo } = useSystemInfo()
-  const lastTrackedAnnouncementIdRef = useRef<string | null>(null)
 
   const { data: manifest } = useQuery({
     queryKey: ['announcements-manifest'],
@@ -48,7 +44,6 @@ export function useAnnouncementSurface(): UseAnnouncementSurfaceResult {
       ),
       {
         appVersion: systemInfo.app_version,
-        plan: systemInfo.plan,
         now: new Date(),
       }
     )
@@ -62,54 +57,23 @@ export function useAnnouncementSurface(): UseAnnouncementSurfaceResult {
     setHiddenAnnouncementIds((current) => [...current, id])
   }, [])
 
-  const buildAnnouncementAnalyticsData = useCallback(
-    (activeAnnouncement: Announcement) => ({
-      announcement_id: activeAnnouncement.id,
-      announcement_type: activeAnnouncement.type,
-      priority: activeAnnouncement.priority ?? null,
-      dismissible: activeAnnouncement.dismissible !== false,
-      has_cta: Boolean(activeAnnouncement.cta_url),
-    }),
-    []
-  )
-
-  useEffect(() => {
-    if (!announcement) {
-      lastTrackedAnnouncementIdRef.current = null
-      return
-    }
-
-    if (lastTrackedAnnouncementIdRef.current === announcement.id) return
-
-    lastTrackedAnnouncementIdRef.current = announcement.id
-    trackAnnouncement(EventAction.VIEW, buildAnnouncementAnalyticsData(announcement))
-  }, [EventAction.VIEW, announcement, buildAnnouncementAnalyticsData, trackAnnouncement])
-
   const handleAcknowledgeAnnouncement = useCallback(() => {
     if (!announcement || announcement.dismissible === false) return
-    trackAnnouncement('Acknowledge', buildAnnouncementAnalyticsData(announcement))
     acknowledgeAnnouncement(announcement.id)
     hideAnnouncement(announcement.id)
-  }, [announcement, buildAnnouncementAnalyticsData, hideAnnouncement, trackAnnouncement])
+  }, [announcement, hideAnnouncement])
 
   const handleSnoozeAnnouncement = useCallback(() => {
     if (!announcement) return
-    trackAnnouncement('Snooze', buildAnnouncementAnalyticsData(announcement))
     const snoozeUntil = new Date()
     snoozeUntil.setDate(snoozeUntil.getDate() + getAnnouncementSnoozeDays(announcement))
     snoozeAnnouncement(announcement.id, snoozeUntil)
     hideAnnouncement(announcement.id)
-  }, [announcement, buildAnnouncementAnalyticsData, hideAnnouncement, trackAnnouncement])
-
-  const handleTrackAnnouncementCtaClick = useCallback(() => {
-    if (!announcement || !announcement.cta_url) return
-    trackAnnouncement('CTA Click', buildAnnouncementAnalyticsData(announcement))
-  }, [announcement, buildAnnouncementAnalyticsData, trackAnnouncement])
+  }, [announcement, hideAnnouncement])
 
   return {
     announcement,
     acknowledgeAnnouncement: handleAcknowledgeAnnouncement,
     snoozeAnnouncement: handleSnoozeAnnouncement,
-    trackAnnouncementCtaClick: handleTrackAnnouncementCtaClick,
   }
 }

@@ -3,21 +3,8 @@ import { renderWithProviders, screen, userEvent, waitFor } from '../../test/test
 import Activity from '../Activity'
 import { activityAPI } from '../../services/api'
 
-const track = vi.fn()
 const refetchSpy = vi.fn()
 const jobsTablePropsSpy = vi.fn()
-
-vi.mock('../../hooks/useAnalytics', () => ({
-  useAnalytics: () => ({
-    track,
-    EventCategory: {
-      NAVIGATION: 'Navigation',
-    },
-    EventAction: {
-      FILTER: 'Filter',
-    },
-  }),
-}))
 
 vi.mock('../../hooks/useAuth', () => ({
   useAuth: () => ({
@@ -69,7 +56,7 @@ describe('Activity page', () => {
     vi.spyOn(activityAPI, 'list').mockResolvedValue({ data: [] } as never)
   })
 
-  it('passes filters into the activity API, tracks filter changes, and supports refresh', async () => {
+  it('passes filters into the activity API and supports refresh', async () => {
     const user = userEvent.setup()
 
     renderWithProviders(<Activity />)
@@ -95,10 +82,6 @@ describe('Activity page', () => {
         job_type: 'restore',
       })
     })
-    expect(track).toHaveBeenCalledWith('Navigation', 'Filter', {
-      filter_kind: 'type',
-      filter_value: 'restore',
-    })
 
     await user.click(screen.getAllByRole('combobox')[1])
     await user.click(await screen.findByRole('option', { name: 'Failed' }))
@@ -109,10 +92,6 @@ describe('Activity page', () => {
         job_type: 'restore',
         status: 'failed',
       })
-    })
-    expect(track).toHaveBeenCalledWith('Navigation', 'Filter', {
-      filter_kind: 'status',
-      filter_value: 'failed',
     })
 
     await user.click(screen.getByRole('button', { name: /refresh/i }))

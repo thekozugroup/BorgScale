@@ -9,7 +9,6 @@ const {
   loginWithPasskeyMock,
   refreshUserMock,
   navigateMock,
-  trackAuthMock,
   beginPasskeyAuthenticationMock,
   finishPasskeyAuthenticationMock,
   isConditionalMediationAvailableMock,
@@ -20,7 +19,6 @@ const {
   loginWithPasskeyMock: vi.fn(),
   refreshUserMock: vi.fn(),
   navigateMock: vi.fn(),
-  trackAuthMock: vi.fn(),
   beginPasskeyAuthenticationMock: vi.fn(),
   finishPasskeyAuthenticationMock: vi.fn(),
   isConditionalMediationAvailableMock: vi.fn(),
@@ -55,17 +53,6 @@ vi.mock('../FirstLoginPasswordSetup', () => ({
   default: () => <div>Password Setup Card</div>,
 }))
 
-vi.mock('../../hooks/useAnalytics', () => ({
-  useAnalytics: () => ({
-    trackAuth: trackAuthMock,
-    EventAction: {
-      LOGIN: 'Login',
-      START: 'Start',
-      FAIL: 'Fail',
-    },
-  }),
-}))
-
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom')
   return {
@@ -93,7 +80,7 @@ describe('Login page', () => {
     refreshUserMock.mockResolvedValue(undefined)
   })
 
-  it('submits credentials, tracks login, and redirects to the dashboard by default', async () => {
+  it('submits credentials and redirects to the dashboard by default', async () => {
     const user = userEvent.setup()
     loginMock.mockResolvedValue({ totpRequired: false, mustChangePassword: false })
 
@@ -105,10 +92,6 @@ describe('Login page', () => {
 
     await waitFor(() => {
       expect(loginMock).toHaveBeenCalledWith('admin', 'secret')
-      expect(trackAuthMock).toHaveBeenCalledWith('Login', {
-        method: 'password',
-        requires_password_setup: false,
-      })
       expect(toast.success).toHaveBeenCalled()
       expect(navigateMock).toHaveBeenCalledWith('/dashboard')
     })
@@ -151,7 +134,6 @@ describe('Login page', () => {
       expect(toast.error).toHaveBeenCalledWith('Incorrect username or password')
     })
     expect(screen.getByRole('button', { name: /^sign in$/i })).toBeEnabled()
-    expect(trackAuthMock).not.toHaveBeenCalled()
   })
 
   it('switches to TOTP verification when the backend requires a second factor', async () => {
@@ -177,10 +159,6 @@ describe('Login page', () => {
     await waitFor(() => {
       expect(verifyTotpLoginMock).toHaveBeenCalledWith('challenge-token', '123456')
       expect(navigateMock).toHaveBeenCalledWith('/dashboard')
-      expect(trackAuthMock).toHaveBeenCalledWith('Login', {
-        method: 'totp',
-        requires_password_setup: false,
-      })
     })
   })
 
@@ -193,13 +171,8 @@ describe('Login page', () => {
     await user.click(screen.getByRole('button', { name: /sign in with passkey/i }))
 
     await waitFor(() => {
-      expect(trackAuthMock).toHaveBeenCalledWith('Start', { method: 'passkey', surface: 'login' })
       expect(loginWithPasskeyMock).toHaveBeenCalled()
       expect(navigateMock).toHaveBeenCalledWith('/dashboard')
-      expect(trackAuthMock).toHaveBeenCalledWith('Login', {
-        method: 'passkey',
-        requires_password_setup: false,
-      })
     })
   })
 
@@ -219,10 +192,6 @@ describe('Login page', () => {
       expect(localStorage.getItem('access_token')).toBe('jwt-token')
       expect(refreshUserMock).toHaveBeenCalled()
       expect(navigateMock).toHaveBeenCalledWith('/dashboard')
-      expect(trackAuthMock).toHaveBeenCalledWith('Login', {
-        method: 'passkey_autofill',
-        requires_password_setup: false,
-      })
     })
 
     expect(refreshUserMock.mock.invocationCallOrder[0]).toBeLessThan(

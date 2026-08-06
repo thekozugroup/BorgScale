@@ -6,7 +6,6 @@ import SettingsCard from './SettingsCard'
 import { toast } from 'sonner'
 import { settingsAPI } from '../services/api'
 import { translateBackendKey } from '../utils/translateBackendKey'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -14,7 +13,6 @@ import { Label } from '@/components/ui/label'
 const MqttSettingsTab: React.FC = () => {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const { trackSystem, EventAction } = useAnalytics()
 
   const [mqttEnabled, setMqttEnabled] = useState(false)
   const [mqttBrokerUrl, setMqttBrokerUrl] = useState('')
@@ -116,13 +114,6 @@ const MqttSettingsTab: React.FC = () => {
       toast.success(t('mqttSettings.savedSuccessfully'))
       setHasChanges(false)
       setPasswordChanged(false)
-      trackSystem(EventAction.EDIT, {
-        section: 'mqtt',
-        enabled: mqttEnabled,
-        tls_enabled: mqttTlsEnabled,
-        qos: mqttQos,
-        retain: mqttRetain,
-      })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {

@@ -4,8 +4,7 @@ import Backup from '../Backup'
 
 const runBackupMock = vi.fn()
 
-const { trackBackup, toastSuccess, toastError } = vi.hoisted(() => ({
-  trackBackup: vi.fn(),
+const { toastSuccess, toastError } = vi.hoisted(() => ({
   toastSuccess: vi.fn(),
   toastError: vi.fn(),
 }))
@@ -24,17 +23,6 @@ let canManageAll = false
 let canDoBackup = true
 let repositoriesPayload: Array<Record<string, unknown>> = []
 let manualJobsPayload: Array<Record<string, unknown>> = []
-
-vi.mock('../../hooks/useAnalytics', () => ({
-  useAnalytics: () => ({
-    trackBackup,
-    EventAction: {
-      START: 'Start',
-      STOP: 'Stop',
-      FILTER: 'Filter',
-    },
-  }),
-}))
 
 vi.mock('../../hooks/useAuth', () => ({
   useAuth: () => ({
@@ -174,14 +162,6 @@ describe('Backup page', () => {
       expect(runBackupMock).toHaveBeenCalledTimes(1)
     })
     expect(toastSuccess).toHaveBeenCalledWith('Backup started successfully!')
-    expect(trackBackup).toHaveBeenCalledWith(
-      'Start',
-      undefined,
-      expect.objectContaining({
-        id: 1,
-        path: '/repos/primary',
-      })
-    )
   })
 
   it('uses the version-aware BorgApiClient when starting a Borg 2 backup', async () => {
@@ -254,20 +234,11 @@ describe('Backup page', () => {
     ).toBeInTheDocument()
   })
 
-  it('tracks repository selection and hides manual backup choices when backup permission is missing', async () => {
+  it('hides manual backup choices when backup permission is missing', async () => {
     const user = userEvent.setup()
     const { unmount } = renderWithProviders(<Backup />)
 
     await user.click(await screen.findByRole('button', { name: /choose primary repo/i }))
-
-    expect(trackBackup).toHaveBeenCalledWith(
-      'Filter',
-      undefined,
-      expect.objectContaining({
-        id: 1,
-        path: '/repos/primary',
-      })
-    )
 
     canDoBackup = false
     unmount()

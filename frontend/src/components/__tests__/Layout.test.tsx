@@ -24,15 +24,6 @@ vi.mock('../../hooks/useAnnouncementSurface', () => ({
   useAnnouncementSurface: () => announcementSurfaceMock(),
 }))
 
-vi.mock('../AnalyticsConsentBanner', () => ({
-  default: ({ onConsentGiven }: { onConsentGiven: () => void }) => (
-    <div>
-      Consent Banner
-      <button onClick={onConsentGiven}>Dismiss Banner</button>
-    </div>
-  ),
-}))
-
 vi.mock('../AnnouncementModal', () => ({
   default: ({
     announcement,
@@ -84,7 +75,6 @@ describe('Layout', () => {
       announcement: null,
       acknowledgeAnnouncement: vi.fn(),
       snoozeAnnouncement: vi.fn(),
-      trackAnnouncementCtaClick: vi.fn(),
     })
     useAuthMock.mockReturnValue({
       user: { username: 'admin', email: 'admin@example.com', role: 'admin', passkey_count: 0 },
@@ -112,7 +102,7 @@ describe('Layout', () => {
     expect(logoutMock).toHaveBeenCalledTimes(1)
   })
 
-  it('shows the passkey prompt before analytics even when password setup is still pending', async () => {
+  it('shows the passkey prompt even when password setup is still pending', async () => {
     sessionStorage.setItem('recent_password_login', '1')
     useAuthMock.mockReturnValue({
       user: {
@@ -137,7 +127,6 @@ describe('Layout', () => {
     )
 
     expect(await screen.findByText('Passkey Prompt')).toBeInTheDocument()
-    expect(screen.queryByText('Consent Banner')).not.toBeInTheDocument()
   })
 
   it('shows the passkey prompt after a recent password login when no passkeys exist', async () => {
@@ -277,7 +266,6 @@ describe('Layout', () => {
       },
       acknowledgeAnnouncement: vi.fn(),
       snoozeAnnouncement: vi.fn(),
-      trackAnnouncementCtaClick: vi.fn(),
     })
 
     renderWithProviders(

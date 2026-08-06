@@ -30,8 +30,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     canEnrollPasskeyFromRecentLogin,
     clearRecentPasskeyEnrollmentState,
   } = useAuth()
-  const { announcement, acknowledgeAnnouncement, snoozeAnnouncement, trackAnnouncementCtaClick } =
-    useAnnouncementSurface()
+  const { announcement, acknowledgeAnnouncement, snoozeAnnouncement } = useAnnouncementSurface()
   const { t } = useTranslation()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [showPasskeyPrompt, setShowPasskeyPrompt] = useState(false)
@@ -127,7 +126,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         open={activeSurface === 'announcement'}
         onAcknowledge={acknowledgeAnnouncement}
         onSnooze={snoozeAnnouncement}
-        onCtaClick={trackAnnouncementCtaClick}
       />
       <PasskeyEnrollmentPrompt
         open={activeSurface === 'passkey'}

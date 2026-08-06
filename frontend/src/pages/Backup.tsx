@@ -16,12 +16,9 @@ import RepoSelect from '../components/RepoSelect'
 import LogViewerDialog from '../components/LogViewerDialog'
 import CommandPreview from '../components/CommandPreview'
 import RunningBackupsSection from '../components/RunningBackupsSection'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { useAuth } from '../hooks/useAuth'
 import { usePermissions } from '../hooks/usePermissions'
 import { getRepoCapabilities } from '../utils/repoCapabilities'
-import { useTrackedJobOutcomes } from '../hooks/useTrackedJobOutcomes'
-import { getJobDurationSeconds } from '../utils/analyticsProperties'
 
 // Job rows only move while a job is in flight, so second-by-second polling is
 // reserved for that case — an idle page must not hammer a self-hosted backend.
@@ -43,7 +40,6 @@ const Backup: React.FC = () => {
   const [showCommandPreview, setShowCommandPreview] = useState(false)
   const queryClient = useQueryClient()
   const location = useLocation()
-  const { trackBackup, EventAction } = useAnalytics()
   const { hasGlobalPermission } = useAuth()
   const canManageRepositoryOperations = hasGlobalPermission('repositories.manage_all')
   const permissions = usePermissions()
@@ -103,7 +99,6 @@ const Backup: React.FC = () => {
     onSuccess: () => {
       toast.success(t('backup.toasts.started'))
       queryClient.invalidateQueries({ queryKey: ['backup-status-manual'] })
-      trackBackup(EventAction.START, undefined, selectedRepoData || undefined)
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -119,7 +114,6 @@ const Backup: React.FC = () => {
     onSuccess: () => {
       toast.success(t('backup.toasts.cancelled'))
       queryClient.invalidateQueries({ queryKey: ['backup-status-manual'] })
-      trackBackup(EventAction.STOP, 'manual')
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -141,10 +135,6 @@ const Backup: React.FC = () => {
   // Handle repository selection
   const handleRepositoryChange = (repoPath: string) => {
     setSelectedRepository(repoPath)
-    const repo = repositoriesData?.data?.repositories?.find((r: Repository) => r.path === repoPath)
-    if (repo) {
-      trackBackup(EventAction.FILTER, undefined, repo)
-    }
   }
 
   // Handle start backup
@@ -158,30 +148,6 @@ const Backup: React.FC = () => {
 
   const runningJobs = backupStatus?.filter((job: BackupJob) => job.status === 'running') || []
   const recentJobs = selectedRepository ? backupStatus || [] : []
-
-  useTrackedJobOutcomes<BackupJob>({
-    jobs: recentJobs,
-    onTerminal: (job) => {
-      const repository = repositoriesData?.data?.repositories?.find(
-        (repo: Repository) => repo.path === job.repository
-      )
-      const action =
-        job.status === 'completed' || job.status === 'completed_with_warnings'
-          ? EventAction.COMPLETE
-          : EventAction.FAIL
-
-      trackBackup(action, 'manual', repository ?? job.repository, {
-        trigger: 'manual',
-        job_id: job.id,
-        status: job.status,
-        has_logs: !!job.has_logs,
-        maintenance_status: job.maintenance_status ?? null,
-        duration_seconds: getJobDurationSeconds(job.started_at, job.completed_at),
-        warning_count: job.status === 'completed_with_warnings' ? 1 : 0,
-        error_present: !!job.error_message,
-      })
-    },
-  })
 
   return (
     <div>

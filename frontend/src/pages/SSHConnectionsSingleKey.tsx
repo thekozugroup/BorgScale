@@ -40,7 +40,6 @@ import { translateBackendKey } from '../utils/translateBackendKey'
 import RemoteMachineCard from '../components/RemoteMachineCard'
 import QuickConnectModal from '../components/ssh/QuickConnectModal'
 import AdvancedDisclosure from '../components/wizard/AdvancedDisclosure'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { useAuth } from '../hooks/useAuth'
 
 interface StorageInfo {
@@ -113,7 +112,6 @@ export default function SSHConnectionsSingleKey() {
   const { t } = useTranslation()
   usePageTitle(t('sshConnections.title'))
   const queryClient = useQueryClient()
-  const { track, EventCategory, EventAction } = useAnalytics()
   const { hasGlobalPermission, isLoading: authLoading } = useAuth()
   const canManageSsh = hasGlobalPermission('settings.ssh.manage')
 
@@ -198,7 +196,6 @@ export default function SSHConnectionsSingleKey() {
       toast.success(t('sshConnections.toasts.keyGenerated'))
       queryClient.invalidateQueries({ queryKey: ['system-ssh-key'] })
       setGenerateDialogOpen(false)
-      track(EventCategory.SSH, EventAction.CREATE, { resource: 'key' })
     },
     onError: (error: unknown) => {
       console.error('Failed to generate SSH key:', error)
@@ -221,7 +218,6 @@ export default function SSHConnectionsSingleKey() {
         public_key_path: '',
         description: 'Imported system SSH key for all remote connections',
       })
-      track(EventCategory.SSH, EventAction.UPLOAD, { resource: 'key' })
     },
     onError: (error: unknown) => {
       console.error('Failed to import SSH key:', error)
@@ -248,7 +244,6 @@ export default function SSHConnectionsSingleKey() {
         ssh_path_prefix: '',
         mount_point: '',
       })
-      track(EventCategory.SSH, EventAction.CREATE, { resource: 'connection' })
     },
     onError: (error: unknown) => {
       console.error('Failed to deploy SSH key:', error)
@@ -264,7 +259,6 @@ export default function SSHConnectionsSingleKey() {
     onSuccess: (response) => {
       if (response.data.success) {
         toast.success(t('sshConnections.toasts.connectionTestSuccess'))
-        track(EventCategory.SSH, EventAction.TEST, { resource: 'connection' })
       } else {
         toast.error(t('sshConnections.toasts.connectionTestFailed'))
       }
@@ -286,7 +280,6 @@ export default function SSHConnectionsSingleKey() {
       toast.success(t('sshConnections.toasts.connectionUpdated'))
       setEditConnectionDialogOpen(false)
       setSelectedConnection(null)
-      track(EventCategory.SSH, EventAction.EDIT, { resource: 'connection' })
 
       // Automatically test the connection after update
       try {
@@ -314,7 +307,6 @@ export default function SSHConnectionsSingleKey() {
       queryClient.invalidateQueries({ queryKey: ['ssh-connections'] })
       setDeleteConnectionDialogOpen(false)
       setSelectedConnection(null)
-      track(EventCategory.SSH, EventAction.DELETE, { resource: 'connection' })
     },
     onError: (error: unknown) => {
       console.error('Failed to delete connection:', error)
@@ -330,7 +322,6 @@ export default function SSHConnectionsSingleKey() {
     onSuccess: () => {
       toast.success(t('sshConnections.toasts.storageRefreshed'))
       queryClient.invalidateQueries({ queryKey: ['ssh-connections'] })
-      track(EventCategory.SSH, EventAction.VIEW, { resource: 'storage' })
     },
     onError: (error: unknown) => {
       console.error('Failed to refresh storage:', error)
@@ -353,7 +344,6 @@ export default function SSHConnectionsSingleKey() {
         )
       }
       queryClient.invalidateQueries({ queryKey: ['ssh-connections'] })
-      track(EventCategory.SSH, EventAction.TEST, { resource: 'connection' })
     },
     onError: (error: unknown) => {
       console.error('Failed to test connection:', error)
@@ -371,7 +361,6 @@ export default function SSHConnectionsSingleKey() {
       queryClient.invalidateQueries({ queryKey: ['system-ssh-key'] })
       queryClient.invalidateQueries({ queryKey: ['ssh-connections'] })
       setDeleteKeyDialogOpen(false)
-      track(EventCategory.SSH, EventAction.DELETE, { resource: 'key' })
     },
     onError: (error: unknown) => {
       console.error('Failed to delete SSH key:', error)
@@ -390,10 +379,6 @@ export default function SSHConnectionsSingleKey() {
         queryClient.invalidateQueries({ queryKey: ['ssh-connections'] })
         setRedeployKeyDialogOpen(false)
         setRedeployPassword('')
-        track(EventCategory.SSH, EventAction.START, {
-          resource: 'connection',
-          operation: 'deploy_key',
-        })
       } else {
         toast.error(
           translateBackendKey(response.data.error) || t('sshConnections.toasts.keyDeployFailed')

@@ -48,7 +48,6 @@ describe('announcements utils', () => {
     expect(
       isAnnouncementEligible(baseAnnouncement, {
         appVersion: '1.60.0',
-        plan: 'community',
         now: NOW,
       })
     ).toBe(false)
@@ -60,7 +59,6 @@ describe('announcements utils', () => {
     expect(
       isAnnouncementEligible(baseAnnouncement, {
         appVersion: '1.60.0',
-        plan: 'community',
         now: NOW,
       })
     ).toBe(false)
@@ -84,7 +82,6 @@ describe('announcements utils', () => {
     expect(
       selectAnnouncement([updateNotice, securityNotice], {
         appVersion: '1.60.0',
-        plan: 'community',
         now: NOW,
       })?.id
     ).toBe('security-1')
@@ -110,7 +107,6 @@ describe('announcements utils', () => {
     expect(
       selectAnnouncement([releaseHighlight, newerUpdate], {
         appVersion: '1.60.0',
-        plan: 'community',
         now: NOW,
       })?.id
     ).toBe('release-1.71.0')
@@ -133,7 +129,6 @@ describe('announcements utils', () => {
     expect(
       selectAnnouncement([updateNotice, securityNotice], {
         appVersion: '1.60.0',
-        plan: 'community',
         now: NOW,
       })?.id
     ).toBe(baseAnnouncement.id)
@@ -143,7 +138,6 @@ describe('announcements utils', () => {
     expect(
       selectAnnouncement([baseAnnouncement], {
         appVersion: '1.70.0',
-        plan: 'community',
         now: NOW,
       })
     ).toBeNull()
@@ -164,7 +158,6 @@ describe('announcements utils', () => {
     expect(
       selectAnnouncement([releaseHighlight], {
         appVersion: '2.0.4',
-        plan: 'community',
         now: NOW,
       })
     ).toBeNull()
@@ -197,7 +190,6 @@ describe('announcements utils', () => {
         },
         {
           appVersion: '1.60.0',
-          plan: 'community',
           now: NOW,
         }
       )

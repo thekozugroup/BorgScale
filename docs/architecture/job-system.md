@@ -2,7 +2,7 @@
 
 ## Overview
 
-Borg-UI uses an asynchronous job system for long-running borg operations. All jobs follow a consistent pattern: create job record → execute in background → track progress → update status.
+BorgScale uses an asynchronous job system for long-running borg operations. All jobs follow a consistent pattern: create job record → execute in background → track progress → update status.
 
 ## Job Types
 
@@ -580,4 +580,4 @@ Test full workflow:
 
 ## Summary
 
-Borg-UI's job system provides a consistent, asynchronous execution framework for all borg operations. Each job type follows the same lifecycle (pending → running → completed/failed) with real-time progress tracking and notification support. The system is extensible - adding new job types requires implementing a service class and creating database models, following established patterns.
+BorgScale's job system provides a consistent, asynchronous execution framework for all borg operations. Each job type follows the same lifecycle (pending → running → completed/failed) with real-time progress tracking and notification support. The system is extensible - adding new job types requires implementing a service class and creating database models, following established patterns.

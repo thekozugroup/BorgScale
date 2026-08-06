@@ -98,7 +98,7 @@ SSH keys allow BorgScale to access remote backup repositories securely without s
 # Mount your existing SSH key when starting the container
 docker run -v ~/.ssh:/host-ssh:ro \
   -v /path/to/data:/data \
-  borgui/borg-web-ui
+  ainullcode/borgscale
 
 # Then import from: /host-ssh/id_ed25519
 ```

@@ -3,35 +3,18 @@ import { renderWithProviders, screen, userEvent, waitFor } from '../../test/test
 import PasskeyEnrollmentPrompt from '../PasskeyEnrollmentPrompt'
 import { toast } from 'sonner'
 
-const {
-  enrollPasskeyFromRecentLoginMock,
-  onSnoozeMock,
-  onIgnoreMock,
-  onSuccessMock,
-  trackAuthMock,
-} = vi.hoisted(() => ({
-  enrollPasskeyFromRecentLoginMock: vi.fn(),
-  onSnoozeMock: vi.fn(),
-  onIgnoreMock: vi.fn(),
-  onSuccessMock: vi.fn(),
-  trackAuthMock: vi.fn(),
-}))
+const { enrollPasskeyFromRecentLoginMock, onSnoozeMock, onIgnoreMock, onSuccessMock } = vi.hoisted(
+  () => ({
+    enrollPasskeyFromRecentLoginMock: vi.fn(),
+    onSnoozeMock: vi.fn(),
+    onIgnoreMock: vi.fn(),
+    onSuccessMock: vi.fn(),
+  })
+)
 
 vi.mock('../../hooks/useAuth', () => ({
   useAuth: () => ({
     enrollPasskeyFromRecentLogin: enrollPasskeyFromRecentLoginMock,
-  }),
-}))
-
-vi.mock('../../hooks/useAnalytics', () => ({
-  useAnalytics: () => ({
-    trackAuth: trackAuthMock,
-    EventAction: {
-      VIEW: 'View',
-      START: 'Start',
-      COMPLETE: 'Complete',
-      FAIL: 'Fail',
-    },
   }),
 }))
 
@@ -53,7 +36,7 @@ describe('PasskeyEnrollmentPrompt', () => {
     onSuccessMock.mockResolvedValue(undefined)
   })
 
-  it('tracks a prompt view and successful enrollment', async () => {
+  it('enrolls a passkey from the prompt', async () => {
     const user = userEvent.setup()
 
     renderWithProviders(
@@ -65,26 +48,16 @@ describe('PasskeyEnrollmentPrompt', () => {
       />
     )
 
-    expect(trackAuthMock).toHaveBeenCalledWith('View', { surface: 'post_login_passkey_prompt' })
-
     await user.click(screen.getByRole('button', { name: /set up passkey/i }))
 
     await waitFor(() => {
-      expect(trackAuthMock).toHaveBeenCalledWith('Start', {
-        surface: 'post_login_passkey_prompt',
-        operation: 'enroll_passkey',
-      })
       expect(enrollPasskeyFromRecentLoginMock).toHaveBeenCalledTimes(1)
-      expect(trackAuthMock).toHaveBeenCalledWith('Complete', {
-        surface: 'post_login_passkey_prompt',
-        operation: 'enroll_passkey',
-      })
       expect(toast.success).toHaveBeenCalledWith('Passkey added')
       expect(onSuccessMock).toHaveBeenCalledTimes(1)
     })
   })
 
-  it('tracks snooze and ignore actions', async () => {
+  it('forwards snooze and ignore actions', async () => {
     const user = userEvent.setup()
 
     const { rerender } = renderWithProviders(
@@ -97,7 +70,6 @@ describe('PasskeyEnrollmentPrompt', () => {
     )
 
     await user.click(screen.getByRole('button', { name: /remind me later/i }))
-    expect(trackAuthMock).toHaveBeenCalledWith('Snooze', { surface: 'post_login_passkey_prompt' })
     expect(onSnoozeMock).toHaveBeenCalledTimes(1)
 
     rerender(
@@ -110,7 +82,6 @@ describe('PasskeyEnrollmentPrompt', () => {
     )
 
     await user.click(screen.getByRole('button', { name: /don't ask again/i }))
-    expect(trackAuthMock).toHaveBeenCalledWith('Ignore', { surface: 'post_login_passkey_prompt' })
     expect(onIgnoreMock).toHaveBeenCalledTimes(1)
   })
 })

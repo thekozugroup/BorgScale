@@ -6,7 +6,6 @@ from fastapi.testclient import TestClient
 
 from app.database.models import (
     DeleteArchiveJob,
-    LicensingState,
     Repository,
     SystemSettings,
 )
@@ -14,13 +13,6 @@ from app.services.archive_browse_service import parse_archive_items
 
 
 def _enable_borg_v2(test_db, *, fast_browse=False):
-    state = test_db.query(LicensingState).first()
-    if state is None:
-        state = LicensingState(instance_id="test-instance-v2-archives")
-        test_db.add(state)
-    state.plan = "pro"
-    state.status = "active"
-    state.is_trial = False
     settings = test_db.query(SystemSettings).first()
     if settings is None:
         settings = SystemSettings()
@@ -58,7 +50,6 @@ class TestV2ArchiveRoutes:
     def test_list_archives_by_repository_id(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
 
         with patch(
@@ -89,7 +80,6 @@ class TestV2ArchiveRoutes:
     def test_list_archives_returns_404_for_unknown_repo(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
 
         response = test_client.get(
             "/api/v2/archives/list?repository=/missing/repo", headers=admin_headers
@@ -104,7 +94,6 @@ class TestV2ArchiveRoutes:
     def test_get_archive_info_by_path_includes_files(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db, path="/tmp/v2-info-repo")
 
         info_payload = {
@@ -196,7 +185,6 @@ class TestV2ArchiveRoutes:
     def test_get_archive_info_returns_raw_text_for_invalid_json(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
 
         with patch(
@@ -220,7 +208,6 @@ class TestV2ArchiveRoutes:
     def test_get_archive_contents_filters_nested_paths(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
 
         stdout = "\n".join(
@@ -291,7 +278,6 @@ class TestV2ArchiveRoutes:
     def test_get_archive_contents_sums_nested_descendants_for_directory_size(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
         stdout = "\n".join(
             [
@@ -360,9 +346,8 @@ class TestV2ArchiveRoutes:
     def test_get_archive_contents_passes_requested_path_to_borg2(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(
-            test_db, source_directories=["/local/Users/karanhudia/Downloads"]
+            test_db, source_directories=["/local/Users/demo/Downloads"]
         )
 
         with (
@@ -401,7 +386,7 @@ class TestV2ArchiveRoutes:
     ):
         _enable_borg_v2(test_db, fast_browse=True)
         repo = _create_v2_repo(
-            test_db, source_directories=["/local/Users/karanhudia/Downloads"]
+            test_db, source_directories=["/local/Users/demo/Downloads"]
         )
 
         with (
@@ -495,9 +480,8 @@ class TestV2ArchiveRoutes:
     def test_get_archive_contents_uses_archive_id_selector_without_resolving_name(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(
-            test_db, source_directories=["/local/Users/karanhudia/Downloads"]
+            test_db, source_directories=["/local/Users/demo/Downloads"]
         )
         archive_id = "10614da295b13209b207fc2499d67e7f10c24f4a1745e482bd3fc2595e4ec7fd"
 
@@ -535,7 +519,6 @@ class TestV2ArchiveRoutes:
     def test_get_archive_contents_uses_cached_items_when_available(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
         cached_items = [
             {
@@ -570,7 +553,6 @@ class TestV2ArchiveRoutes:
     def test_get_archive_contents_uses_archive_id_cache_key(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
         archive_id = "10614da295b13209b207fc2499d67e7f10c24f4a1745e482bd3fc2595e4ec7fd"
         cached_items = [
@@ -608,7 +590,6 @@ class TestV2ArchiveRoutes:
     def test_get_archive_contents_caches_items_by_archive_and_path(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
         stdout = "\n".join(
             [
@@ -665,7 +646,6 @@ class TestV2ArchiveRoutes:
     def test_get_archive_contents_does_not_precompute_other_directories(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
         stdout = "\n".join(
             json.dumps(
@@ -708,7 +688,6 @@ class TestV2ArchiveRoutes:
     def test_download_file_success(
         self, test_client: TestClient, admin_headers, test_db, tmp_path
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
         archive_path = tmp_path / "extract"
 
@@ -736,7 +715,6 @@ class TestV2ArchiveRoutes:
     def test_download_file_uses_archive_id_selector(
         self, test_client: TestClient, admin_headers, test_db, tmp_path
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
         archive_id = "10614da295b13209b207fc2499d67e7f10c24f4a1745e482bd3fc2595e4ec7fd"
 
@@ -768,7 +746,6 @@ class TestV2ArchiveRoutes:
     def test_download_file_returns_500_when_extract_fails(
         self, test_client: TestClient, admin_headers, test_db, tmp_path
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
 
         with patch("app.api.v2.archives.tempfile.mkdtemp", return_value=str(tmp_path)):
@@ -792,7 +769,6 @@ class TestV2ArchiveRoutes:
     def test_download_file_returns_404_when_extracted_file_is_missing(
         self, test_client: TestClient, admin_headers, test_db, tmp_path
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
 
         with patch("app.api.v2.archives.tempfile.mkdtemp", return_value=str(tmp_path)):
@@ -814,7 +790,6 @@ class TestV2ArchiveRoutes:
     def test_delete_archive_requires_admin(
         self, test_client: TestClient, auth_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
 
         response = test_client.delete(
@@ -831,7 +806,6 @@ class TestV2ArchiveRoutes:
     def test_delete_archive_success_creates_job(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
 
         with patch(
@@ -855,7 +829,6 @@ class TestV2ArchiveRoutes:
     def test_delete_archive_rejects_duplicate_running_job(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
         test_db.add(
             DeleteArchiveJob(
@@ -881,7 +854,6 @@ class TestV2ArchiveRoutes:
     def test_delete_job_status_returns_logs(
         self, test_client: TestClient, admin_headers, test_db, tmp_path
     ):
-        _enable_borg_v2(test_db)
         log_file = tmp_path / "delete.log"
         log_file.write_text("archive deleted")
         job = DeleteArchiveJob(
@@ -909,7 +881,6 @@ class TestV2ArchiveRoutes:
     def test_delete_job_status_returns_404_when_missing(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
 
         response = test_client.get(
             "/api/v2/archives/delete-jobs/9999", headers=admin_headers

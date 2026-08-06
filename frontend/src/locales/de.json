@@ -181,7 +181,6 @@
     "overline": "Erste Anmeldung",
     "title": "Neues Passwort setzen oder fortfahren",
     "description": "Du kannst jetzt ein neues Passwort setzen oder diesen Schritt überspringen und mit dem Dashboard fortfahren.",
-    "flowHint": "Nach diesem Schritt fährt BorgScale mit Passkeys, der Analyse-Einwilligung und aktiven Ankündigungen fort.",
     "skipHint": "Du kannst diesen Schritt überspringen und das Passwort später in den Kontoeinstellungen ändern.",
     "skip": "Jetzt überspringen"
   },
@@ -212,7 +211,6 @@
       "appearance": "Erscheinungsbild",
       "notifications": "Benachrichtigungen",
       "preferences": "Einstellungen",
-      "licensing": "Lizenzierung",
       "systemLabel": "System",
       "mqtt": "MQTT",
       "cache": "Cache",
@@ -227,14 +225,14 @@
     "menu": {
       "accountAndSecurityDesc": "Profil, Passwort, 2FA, Passkeys",
       "appearanceDesc": "Design, Sprache",
-      "notificationsDesc": "Benachrichtigungen & Einstellungen"
+      "notificationsDesc": "Benachrichtigungen & Einstellungen",
+      "openSourceDesc": "Frei und Open Source (AGPL-3.0)"
     },
     "versionInfo": "Versionsinformationen",
     "app": "App:",
     "loading": "Lädt...",
     "welcome": "Willkommen,",
-    "logout": "Abmelden",
-    "yourPlan": "Your Plan"
+    "logout": "Abmelden"
   },
   "status": {
     "completed": "Abgeschlossen",
@@ -1800,17 +1798,11 @@
     "save": "Einstellungen speichern",
     "saving": "Speichert...",
     "updatedSuccessfully": "Einstellungen erfolgreich aktualisiert",
-    "analyticsTitle": "Anonyme Nutzungsanalyse",
-    "analyticsDescription": "Hilf uns, BorgScale zu verbessern, indem du anonyme Nutzungsdaten teilst. Wir erfassen Seitenaufrufe, Funktionsklicks und Browser-Typ – ohne IP-Adressen, Hostnamen, Cookies oder persönlich identifizierbare Informationen zu verfolgen.",
-    "enableAnalytics": "Analysen aktivieren",
     "languageTitle": "Sprache",
     "languageDescription": "Wähle die Sprache der Benutzeroberfläche",
     "languageLabel": "Oberflächensprache",
     "languageSaved": "Sprache erfolgreich aktualisiert",
-    "updateFailed": "Einstellungen konnten nicht aktualisiert werden",
-    "analyticsTransparencyBold": "Volle Transparenz:",
-    "analyticsTransparencyLink": "Unser Analyse-Dashboard öffentlich einsehen",
-    "analyticsTransparencyAfterLink": "um genau zu sehen, was wir erfassen. Anonym und datenschutzorientiert."
+    "updateFailed": "Einstellungen konnten nicht aktualisiert werden"
   },
   "betaFeatures": {
     "title": "Beta-Funktionen",
@@ -2071,19 +2063,6 @@
     "eta": "Verbleibend:",
     "currentFile": "Aktuelle Datei:",
     "duration": "Dauer:"
-  },
-  "analyticsConsent": {
-    "title": "Hilf uns, BorgScale zu verbessern",
-    "message": "Wir erfassen anonyme Nutzungsdaten, um zu verstehen, wie BorgScale verwendet wird, und es zu verbessern. Es werden keine persönlichen Informationen, IP-Adressen, Hostnamen oder Sicherungsdaten erfasst.",
-    "accept": "Akzeptieren",
-    "decline": "Ablehnen",
-    "learnMore": "Mehr erfahren",
-    "viewDashboard": "Unser öffentliches Analyse-Dashboard ansehen",
-    "viewDashboardSuffix": "um genau zu sehen, was wir erfassen.",
-    "enableToggle": "Anonyme Analysen aktivieren",
-    "continue": "Weiter",
-    "saving": "Speichert...",
-    "changeAnytime": "Du kannst dies jederzeit in Einstellungen → Einstellungen ändern"
   },
   "lastRestoreSection": {
     "title": "Letzte Wiederherstellung",
@@ -2940,11 +2919,6 @@
     "failedToDownloadKeyfile": "Schlüsseldatei konnte nicht heruntergeladen werden",
     "noArchivesDescription": "Dieses Repository wurde initialisiert, enthält aber keine Archive. Speicherstatistiken erscheinen hier nach der ersten Sicherung.",
     "failedToLoad": "Repository-Informationen konnten nicht geladen werden. Stelle sicher, dass das Repository zugänglich und ordnungsgemäß initialisiert ist."
-  },
-  "analyticsBanner": {
-    "viewDashboardLink": "Unser öffentliches Analyse-Dashboard anzeigen",
-    "viewDashboardSuffix": "um genau zu sehen, was wir erfassen.",
-    "changeAnytimeNote": "Du kannst dies jederzeit in Einstellungen → Präferenzen ändern"
   },
   "repositoryScripts": {
     "errors": {

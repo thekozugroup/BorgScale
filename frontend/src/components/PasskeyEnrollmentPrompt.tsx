@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -6,7 +5,6 @@ import { Fingerprint, ShieldCheck, Zap, KeyRound, Loader2 } from 'lucide-react'
 import { getApiErrorDetail } from '../utils/apiErrors'
 import { translateBackendKey } from '../utils/translateBackendKey'
 import { useAuth } from '../hooks/useAuth'
-import { useAnalytics } from '../hooks/useAnalytics'
 import ResponsiveDialog from './ResponsiveDialog'
 import { Button } from '@/components/ui/button'
 
@@ -43,28 +41,14 @@ export default function PasskeyEnrollmentPrompt({
 }: PasskeyEnrollmentPromptProps) {
   const { t } = useTranslation()
   const { enrollPasskeyFromRecentLogin } = useAuth()
-  const { trackAuth, EventAction } = useAnalytics()
-
-  useEffect(() => {
-    if (!open) return
-    trackAuth(EventAction.VIEW, { surface: 'post_login_passkey_prompt' })
-  }, [EventAction.VIEW, open, trackAuth])
 
   const addPasskeyMutation = useMutation({
     mutationFn: async () => enrollPasskeyFromRecentLogin(),
     onSuccess: async () => {
-      trackAuth(EventAction.COMPLETE, {
-        surface: 'post_login_passkey_prompt',
-        operation: 'enroll_passkey',
-      })
       toast.success(t('settings.account.security.passkeyAddedToast'))
       await onSuccess()
     },
     onError: (error: unknown) => {
-      trackAuth(EventAction.FAIL, {
-        surface: 'post_login_passkey_prompt',
-        operation: 'enroll_passkey',
-      })
       toast.error(
         translateBackendKey(getApiErrorDetail(error)) ||
           t('settings.account.security.passkeyAddFailed')
@@ -76,21 +60,15 @@ export default function PasskeyEnrollmentPrompt({
 
   const handleClose = () => {
     if (isPending) return
-    trackAuth('Snooze', { surface: 'post_login_passkey_prompt' })
     onSnooze()
   }
 
   const handleIgnore = () => {
     if (isPending) return
-    trackAuth('Ignore', { surface: 'post_login_passkey_prompt' })
     onIgnore()
   }
 
   const handleSubmit = () => {
-    trackAuth(EventAction.START, {
-      surface: 'post_login_passkey_prompt',
-      operation: 'enroll_passkey',
-    })
     void addPasskeyMutation.mutateAsync()
   }
 

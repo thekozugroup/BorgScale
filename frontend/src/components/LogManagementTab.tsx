@@ -6,7 +6,6 @@ import SettingsCard from './SettingsCard'
 import { toast } from 'sonner'
 import { settingsAPI } from '../services/api'
 import { translateBackendKey } from '../utils/translateBackendKey'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -32,7 +31,6 @@ interface SystemSettings {
 const LogManagementTab: React.FC = () => {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const { trackSystem, EventAction } = useAnalytics()
 
   const [logSavePolicy, setLogSavePolicy] = useState('failed_and_warnings')
   const [retentionDays, setRetentionDays] = useState(30)
@@ -101,13 +99,6 @@ const LogManagementTab: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['system-settings'] })
       queryClient.invalidateQueries({ queryKey: ['log-storage-stats'] })
       setHasChanges(false)
-      trackSystem(EventAction.EDIT, {
-        section: 'log_management',
-        log_save_policy: logSavePolicy,
-        retention_days: retentionDays,
-        max_total_size_mb: maxTotalSizeMb,
-        cleanup_on_startup: cleanupOnStartup,
-      })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -126,7 +117,6 @@ const LogManagementTab: React.FC = () => {
       toast.success(translateBackendKey(data.message) || t('logManagement.cleanupCompleted'))
       queryClient.invalidateQueries({ queryKey: ['log-storage-stats'] })
       queryClient.invalidateQueries({ queryKey: ['system-settings'] })
-      trackSystem(EventAction.DELETE, { section: 'log_management', operation: 'manual_cleanup' })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {

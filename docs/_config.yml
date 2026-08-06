@@ -14,7 +14,7 @@ color_scheme: dark
 logo: "/assets/images/logo.png"
 
 # Footer content
-footer_content: "Maintained by The Kozu Group. Forked from borg-ui by Karan Hudia. Distributed under the AGPL-3.0 License."
+footer_content: "Maintained by The Kozu Group. Distributed under the AGPL-3.0 License."
 
 # Back to top link
 back_to_top: true

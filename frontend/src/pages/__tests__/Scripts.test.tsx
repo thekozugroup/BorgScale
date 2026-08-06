@@ -11,21 +11,6 @@ import Scripts from '../Scripts'
 import api from '../../services/api'
 import { toast } from 'sonner'
 
-const trackScripts = vi.fn()
-
-vi.mock('../../hooks/useAnalytics', () => ({
-  useAnalytics: () => ({
-    trackScripts,
-    EventAction: {
-      VIEW: 'View',
-      CREATE: 'Create',
-      EDIT: 'Edit',
-      DELETE: 'Delete',
-      TEST: 'Test',
-    },
-  }),
-}))
-
 vi.mock('../../hooks/useAuth', () => ({
   useAuth: () => ({
     user: {
@@ -188,7 +173,6 @@ describe('Scripts page', () => {
         })
       )
     })
-    expect(trackScripts).toHaveBeenCalledWith('Create', 'Rotate Logs', expect.any(Object))
 
     const cleanupRow = screen.getByText('Cleanup').closest('tr')
     const actionButtons = cleanupRow ? Array.from(cleanupRow.querySelectorAll('button')) : []
@@ -213,7 +197,6 @@ describe('Scripts page', () => {
         })
       )
     })
-    expect(trackScripts).toHaveBeenCalledWith('Edit', 'Cleanup', expect.any(Object))
 
     expect(playButton).toBeTruthy()
     await user.click(playButton!)
@@ -229,11 +212,6 @@ describe('Scripts page', () => {
       })
     })
     expect(await screen.findByText('ok')).toBeInTheDocument()
-    expect(trackScripts).toHaveBeenCalledWith(
-      'Test',
-      'Cleanup',
-      expect.objectContaining({ success: true })
-    )
 
     // Close test dialog before clicking delete (dialog sets pointer-events:none on body)
     const closeButtons = within(testDialog).getAllByRole('button', { name: /close/i })
@@ -250,7 +228,6 @@ describe('Scripts page', () => {
     await waitFor(() => {
       expect(api.delete).toHaveBeenCalledWith('/scripts/1')
     })
-    expect(trackScripts).toHaveBeenCalledWith('Delete', 'Cleanup', { category: 'custom' })
   })
 
   it('detects custom parameters, ignores borgscale reserved variables, and preserves secret toggles', async () => {
@@ -290,7 +267,7 @@ describe('Scripts page', () => {
     expect(within(createDialog).getByText('Default: /srv')).toBeInTheDocument()
   })
 
-  it('shows failed test output and tracks an unsuccessful script test', async () => {
+  it('shows failed test output for an unsuccessful script test', async () => {
     const user = userEvent.setup()
     vi.mocked(api.post).mockImplementation((url: string) => {
       if (url === '/scripts/1/test') {
@@ -320,11 +297,6 @@ describe('Scripts page', () => {
 
     expect(await screen.findByText(/execution failed/i)).toBeInTheDocument()
     expect(await screen.findByText(/scripts.errors.failedToExecute/i)).toBeInTheDocument()
-    expect(trackScripts).toHaveBeenCalledWith(
-      'Test',
-      'Cleanup',
-      expect.objectContaining({ success: false, parameter_count: 1 })
-    )
   })
 
   it('prevents deleting template scripts', async () => {

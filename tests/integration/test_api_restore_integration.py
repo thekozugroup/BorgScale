@@ -19,20 +19,6 @@ def _require_borg2_binary() -> str:
     return borg2_path
 
 
-def _enable_borg_v2(test_db) -> None:
-    from app.database.models import LicensingState
-
-    state = test_db.query(LicensingState).first()
-    if state is None:
-        state = LicensingState(instance_id="integration-borg-v2-restore")
-        test_db.add(state)
-
-    state.plan = "pro"
-    state.status = "active"
-    state.is_trial = False
-    test_db.commit()
-
-
 def _create_borg2_repo_with_archives(test_db, tmp_path):
     from app.database.models import Repository
     from tests.utils.borg import (
@@ -43,7 +29,6 @@ def _create_borg2_repo_with_archives(test_db, tmp_path):
     )
 
     borg2_binary = _require_borg2_binary()
-    _enable_borg_v2(test_db)
 
     repo_path = tmp_path / "borg2-restore-repo"
     source_path = tmp_path / "borg2-restore-source"

@@ -13,7 +13,7 @@ from sqlalchemy.orm import sessionmaker
 from app.api.v2 import repositories as repositories_v2_api
 from app.core.borg2 import BORG2_ENCRYPTION_MODES
 from app.config import settings
-from app.database.models import LicensingState, Repository, SystemSettings
+from app.database.models import Repository, SystemSettings
 from app.database.models import SSHConnection, SSHKey
 
 
@@ -26,13 +26,6 @@ def _enable_borg_v2(test_db, **settings):
         for key, value in settings.items():
             setattr(system_settings, key, value)
 
-    state = test_db.query(LicensingState).first()
-    if state is None:
-        state = LicensingState(instance_id="test-instance-v2-repositories")
-        test_db.add(state)
-    state.plan = "pro"
-    state.status = "active"
-    state.is_trial = False
     test_db.commit()
 
 
@@ -68,7 +61,6 @@ class TestV2RepositoryRoutes:
     def test_encryption_modes_success(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
 
         response = test_client.get(
             "/api/v2/repositories/encryption-modes", headers=admin_headers
@@ -80,7 +72,6 @@ class TestV2RepositoryRoutes:
     def test_create_repository_success(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         payload = {
             "name": "Borg 2 Repo",
             "path": "/tmp/v2-create-repo",
@@ -125,7 +116,6 @@ class TestV2RepositoryRoutes:
     def test_create_repository_rejects_invalid_encryption(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
 
         response = test_client.post(
             "/api/v2/repositories/",
@@ -145,7 +135,6 @@ class TestV2RepositoryRoutes:
     def test_create_repository_requires_admin(
         self, test_client: TestClient, auth_headers, test_db
     ):
-        _enable_borg_v2(test_db)
 
         response = test_client.post(
             "/api/v2/repositories/",
@@ -166,7 +155,6 @@ class TestV2RepositoryRoutes:
     def test_create_repository_rejects_missing_ssh_connection(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
 
         response = test_client.post(
             "/api/v2/repositories/",
@@ -187,7 +175,6 @@ class TestV2RepositoryRoutes:
     def test_create_repository_with_ssh_connection_uses_ssh_key_rsh(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
 
         cipher = Fernet(base64.urlsafe_b64encode(settings.secret_key.encode()[:32]))
         ssh_key = SSHKey(
@@ -241,7 +228,6 @@ class TestV2RepositoryRoutes:
     def test_create_repository_reports_init_failure(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
 
         with patch(
             "app.api.v2.repositories._rcreate",
@@ -270,7 +256,6 @@ class TestV2RepositoryRoutes:
     def test_create_repository_rejects_duplicate_name(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         _create_v2_repo(test_db, name="Existing Repo", path="/tmp/existing-repo")
 
         response = test_client.post(
@@ -289,7 +274,6 @@ class TestV2RepositoryRoutes:
     def test_import_repository_rejects_verification_failure(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
 
         with patch(
             "app.api.v2.repositories._rinfo",
@@ -313,7 +297,6 @@ class TestV2RepositoryRoutes:
     def test_import_repository_success(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
 
         with patch(
             "app.api.v2.repositories._rinfo",
@@ -356,7 +339,6 @@ class TestV2RepositoryRoutes:
     def test_import_repository_writes_keyfile_content_for_verification(
         self, test_client: TestClient, admin_headers, test_db, tmp_path
     ):
-        _enable_borg_v2(test_db)
 
         fake_home = tmp_path / "home"
         fake_home.mkdir()
@@ -403,7 +385,6 @@ class TestV2RepositoryRoutes:
     def test_import_repository_rejects_duplicate_path(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         _create_v2_repo(test_db, name="Existing Import", path="/tmp/existing-import")
 
         response = test_client.post(
@@ -423,7 +404,6 @@ class TestV2RepositoryRoutes:
     async def test_v2_metadata_routes_serialize_borg_commands_per_repository(
         self, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(
             test_db, name="Serialized Repo", path="/tmp/v2-serialized"
         )
@@ -501,7 +481,6 @@ class TestV2RepositoryRoutes:
     def test_get_repository_info_merges_rinfo_and_disk_usage(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db, path="/tmp/v2-info-repo")
 
         with patch(
@@ -549,7 +528,6 @@ class TestV2RepositoryRoutes:
     def test_get_repository_info_returns_500_on_info_failure(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db, path="/tmp/v2-info-fail")
 
         with patch(
@@ -568,7 +546,6 @@ class TestV2RepositoryRoutes:
     def test_get_repository_info_retries_with_bypass_lock_on_lock_like_failure(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db, path="/tmp/v2-lock-retry")
 
         with (
@@ -616,7 +593,6 @@ class TestV2RepositoryRoutes:
     def test_get_repository_info_returns_404_for_missing_repo(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
 
         response = test_client.get(
             "/api/v2/repositories/999/info", headers=admin_headers
@@ -688,7 +664,6 @@ class TestV2RepositoryRoutes:
     def test_list_archives_returns_500_on_borg_failure(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
 
         with patch(
@@ -707,7 +682,6 @@ class TestV2RepositoryRoutes:
     def test_list_archives_returns_500_on_borg_failure(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
 
         with patch(
@@ -726,7 +700,6 @@ class TestV2RepositoryRoutes:
     def test_get_repository_stats_success(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
 
         with patch(
@@ -756,7 +729,6 @@ class TestV2RepositoryRoutes:
     def test_get_repository_stats_returns_500_on_borg_failure(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
 
         with patch(

@@ -5,26 +5,11 @@ import RepositoryWizard from '../RepositoryWizard'
 import { QueryClient } from '@tanstack/react-query'
 import { sshKeysAPI } from '../../services/api'
 
-const { mockTrack, mockTrackRepository } = vi.hoisted(() => ({
-  mockTrack: vi.fn(),
-  mockTrackRepository: vi.fn(),
-}))
-
 // Mock the API
 vi.mock('../../services/api', () => ({
   sshKeysAPI: {
     getSSHConnections: vi.fn(),
   },
-}))
-
-// Mock analytics hook
-vi.mock('../../hooks/useAnalytics', () => ({
-  useAnalytics: () => ({
-    track: mockTrack,
-    trackRepository: mockTrackRepository,
-    EventCategory: { REPOSITORY: 'repository' },
-    EventAction: { CREATE: 'create', EDIT: 'edit', UPLOAD: 'upload' },
-  }),
 }))
 
 // Mock child components
@@ -885,7 +870,7 @@ describe('RepositoryWizard', () => {
         )
       })
 
-      it('submits an uploaded keyfile for keyfile-based imports and tracks upload analytics', async () => {
+      it('submits an uploaded keyfile for keyfile-based imports', async () => {
         const user = userEvent.setup()
         const { onSubmit } = renderWizard('import')
 
@@ -946,13 +931,6 @@ describe('RepositoryWizard', () => {
           }),
           uploadedKeyfile
         )
-        expect(mockTrack).toHaveBeenCalledWith('repository', 'upload', {
-          source: 'wizard',
-          mode: 'import',
-        })
-        expect(mockTrackRepository).toHaveBeenCalledWith('upload', {
-          name: 'Imported Keyfile Repo',
-        })
       })
 
       it('submits a pasted keyfile as a generated file for import mode', async () => {

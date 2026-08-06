@@ -11,15 +11,11 @@ Thank you for your interest in contributing to BorgScale!
 
 ## Quick Start
 
-### Fork and Clone
+### Clone
 
 ```bash
-# Fork the repository on GitHub, then:
-git clone https://github.com/YOUR_USERNAME/borgscale.git
-cd borgscale
-
-# Add upstream remote
-git remote add upstream https://github.com/thekozugroup/BorgScale.git
+git clone https://github.com/thekozugroup/BorgScale.git
+cd BorgScale
 ```
 
 ### Create a Branch
@@ -56,7 +52,7 @@ docker-compose up -d --build
 
 ### Submit a Pull Request
 
-1. Push your changes to your fork
+1. Push your branch
 2. Open a pull request against `main`
 3. Describe your changes clearly
 4. Link any related issues
@@ -73,7 +69,8 @@ docker-compose up -d --build
 
 **Frontend (TypeScript/React)**
 - Use TypeScript for type safety
-- Follow Material-UI patterns
+- Build on the shadcn/ui primitives in `frontend/src/components/ui/`
+- Use the design tokens in `frontend/src/index.css`; never a raw colour
 - Keep components small and reusable
 - Use hooks for state management
 

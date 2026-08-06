@@ -1,6 +1,6 @@
 # Prometheus Metrics
 
-Borg-UI can expose Prometheus metrics at `/metrics` for monitoring and alerting.
+BorgScale can expose Prometheus metrics at `/metrics` for monitoring and alerting.
 
 Metrics are disabled by default. If you enable them, the recommended setup is:
 
@@ -65,12 +65,12 @@ scrape_configs:
 
 An example monitoring stack is included in this repository:
 
-- [examples/monitoring/docker-compose.yml](/examples/monitoring/docker-compose.yml)
-- [examples/monitoring/prometheus.yml](/examples/monitoring/prometheus.yml)
-- [examples/monitoring/grafana/provisioning/datasources/prometheus.yml](/examples/monitoring/grafana/provisioning/datasources/prometheus.yml)
-- [examples/monitoring/grafana/provisioning/dashboards/dashboards.yml](/examples/monitoring/grafana/provisioning/dashboards/dashboards.yml)
-- [examples/monitoring/grafana/provisioning/dashboards/json/borgscale-overview.json](/examples/monitoring/grafana/provisioning/dashboards/json/borgscale-overview.json)
-- [examples/monitoring/grafana/provisioning/dashboards/json/borgscale-jobs.json](/examples/monitoring/grafana/provisioning/dashboards/json/borgscale-jobs.json)
+- [examples/monitoring/docker-compose.yml](https://github.com/thekozugroup/BorgScale/blob/main/examples/monitoring/docker-compose.yml)
+- [examples/monitoring/prometheus.yml](https://github.com/thekozugroup/BorgScale/blob/main/examples/monitoring/prometheus.yml)
+- [examples/monitoring/grafana/provisioning/datasources/prometheus.yml](https://github.com/thekozugroup/BorgScale/blob/main/examples/monitoring/grafana/provisioning/datasources/prometheus.yml)
+- [examples/monitoring/grafana/provisioning/dashboards/dashboards.yml](https://github.com/thekozugroup/BorgScale/blob/main/examples/monitoring/grafana/provisioning/dashboards/dashboards.yml)
+- [examples/monitoring/grafana/provisioning/dashboards/json/borgscale-overview.json](https://github.com/thekozugroup/BorgScale/blob/main/examples/monitoring/grafana/provisioning/dashboards/json/borgscale-overview.json)
+- [examples/monitoring/grafana/provisioning/dashboards/json/borgscale-jobs.json](https://github.com/thekozugroup/BorgScale/blob/main/examples/monitoring/grafana/provisioning/dashboards/json/borgscale-jobs.json)
 
 Bring it up with:
 

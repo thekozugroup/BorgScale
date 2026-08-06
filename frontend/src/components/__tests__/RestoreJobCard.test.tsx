@@ -71,11 +71,11 @@ describe('RestoreJobCard', () => {
         ...baseJob,
         archive: 'backup',
         status: 'completed',
-        destination: '/Users/karanhudia/Documents',
+        destination: '/home/demo/Documents',
       }
       renderWithProviders(<RestoreJobCard job={job} />)
 
-      const destinationElement = screen.getByText('/Users/karanhudia/Documents')
+      const destinationElement = screen.getByText('/home/demo/Documents')
       expect(destinationElement).toBeInTheDocument()
     })
 

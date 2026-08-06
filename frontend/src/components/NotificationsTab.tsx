@@ -7,7 +7,6 @@ import { toast } from 'sonner'
 import { translateBackendKey } from '../utils/translateBackendKey'
 import { Repository } from '../types'
 import MultiRepositorySelector from './MultiRepositorySelector'
-import { useAnalytics } from '../hooks/useAnalytics'
 import NotificationCard from './NotificationCard'
 import ResponsiveDialog from './ResponsiveDialog'
 import { Button } from '@/components/ui/button'
@@ -44,7 +43,6 @@ interface NotificationSetting {
 const NotificationsTab: React.FC = () => {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const { trackNotifications, EventAction } = useAnalytics()
   const [showDialog, setShowDialog] = useState(false)
   const [editingNotification, setEditingNotification] = useState<NotificationSetting | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<NotificationSetting | null>(null)
@@ -94,11 +92,6 @@ const NotificationsTab: React.FC = () => {
       toast.success(t('notifications.serviceAddedSuccessfully'))
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
       setShowDialog(false)
-      trackNotifications(EventAction.CREATE, {
-        enabled: formData.enabled,
-        monitor_all_repositories: formData.monitor_all_repositories,
-        repository_count: formData.repository_ids.length,
-      })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -116,11 +109,6 @@ const NotificationsTab: React.FC = () => {
       toast.success(t('notifications.serviceUpdatedSuccessfully'))
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
       setShowDialog(false)
-      trackNotifications(EventAction.EDIT, {
-        enabled: formData.enabled,
-        monitor_all_repositories: formData.monitor_all_repositories,
-        repository_count: formData.repository_ids.length,
-      })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -137,7 +125,6 @@ const NotificationsTab: React.FC = () => {
       toast.success(t('notifications.serviceDeletedSuccessfully'))
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
       setDeleteConfirm(null)
-      trackNotifications(EventAction.DELETE, {})
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -159,7 +146,6 @@ const NotificationsTab: React.FC = () => {
         )
       }
       setTesting(null)
-      trackNotifications(EventAction.TEST, { success: !!response.data.success })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -241,10 +227,6 @@ const NotificationsTab: React.FC = () => {
         : [],
     })
     setShowDialog(true)
-    trackNotifications(EventAction.VIEW, {
-      source: 'duplicate',
-      repository_count: notification.repositories.length,
-    })
   }
 
   const handleSubmit = () => {
@@ -295,7 +277,6 @@ const NotificationsTab: React.FC = () => {
             resetForm()
             setEditingNotification(null)
             setShowDialog(true)
-            trackNotifications(EventAction.VIEW, { source: 'create_dialog' })
           }}
           className="w-full sm:w-auto"
         >

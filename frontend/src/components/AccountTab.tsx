@@ -5,7 +5,6 @@ import { authAPI, settingsAPI } from '../services/api'
 import { toast } from 'sonner'
 import QRCode from 'qrcode'
 import { useAuth } from '../hooks/useAuth'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { getApiErrorDetail } from '../utils/apiErrors'
 import { getGlobalRolePresentation } from '../utils/rolePresentation'
 import { translateBackendKey } from '../utils/translateBackendKey'
@@ -35,7 +34,6 @@ const AccountTab: React.FC = () => {
     proxyAuthEnabled,
     markRecentPasswordConfirmation,
   } = useAuth()
-  const { trackSettings, EventAction } = useAnalytics()
   const canManageSystem = hasGlobalPermission('settings.system.manage')
   const hasGlobalRepositoryAccess = hasGlobalPermission('repositories.manage_all')
 
@@ -96,7 +94,6 @@ const AccountTab: React.FC = () => {
       setChangePasswordForm({ current_password: '', new_password: '', confirm_password: '' })
       setShowChangePasswordDialog(false)
       await refreshUser()
-      trackSettings(EventAction.EDIT, { section: 'account', operation: 'change_password' })
     },
     onError: (error: unknown) => {
       toast.error(
@@ -176,11 +173,6 @@ const AccountTab: React.FC = () => {
       setPasskeyPassword('')
       await refreshUser()
       await refetchPasskeys()
-      trackSettings(EventAction.CREATE, {
-        section: 'account',
-        operation: 'add_passkey',
-        surface: 'security',
-      })
     },
     onError: (error: unknown) => {
       toast.error(
@@ -196,11 +188,6 @@ const AccountTab: React.FC = () => {
       toast.success(t('settings.account.security.passkeyDeletedToast'))
       await refreshUser()
       await refetchPasskeys()
-      trackSettings(EventAction.DELETE, {
-        section: 'account',
-        operation: 'delete_passkey',
-        surface: 'security',
-      })
     },
     onError: (error: unknown) => {
       toast.error(
@@ -221,7 +208,6 @@ const AccountTab: React.FC = () => {
     onSuccess: async () => {
       toast.success(t('settings.account.toasts.profileUpdated'))
       await refreshUser()
-      trackSettings(EventAction.EDIT, { section: 'account', operation: 'update_personal_profile' })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -242,10 +228,6 @@ const AccountTab: React.FC = () => {
     onSuccess: async () => {
       toast.success(t('settings.account.toasts.deploymentUpdated'))
       await refreshUser()
-      trackSettings(EventAction.EDIT, {
-        section: 'account',
-        operation: 'update_deployment_profile',
-      })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -258,7 +240,6 @@ const AccountTab: React.FC = () => {
 
   const setAccountSurface = (view: AccountView) => {
     setAccountView(view)
-    trackSettings(EventAction.VIEW, { section: 'account', surface: view })
   }
 
   const username = user?.username || ''
@@ -361,17 +342,9 @@ const AccountTab: React.FC = () => {
                 onSaveDeployment={() => updateDeploymentMutation.mutate(deploymentForm)}
                 onOpenChangePassword={() => {
                   setShowChangePasswordDialog(true)
-                  trackSettings(EventAction.VIEW, {
-                    section: 'account',
-                    operation: 'open_change_password_dialog',
-                  })
                 }}
                 onOpenEditProfile={() => {
                   setShowEditProfileDialog(true)
-                  trackSettings(EventAction.VIEW, {
-                    section: 'account',
-                    operation: 'open_edit_profile_dialog',
-                  })
                 }}
               />
             )}

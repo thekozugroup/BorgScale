@@ -9,20 +9,8 @@ from app.database.models import (
     BackupJob,
     CheckJob,
     CompactJob,
-    LicensingState,
     Repository,
 )
-
-
-def _enable_borg_v2(test_db):
-    state = test_db.query(LicensingState).first()
-    if state is None:
-        state = LicensingState(instance_id="test-instance-v2-backups")
-        test_db.add(state)
-    state.plan = "pro"
-    state.status = "active"
-    state.is_trial = False
-    test_db.commit()
 
 
 def _create_v2_repo(
@@ -48,7 +36,6 @@ def _create_v2_repo(
 @pytest.mark.unit
 class TestV2BackupRoutes:
     def test_backup_run_success(self, test_client: TestClient, admin_headers, test_db):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(
             test_db, source_directories=["/data/source-a", "/data/source-b"]
         )
@@ -86,7 +73,6 @@ class TestV2BackupRoutes:
     def test_backup_run_rejects_missing_source_directories(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db)
 
         with patch(
@@ -108,7 +94,6 @@ class TestV2BackupRoutes:
     def test_backup_run_returns_500_when_shared_backup_execution_fails(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db, source_directories=["/data/source-a"])
 
         async def mark_backup_failed(
@@ -134,7 +119,6 @@ class TestV2BackupRoutes:
     def test_backup_run_rejects_missing_repository(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
 
         response = test_client.post(
             "/api/v2/backup/run",
@@ -150,7 +134,6 @@ class TestV2BackupRoutes:
     def test_backup_prune_requires_admin(
         self, test_client: TestClient, auth_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db, source_directories=["/data/source"])
 
         response = test_client.post(
@@ -168,7 +151,6 @@ class TestV2BackupRoutes:
     def test_backup_prune_success(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db, source_directories=["/data/source"])
 
         with (
@@ -214,7 +196,6 @@ class TestV2BackupRoutes:
     def test_backup_prune_dry_run_returns_legacy_modal_shape(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db, source_directories=["/data/source"])
 
         with (
@@ -254,7 +235,6 @@ class TestV2BackupRoutes:
     def test_backup_compact_creates_job(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db, source_directories=["/data/source"])
 
         with patch("app.api.v2.backups.start_background_maintenance_job") as mock_start:
@@ -276,7 +256,6 @@ class TestV2BackupRoutes:
     async def test_backup_compact_dispatcher_uses_stable_repo_id(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db, source_directories=["/data/source"])
         dispatched = {}
 
@@ -308,7 +287,6 @@ class TestV2BackupRoutes:
     def test_backup_compact_rejects_duplicate_running_job(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db, source_directories=["/data/source"])
         test_db.add(
             CompactJob(
@@ -333,7 +311,6 @@ class TestV2BackupRoutes:
     def test_backup_check_creates_job(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db, source_directories=["/data/source"])
 
         with patch("app.api.v2.backups.start_background_maintenance_job") as mock_start:
@@ -356,7 +333,6 @@ class TestV2BackupRoutes:
     async def test_backup_check_dispatcher_uses_stable_repo_id(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db, source_directories=["/data/source"])
         dispatched = {}
 
@@ -388,7 +364,6 @@ class TestV2BackupRoutes:
     def test_backup_check_rejects_duplicate_running_job(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = _create_v2_repo(test_db, source_directories=["/data/source"])
         test_db.add(
             CheckJob(

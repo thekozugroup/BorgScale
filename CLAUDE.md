@@ -2,10 +2,10 @@
 
 ## Project overview
 
-BorgScale is the AGPL-3.0 fork of `karanhudia/borgscale` maintained by
-The Kozu Group. The fork preserves the upstream's open-source
-baseline while removing the closed-ecosystem activation and
-analytics scaffolding announced for the post-relicense direction.
+BorgScale is a self-hosted web UI for BorgBackup, maintained by The
+Kozu Group. It runs backups, browses and restores archives, manages
+repositories, and automates schedules. Every feature is available to
+every instance: no tiers, no license keys, no phone-home.
 Source: https://github.com/thekozugroup/BorgScale.
 
 ## Repository layout
@@ -16,7 +16,7 @@ Source: https://github.com/thekozugroup/BorgScale.
 | `frontend/` | React 18 + TypeScript + Vite frontend |
 | `tests/` | pytest backend tests |
 | `frontend/src/**/__tests__/` | vitest frontend tests |
-| `docs/` | specs, plans, runbooks |
+| `docs/` | user guides, specs, runbooks |
 | `scripts/` | tooling: build, release, security |
 | `.github/workflows/` | CI |
 

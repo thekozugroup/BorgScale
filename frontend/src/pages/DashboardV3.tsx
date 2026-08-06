@@ -44,7 +44,6 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { formatDistanceToNow, differenceInDays, startOfDay, addDays, format } from 'date-fns'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { dashboardAPI } from '../services/api'
 import StatusBadge from '../components/StatusBadge'
 
@@ -590,7 +589,6 @@ export default function DashboardV3() {
   const navigate = useNavigate()
   const { t } = useTranslation()
   usePageTitle(t('dashboard.pageTitle'))
-  const { trackNavigation, EventAction } = useAnalytics()
   const [nowMs] = React.useState(() => Date.now())
 
   const {
@@ -613,17 +611,7 @@ export default function DashboardV3() {
         className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive flex items-center justify-between gap-4"
       >
         <span>{t('dashboard.error.unavailable')}</span>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => {
-            trackNavigation(EventAction.VIEW, {
-              section: 'dashboard',
-              operation: 'retry_refresh',
-            })
-            refetch()
-          }}
-        >
+        <Button size="sm" variant="outline" onClick={() => refetch()}>
           {t('dashboard.error.retry')}
         </Button>
       </div>
@@ -666,18 +654,7 @@ export default function DashboardV3() {
             <StatusDot status={sysStatus} />
             {systemStatusText}
           </Badge>
-          <Button
-            size="sm"
-            variant="outline"
-            className="gap-1.5"
-            onClick={() => {
-              trackNavigation(EventAction.VIEW, {
-                section: 'dashboard',
-                operation: 'refresh',
-              })
-              refetch()
-            }}
-          >
+          <Button size="sm" variant="outline" className="gap-1.5" onClick={() => refetch()}>
             <RefreshCw className="h-3.5 w-3.5" />
             {t('common.buttons.refresh')}
           </Button>
@@ -864,11 +841,6 @@ export default function DashboardV3() {
                     role="button"
                     tabIndex={0}
                     onClick={() => {
-                      trackNavigation(EventAction.VIEW, {
-                        section: 'dashboard',
-                        destination: 'repositories',
-                        source: 'repository_health',
-                      })
                       navigate(repoHref)
                     }}
                     onKeyDown={(e) => {
@@ -1015,11 +987,6 @@ export default function DashboardV3() {
               variant="ghost"
               className="gap-1 text-xs text-muted-foreground"
               onClick={() => {
-                trackNavigation(EventAction.VIEW, {
-                  section: 'dashboard',
-                  destination: 'activity',
-                  source: 'recent_activity',
-                })
                 navigate('/activity')
               }}
             >

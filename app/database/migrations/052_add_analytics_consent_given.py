@@ -6,7 +6,7 @@ the user has seen and responded to the analytics consent banner.
 Changes analytics from opt-out to opt-in model.
 """
 
-# DEPRECATED in BorgScale (fork of borgscale): the analytics columns
+# DEPRECATED: BorgScale collects no analytics. These columns
 # created here are no longer read or written. The migration runs
 # unchanged to preserve historical replay; new schema work goes in
 # migration 100+.

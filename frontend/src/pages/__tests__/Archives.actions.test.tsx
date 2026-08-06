@@ -5,7 +5,6 @@ import Archives from '../Archives'
 import * as apiModule from '../../services/api'
 import { toast } from 'sonner'
 
-const trackArchive = vi.fn()
 const borgListArchivesMock = vi.fn()
 const borgGetInfoMock = vi.fn()
 const borgDeleteArchiveMock = vi.fn()
@@ -150,20 +149,6 @@ vi.mock('../../services/api', () => ({
   },
 }))
 
-vi.mock('../../hooks/useAnalytics', () => ({
-  useAnalytics: () => ({
-    trackArchive,
-    EventAction: {
-      FILTER: 'Filter',
-      VIEW: 'View',
-      START: 'Start',
-      MOUNT: 'Mount',
-      DELETE: 'Delete',
-      DOWNLOAD: 'Download',
-    },
-  }),
-}))
-
 vi.mock('react-router-dom', async (importOriginal) => {
   const actual = (await importOriginal()) as Record<string, unknown>
   return {
@@ -218,7 +203,7 @@ describe('Archives page actions', () => {
     borgDownloadFileMock.mockResolvedValue(undefined)
   })
 
-  it('tracks filter/view and calls download, restore, and mount APIs from archive actions', async () => {
+  it('calls download, restore, and mount APIs from archive actions', async () => {
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
     })
@@ -231,24 +216,12 @@ describe('Archives page actions', () => {
     await waitFor(() => {
       expect(borgListArchivesMock).toHaveBeenCalledTimes(1)
       expect(borgGetInfoMock).toHaveBeenCalledTimes(1)
-      expect(trackArchive).toHaveBeenCalledWith('Filter', repository, {
-        surface: 'archives_page',
-      })
     })
 
     await user.click(screen.getByText('View Archive'))
     await user.click(await screen.findByText('Download File'))
 
     expect(borgDownloadFileMock).toHaveBeenCalledWith('a1', '/etc/hosts')
-    expect(trackArchive).toHaveBeenCalledWith('View', repository, {
-      surface: 'archive_contents',
-      operation: 'open_archive',
-      archive_age_bucket: expect.any(String),
-    })
-    expect(trackArchive).toHaveBeenCalledWith('Download', repository, {
-      operation: 'download_archive_file',
-      archive_age_bucket: expect.any(String),
-    })
 
     await user.click(screen.getByText('Restore Archive'))
     await user.click(await screen.findByText('Confirm Restore'))
@@ -263,18 +236,6 @@ describe('Archives page actions', () => {
         'local',
         null
       )
-    })
-    expect(trackArchive).toHaveBeenCalledWith('View', repository, {
-      surface: 'restore_wizard',
-      operation: 'select_archive',
-      archive_age_bucket: expect.any(String),
-    })
-    expect(trackArchive).toHaveBeenCalledWith('Start', repository, {
-      operation: 'restore',
-      destination_type: 'local',
-      restore_path_count: 1,
-      uses_custom_destination: true,
-      archive_age_bucket: expect.any(String),
     })
 
     await user.click(screen.getByText('Mount Archive'))
@@ -307,7 +268,6 @@ describe('Archives page actions', () => {
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith('Failed to start restore')
     })
-    expect(trackArchive).not.toHaveBeenCalledWith('Start', repository)
   })
 
   it('loads repository info before requesting archives', async () => {
@@ -354,6 +314,5 @@ describe('Archives page actions', () => {
       expect(borgDeleteArchiveMock).toHaveBeenCalledWith('archive-1')
       expect(toast.error).toHaveBeenCalledWith('Failed to delete archive')
     })
-    expect(trackArchive).not.toHaveBeenCalledWith('Delete', repository)
   })
 })

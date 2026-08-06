@@ -22,29 +22,10 @@ from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
 from app.database.models import (
     CheckJob,
-    LicensingState,
     Repository,
     ScheduledJob,
     SSHConnection,
-    SystemSettings,
 )
-
-
-def _enable_borg_v2(test_db):
-    settings_row = test_db.query(SystemSettings).first()
-    if settings_row is None:
-        settings_row = SystemSettings()
-        test_db.add(settings_row)
-
-    state = test_db.query(LicensingState).first()
-    if state is None:
-        state = LicensingState(instance_id="test-instance-v2-repository-api")
-        test_db.add(state)
-
-    state.plan = "pro"
-    state.status = "active"
-    state.is_trial = False
-    test_db.commit()
 
 
 def _base_repository_payload(**overrides):
@@ -482,7 +463,6 @@ class TestRepositoriesCreate:
     def test_create_repository_delegates_borg2_payloads_to_v2_api(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
 
         with patch(
             "app.api.v2.repositories._rcreate",
@@ -521,7 +501,6 @@ class TestRepositoriesCreate:
     def test_legacy_prune_route_dispatches_v2_repo_via_router(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
         repo = Repository(
             **_base_repository_payload(name="Legacy Prune V2", borg_version=2)
         )
@@ -1519,7 +1498,6 @@ class TestRepositoriesImport:
     def test_import_repository_delegates_borg2_payloads_to_v2_api(
         self, test_client: TestClient, admin_headers, test_db
     ):
-        _enable_borg_v2(test_db)
 
         with patch(
             "app.api.v2.repositories._rinfo",

@@ -7,7 +7,6 @@ import { Button } from '../components/ui/button'
 import { Plus } from 'lucide-react'
 import { scheduleAPI, repositoriesAPI, backupAPI, scriptsAPI } from '../services/api'
 import { toast } from 'sonner'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { useAuth } from '../hooks/useAuth'
 import { usePermissions } from '../hooks/usePermissions'
 import { translateBackendKey } from '../utils/translateBackendKey'
@@ -21,8 +20,6 @@ import BackupHistorySection from '../components/BackupHistorySection'
 import RunningBackupsSection from '../components/RunningBackupsSection'
 import ScheduledJobsTable from '../components/ScheduledJobsTable'
 import { Repository } from '../types'
-import { useTrackedJobOutcomes } from '../hooks/useTrackedJobOutcomes'
-import { getJobDurationSeconds } from '../utils/analyticsProperties'
 
 interface ScheduledJob {
   id: number
@@ -82,7 +79,6 @@ const Schedule: React.FC = () => {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const location = useLocation()
-  const { track, EventCategory, EventAction } = useAnalytics()
   const { hasGlobalPermission } = useAuth()
   const { canDo } = usePermissions()
   const canManageRepositoriesGlobally = hasGlobalPermission('repositories.manage_all')
@@ -196,7 +192,6 @@ const Schedule: React.FC = () => {
       toast.success(t('schedule.toasts.jobCreated'))
       queryClient.invalidateQueries({ queryKey: ['scheduled-jobs'] })
       queryClient.invalidateQueries({ queryKey: ['upcoming-jobs'] })
-      track(EventCategory.BACKUP, EventAction.CREATE, { entity: 'schedule' })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -215,7 +210,6 @@ const Schedule: React.FC = () => {
       toast.success(t('schedule.toasts.jobUpdated'))
       queryClient.invalidateQueries({ queryKey: ['scheduled-jobs'] })
       queryClient.invalidateQueries({ queryKey: ['upcoming-jobs'] })
-      track(EventCategory.BACKUP, EventAction.EDIT, { entity: 'schedule' })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -233,7 +227,6 @@ const Schedule: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['scheduled-jobs'] })
       queryClient.invalidateQueries({ queryKey: ['upcoming-jobs'] })
       setDeleteConfirmJob(null)
-      track(EventCategory.BACKUP, EventAction.DELETE, { entity: 'schedule' })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -246,15 +239,10 @@ const Schedule: React.FC = () => {
   // Toggle job mutation
   const toggleJobMutation = useMutation({
     mutationFn: (job: ScheduledJob) => scheduleAPI.toggleScheduledJob(job.id),
-    onSuccess: (_response, job) => {
+    onSuccess: () => {
       toast.success(t('schedule.toasts.jobStatusUpdated'))
       queryClient.invalidateQueries({ queryKey: ['scheduled-jobs'] })
       queryClient.invalidateQueries({ queryKey: ['upcoming-jobs'] })
-      track(EventCategory.BACKUP, EventAction.EDIT, {
-        entity: 'schedule',
-        operation: 'toggle',
-        enabled: !job.enabled,
-      })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -267,16 +255,11 @@ const Schedule: React.FC = () => {
   // Run job now mutation
   const runJobNowMutation = useMutation({
     mutationFn: (job: ScheduledJob) => scheduleAPI.runScheduledJobNow(job.id),
-    onSuccess: (_response, job) => {
+    onSuccess: () => {
       toast.success(t('schedule.toasts.jobStarted'))
       queryClient.invalidateQueries({ queryKey: ['scheduled-jobs'] })
       queryClient.invalidateQueries({ queryKey: ['backup-status'] })
       queryClient.invalidateQueries({ queryKey: ['backup-jobs-scheduled'] })
-      track(EventCategory.BACKUP, EventAction.START, {
-        entity: 'schedule',
-        trigger: 'manual',
-        repository_count: job.repository_ids?.length || (job.repository_id ? 1 : 0),
-      })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -289,15 +272,10 @@ const Schedule: React.FC = () => {
   // Duplicate job mutation
   const duplicateJobMutation = useMutation({
     mutationFn: (job: ScheduledJob) => scheduleAPI.duplicateScheduledJob(job.id),
-    onSuccess: (_response, job) => {
+    onSuccess: () => {
       toast.success(t('schedule.toasts.jobDuplicated'))
       queryClient.invalidateQueries({ queryKey: ['scheduled-jobs'] })
       queryClient.invalidateQueries({ queryKey: ['upcoming-jobs'] })
-      track(EventCategory.BACKUP, EventAction.CREATE, {
-        entity: 'schedule',
-        source: 'duplicate',
-        repository_count: job.repository_ids?.length || (job.repository_id ? 1 : 0),
-      })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -339,34 +317,6 @@ const Schedule: React.FC = () => {
   const handleDuplicateJob = (job: ScheduledJob) => {
     duplicateJobMutation.mutate(job)
   }
-
-  useTrackedJobOutcomes<BackupJob>({
-    jobs: backupJobsData?.data?.jobs?.filter((job: BackupJob) => job.scheduled_job_id),
-    onTerminal: (job) => {
-      const scheduledJob = jobsData?.data?.jobs?.find(
-        (candidate: ScheduledJob) => candidate.id === job.scheduled_job_id
-      )
-      const action =
-        job.status === 'completed' || job.status === 'completed_with_warnings'
-          ? EventAction.COMPLETE
-          : EventAction.FAIL
-
-      track(EventCategory.BACKUP, action, {
-        entity: 'schedule',
-        scheduled_job_id: job.scheduled_job_id,
-        schedule_name: scheduledJob?.name ?? null,
-        repository_count:
-          scheduledJob?.repository_ids?.length || (scheduledJob?.repository_id ? 1 : 0),
-        status: job.status,
-        job_id: job.id,
-        trigger: 'scheduled',
-        maintenance_status: job.maintenance_status ?? null,
-        duration_seconds: getJobDurationSeconds(job.started_at, job.completed_at),
-        error_present: !!job.error_message,
-        warning_count: job.status === 'completed_with_warnings' ? 1 : 0,
-      })
-    },
-  })
 
   // Wizard handlers
   const openCreateWizard = () => {

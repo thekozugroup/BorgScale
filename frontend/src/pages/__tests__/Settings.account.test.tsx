@@ -5,7 +5,6 @@ import Settings from '../Settings'
 import * as apiModule from '../../services/api'
 import { toast } from 'sonner'
 
-const trackSettings = vi.fn()
 const { useAuthMock } = vi.hoisted(() => ({
   useAuthMock: vi.fn(),
 }))
@@ -25,24 +24,6 @@ vi.mock('../../hooks/useAuthorization', () => ({
         'settings.mounts.manage',
       ].includes(permission)
     },
-  }),
-}))
-
-vi.mock('../../hooks/useAnalytics', () => ({
-  useAnalytics: () => ({
-    trackSettings,
-    EventAction: {
-      VIEW: 'View',
-      EDIT: 'Edit',
-      CREATE: 'Create',
-      DELETE: 'Delete',
-    },
-  }),
-}))
-
-vi.mock('../../hooks/usePlan', () => ({
-  usePlan: () => ({
-    can: () => true,
   }),
 }))
 
@@ -126,21 +107,6 @@ describe('Settings account tab', () => {
     vi.mocked(apiModule.settingsAPI.changePassword).mockResolvedValue({ data: {} } as never)
   })
 
-  it('tracks the account tab view on render', async () => {
-    renderWithProviders(
-      <ThemeProvider>
-        <Settings />
-      </ThemeProvider>
-    )
-
-    await screen.findByRole('tab', { name: 'Personal profile' })
-
-    expect(trackSettings).toHaveBeenCalledWith('View', {
-      section: 'settings',
-      tab: 'account',
-    })
-  })
-
   it('keeps the account password section in its normal state even when must_change_password is set', async () => {
     useAuthMock.mockReturnValue({
       user: {
@@ -181,7 +147,7 @@ describe('Settings account tab', () => {
     expect(screen.queryByText('Finish account setup')).not.toBeInTheDocument()
   })
 
-  it('changes password and tracks the edit event', async () => {
+  it('changes password from the account dialog', async () => {
     const user = userEvent.setup()
 
     renderWithProviders(
@@ -204,10 +170,6 @@ describe('Settings account tab', () => {
         current_password: 'old-password',
         new_password: 'new-password-123',
       })
-    })
-    expect(trackSettings).toHaveBeenCalledWith('Edit', {
-      section: 'account',
-      operation: 'change_password',
     })
     expect(toast.success).toHaveBeenCalled()
   })
@@ -257,10 +219,6 @@ describe('Settings account tab', () => {
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith('Failed to change password')
-    })
-    expect(trackSettings).not.toHaveBeenCalledWith('Edit', {
-      section: 'account',
-      operation: 'change_password',
     })
   })
 })

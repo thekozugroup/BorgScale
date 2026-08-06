@@ -6,8 +6,7 @@ interface AnnouncementManagerProps {
 }
 
 export default function AnnouncementManager({ open = true }: AnnouncementManagerProps = {}) {
-  const { announcement, acknowledgeAnnouncement, snoozeAnnouncement, trackAnnouncementCtaClick } =
-    useAnnouncementSurface()
+  const { announcement, acknowledgeAnnouncement, snoozeAnnouncement } = useAnnouncementSurface()
 
   return (
     <AnnouncementModal
@@ -15,7 +14,6 @@ export default function AnnouncementManager({ open = true }: AnnouncementManager
       open={open && !!announcement}
       onAcknowledge={acknowledgeAnnouncement}
       onSnooze={snoozeAnnouncement}
-      onCtaClick={trackAnnouncementCtaClick}
     />
   )
 }

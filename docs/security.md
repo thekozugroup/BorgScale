@@ -756,6 +756,32 @@ slack://TokenA/TokenB/TokenC/
 
 ---
 
+## Privacy
+
+BorgScale collects nothing. There is no analytics, no telemetry, no usage
+statistics, and no phone-home of any kind. Nothing about your instance, your
+repositories, or your backups leaves the machine you run it on.
+
+The frontend loads no third-party scripts — fonts, icons, and assets are all
+served from your own instance, so BorgScale works on an air-gapped network. The
+backend makes only the outbound connections you configure yourself: your Borg
+repositories over SSH, your notification services, your MQTT broker, and your
+Redis cache.
+
+`tests/test_no_phone_home.py` enforces this in CI. It starts the application
+with every outbound HTTP call denied at the transport layer, exercises the
+startup path and the main endpoints, and fails on any request to a host it was
+not explicitly told to allow.
+
+To check a running container yourself:
+
+```bash
+# Shows every socket the container has open
+docker exec borg-web-ui ss -tunp
+```
+
+---
+
 ## Monitoring and Auditing
 
 ### Enable Logging

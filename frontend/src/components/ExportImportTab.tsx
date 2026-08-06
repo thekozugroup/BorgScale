@@ -7,7 +7,6 @@ import { toast } from 'sonner'
 import { configExportImportAPI } from '../services/api'
 import { translateBackendKey } from '../utils/translateBackendKey'
 import { Repository } from '../types'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { useAuth } from '../hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -34,7 +33,6 @@ const ExportImportTab: React.FC = () => {
   const { t } = useTranslation()
   const { hasGlobalPermission } = useAuth()
   const canManageExportImport = hasGlobalPermission('settings.export_import.manage')
-  const { trackSystem, EventAction } = useAnalytics()
 
   const [selectedRepos, setSelectedRepos] = useState<number[]>([])
   const [includeSchedules, setIncludeSchedules] = useState(true)
@@ -75,12 +73,6 @@ const ExportImportTab: React.FC = () => {
       document.body.removeChild(link)
       window.URL.revokeObjectURL(url)
       toast.success(t('exportImport.export.success'))
-      trackSystem(EventAction.EXPORT, {
-        section: 'export_import',
-        exporting_all: exportingAll,
-        repository_count: exportingAll ? repositories.length : selectedRepos.length,
-        include_schedules: includeSchedules,
-      })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -100,20 +92,6 @@ const ExportImportTab: React.FC = () => {
       if (!result.success) toast.error(result.error || t('exportImport.importFailed'))
       else if (result.errors?.length > 0) toast.error(t('exportImport.importCompletedWithErrors'))
       else toast.success(t('exportImport.importSuccess'))
-      trackSystem(EventAction.UPLOAD, {
-        section: 'export_import',
-        merge_strategy: mergeStrategy,
-        dry_run: false,
-        success: !!result.success,
-        file_extension: importFile?.name.split('.').pop()?.toLowerCase() ?? 'unknown',
-        file_size_bytes: importFile?.size ?? 0,
-        warning_count: result.warnings?.length || 0,
-        error_count: result.errors?.length || 0,
-        repositories_created: result.repositories_created || 0,
-        repositories_updated: result.repositories_updated || 0,
-        schedules_created: result.schedules_created || 0,
-        schedules_updated: result.schedules_updated || 0,
-      })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -132,12 +110,6 @@ const ExportImportTab: React.FC = () => {
       }
       setImportFile(file)
       setImportResult(null)
-      trackSystem(EventAction.VIEW, {
-        section: 'export_import',
-        operation: 'select_import_file',
-        file_extension: file.name.split('.').pop()?.toLowerCase() ?? 'unknown',
-        file_size_bytes: file.size,
-      })
     }
   }
 
@@ -310,11 +282,6 @@ const ExportImportTab: React.FC = () => {
               value={mergeStrategy}
               onValueChange={(v) => {
                 setMergeStrategy(v)
-                trackSystem(EventAction.EDIT, {
-                  section: 'export_import',
-                  setting: 'merge_strategy',
-                  value: v,
-                })
               }}
             >
               <SelectTrigger className="h-9 text-sm font-semibold">

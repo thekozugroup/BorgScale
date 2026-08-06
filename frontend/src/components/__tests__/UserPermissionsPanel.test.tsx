@@ -2,9 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderWithProviders, userEvent, screen, waitFor } from '../../test/test-utils'
 import UserPermissionsPanel from '../UserPermissionsPanel'
 
-const { refreshUserMock, trackSettingsMock } = vi.hoisted(() => ({
+const { refreshUserMock } = vi.hoisted(() => ({
   refreshUserMock: vi.fn(),
-  trackSettingsMock: vi.fn(),
 }))
 
 vi.mock('../../services/api', () => ({
@@ -36,16 +35,6 @@ vi.mock('../../hooks/useAuthorization', () => ({
   useAuthorization: () => ({
     assignableRepositoryRolesFor: (role: string) =>
       role === 'viewer' ? ['viewer'] : ['viewer', 'operator'],
-  }),
-}))
-
-vi.mock('../../hooks/useAnalytics', () => ({
-  useAnalytics: () => ({
-    trackSettings: trackSettingsMock,
-    EventAction: {
-      EDIT: 'Edit',
-      DELETE: 'Delete',
-    },
   }),
 }))
 

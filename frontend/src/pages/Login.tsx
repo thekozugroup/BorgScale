@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth.tsx'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import PasswordSetupCard from './FirstLoginPasswordSetup'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { getApiErrorDetail } from '../utils/apiErrors'
 import { translateBackendKey } from '../utils/translateBackendKey'
 import { authAPI } from '../services/api'
@@ -38,7 +37,6 @@ export default function Login() {
   const navigate = useNavigate()
   const { t } = useTranslation()
   usePageTitle(t('auth.signIn', 'Sign in'))
-  const { trackAuth, EventAction } = useAnalytics()
 
   const {
     register,
@@ -47,12 +45,7 @@ export default function Login() {
   } = useForm<LoginForm>()
 
   const handleSuccessfulLogin = useCallback(
-    (
-      _username: string | null,
-      mustChangePassword: boolean,
-      method: 'password' | 'totp' | 'passkey' | 'passkey_autofill'
-    ) => {
-      trackAuth(EventAction.LOGIN, { method, requires_password_setup: mustChangePassword })
+    (_username: string | null, mustChangePassword: boolean) => {
       toast.success(t('login.success'))
       if (mustChangePassword) {
         setShowPasswordSetup(true)
@@ -60,7 +53,7 @@ export default function Login() {
         navigate('/dashboard')
       }
     },
-    [EventAction.LOGIN, navigate, t, trackAuth]
+    [navigate, t]
   )
 
   // AuthProvider rebuilds its context value on every render, so depending on
@@ -104,7 +97,7 @@ export default function Login() {
         }
         localStorage.setItem('access_token', access_token)
         await refreshUserRef.current()
-        handleSuccessfulLogin(null, must_change_password || false, 'passkey_autofill')
+        handleSuccessfulLogin(null, must_change_password || false)
       } catch (error: unknown) {
         if (hasErrorName(error, 'AbortError') || cancelled) {
           return
@@ -135,7 +128,7 @@ export default function Login() {
         setTotpCode('')
         toast.success(t('login.totpRequired'))
       } else {
-        handleSuccessfulLogin(data.username, result.mustChangePassword, 'password')
+        handleSuccessfulLogin(data.username, result.mustChangePassword)
       }
     } catch (error: unknown) {
       toast.error(translateBackendKey(getApiErrorDetail(error)) || t('login.failed'))
@@ -149,7 +142,7 @@ export default function Login() {
     setIsLoading(true)
     try {
       const result = await verifyTotpLogin(pendingChallengeToken, totpCode)
-      handleSuccessfulLogin(pendingUsername, result.mustChangePassword, 'totp')
+      handleSuccessfulLogin(pendingUsername, result.mustChangePassword)
     } catch (error: unknown) {
       toast.error(translateBackendKey(getApiErrorDetail(error)) || t('login.failed'))
     } finally {
@@ -159,22 +152,19 @@ export default function Login() {
 
   const onSubmitPasskey = async () => {
     setIsLoading(true)
-    trackAuth(EventAction.START, { method: 'passkey', surface: 'login' })
     try {
       conditionalPasskeyAbortRef.current?.abort()
       conditionalPasskeyAbortRef.current = null
       const result = await loginWithPasskey()
-      handleSuccessfulLogin(null, result.mustChangePassword, 'passkey')
+      handleSuccessfulLogin(null, result.mustChangePassword)
     } catch (error: unknown) {
       if (
         hasErrorName(error, 'NotAllowedError') ||
         hasErrorName(error, 'AbortError') ||
         hasErrorName(error, 'InvalidStateError')
       ) {
-        trackAuth('Cancel', { method: 'passkey', surface: 'login' })
         toast.error(t('login.passkeyCancelled'))
       } else {
-        trackAuth(EventAction.FAIL, { method: 'passkey', surface: 'login' })
         toast.error(translateBackendKey(getApiErrorDetail(error)) || t('login.failed'))
       }
     } finally {

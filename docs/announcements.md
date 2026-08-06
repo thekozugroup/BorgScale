@@ -10,11 +10,11 @@ The production announcement feed is published from:
 
 `https://github.com/thekozugroup/BorgScale
 
-This file is sourced from [docs/announcements.json](/docs/announcements.json) because GitHub Pages in this repository publishes the `docs/` site.
+This file is sourced from [docs/announcements.json](https://github.com/thekozugroup/BorgScale/blob/main/docs/announcements.json) because GitHub Pages in this repository publishes the `docs/` site.
 
 ## Update Flow
 
-1. Edit [docs/announcements.json](/docs/announcements.json).
+1. Edit [docs/announcements.json](https://github.com/thekozugroup/BorgScale/blob/main/docs/announcements.json).
 2. Commit and push to `main`.
 3. Wait for GitHub Pages to rebuild.
 4. Verify the live manifest URL returns JSON.
@@ -48,13 +48,13 @@ Example:
     "es": "Novedades de la version 2.0.0",
     "de": "Neu in 2.0.0"
   },
-  "message": "BorgScale 2.0.0 adds built-in plans and Borg 2 support.",
+  "message": "BorgScale 2.0.0 adds a responsive UI and Borg 2 support.",
   "message_localized": {
-    "es": "BorgScale 2.0.0 agrega planes integrados y soporte para Borg 2."
+    "es": "BorgScale 2.0.0 agrega una interfaz adaptable y soporte para Borg 2."
   },
-  "highlights": ["Built-in plans", "Borg 2 support"],
+  "highlights": ["Responsive UI", "Borg 2 support"],
   "highlights_localized": {
-    "es": ["Planes integrados", "Soporte para Borg 2"]
+    "es": ["Interfaz adaptable", "Soporte para Borg 2"]
   },
   "cta_label": "View release notes",
   "cta_label_localized": {
@@ -72,7 +72,7 @@ Resolution order is:
 
 ## Local Development
 
-Local frontend development does not use [frontend/public/announcements.json](/frontend/public/announcements.json) automatically.
+Local frontend development does not use `frontend/public/announcements.json` automatically.
 
 The app defaults to the published GitHub Pages manifest unless `VITE_ANNOUNCEMENTS_URL` is explicitly set.
 

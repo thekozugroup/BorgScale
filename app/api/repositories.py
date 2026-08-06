@@ -822,15 +822,6 @@ def _validate_local_repository_path(repo_path: str) -> None:
         ancestor = os.path.dirname(ancestor)
 
 
-def _require_borg2_feature(db: Session) -> None:
-    """No-op. Borg 2 support is available to every BorgScale instance.
-
-    Kept as a seam so the v2 creation paths keep a single place to add a real
-    precondition (for example, "borg2 binary present") if one is ever needed.
-    """
-    return None
-
-
 @router.get("/")
 async def get_repositories(
     current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
@@ -940,7 +931,6 @@ async def create_repository(
     """Create a new repository"""
     try:
         if _uses_borg2_payload(repo_data):
-            _require_borg2_feature(db)
             from app.api.v2.repositories import (
                 RepositoryV2Create,
                 create_repository as create_repository_v2,
@@ -1277,7 +1267,6 @@ async def import_repository(
     """Import an existing Borg repository"""
     try:
         if _uses_borg2_payload(repo_data):
-            _require_borg2_feature(db)
             from app.api.v2.repositories import (
                 RepositoryV2Import,
                 import_repository as import_repository_v2,

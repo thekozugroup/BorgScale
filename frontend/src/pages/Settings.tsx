@@ -5,7 +5,6 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 import { settingsAPI } from '../services/api'
 import { useAuth } from '../hooks/useAuth'
-import { useAnalytics } from '../hooks/useAnalytics'
 import AccountTab from '../components/AccountTab'
 import AppearanceTab from '../components/AppearanceTab'
 import NotificationsTab from '../components/NotificationsTab'
@@ -37,7 +36,6 @@ const Settings: React.FC = () => {
   const canManageMounts = hasGlobalPermission('settings.mounts.manage')
   const canManageScripts = hasGlobalPermission('settings.scripts.manage')
   const canManageExportImport = hasGlobalPermission('settings.export_import.manage')
-  const { trackSettings, EventAction } = useAnalytics()
   const { tab } = useParams<{ tab?: string }>()
   const { data: systemSettingsData } = useQuery({
     queryKey: ['systemSettings'],
@@ -107,12 +105,6 @@ const Settings: React.FC = () => {
   useEffect(() => {
     setActiveTab(getTabIndexFromPath(tab))
   }, [tab, getTabIndexFromPath])
-
-  useEffect(() => {
-    if (currentTabId) {
-      trackSettings(EventAction.VIEW, { section: 'settings', tab: currentTabId })
-    }
-  }, [currentTabId, trackSettings, EventAction])
 
   return (
     <div>

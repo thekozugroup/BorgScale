@@ -17,19 +17,6 @@ vi.mock('../../services/api', () => ({
   },
 }))
 
-vi.mock('../../hooks/useAnalytics', () => ({
-  useAnalytics: () => ({
-    trackNotifications: vi.fn(),
-    EventAction: {
-      CREATE: 'Create',
-      EDIT: 'Edit',
-      DELETE: 'Delete',
-      TEST: 'Test',
-      VIEW: 'View',
-    },
-  }),
-}))
-
 vi.mock('../ResponsiveDialog', () => ({
   default: ({
     open,

@@ -181,7 +181,6 @@
     "overline": "Primo accesso",
     "title": "Imposta una nuova password o continua",
     "description": "Puoi impostare una nuova password ora oppure saltare questo passaggio e continuare alla dashboard.",
-    "flowHint": "Dopo questo passaggio, BorgScale proseguirà con passkey, consenso analytics e eventuali annunci attivi.",
     "skipHint": "Puoi saltare questo passaggio e cambiarla più tardi dalle impostazioni account.",
     "skip": "Salta per ora"
   },
@@ -212,7 +211,6 @@
       "appearance": "Aspetto",
       "notifications": "Notifiche",
       "preferences": "Preferenze",
-      "licensing": "Licenze",
       "systemLabel": "Sistema",
       "mqtt": "MQTT",
       "cache": "Cache",
@@ -227,14 +225,14 @@
     "menu": {
       "accountAndSecurityDesc": "Profilo, password, 2FA, passkey",
       "appearanceDesc": "Tema, lingua",
-      "notificationsDesc": "Avvisi e preferenze"
+      "notificationsDesc": "Avvisi e preferenze",
+      "openSourceDesc": "Libero e open source (AGPL-3.0)"
     },
     "versionInfo": "Info Versione",
     "app": "App:",
     "loading": "Caricamento in corso...",
     "welcome": "Benvenuto,",
-    "logout": "Esci",
-    "yourPlan": "Your Plan"
+    "logout": "Esci"
   },
   "status": {
     "completed": "Completato",
@@ -1800,17 +1798,11 @@
     "save": "Salva Preferenze",
     "saving": "Salvataggio in corso...",
     "updatedSuccessfully": "Preferenze aggiornate con successo",
-    "analyticsTitle": "Analisi di Utilizzo Anonime",
-    "analyticsDescription": "Aiutaci a migliorare BorgScale condividendo dati di utilizzo anonimi. Raccogliamo visualizzazioni di pagina, clic su funzionalità e tipo di browser, senza tracciare indirizzi IP, hostname, cookie o informazioni personali identificabili.",
-    "enableAnalytics": "Abilita analisi",
     "languageTitle": "Lingua",
     "languageDescription": "Scegli la lingua dell'interfaccia",
     "languageLabel": "Lingua Interfaccia",
     "languageSaved": "Lingua aggiornata con successo",
-    "updateFailed": "Impossibile aggiornare le preferenze",
-    "analyticsTransparencyBold": "Trasparenza Totale:",
-    "analyticsTransparencyLink": "Visualizza pubblicamente la nostra dashboard di analisi",
-    "analyticsTransparencyAfterLink": "per vedere esattamente cosa raccogliamo. Anonimo e attento alla privacy."
+    "updateFailed": "Impossibile aggiornare le preferenze"
   },
   "betaFeatures": {
     "title": "Funzionalità Beta",
@@ -2071,19 +2063,6 @@
     "eta": "Tempo Stimato:",
     "currentFile": "File Corrente:",
     "duration": "Durata:"
-  },
-  "analyticsConsent": {
-    "title": "Aiuta a Migliorare BorgScale",
-    "message": "Raccogliamo dati di utilizzo anonimi per capire come viene usata BorgScale e migliorarla. Non vengono mai raccolte informazioni personali, indirizzi IP, hostname o dati di backup.",
-    "accept": "Accetta",
-    "decline": "Rifiuta",
-    "learnMore": "Scopri di più",
-    "viewDashboard": "Visualizza la nostra dashboard di analisi pubblica",
-    "viewDashboardSuffix": "per vedere esattamente cosa raccogliamo.",
-    "enableToggle": "Abilita analisi anonime",
-    "continue": "Continua",
-    "saving": "Salvataggio in corso...",
-    "changeAnytime": "Puoi modificare questa impostazione in qualsiasi momento in Impostazioni → Preferenze"
   },
   "lastRestoreSection": {
     "title": "Ultimo Ripristino",
@@ -2940,11 +2919,6 @@
     "failedToDownloadKeyfile": "Impossibile scaricare il file chiave",
     "noArchivesDescription": "Questo repository è stato inizializzato ma non contiene archivi. Le statistiche di archiviazione appariranno qui dopo aver creato il primo backup.",
     "failedToLoad": "Impossibile caricare le informazioni del repository. Assicurati che il repository sia accessibile e inizializzato correttamente."
-  },
-  "analyticsBanner": {
-    "viewDashboardLink": "Visualizza la nostra dashboard di analisi pubblica",
-    "viewDashboardSuffix": "per vedere esattamente cosa raccogliamo.",
-    "changeAnytimeNote": "Puoi modificare questa impostazione in qualsiasi momento in Impostazioni → Preferenze"
   },
   "repositoryScripts": {
     "errors": {

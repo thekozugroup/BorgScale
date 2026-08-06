@@ -1,5 +1,3 @@
-import type { Plan } from '../core/features'
-
 export type AnnouncementType =
   | 'update_available'
   | 'release_highlight'
@@ -30,7 +28,6 @@ export interface Announcement {
   ends_at?: string
   min_app_version?: string
   max_app_version?: string
-  target_plans?: Plan[]
 }
 
 export interface AnnouncementManifest {
@@ -41,6 +38,5 @@ export interface AnnouncementManifest {
 
 export interface AnnouncementContext {
   appVersion: string
-  plan: Plan
   now: Date
 }

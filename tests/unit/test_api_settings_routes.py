@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 
 from app.api import settings as settings_api
 from app.config import get_runtime_app_version
-from app.database.models import LicensingState, Repository, SystemSettings, User
+from app.database.models import Repository, SystemSettings, User
 
 
 @pytest.mark.unit
@@ -140,13 +140,6 @@ class TestSettingsUserContracts:
         self, test_client: TestClient, admin_headers, test_db
     ):
         test_db.add(SystemSettings())
-        state = test_db.query(LicensingState).first()
-        if state is None:
-            state = LicensingState(instance_id="test-instance-settings-users")
-            test_db.add(state)
-        state.plan = "pro"
-        state.status = "active"
-        state.is_trial = False
         existing = User(
             username="existing",
             email="taken@example.com",
@@ -252,21 +245,25 @@ class TestSettingsUserContracts:
         assert profile["deployment_type"] == "enterprise"
         assert profile["enterprise_name"] == "Acme Inc"
 
-    def test_get_preferences_returns_analytics_always_false(
+    def test_preferences_carry_no_analytics_fields(
         self, test_client: TestClient, admin_headers, admin_user
     ):
-        """BorgScale removes analytics: flags always read as False regardless of stored value."""
+        """There is no analytics, so there is nothing to consent to.
+
+        An analytics flag in this payload — even one hardcoded to False — is
+        what a client would build a consent banner around.
+        """
         response = test_client.get("/api/settings/preferences", headers=admin_headers)
 
         assert response.status_code == 200
         prefs = response.json()["preferences"]
-        assert prefs["analytics_enabled"] is False
-        assert prefs["analytics_consent_given"] is False
+        assert "analytics_enabled" not in prefs
+        assert "analytics_consent_given" not in prefs
 
-    def test_update_preferences_analytics_always_false(
+    def test_update_preferences_ignores_unknown_analytics_fields(
         self, test_client: TestClient, admin_headers, admin_user, test_db
     ):
-        """PUT with analytics_enabled=True must not persist True: stub always returns False."""
+        """An old client still sending the removed fields must not error."""
         response = test_client.put(
             "/api/settings/preferences",
             json={"analytics_enabled": True, "analytics_consent_given": True},
@@ -274,9 +271,7 @@ class TestSettingsUserContracts:
         )
 
         assert response.status_code == 200
-        test_db.refresh(admin_user)
-        assert admin_user.analytics_enabled is False
-        assert admin_user.analytics_consent_given is False
+        assert not hasattr(admin_user, "analytics_enabled")
         assert (
             response.json()["message"] == "backend.success.settings.preferencesUpdated"
         )

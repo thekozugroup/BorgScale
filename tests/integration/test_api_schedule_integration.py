@@ -50,23 +50,8 @@ def _require_borg2_binary() -> str:
     return borg2_path
 
 
-def _enable_borg_v2(test_db) -> None:
-    from app.database.models import LicensingState
-
-    state = test_db.query(LicensingState).first()
-    if state is None:
-        state = LicensingState(instance_id="integration-borg-v2-schedule")
-        test_db.add(state)
-
-    state.plan = "pro"
-    state.status = "active"
-    state.is_trial = False
-    test_db.commit()
-
-
 def _create_borg2_registered_repo(test_db, tmp_path, source_root):
     borg2_binary = _require_borg2_binary()
-    _enable_borg_v2(test_db)
 
     repo_path = tmp_path / "borg2-schedule-repo"
     env = make_borg_test_env(str(tmp_path))

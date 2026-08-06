@@ -24,8 +24,6 @@ describe('useSystemInfo', () => {
         app_version: '1.0.0',
         borg_version: 'borg 1.4.0',
         borg2_version: null,
-        plan: 'community',
-        features: {},
       },
     } as never)
 
@@ -36,7 +34,7 @@ describe('useSystemInfo', () => {
     expect(result.current.data).toEqual(
       expect.objectContaining({
         app_version: '1.0.0',
-        plan: 'community',
+        borg_version: 'borg 1.4.0',
       })
     )
   })

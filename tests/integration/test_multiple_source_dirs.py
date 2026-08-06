@@ -3,7 +3,7 @@
 Test for Multiple Source Directories Bug
 
 This test reproduces and validates the fix for the issue where:
-- User adds 2 source directories: /local/home/karanhudia/ImmichPhotos and /local/home/karanhudia/Immich
+- User adds 2 source directories: /local/home/demo/ImmichPhotos and /local/home/demo/Immich
 - Only one directory (ImmichPhotos) gets backed up
 - The second directory (Immich) is missing from the backup
 

@@ -21,7 +21,6 @@ import BorgVersionChip from './BorgVersionChip'
 import { getRepoCapabilities } from '../utils/repoCapabilities'
 import { formatDateShort, formatDateTimeFull, formatElapsedTime } from '../utils/dateUtils'
 import { useQueryClient } from '@tanstack/react-query'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { Repository } from '../types'
 import type { RepoAction } from '../hooks/usePermissions'
 import { Button } from '@/components/ui/button'
@@ -78,7 +77,6 @@ export default function RepositoryCard({
 }: RepositoryCardProps) {
   const queryClient = useQueryClient()
   const { t } = useTranslation()
-  const { trackRepository, trackBackup, trackArchive, EventAction } = useAnalytics()
 
   const capabilities = getRepoCapabilities(repository)
   const { hasRunningJobs, checkJob, compactJob, pruneJob } = useMaintenanceJobs(repository.id, true)
@@ -368,7 +366,6 @@ export default function RepositoryCard({
                     <button
                       type="button"
                       onClick={() => {
-                        trackRepository(EventAction.VIEW, repository)
                         onViewInfo()
                       }}
                       aria-label={t('repositoryCard.buttons.info')}
@@ -459,7 +456,6 @@ export default function RepositoryCard({
                     <button
                       type="button"
                       onClick={() => {
-                        trackArchive(EventAction.VIEW, repository)
                         onViewArchives()
                       }}
                       aria-label={t('repositoryCard.buttons.viewArchives')}
@@ -506,7 +502,6 @@ export default function RepositoryCard({
                   <Button
                     size="sm"
                     onClick={() => {
-                      trackBackup(EventAction.START, undefined, repository)
                       onBackupNow()
                     }}
                     disabled={isMaintenanceRunning}

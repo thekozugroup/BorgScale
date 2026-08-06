@@ -30,7 +30,6 @@ import { toast } from 'sonner'
 import api from '../services/api'
 import CodeEditor from '../components/CodeEditor'
 import ScriptParameterInputs, { ScriptParameter } from '../components/ScriptParameterInputs'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { useAuth } from '../hooks/useAuth'
 import DataTable, { ActionButton, Column } from '../components/DataTable'
 
@@ -79,7 +78,6 @@ export default function Scripts() {
   const { t } = useTranslation()
   const { hasGlobalPermission } = useAuth()
   const canManageScripts = hasGlobalPermission('settings.scripts.manage')
-  const { trackScripts, EventAction } = useAnalytics()
   const [scripts, setScripts] = useState<Script[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -133,7 +131,6 @@ export default function Scripts() {
     })
     setDetectedParameters(parseParameters(defaultContent))
     setDialogOpen(true)
-    trackScripts(EventAction.VIEW, undefined, { source: 'create_dialog' })
   }
 
   const handleEdit = async (script: Script) => {
@@ -151,7 +148,6 @@ export default function Scripts() {
       })
       setDetectedParameters(detail.parameters || [])
       setDialogOpen(true)
-      trackScripts(EventAction.VIEW, detail.name, { source: 'edit_dialog' })
     } catch (error) {
       console.error('Failed to fetch script details:', error)
       toast.error(t('scripts.errors.failedToLoadDetails'))
@@ -219,20 +215,10 @@ export default function Scripts() {
         // Update existing script
         await api.put(`/scripts/${editingScript.id}`, dataToSave)
         toast.success(t('scripts.toasts.scriptUpdated'))
-        trackScripts(EventAction.EDIT, editingScript.name, {
-          category: dataToSave.category,
-          run_on: dataToSave.run_on,
-          parameter_count: detectedParameters.length,
-        })
       } else {
         // Create new script
         await api.post('/scripts', dataToSave)
         toast.success(t('scripts.toasts.scriptCreated'))
-        trackScripts(EventAction.CREATE, dataToSave.name, {
-          category: dataToSave.category,
-          run_on: dataToSave.run_on,
-          parameter_count: detectedParameters.length,
-        })
       }
       setDialogOpen(false)
       fetchScripts()
@@ -261,7 +247,6 @@ export default function Scripts() {
     try {
       await api.delete(`/scripts/${script.id}`)
       toast.success(t('scripts.toasts.scriptDeleted'))
-      trackScripts(EventAction.DELETE, script.name, { category: script.category })
       fetchScripts()
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -281,7 +266,6 @@ export default function Scripts() {
     setTestParameterValues({})
     setTestResult(null)
     setTestDialogOpen(true)
-    trackScripts(EventAction.VIEW, script.name, { source: 'test_dialog' })
   }
 
   const executeTest = async () => {
@@ -296,10 +280,6 @@ export default function Scripts() {
         timeout: undefined,
       })
       setTestResult(response.data)
-      trackScripts(EventAction.TEST, testingScriptData.name, {
-        parameter_count: Object.keys(testParameterValues).length,
-        success: !!response.data?.success,
-      })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Failed to test script:', error)
@@ -309,10 +289,6 @@ export default function Scripts() {
         stdout: '',
         stderr: translateBackendKey(error.response?.data?.detail) || error.message,
         execution_time: 0,
-      })
-      trackScripts(EventAction.TEST, testingScriptData.name, {
-        parameter_count: Object.keys(testParameterValues).length,
-        success: false,
       })
     } finally {
       setTestingScript(false)

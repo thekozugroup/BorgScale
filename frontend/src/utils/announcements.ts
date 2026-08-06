@@ -1,5 +1,4 @@
 import type { Announcement, AnnouncementContext } from '../types/announcements'
-import type { Plan } from '../core/features'
 
 const ANNOUNCEMENT_TYPES = new Set<Announcement['type']>([
   'update_available',
@@ -10,7 +9,6 @@ const ANNOUNCEMENT_TYPES = new Set<Announcement['type']>([
   'custom_announcement',
 ])
 
-const VALID_PLANS = new Set<Plan>(['community', 'pro', 'enterprise'])
 const CRITICAL_ANNOUNCEMENT_TYPES = new Set<Announcement['type']>([
   'security_notice',
   'migration_notice',
@@ -111,10 +109,7 @@ function isValidAnnouncementShape(announcement: Announcement) {
     isValidDateString(announcement.starts_at) &&
     isValidDateString(announcement.ends_at) &&
     isOptionalString(announcement.min_app_version) &&
-    isOptionalString(announcement.max_app_version) &&
-    (announcement.target_plans === undefined ||
-      (Array.isArray(announcement.target_plans) &&
-        announcement.target_plans.every((plan) => VALID_PLANS.has(plan))))
+    isOptionalString(announcement.max_app_version)
   )
 }
 
@@ -280,10 +275,6 @@ function isWithinActiveWindow(announcement: Announcement, now: Date) {
   return true
 }
 
-function matchesPlan(announcement: Announcement, plan: string) {
-  return !announcement.target_plans?.length || announcement.target_plans.includes(plan as never)
-}
-
 export function isAnnouncementEligible(
   announcement: Announcement,
   context: AnnouncementContext
@@ -292,7 +283,6 @@ export function isAnnouncementEligible(
     isValidAnnouncementShape(announcement) &&
     isWithinActiveWindow(announcement, context.now) &&
     isWithinVersionRange(announcement, context.appVersion) &&
-    matchesPlan(announcement, context.plan) &&
     !isAnnouncementAcknowledged(announcement.id) &&
     !isAnnouncementSnoozed(announcement.id, context.now)
   )

@@ -3,7 +3,6 @@ import { Clock } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import BackupJobsTable from './BackupJobsTable'
 import RepoSelect from './RepoSelect'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -97,7 +96,6 @@ const BackupHistorySection: React.FC<BackupHistorySectionProps> = ({
   onFilterRepositoryChange,
   onFilterStatusChange,
 }) => {
-  const { trackNavigation, EventAction } = useAnalytics()
   const { t } = useTranslation()
 
   const filteredBackupJobs = backupJobs.filter((job: BackupJob) => {
@@ -141,10 +139,6 @@ const BackupHistorySection: React.FC<BackupHistorySectionProps> = ({
               onFilterScheduleChange('all')
               onFilterRepositoryChange('all')
               onFilterStatusChange('all')
-              trackNavigation(EventAction.FILTER, {
-                section: 'backup_history',
-                filter_kind: 'reset',
-              })
             }}
           >
             {t('common.clearFilters', { defaultValue: 'Clear filters' })}
@@ -159,11 +153,6 @@ const BackupHistorySection: React.FC<BackupHistorySectionProps> = ({
           onValueChange={(v) => {
             const value = v === 'all' ? 'all' : Number(v)
             onFilterScheduleChange(value as number | 'all')
-            trackNavigation(EventAction.FILTER, {
-              section: 'backup_history',
-              filter_kind: 'schedule',
-              filter_value: value,
-            })
           }}
         >
           <SelectTrigger className="flex-1 min-w-[150px] sm:min-w-[150px] text-sm font-semibold h-9">
@@ -185,11 +174,6 @@ const BackupHistorySection: React.FC<BackupHistorySectionProps> = ({
             value={filterRepository}
             onChange={(v) => {
               onFilterRepositoryChange(v as string)
-              trackNavigation(EventAction.FILTER, {
-                section: 'backup_history',
-                filter_kind: 'repository',
-                filter_value: v as string,
-              })
             }}
             valueKey="path"
             size="small"
@@ -205,11 +189,6 @@ const BackupHistorySection: React.FC<BackupHistorySectionProps> = ({
           value={filterStatus}
           onValueChange={(v) => {
             onFilterStatusChange(v)
-            trackNavigation(EventAction.FILTER, {
-              section: 'backup_history',
-              filter_kind: 'status',
-              filter_value: v,
-            })
           }}
         >
           <SelectTrigger className="flex-1 min-w-[140px] text-sm font-semibold h-9">

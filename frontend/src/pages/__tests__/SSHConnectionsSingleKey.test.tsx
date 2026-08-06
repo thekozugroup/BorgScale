@@ -2,8 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders, screen, userEvent, waitFor, fireEvent } from '../../test/test-utils'
 import SSHConnectionsSingleKey from '../SSHConnectionsSingleKey'
 
-const { track, toastSuccess, toastError, mockState } = vi.hoisted(() => ({
-  track: vi.fn(),
+const { toastSuccess, toastError, mockState } = vi.hoisted(() => ({
   toastSuccess: vi.fn(),
   toastError: vi.fn(),
   mockState: {
@@ -46,22 +45,6 @@ vi.mock('../../hooks/useAuth', () => ({
     user: { id: 1, role: 'admin' },
     hasGlobalPermission: (permission: string) =>
       permission === 'settings.ssh.manage' ? mockState.canManageSsh : false,
-  }),
-}))
-
-vi.mock('../../hooks/useAnalytics', () => ({
-  useAnalytics: () => ({
-    track,
-    EventCategory: { SSH: 'ssh' },
-    EventAction: {
-      CREATE: 'create',
-      UPLOAD: 'upload',
-      TEST: 'test',
-      EDIT: 'edit',
-      DELETE: 'delete',
-      VIEW: 'view',
-      START: 'start',
-    },
   }),
 }))
 

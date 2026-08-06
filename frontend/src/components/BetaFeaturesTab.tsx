@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { settingsAPI } from '../services/api'
-import { useAnalytics } from '../hooks/useAnalytics'
 import SettingsCard from './SettingsCard'
 import { Switch } from '@/components/ui/switch'
 import { Loader2 } from 'lucide-react'
@@ -11,7 +10,6 @@ import { Loader2 } from 'lucide-react'
 const BetaFeaturesTab: React.FC = () => {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const { trackSettings, EventAction } = useAnalytics()
   const [bypassLockOnInfo, setBypassLockOnInfo] = useState(false)
   const [bypassLockOnList, setBypassLockOnList] = useState(false)
   const [borg2FastBrowseBetaEnabled, setBorg2FastBrowseBetaEnabled] = useState(false)
@@ -62,41 +60,21 @@ const BetaFeaturesTab: React.FC = () => {
 
   const handleToggle = (checked: boolean) => {
     setBypassLockOnInfo(checked)
-    trackSettings(EventAction.EDIT, {
-      section: 'beta_features',
-      feature: 'bypass_lock_on_info',
-      enabled: checked,
-    })
     saveSettingsMutation.mutate({ bypass_lock_on_info: checked })
   }
 
   const handleListToggle = (checked: boolean) => {
     setBypassLockOnList(checked)
-    trackSettings(EventAction.EDIT, {
-      section: 'beta_features',
-      feature: 'bypass_lock_on_list',
-      enabled: checked,
-    })
     saveSettingsMutation.mutate({ bypass_lock_on_list: checked })
   }
 
   const handleBorg2FastBrowseToggle = (checked: boolean) => {
     setBorg2FastBrowseBetaEnabled(checked)
-    trackSettings(EventAction.EDIT, {
-      section: 'beta_features',
-      feature: 'borg2_fast_browse_beta_enabled',
-      enabled: checked,
-    })
     saveSettingsMutation.mutate({ borg2_fast_browse_beta_enabled: checked })
   }
 
   const handleMQTTBetaToggle = (checked: boolean) => {
     setMqttBetaEnabled(checked)
-    trackSettings(EventAction.EDIT, {
-      section: 'beta_features',
-      feature: 'mqtt_beta_enabled',
-      enabled: checked,
-    })
     saveSettingsMutation.mutate({ mqtt_beta_enabled: checked })
   }
 

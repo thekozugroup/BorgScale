@@ -20,7 +20,6 @@ import {
 } from './wizard'
 import FileExplorerDialog from './FileExplorerDialog'
 import { sshKeysAPI, RepositoryData } from '../services/api'
-import { useAnalytics } from '../hooks/useAnalytics'
 
 interface Repository extends RepositoryData {
   id: number
@@ -113,7 +112,6 @@ const createInitialState = (): WizardState => ({
 })
 
 const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: RepositoryWizardProps) => {
-  const { track, trackRepository, EventCategory, EventAction } = useAnalytics()
   const { t } = useTranslation()
   const [activeStep, setActiveStep] = useState(0)
   const [wizardState, setWizardState] = useState<WizardState>(() => createInitialState())
@@ -458,24 +456,6 @@ const RepositoryWizard = ({ open, onClose, mode, repository, onSubmit }: Reposit
           ? wizardState.sourceSshConnectionId
           : null,
     }
-
-    track(
-      EventCategory.REPOSITORY,
-      mode === 'create'
-        ? EventAction.CREATE
-        : mode === 'import'
-          ? EventAction.UPLOAD
-          : EventAction.EDIT,
-      { source: 'wizard', mode }
-    )
-    trackRepository(
-      mode === 'create'
-        ? EventAction.CREATE
-        : mode === 'import'
-          ? EventAction.UPLOAD
-          : EventAction.EDIT,
-      { name: wizardState.name }
-    )
 
     setIsSubmitting(true)
     try {

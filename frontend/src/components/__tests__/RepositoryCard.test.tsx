@@ -3,11 +3,9 @@ import userEvent from '@testing-library/user-event'
 import { renderWithProviders, screen, waitFor } from '../../test/test-utils'
 import RepositoryCard from '../RepositoryCard'
 import * as useMaintenanceJobsModule from '../../hooks/useMaintenanceJobs'
-import * as useAnalyticsModule from '../../hooks/useAnalytics'
 
 // Mock the hooks
 vi.mock('../../hooks/useMaintenanceJobs')
-vi.mock('../../hooks/useAnalytics')
 
 describe('RepositoryCard', () => {
   const mockRepository = {
@@ -57,65 +55,6 @@ describe('RepositoryCard', () => {
     return labels[compression] || compression
   })
 
-  const mockAnalyticsTracking = {
-    trackRepository: vi.fn(),
-    trackBackup: vi.fn(),
-    trackMaintenance: vi.fn(),
-    trackArchive: vi.fn(),
-    trackPage: vi.fn(),
-    track: vi.fn(),
-    trackMount: vi.fn(),
-    trackSSH: vi.fn(),
-    trackSettings: vi.fn(),
-    trackScripts: vi.fn(),
-    trackNotifications: vi.fn(),
-    trackSystem: vi.fn(),
-    trackPackage: vi.fn(),
-    trackNavigation: vi.fn(),
-    trackPlan: vi.fn(),
-    trackAnnouncement: vi.fn(),
-    trackAuth: vi.fn(),
-    buildEntityData: vi.fn(),
-    EventCategory: {
-      REPOSITORY: 'Repository',
-      BACKUP: 'Backup',
-      ARCHIVE: 'Archive',
-      MOUNT: 'Mount',
-      MAINTENANCE: 'Maintenance',
-      SSH: 'SSH Connection',
-      SCRIPT: 'Script',
-      NOTIFICATION: 'Notification',
-      SYSTEM: 'System',
-      PACKAGE: 'Package',
-      SETTINGS: 'Settings',
-      AUTH: 'Authentication',
-      NAVIGATION: 'Navigation',
-      PLAN: 'Plan',
-      ANNOUNCEMENT: 'Announcement',
-    } as const,
-    EventAction: {
-      CREATE: 'Create',
-      EDIT: 'Edit',
-      DELETE: 'Delete',
-      VIEW: 'View',
-      START: 'Start',
-      STOP: 'Stop',
-      MOUNT: 'Mount',
-      UNMOUNT: 'Unmount',
-      DOWNLOAD: 'Download',
-      UPLOAD: 'Upload',
-      TEST: 'Test',
-      LOGIN: 'Login',
-      LOGOUT: 'Logout',
-      SEARCH: 'Search',
-      FILTER: 'Filter',
-      EXPORT: 'Export',
-      COMPLETE: 'Complete',
-      FAIL: 'Fail',
-      CANCEL: 'Cancel',
-    } as const,
-  }
-
   const mockMaintenanceJobs = {
     hasRunningJobs: false,
     checkJob: null,
@@ -128,7 +67,6 @@ describe('RepositoryCard', () => {
     vi.clearAllMocks()
     // Setup default mocks
     vi.spyOn(useMaintenanceJobsModule, 'useMaintenanceJobs').mockReturnValue(mockMaintenanceJobs)
-    vi.spyOn(useAnalyticsModule, 'useAnalytics').mockReturnValue(mockAnalyticsTracking)
   })
 
   afterEach(() => {
@@ -493,7 +431,7 @@ describe('RepositoryCard', () => {
       expect(mockCallbacks.onEdit).toHaveBeenCalledTimes(1)
     })
 
-    it('calls onViewInfo and tracks event when Info button is clicked', async () => {
+    it('calls onViewInfo when Info button is clicked', async () => {
       const user = userEvent.setup()
       renderWithProviders(
         <RepositoryCard
@@ -507,7 +445,6 @@ describe('RepositoryCard', () => {
 
       await user.click(screen.getByRole('button', { name: /Info/i }))
       expect(mockCallbacks.onViewInfo).toHaveBeenCalledTimes(1)
-      expect(mockAnalyticsTracking.trackRepository).toHaveBeenCalledWith('View', mockRepository)
     })
 
     it('calls onCheck when Check button is clicked', async () => {
@@ -558,7 +495,7 @@ describe('RepositoryCard', () => {
       expect(mockCallbacks.onPrune).toHaveBeenCalledTimes(1)
     })
 
-    it('calls onBackupNow and tracks event when Backup Now button is clicked', async () => {
+    it('calls onBackupNow when Backup Now button is clicked', async () => {
       const user = userEvent.setup()
       renderWithProviders(
         <RepositoryCard
@@ -572,14 +509,9 @@ describe('RepositoryCard', () => {
 
       await user.click(screen.getByRole('button', { name: /Backup Now/i }))
       expect(mockCallbacks.onBackupNow).toHaveBeenCalledTimes(1)
-      expect(mockAnalyticsTracking.trackBackup).toHaveBeenCalledWith(
-        'Start',
-        undefined,
-        mockRepository
-      )
     })
 
-    it('calls onViewArchives and tracks event when View Archives button is clicked', async () => {
+    it('calls onViewArchives when View Archives button is clicked', async () => {
       const user = userEvent.setup()
       renderWithProviders(
         <RepositoryCard
@@ -593,7 +525,6 @@ describe('RepositoryCard', () => {
 
       await user.click(screen.getByRole('button', { name: /View Archives/i }))
       expect(mockCallbacks.onViewArchives).toHaveBeenCalledTimes(1)
-      expect(mockAnalyticsTracking.trackArchive).toHaveBeenCalledWith('View', mockRepository)
     })
 
     it('calls onDelete when Delete button is clicked', async () => {

@@ -30,10 +30,6 @@ vi.mock('../../services/api', () => ({
   },
 }))
 
-vi.mock('../../hooks/usePlan', () => ({
-  usePlan: () => ({ plan: 'pro', isLoading: false, can: () => true }),
-}))
-
 describe('ApiTokensSection', () => {
   it('renders empty state when no tokens', async () => {
     renderWithProviders(<ApiTokensSection />)

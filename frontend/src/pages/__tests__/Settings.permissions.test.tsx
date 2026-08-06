@@ -17,29 +17,12 @@ const { authState, currentTab } = vi.hoisted(() => ({
   currentTab: { value: 'users' },
 }))
 
-const trackSettings = vi.fn()
-
 vi.mock('../../hooks/useAuth', () => ({
   useAuth: () => ({
     user: authState.user,
     hasGlobalPermission: (permission: string) =>
       authState.user.global_permissions.includes(permission),
     refreshUser: vi.fn(),
-  }),
-}))
-
-vi.mock('../../hooks/useAnalytics', () => ({
-  useAnalytics: () => ({
-    trackSettings,
-    EventAction: {
-      VIEW: 'View',
-    },
-  }),
-}))
-
-vi.mock('../../hooks/usePlan', () => ({
-  usePlan: () => ({
-    can: () => true,
   }),
 }))
 

@@ -220,7 +220,7 @@ python3 tests/integration/test_archive_contents.py
 ### 1. Setup Test Environment
 
 ```bash
-cd /Users/karanhudia/Documents/Projects/borgscale
+cd /path/to/borgscale
 ./tests/setup_test_env.sh
 ```
 

@@ -17,7 +17,6 @@ interface AnnouncementModalProps {
   open: boolean
   onAcknowledge: () => void
   onSnooze: () => void
-  onCtaClick?: () => void
 }
 
 function getAnnouncementTone(type: Announcement['type']) {
@@ -49,7 +48,6 @@ export default function AnnouncementModal({
   open,
   onAcknowledge,
   onSnooze,
-  onCtaClick,
 }: AnnouncementModalProps) {
   const { t } = useTranslation()
 
@@ -194,7 +192,6 @@ export default function AnnouncementModal({
                     href={announcement.cta_url}
                     target="_blank"
                     rel="noreferrer"
-                    onClick={onCtaClick}
                     className="inline-flex items-center gap-1.5 text-sm font-bold transition-colors duration-150 text-primary hover:text-primary/80 no-underline"
                     style={{ textDecoration: 'none' }}
                   >

@@ -56,7 +56,7 @@ locale-parity check, a design-token contrast check, and core, extended and SSH
 smoke suites against a built app. A release additionally has to pass that same
 gate before any image is pushed, so a red commit cannot reach Docker Hub.
 
-Two checks exist specifically to keep this fork honest:
+Two checks exist specifically to keep BorgScale honest:
 `tests/test_no_phone_home.py` denies all outbound HTTP and fails on any
 unexpected request, and `tests/unit/test_authorization_coverage.py` calls every
 state-changing route as a signed-out client and as a low-privilege user and
@@ -143,14 +143,6 @@ For setup details, see the [installation guide](https://github.com/thekozugroup/
 - [Development guide](https://github.com/thekozugroup/BorgScale)
 - [Testing guide](https://github.com/thekozugroup/BorgScale)
 
-## Enterprise
-
-For teams that need commercial support, larger rollouts, or an enterprise conversation, BorgScale can also support evaluation and deployment beyond the core open source setup.
-
-- [Learn more](https://github.com/thekozugroup/BorgScale)
-- Contact: [GitHub Issues](https://github.com/thekozugroup/BorgScale/issues)
-- You can also explore the project at [github.com/thekozugroup/BorgScale](https://github.com/thekozugroup/BorgScale)
-
 ## Support
 
 - [Discord community](https://discord.gg/5KfVa5QkdQ)
@@ -177,10 +169,16 @@ See the [contributing guide](.github/CONTRIBUTING.md) and the [development guide
 ## License
 
 This project is licensed under the GNU Affero General Public License v3.0. See [LICENSE](LICENSE).
+Every feature is available to every instance: no tiers, no plans, no license keys, no user limit.
+
+AGPL §13 asks that anyone using a modified instance over a network can get its
+source. BorgScale ships that out of the box — `GET /api/about` returns a
+machine-readable source pointer, and a "Source (AGPL)" link sits in the footer of
+every page. If you host a modified BorgScale for others, point both at your own
+repository: your users need your source, not ours.
 
 <div align="center">
 
 Maintained by [The Kozu Group](https://github.com/thekozugroup).
-Forked from [borg-ui](https://github.com/karanhudia/borg-ui) by [Karan Hudia](https://github.com/karanhudia).
 
 </div>

@@ -17,7 +17,6 @@ import SettingsCard from './SettingsCard'
 import { toast } from 'sonner'
 import { authAPI, settingsAPI } from '../services/api'
 import { translateBackendKey } from '../utils/translateBackendKey'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -92,7 +91,6 @@ function TimeoutField({
 const SystemSettingsTab: React.FC = () => {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const { trackSystem, EventAction } = useAnalytics()
 
   const [browseMaxItems, setBrowseMaxItems] = useState(1_000_000)
   const [browseMaxMemoryMb, setBrowseMaxMemoryMb] = useState(1024)
@@ -380,23 +378,6 @@ const SystemSettingsTab: React.FC = () => {
         setNewMetricsToken(generatedMetricsToken)
         setMetricsTokenCopied(false)
       }
-      trackSystem(EventAction.EDIT, {
-        section: 'system_settings',
-        browse_max_items: browseMaxItems,
-        browse_max_memory_mb: browseMaxMemoryMb,
-        mount_timeout: mountTimeout,
-        info_timeout: infoTimeout,
-        list_timeout: listTimeout,
-        init_timeout: initTimeout,
-        backup_timeout: backupTimeout,
-        source_size_timeout: sourceSizeTimeout,
-        max_concurrent_scheduled_backups: maxConcurrentScheduledBackups,
-        max_concurrent_scheduled_checks: maxConcurrentScheduledChecks,
-        stats_refresh_interval_minutes: statsRefreshInterval,
-        metrics_enabled: metricsEnabled,
-        metrics_require_auth: metricsRequireAuth,
-        rotate_metrics_token: rotateMetricsToken,
-      })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error.message || t('systemSettings.failedToSaveSettings'))
@@ -419,7 +400,6 @@ const SystemSettingsTab: React.FC = () => {
       const response = await settingsAPI.refreshAllStats()
       const data = response.data
       toast.success(translateBackendKey(data.message) || t('systemSettings.statsRefreshStarted'))
-      trackSystem(EventAction.START, { section: 'system_settings', operation: 'refresh_stats' })
       const startTime = Date.now()
       const maxWaitTime = 5 * 60 * 1000
       stopStatsRefreshPoll()

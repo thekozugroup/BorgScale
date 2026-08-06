@@ -66,13 +66,6 @@ vi.mock('react-router-dom', async (importOriginal) => {
   }
 })
 
-vi.mock('../../hooks/useAnalytics', () => ({
-  useAnalytics: () => ({
-    trackArchive: vi.fn(),
-    EventAction: { DELETE: 'delete', FILTER: 'filter' },
-  }),
-}))
-
 vi.mock('../../hooks/useAuth', () => ({
   useAuth: () => ({
     user: {

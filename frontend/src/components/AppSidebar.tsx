@@ -372,7 +372,6 @@ export default function AppSidebar({ mobileOpen, onClose }: AppSidebarProps) {
       Mounts: t('navigation.settings.mounts'),
       Scripts: t('navigation.settings.scripts'),
       Users: t('navigation.settings.users'),
-      Licensing: t('navigation.settings.licensing'),
       'Export/Import': t('navigation.settings.exportImport'),
       Beta: t('navigation.settings.beta'),
     }

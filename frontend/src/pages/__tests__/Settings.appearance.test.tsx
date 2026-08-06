@@ -3,8 +3,6 @@ import { screen, renderWithProviders, userEvent, waitFor } from '../../test/test
 import { ThemeProvider } from '../../context/ThemeContext'
 import Settings from '../Settings'
 
-const trackSettings = vi.fn()
-
 vi.mock('../../hooks/useAuth', () => ({
   useAuth: () => ({
     user: {
@@ -15,22 +13,6 @@ vi.mock('../../hooks/useAuth', () => ({
       global_permissions: [],
     },
     hasGlobalPermission: () => false,
-  }),
-}))
-
-vi.mock('../../hooks/useAnalytics', () => ({
-  useAnalytics: () => ({
-    trackSettings,
-    EventAction: {
-      VIEW: 'View',
-      EDIT: 'Edit',
-    },
-  }),
-}))
-
-vi.mock('../../hooks/usePlan', () => ({
-  usePlan: () => ({
-    can: () => true,
   }),
 }))
 
@@ -68,7 +50,6 @@ vi.mock('react-router-dom', async () => {
 
 describe('Settings appearance tab', () => {
   beforeEach(() => {
-    trackSettings.mockClear()
     localStorage.clear()
     document.documentElement.classList.remove('dark')
 
@@ -109,7 +90,6 @@ describe('Settings appearance tab', () => {
     )
 
     await screen.findByText('Appearance')
-    trackSettings.mockClear()
 
     await userEvent.click(screen.getByRole('button', { name: 'Theme mode: Dark' }))
 
@@ -119,10 +99,5 @@ describe('Settings appearance tab', () => {
 
     expect(localStorage.getItem('theme')).toBe('dark')
     expect(document.documentElement.classList.contains('dark')).toBe(true)
-    expect(trackSettings).toHaveBeenCalledWith('Edit', {
-      section: 'appearance',
-      setting: 'theme',
-      theme: 'dark',
-    })
   })
 })

@@ -28,22 +28,9 @@ import { toast } from 'sonner'
 // MountSuccessToast replaced by inline dialog — import removed
 import { Archive, Repository } from '@/types'
 import LockErrorDialog from '../components/LockErrorDialog'
-import { useAnalytics } from '../hooks/useAnalytics'
 import RestoreWizard, { RestoreData } from '../components/RestoreWizard'
 import { getRepoCapabilities, getBorgVersion } from '../utils/repoCapabilities'
 import { usePermissions } from '../hooks/usePermissions'
-import { useTrackedJobOutcomes } from '../hooks/useTrackedJobOutcomes'
-import { getArchiveAgeBucket, getJobDurationSeconds } from '../utils/analyticsProperties'
-
-interface RestoreJob {
-  id: number
-  repository: string
-  archive: string
-  status: string
-  started_at?: string
-  completed_at?: string
-  error_message?: string
-}
 
 function getDefaultMountPoint(archiveName: string): string {
   return archiveName.replace(/[/:]/g, '_').replace(/\s+/g, '_')
@@ -86,7 +73,6 @@ const Archives: React.FC = () => {
 
   const queryClient = useQueryClient()
   const location = useLocation()
-  const { trackArchive, EventAction } = useAnalytics()
   const permissions = usePermissions()
 
   // Get repositories list
@@ -175,7 +161,6 @@ const Archives: React.FC = () => {
         queryClient.invalidateQueries({ queryKey: ['repository-info', selectedRepositoryId] })
       }, 2000)
       setShowDeleteConfirm(null)
-      trackArchive(EventAction.DELETE, selectedRepository || undefined)
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -195,8 +180,6 @@ const Archives: React.FC = () => {
       repository_id: number
       archive_name: string
       mount_point?: string
-      archive_start?: string
-      is_custom_mount_point: boolean
     }) => mountsAPI.mountBorgArchive({ repository_id, archive_name, mount_point }),
     onSuccess: (data, variables) => {
       const mountPoint = data.data.mount_point
@@ -206,11 +189,6 @@ const Archives: React.FC = () => {
 
       setShowMountCommand({ command: accessCommand, archiveName, mountPoint })
       toast.success(t('archives.mountSuccess', { command: accessCommand }))
-      trackArchive(EventAction.MOUNT, selectedRepository || undefined, {
-        operation: 'mount_archive',
-        archive_age_bucket: getArchiveAgeBucket(variables.archive_start),
-        uses_custom_mount_point: variables.is_custom_mount_point,
-      })
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (error: any) => {
@@ -256,16 +234,8 @@ const Archives: React.FC = () => {
         destination_type,
         destination_connection_id
       ),
-    onSuccess: (_response, variables) => {
+    onSuccess: () => {
       toast.success(t('archives.restoreStarted'), { duration: 6000 })
-      trackArchive(EventAction.START, selectedRepository || undefined, {
-        operation: 'restore',
-        destination_type: variables.destination_type,
-        restore_path_count: variables.paths.length,
-        uses_custom_destination: variables.destination !== '/',
-        archive_age_bucket: getArchiveAgeBucket(restoreArchive?.start),
-      })
-
       setRestoreArchive(null)
       setShowRestoreWizard(false)
 
@@ -283,15 +253,11 @@ const Archives: React.FC = () => {
   const handleRepositoryChange = (repositoryId: number) => {
     const normalizedRepositoryId = normalizeRepositoryId(repositoryId)
     setSelectedRepositoryId(normalizedRepositoryId)
-    const repo = repositories.find((r: Repository) => r.id === normalizedRepositoryId)
 
     if (normalizedRepositoryId) {
       setSearchParams({ repo: String(normalizedRepositoryId) }, { replace: true })
     } else {
       setSearchParams({}, { replace: true })
-    }
-    if (repo) {
-      trackArchive(EventAction.FILTER, repo, { surface: 'archives_page' })
     }
   }
 
@@ -305,13 +271,10 @@ const Archives: React.FC = () => {
   // Handle archive mounting
   const handleMountArchive = () => {
     if (selectedRepositoryId && mountDialogArchive) {
-      const defaultMountPoint = getDefaultMountPoint(mountDialogArchive.name)
       mountArchiveMutation.mutate({
         repository_id: selectedRepositoryId,
         archive_name: mountDialogArchive.name,
         mount_point: customMountPoint || undefined,
-        archive_start: mountDialogArchive.start,
-        is_custom_mount_point: !!customMountPoint && customMountPoint !== defaultMountPoint,
       })
       setMountDialogArchive(null)
       setCustomMountPoint('')
@@ -325,18 +288,10 @@ const Archives: React.FC = () => {
   }
 
   // Open restore wizard directly
-  const handleRestoreArchiveClick = React.useCallback(
-    (archive: Archive) => {
-      setRestoreArchive(archive)
-      setShowRestoreWizard(true)
-      trackArchive(EventAction.VIEW, selectedRepository || undefined, {
-        surface: 'restore_wizard',
-        operation: 'select_archive',
-        archive_age_bucket: getArchiveAgeBucket(archive.start),
-      })
-    },
-    [selectedRepository, trackArchive, EventAction]
-  )
+  const handleRestoreArchiveClick = React.useCallback((archive: Archive) => {
+    setRestoreArchive(archive)
+    setShowRestoreWizard(true)
+  }, [])
 
   // Handle restore from wizard
   const handleRestoreFromWizard = (data: RestoreData) => {
@@ -397,38 +352,11 @@ const Archives: React.FC = () => {
   // Handle viewing archive contents
   const handleViewArchive = (archive: Archive) => {
     setViewArchive(archive)
-    trackArchive(EventAction.VIEW, selectedRepository || undefined, {
-      surface: 'archive_contents',
-      operation: 'open_archive',
-      archive_age_bucket: getArchiveAgeBucket(archive.start),
-    })
   }
 
   const handleRestoreArchive = (archive: Archive) => {
     handleRestoreArchiveClick(archive)
   }
-
-  useTrackedJobOutcomes<RestoreJob>({
-    jobs: restoreJobsData?.data?.jobs,
-    onTerminal: (job) => {
-      const action =
-        job.status === 'completed' || job.status === 'completed_with_warnings'
-          ? EventAction.COMPLETE
-          : EventAction.FAIL
-      const archiveStart = archivesList.find(
-        (archive: Archive) => archive.name === job.archive
-      )?.start
-
-      trackArchive(action, selectedRepository ?? job.repository, {
-        operation: 'restore',
-        job_id: job.id,
-        status: job.status,
-        archive_age_bucket: getArchiveAgeBucket(archiveStart),
-        duration_seconds: getJobDurationSeconds(job.started_at, job.completed_at),
-        error_present: !!job.error_message,
-      })
-    },
-  })
 
   return (
     <div>
@@ -519,10 +447,6 @@ const Archives: React.FC = () => {
         onClose={() => setViewArchive(null)}
         onDownloadFile={(archiveName, filePath) => {
           if (selectedRepository) {
-            trackArchive(EventAction.DOWNLOAD, selectedRepository, {
-              operation: 'download_archive_file',
-              archive_age_bucket: getArchiveAgeBucket(viewArchive?.start),
-            })
             const archiveRef =
               getBorgVersion(selectedRepository) === 2
                 ? (viewArchive?.id ?? archiveName)

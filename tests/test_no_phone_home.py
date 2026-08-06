@@ -38,11 +38,10 @@ def test_no_phone_home_during_full_lifecycle(respx_mock):
     r = client.get("/health")
     assert r.status_code == 200, r.text
 
-    r = client.get("/api/system/licensing/status")
-    assert r.status_code == 200
-    body = r.json()
-    assert body["tier"] == "full"
-    assert body["entitlement_id"] == "open-source"
+    # Exercise the endpoints that would be the natural place for a call home.
+    r = client.get("/api/about")
+    assert r.status_code == 200, r.text
+    assert r.json()["license"] == "AGPL-3.0"
 
     for call in respx_mock.calls:
         host = (call.request.url.host or "").lower()

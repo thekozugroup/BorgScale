@@ -4,7 +4,6 @@ import { usePageTitle } from '../hooks/usePageTitle'
 import { useQuery } from '@tanstack/react-query'
 import { History, Info, RefreshCw } from 'lucide-react'
 import { activityAPI } from '../services/api'
-import { useAnalytics } from '../hooks/useAnalytics'
 import { useAuth } from '../hooks/useAuth'
 import BackupJobsTable from '../components/BackupJobsTable'
 import {
@@ -36,7 +35,6 @@ interface ActivityItem {
 const Activity: React.FC = () => {
   const { t } = useTranslation()
   usePageTitle(t('activity.title'))
-  const { track, EventCategory, EventAction } = useAnalytics()
   const { hasGlobalPermission } = useAuth()
   const canManageActivityJobs = hasGlobalPermission('repositories.manage_all')
   const [typeFilter, setTypeFilter] = useState<string>('all')
@@ -60,18 +58,10 @@ const Activity: React.FC = () => {
 
   const handleTypeFilterChange = (value: string) => {
     setTypeFilter(value)
-    track(EventCategory.NAVIGATION, EventAction.FILTER, {
-      filter_kind: 'type',
-      filter_value: value,
-    })
   }
 
   const handleStatusFilterChange = (value: string) => {
     setStatusFilter(value)
-    track(EventCategory.NAVIGATION, EventAction.FILTER, {
-      filter_kind: 'status',
-      filter_value: value,
-    })
   }
 
   const processedActivities = React.useMemo(() => {
