@@ -1,6 +1,6 @@
-@import "tw-animate-css";
-@import "@fontsource-variable/geist";
-@import "tailwindcss";
+@import 'tw-animate-css';
+@import '@fontsource-variable/geist';
+@import 'tailwindcss';
 @config "../tailwind.config.ts";
 
 @theme inline {
@@ -82,7 +82,7 @@
     --muted-foreground: oklch(0.556 0 0);
     --accent: oklch(0.97 0 0);
     --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
+    --destructive: oklch(0.52 0.245 27.325);
     --destructive-foreground: oklch(0.985 0 0);
     --border: oklch(0.922 0 0);
     --input: oklch(0.65 0 0);
@@ -90,9 +90,9 @@
     /* Categorical chart series. Distinguishable by hue for colour-normal
        viewers and by lightness for everyone else, so a series stays readable
        in greyscale and to the most common forms of colour blindness. */
-    --chart-1: oklch(0.52 0.13 163);
-    --chart-2: oklch(0.55 0.15 250);
-    --chart-3: oklch(0.55 0.14 75);
+    --chart-1: oklch(0.5 0.13 163);
+    --chart-2: oklch(0.52 0.15 250);
+    --chart-3: oklch(0.53 0.14 75);
     --chart-4: oklch(0.55 0.18 320);
     --chart-5: oklch(0.45 0 0);
     --radius: 0.625rem;
@@ -101,19 +101,19 @@
        so a status can be read rather than merely decorated. The neutral scale
        above intentionally stays neutral: colour here means "this needs your
        attention", never "this is a heading". */
-    --brand: oklch(0.52 0.13 163);
+    --brand: oklch(0.5 0.13 163);
     --brand-foreground: oklch(0.985 0 0);
-    --brand-subtle: oklch(0.52 0.13 163 / 10%);
-    --success: oklch(0.52 0.14 152);
+    --brand-subtle: oklch(0.5 0.13 163 / 10%);
+    --success: oklch(0.5 0.14 152);
     --success-foreground: oklch(0.985 0 0);
-    --success-subtle: oklch(0.52 0.14 152 / 10%);
-    --warning: oklch(0.55 0.14 75);
+    --success-subtle: oklch(0.5 0.14 152 / 10%);
+    --warning: oklch(0.53 0.14 75);
     --warning-foreground: oklch(0.985 0 0);
-    --warning-subtle: oklch(0.55 0.14 75 / 12%);
-    --info: oklch(0.55 0.15 250);
+    --warning-subtle: oklch(0.53 0.14 75 / 10%);
+    --info: oklch(0.52 0.15 250);
     --info-foreground: oklch(0.985 0 0);
-    --info-subtle: oklch(0.55 0.15 250 / 10%);
-    --destructive-subtle: oklch(0.577 0.245 27.325 / 10%);
+    --info-subtle: oklch(0.52 0.15 250 / 10%);
+    --destructive-subtle: oklch(0.52 0.245 27.325 / 10%);
 
     /* Frosted surfaces. Translucent panels that read as glass over whatever
        scrolls beneath them, in the Android 17 idiom: a real blur plus a
@@ -149,7 +149,7 @@
     --destructive: oklch(0.704 0.191 22.216);
     --destructive-foreground: oklch(0.985 0 0);
     --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 28%);
+    --input: oklch(1 0 0 / 45%);
     --ring: var(--brand);
     --chart-1: oklch(0.7 0.13 163);
     --chart-2: oklch(0.7 0.15 250);
@@ -188,8 +188,14 @@
 }
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in-up {
@@ -197,23 +203,49 @@
 }
 
 @keyframes blobPulseJob {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.25; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
 }
 
 @keyframes liveDot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.45; transform: scale(0.82); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.82);
+  }
 }
 
 @keyframes borgPulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.18); opacity: 0.4; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 0.4;
+  }
 }
 
 @keyframes borgFloat {
-  0%, 100% { transform: translateY(0px); opacity: 0.5; }
-  50% { transform: translateY(-12px); opacity: 1; }
+  0%,
+  100% {
+    transform: translateY(0px);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(-12px);
+    opacity: 1;
+  }
 }
 
 /* Frosted surface.
@@ -266,8 +298,31 @@
 
   /* Status indicators must keep signalling "live" without motion, so they hold
      a steady visible state instead of pulsing. */
-  @keyframes blobPulseJob { 0%, 100% { opacity: 1; } }
-  @keyframes liveDot { 0%, 100% { opacity: 1; transform: none; } }
-  @keyframes borgPulse { 0%, 100% { transform: none; opacity: 1; } }
-  @keyframes borgFloat { 0%, 100% { transform: none; opacity: 0.5; } }
+  @keyframes blobPulseJob {
+    0%,
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes liveDot {
+    0%,
+    100% {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes borgPulse {
+    0%,
+    100% {
+      transform: none;
+      opacity: 1;
+    }
+  }
+  @keyframes borgFloat {
+    0%,
+    100% {
+      transform: none;
+      opacity: 0.5;
+    }
+  }
 }

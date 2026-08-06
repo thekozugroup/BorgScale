@@ -215,6 +215,9 @@ jobs:
         working-directory: frontend
         run: npm run check:locales
 
+      - name: Check design token contrast
+        run: python3 scripts/check-contrast.py
+
       - name: TypeScript type check
         working-directory: frontend
         run: npm run typecheck
